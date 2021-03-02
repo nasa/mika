@@ -20,11 +20,11 @@ from gensim.utils import simple_preprocess
 from gensim.models import Phrases
 import pyLDAvis
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import normalize
 
 """
-- When do we want to pass in domain stopwords? when we call the processing function, pass in optional parameter
-see https://www.geeksforgeeks.org/progress-bars-in-python/ for progress bar
-see https://realpython.com/python-kwargs-and-args/ for using kwargs and args for parameters
+- Note: pass in doman stopwords when we call the processing function, pass in optional parameter
+
 - to perform preprocessing:
     -prepare data: print run time
     -preprocess data: include progress bar bc large data sets; print run time; include all parameters as optional so they are easy to change:
@@ -40,7 +40,7 @@ see https://realpython.com/python-kwargs-and-args/ for using kwargs and args for
     - save taxonomy of varying levels
     - print run time
  - display options:
-     -hlda tree display-graphviz required, hard to work around
+     -hlda tree display-graphviz required
      -ldaviz for lda objects
      -print run time
  - to run: 
@@ -51,10 +51,13 @@ see https://realpython.com/python-kwargs-and-args/ for using kwargs and args for
      -run topic modeling
      -run save
      -run display
-     ~10 lines of code for a simple dataset"""
+     ~10 lines of code for a simple dataset
+  - future improvements:
+      -when extracting preprocessed data or bins, save results to existing folder rather than new one
+      -add hyper parameter tuning for lda (alpha and beta) and hlda (eta, alpha, gamma)"""
 
 class Topic_Model_plus():
-    def __init__(self, document_id_col="", csv_file="", list_of_attributes=[], extra_cols = [],name=""):
+    def __init__(self, document_id_col="", csv_file="", list_of_attributes=[], extra_cols = [],name="output data/"):
         self.data_csv = csv_file
         self.doc_ids_label = document_id_col
         self.list_of_attributes = list_of_attributes
@@ -174,13 +177,6 @@ class Topic_Model_plus():
         for i in range(len(self.data_df)):
             for attr in self.list_of_attributes:
                 if type(self.data_df.iloc[i][attr]) == int: print(self.data_df.iloc[i][attr])
-        def func(y):
-            print("entered function",y)
-            if len(y)==0:
-                return np.nan
-            else:
-                return y
-        #self.data_df = self.data_df.applymap(lambda y: func(y)).dropna(how="any")
         cols = self.data_df.columns.difference([self.doc_ids_label]+self.extra_cols)
         self.data_df[cols] = self.data_df[cols].applymap(lambda y: np.nan if (type(y)==int or len(y)==0) else y)#.dropna(how="any")
         self.data_df = self.data_df.dropna(how="any")
@@ -201,11 +197,17 @@ class Topic_Model_plus():
         
     def save_preprocessed_data(self):
         self.create_folder()
-        self.data_df.to_csv(self.folder_path+"/preprocessed_data.csv")
+        self.data_df.to_csv(self.folder_path+"/preprocessed_data.csv", index=False)
         print("Preprocessed data saves to: ", self.folder_path+"/preprocessed_data.csv")
     
     def extract_preprocessed_data(self, file_name):
+        def remove_quote_marks(word_list):
+            word_list = word_list.strip("[]").split(", ")
+            word_list = [w.replace("'","") for w in word_list]
+            return word_list
         self.data_df = pd.read_csv(file_name)
+        cols = self.list_of_attributes
+        self.data_df[cols] = self.data_df[cols].applymap(lambda y: remove_quote_marks(y))
         print("Preprocessed data extracted from: ", file_name)
         
     def coherence_scores(self, mdl, lda_or_hlda, measure='c_v'):
@@ -257,10 +259,11 @@ class Topic_Model_plus():
     def find_optimized_lda_topic_num(self, attr, max_topics, training_iterations=1000, iteration_step=10, remove_pct=0.3, **kwargs):
         coherence = []
         LL = []
+        perplexity = []
         topic_num = [i for i in range(1, max_topics+1)]
         ##need to address this specifically what percentage is removed
         texts = self.remove_words_in_pct_of_docs(self.data_df[attr].tolist())
-        for num in tqdm(topic_num, attr+" LDA optomization…"):
+        for num in tqdm(topic_num, attr+" LDA optimization…"):
             if self.ngrams == "tp":
                 corpus = self.create_corpus_of_ngrams(texts)
                 lda = tp.LDAModel(k=num, tw = tp.TermWeight.IDF, corpus=corpus, **kwargs)
@@ -273,25 +276,46 @@ class Topic_Model_plus():
                 lda.train(iteration_step)
             coherence.append(self.coherence_scores(lda, "lda")["average"])
             LL.append(lda.ll_per_word)
+            perplexity.append(lda.perplexity)
+        coherence = normalize(np.array([coherence,np.zeros(len(coherence))]))[0]
+        perplexity = normalize(np.array([perplexity,np.zeros(len(perplexity))]))[0]
         #plots optomization graph
         plt.figure()
         plt.xlabel("Number of Topics")
-        plt.ylabel("Coherence Score (c_v)")
+        plt.ylabel("Normalized Score")
         plt.title("LDA optimization for "+attr)
-        plt.plot(topic_num, coherence, marker='o', color="purple")
+        plt.plot(topic_num, coherence, label="Coherence (c_v)", color="purple")
+        plt.plot(topic_num, perplexity, label="Perplexity", color="green")
+        plt.legend()
         plt.show()
         self.create_folder()
-        plt.savefig(self.folder_path+"/LDA_optomization_"+attr+"_.png")
+        plt.savefig(self.folder_path+"/LDA_optimization_"+attr+"_.png")
+        plt.close()
+        """
+        plt.figure()
+        plt.xlabel("Number of Topics")
+        plt.ylabel("Perplexity")
+        plt.title("LDA optimization for "+attr)
+        plt.plot(topic_num, perplexity, marker='o', color="green")
+        plt.show()
+        self.create_folder()
+        plt.savefig(self.folder_path+"/LDA_optimization_P_"+attr+"_.png")
+        
         plt.close()
         plt.figure()
         plt.xlabel("Number of Topics")
-        plt.ylabel("log-likelihood")
+        plt.ylabel("Loglikelihood")
         plt.title("LDA optimization for "+attr)
-        plt.plot(topic_num, LL, marker='o', color="green")
+        plt.plot(topic_num, LL, marker='o', color="blue")
         plt.show()
         self.create_folder()
-        plt.savefig(self.folder_path+"/LDA_optomization_LL_"+attr+"_.png")
-        index_best_num_of_topics = np.argmax(coherence)
+        plt.savefig(self.folder_path+"/LDA_optimization_LL_"+attr+"_.png")
+        """
+        #want to minimize perplexity, maximize coherence, look for max difference between the two
+        diff = [coherence[i]-perplexity[i] for i in range(len(topic_num))]
+        change_in_diff = [abs(diff[i]-diff[i+1])-abs(diff[i+1]-diff[i+2]) for i in range(0, len(diff)-2)]
+        index_best_num_of_topics = np.argmax(change_in_diff) + 1
+        #index_best_num_of_topics = np.argmax(diff)
         best_num_of_topics = topic_num[index_best_num_of_topics]
         self.lda_num_topics[attr] = best_num_of_topics
         
@@ -303,7 +327,9 @@ class Topic_Model_plus():
         self.lda_num_topics = {}
         for attr in self.list_of_attributes:
             self.find_optimized_lda_topic_num(attr, max_topics, training_iterations=1000, iteration_step=10, remove_pct=0.3, **kwargs)
+            print(self.lda_num_topics[attr], " topics for ", attr)
         print("LDA topic optomization: ", (time()-start)/60, " minutes")
+        
         
     
     def lda(self, num_topics={}, training_iterations=1000, iteration_step=10, remove_pct=0.3, **kwargs):
@@ -338,7 +364,7 @@ class Topic_Model_plus():
         #identical to hlda function except for lda tag
         self.create_folder()
         doc_data = {attr: [] for attr in self.list_of_attributes}
-        doc_data['document number']=self.doc_ids
+        doc_data['document number'] = self.doc_ids
         for attr in self.list_of_attributes:
             mdl = self.lda_models[attr]
             for doc in mdl.docs:
@@ -361,7 +387,7 @@ class Topic_Model_plus():
             coherence_per_topic = c_scores['per topic']
             for i in range(0, (max_topics-len(coherence_per_topic))):
                 coherence_per_topic.append("n/a")
-            coherence_score[attr]+=coherence_per_topic
+            coherence_score[attr] += coherence_per_topic
         coherence_df = pd.DataFrame(coherence_score)
         coherence_df.to_csv(self.folder_path+"/lda_coherence_scores.csv")
     
@@ -397,7 +423,7 @@ class Topic_Model_plus():
     def lda_extract_models(self, file_path):
         self.lda_models = {}
         for attr in self.list_of_attributes:
-            self.lda_models[attr]=tp.LDAModel.load(file_path+attr+"_lda_model_object.bin")
+            self.lda_models[attr] = tp.LDAModel.load(file_path+attr+"_lda_model_object.bin")
         print("LDA models extracted from: ", file_path)
         
     def lda_visual(self, attr):
@@ -484,7 +510,7 @@ class Topic_Model_plus():
                 topics_data["topic number"].append(k)
                 topics_data["number of words"].append(mdl.get_count_by_topics()[k])
                 topics_data["topic words"].append(", ".join([word[0] for word in mdl.get_topic_words(k, top_n=mdl.get_count_by_topics()[k])]))
-                i=0
+                i = 0
                 docs_in_topic = []
                 probs = []
                 for doc in mdl.docs:
@@ -492,7 +518,7 @@ class Topic_Model_plus():
                         prob = doc.get_topic_dist()[mdl.level(k)]
                         docs_in_topic.append(self.doc_ids[i])
                         probs.append(prob)
-                    i+=1
+                    i += 1
                 topics_data["best document"].append(docs_in_topic[probs.index(max(probs))])
             df = pd.DataFrame(topics_data)
             df.to_csv(self.folder_path+"/"+attr+"_hlda_topics.csv")
