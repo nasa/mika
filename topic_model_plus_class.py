@@ -57,7 +57,7 @@ from sklearn.preprocessing import normalize
       -add hyper parameter tuning for lda (alpha and beta) and hlda (eta, alpha, gamma)"""
 
 class Topic_Model_plus():
-    def __init__(self, document_id_col="", csv_file="", list_of_attributes=[], extra_cols = [],name="output data/"):
+    def __init__(self, document_id_col="", csv_file="", list_of_attributes=[], extra_cols = [], name="output data/"):
         self.data_csv = csv_file
         self.doc_ids_label = document_id_col
         self.list_of_attributes = list_of_attributes
@@ -174,12 +174,9 @@ class Topic_Model_plus():
             texts[attr] = preprocess(self.data_df[attr], domain_stopwords, ngrams, ngram_range, threshold, min_count)
             #print(texts[attr])
             self.data_df[attr]=texts[attr]
-        for i in range(len(self.data_df)):
-            for attr in self.list_of_attributes:
-                if type(self.data_df.iloc[i][attr]) == int: print(self.data_df.iloc[i][attr])
         cols = self.data_df.columns.difference([self.doc_ids_label]+self.extra_cols)
         self.data_df[cols] = self.data_df[cols].applymap(lambda y: np.nan if (type(y)==int or len(y)==0) else y)#.dropna(how="any")
-        self.data_df = self.data_df.dropna(how="any")
+        self.data_df = self.data_df.dropna(how="any").reset_index(drop=True)
         self.doc_ids = self.data_df[self.doc_ids_label].tolist()
         print("Processing time: ", (time()-start)/60, " minutes")
         sleep(0.5)
@@ -188,7 +185,9 @@ class Topic_Model_plus():
         if self.folder_path == "":
             path = os.getcwd()
             today_str = datetime.date.today().strftime("%b-%d-%Y")
-            filename = self.name+'topics-'+today_str+'-'+str(itr)
+            if itr != "":
+                itr = "-"+str(itr)
+            filename = self.name+'topics-'+today_str+str(itr)
             self.folder_path = path+"/"+filename
             os.makedirs(self.folder_path, exist_ok = True)
             print("folder created")
@@ -208,6 +207,7 @@ class Topic_Model_plus():
         self.data_df = pd.read_csv(file_name)
         cols = self.list_of_attributes
         self.data_df[cols] = self.data_df[cols].applymap(lambda y: remove_quote_marks(y))
+        self.doc_ids = self.data_df[self.doc_ids_label].tolist()
         print("Preprocessed data extracted from: ", file_name)
         
     def coherence_scores(self, mdl, lda_or_hlda, measure='c_v'):
@@ -228,23 +228,30 @@ class Topic_Model_plus():
         scores['std dev'] = np.std(scores["per topic"])
         return scores
     
-    def remove_words_in_pct_of_docs(self,texts, pct_=0.3):
-        num_docs = len(texts)
+    def remove_words_in_pct_of_docs(self, pct_=0.3):
+        num_docs = len(self.data_df)
         pct = np.round(pct_*num_docs)
-        new_texts = []
-        for text in texts:
-            new_text = []
-            for word in text:
-                in_docs = [doc for doc in texts if word in doc]
-                if len(in_docs) < pct:
-                    new_text.append(word)
-            #if this results in the removal of all words, then just use the original full text
-            #when tested, this never actually happened but is in here just in case
-            if new_text == []:
-                new_text = text
-                print("all words are frequent", texts.index(text), text)
-            new_texts.append(new_text)
-        return new_texts
+        indicies_to_drop = []
+        for attr in self.list_of_attributes:
+            for i in range(0,len(self.data_df)):
+                text = self.data_df.iloc[i][attr]
+                new_text = []
+                for word in text:
+                    in_docs = [doc for doc in self.data_df[attr] if word in doc]
+                    if len(in_docs) < pct:
+                        new_text.append(word)
+                #if this results in the removal of all words, then just use the original full text
+                #when tested, this never actually happened but is in here just in case
+                if new_text == []:
+                    new_text = text
+                    print("all words are frequent", i, text)
+                    indicies_to_drop.append(i)
+                else:
+                    self.data_df.at[i,attr] = new_text
+        indicies_to_drop = list(set(indicies_to_drop))
+        self.data_df = self.data_df.drop(indicies_to_drop).reset_index(drop=True)
+        self.doc_ids = self.data_df[self.doc_ids_label].tolist()
+        return
     
     def create_corpus_of_ngrams(self, texts):
         corpus = tp.utils.Corpus()
@@ -262,7 +269,8 @@ class Topic_Model_plus():
         perplexity = []
         topic_num = [i for i in range(1, max_topics+1)]
         ##need to address this specifically what percentage is removed
-        texts = self.remove_words_in_pct_of_docs(self.data_df[attr].tolist())
+        texts = self.data_df[attr].tolist()
+        sleep(0.5)
         for num in tqdm(topic_num, attr+" LDA optimization…"):
             if self.ngrams == "tp":
                 corpus = self.create_corpus_of_ngrams(texts)
@@ -277,6 +285,7 @@ class Topic_Model_plus():
             coherence.append(self.coherence_scores(lda, "lda")["average"])
             LL.append(lda.ll_per_word)
             perplexity.append(lda.perplexity)
+        print(coherence, perplexity)
         coherence = normalize(np.array([coherence,np.zeros(len(coherence))]))[0]
         perplexity = normalize(np.array([perplexity,np.zeros(len(perplexity))]))[0]
         #plots optomization graph
@@ -325,6 +334,7 @@ class Topic_Model_plus():
         #needs work
         start = time()
         self.lda_num_topics = {}
+        self.remove_words_in_pct_of_docs()
         for attr in self.list_of_attributes:
             self.find_optimized_lda_topic_num(attr, max_topics, training_iterations=1000, iteration_step=10, remove_pct=0.3, **kwargs)
             print(self.lda_num_topics[attr], " topics for ", attr)
@@ -336,10 +346,13 @@ class Topic_Model_plus():
         start = time()
         self.lda_models = {}
         self.lda_coherence = {}
-        if num_topics != {}:
+        self.remove_words_in_pct_of_docs(pct_=remove_pct)
+        if num_topics == {}:
             self.lda_optimization(**kwargs)
+        else:
+            self.lda_num_topics = num_topics
         for attr in self.list_of_attributes:
-            texts = self.remove_words_in_pct_of_docs(self.data_df[attr].tolist())
+            texts = self.data_df[attr].tolist()
             if self.ngrams == "tp":
                 corpus = self.create_corpus_of_ngrams(texts)
                 lda = tp.LDAModel(k=self.lda_num_topics[attr], tw = tp.TermWeight.IDF, corpus=corpus, **kwargs)
@@ -398,9 +411,15 @@ class Topic_Model_plus():
             mdl = self.lda_models[attr]
             for doc in mdl.docs: 
                 topic_num = int(doc.get_topics(top_n=1)[0][0])
-                taxonomy_data[attr].append( ", ".join([word[0] for word in mdl.get_topic_words(topic_num, top_n=mdl.get_count_by_topics()[topic_num])]))
+                num_words = min(mdl.get_count_by_topics()[topic_num], 100)
+                words =  ", ".join([word[0] for word in mdl.get_topic_words(topic_num, top_n=num_words)])
+                #if len(words) > 35000:
+                #    words = words[0:words.rfind(", ")]
+                taxonomy_data[attr].append(words)
         taxonomy_df = pd.DataFrame(taxonomy_data)
+        #print(taxonomy_df, taxonomy_data)
         taxonomy_df = taxonomy_df.drop_duplicates()
+        taxonomy_df.to_csv(self.folder_path+"/lda_taxonomy_test.csv")
         lesson_nums_per_row = []
         num_lessons_per_row = []
         for i in range(len(taxonomy_df)):
@@ -449,8 +468,9 @@ class Topic_Model_plus():
         self.hlda_models = {}
         self.hlda_coherence = {}
         self.levels = levels
+        self.remove_words_in_pct_of_docs(pct_=remove_pct)
         for attr in self.list_of_attributes:
-            texts = self.remove_words_in_pct_of_docs(self.data_df[attr].tolist(),remove_pct)
+            texts = self.data_df[attr].tolist()
             if self.ngrams == "tp":
                 corpus = self.create_corpus_of_ngrams(texts)
                 mdl = tp.HLDAModel(depth=levels, tw = tp.TermWeight.IDF, corpus=corpus, **kwargs)
