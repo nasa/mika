@@ -57,18 +57,40 @@ from sklearn.preprocessing import normalize
       -add hyper parameter tuning for lda (alpha and beta) and hlda (eta, alpha, gamma)"""
 
 class Topic_Model_plus():
-    def __init__(self, document_id_col="", csv_file="", list_of_attributes=[], extra_cols = [], name="output data/"):
+    def __init__(self, document_id_col="", csv_file="", list_of_attributes=[], extra_cols = [], name="output data/", combine_cols=False):
         self.data_csv = csv_file
         self.doc_ids_label = document_id_col
         self.list_of_attributes = list_of_attributes
         self.extra_cols = extra_cols
         self.folder_path = ""
         self.name = name
+        if combine_cols == True: 
+            self.name += "_combined"
+        self.combine_cols = combine_cols
         
     def load_data(self, **kwargs):
             self.data_df = pd.read_csv(open(self.data_csv,encoding='utf8',errors='ignore'), **kwargs)
             self.doc_ids = self.data_df[self.doc_ids_label].tolist()
-            
+     
+    def combine_columns(self):
+        columns_to_drop = [cols for cols in  self.data_df.columns if cols not in [self.doc_ids_label]+self.extra_cols]
+        rows_to_drop = []
+        combined_text = []
+        sleep(0.5)
+        for i in tqdm(range(0, len(self.data_df)), "Combining Columns…"):
+            text = ""
+            for attr in self.list_of_attributes:
+                if not(str(self.data_df.iloc[i][attr]).strip("()").lower().startswith("see") or str(self.data_df.iloc[i][attr]).strip("()").lower().startswith("same") or str(self.data_df.iloc[i][attr])=="" or isinstance(self.data_df.iloc[i][attr],float) or str(self.data_df.iloc[i][attr]).lower().startswith("none")):
+                    text += str(self.data_df.iloc[i][attr])
+            if text == "":
+                rows_to_drop.append(i)
+            combined_text.append(text)
+        sleep(0.5)
+        self.data_df["Combined Text"] = combined_text
+        self.list_of_attributes = ["Combined Text"]
+        self.data_df = self.data_df.drop(columns_to_drop, axis=1)
+        self.data_df = self.data_df.drop(rows_to_drop).reset_index(drop=True)
+    
     def remove_incomplete_rows(self):
          columns_to_drop = [cols for cols in  self.data_df.columns if cols not in self.list_of_attributes+[self.doc_ids_label]+self.extra_cols]
          rows_to_drop = []
@@ -86,7 +108,10 @@ class Topic_Model_plus():
     def prepare_data(self, **kwargs):
         start_time = time()
         self.load_data(**kwargs)
-        self.remove_incomplete_rows()
+        if self.combine_cols == False: 
+            self.remove_incomplete_rows()
+        if self.combine_cols == True:
+            self.combine_columns()
         print("data preparation: ", (time()-start_time)/60,"minutess \n")
         
     def preprocess_data(self, domain_stopwords=[], ngrams=True, ngram_range=3, threshold=15, min_count=5):
@@ -121,6 +146,7 @@ class Topic_Model_plus():
         def remove_stopwords(texts,domain_stopwords):
             def rm_stopwords(text):
                 all_stopwords = stopwords.words('english')+domain_stopwords
+                all_stopwords = [word.lower() for word in all_stopwords]
                 if not isinstance(text,float):
                     text = [w for w in text if not w in all_stopwords]
                     text = [w for w in text if len(w)>3]
@@ -196,8 +222,11 @@ class Topic_Model_plus():
         
     def save_preprocessed_data(self):
         self.create_folder()
-        self.data_df.to_csv(self.folder_path+"/preprocessed_data.csv", index=False)
-        print("Preprocessed data saves to: ", self.folder_path+"/preprocessed_data.csv")
+        name = "/preprocessed_data.csv"
+        if self.combine_columns == True:
+            name = "/preprocessed_data_combined_text.csv"
+        self.data_df.to_csv(self.folder_path+name, index=False)
+        print("Preprocessed data saves to: ", self.folder_path+name)
     
     def extract_preprocessed_data(self, file_name):
         def remove_quote_marks(word_list):
