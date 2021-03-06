@@ -2,7 +2,7 @@
 """
 Created on Fri Feb 19 11:10:28 2021
 TopicModel+ class definition
-@author: srandrad
+@author: srandrad, hswalsh
 """
 import pandas as pd
 import tomotopy as tp
@@ -21,6 +21,7 @@ from gensim.models import Phrases
 import pyLDAvis
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import normalize
+import symspellpy
 
 """
 - Note: pass in doman stopwords when we call the processing function, pass in optional parameter
@@ -120,15 +121,18 @@ class Topic_Model_plus():
             self.ngrams = "custom"
         else: 
             self.ngrams = "tp"
-        def clean_text(text):
-            if not isinstance(text,float):
-                text = simple_preprocess(text)
-                for w_check in text:
-                    if w_check not in english_vocab:
-                        w_tmp = w_check.replace('quot','')
-                        if w_tmp in english_vocab: 
-                            text =list(map(lambda x: x if x != w_check else w_tmp,text))
-            return text
+        def clean_texts(texts):
+            def clean_text(text):
+                if not isinstance(text,float):
+                    text = simple_preprocess(text)
+                    for w_check in text:
+                        if w_check not in english_vocab:
+                            w_tmp = w_check.replace('quot','')
+                            if w_tmp in english_vocab:
+                                text =list(map(lambda x: x if x != w_check else w_tmp,text))
+                return text
+            texts = [clean_text(text) for text in texts]
+            return texts
         def lemmatize_texts(texts):
             def get_wordnet_pos(word):
                 tag = pos_tag([word])[0][1][0].upper()
@@ -183,15 +187,11 @@ class Topic_Model_plus():
                 ngrams.append(ngram)
             return ngrams
         def preprocess(texts,domain_stopwords=[], ngrams=True, ngram_range=3, threshold=15, min_count=5):
-            texts = [clean_text(text) for text in texts]
-            #print(len(texts))
+            texts = clean_texts(texts)
             texts = lemmatize_texts(texts)
-            #print(len(texts))
             texts = remove_stopwords(texts,domain_stopwords)
-            #print(len(texts))
             if ngrams == True:
                 texts = trigram_texts(texts, ngram_range,threshold, min_count)
-            #print(len(texts))
             return texts
         start = time()
         texts = {}
