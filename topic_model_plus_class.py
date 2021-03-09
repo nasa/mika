@@ -21,7 +21,8 @@ from gensim.models import Phrases
 import pyLDAvis
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import normalize
-import symspellpy
+from symspellpy import SymSpell, Verbosity
+import pkg_resources
 
 """
 - Note: pass in doman stopwords when we call the processing function, pass in optional parameter
@@ -115,7 +116,10 @@ class Topic_Model_plus():
             self.combine_columns()
         print("data preparation: ", (time()-start_time)/60,"minutess \n")
         
-    def preprocess_data(self, domain_stopwords=[], ngrams=True, ngram_range=3, threshold=15, min_count=5):
+    def preprocess_data(self, domain_stopwords=[], ngrams=True, ngram_range=3, threshold=15, min_count=5,LLIS=0,spellcheck=1):
+        '''
+        LLIS: optional parameter; if set to 1, a specialized preprocessing step will be completed to handle misplaced "quot" additions to words, which occurs frequently in the LLIS
+        '''
         english_vocab = set([w.lower() for w in words.words()])
         if ngrams == True:
             self.ngrams = "custom"
@@ -125,11 +129,6 @@ class Topic_Model_plus():
             def clean_text(text):
                 if not isinstance(text,float):
                     text = simple_preprocess(text)
-                    for w_check in text:
-                        if w_check not in english_vocab:
-                            w_tmp = w_check.replace('quot','')
-                            if w_tmp in english_vocab:
-                                text =list(map(lambda x: x if x != w_check else w_tmp,text))
                 return text
             texts = [clean_text(text) for text in texts]
             return texts
@@ -146,7 +145,6 @@ class Topic_Model_plus():
                 return text
             lemmatized_texts = [lemmatize_text(text) for text in texts]
             return lemmatized_texts
-        
         def remove_stopwords(texts,domain_stopwords):
             def rm_stopwords(text):
                 all_stopwords = stopwords.words('english')+domain_stopwords
@@ -156,6 +154,34 @@ class Topic_Model_plus():
                     text = [w for w in text if len(w)>3]
                 return text
             texts = [rm_stopwords(text) for text in texts]
+            return texts
+        def canonize_texts(texts,LLIS,spellcheck):
+            sym_spell = SymSpell()
+            dictionary_path = pkg_resources.resource_filename("symspellpy", "frequency_dictionary_en_82_765.txt")
+            sym_spell.load_dictionary(dictionary_path, term_index=0, count_index=1)
+            def canonize_text(text,LLIS,spellcheck):
+                if not isinstance(text,float):
+                    if LLIS == 1:
+                        for word in text:
+                            if word not in english_vocab:
+                                w_tmp = word.replace('quot','')
+                                if w_tmp in english_vocab:
+                                    text = list(map(lambda x: x if x != word else w_tmp,text))
+                    if spellcheck == 1:
+                        for word in text:
+                            if word not in english_vocab:
+                                suggestions = sym_spell.lookup(word,Verbosity.CLOSEST,           max_edit_distance=2,include_unknown=True)
+                                correction = suggestions[0].term
+                                if correction == word:
+                                    segmented_word = sym_spell.word_segmentation(word).corrected_string
+                                    if segmented_word.split()[0] != word:
+                                        text_str = ' '.join(text)
+                                        text_str = text_str.replace(word,segmented_word)
+                                        text = text_str.split()
+                                else:
+                                    text = list(map(lambda x: x if x != word else correction,text))
+                return text
+            texts = [canonize_text(text,LLIS,spellcheck) for text in texts]
             return texts
         def trigram_texts(texts, ngram_range, threshold, min_count):
             ngrams = []
@@ -186,8 +212,9 @@ class Topic_Model_plus():
                 #ngram = (bigrams_+trigrams_+words)
                 ngrams.append(ngram)
             return ngrams
-        def preprocess(texts,domain_stopwords=[], ngrams=True, ngram_range=3, threshold=15, min_count=5):
+        def preprocess(texts,domain_stopwords=[], ngrams=True, ngram_range=3, threshold=15, min_count=5,LLIS=0,spellcheck=1):
             texts = clean_texts(texts)
+            texts = canonize_texts(texts,LLIS,spellcheck)
             texts = lemmatize_texts(texts)
             texts = remove_stopwords(texts,domain_stopwords)
             if ngrams == True:
@@ -198,7 +225,6 @@ class Topic_Model_plus():
         sleep(0.5)
         for attr in tqdm(self.list_of_attributes,desc="Preprocessing data…"):
             texts[attr] = preprocess(self.data_df[attr], domain_stopwords, ngrams, ngram_range, threshold, min_count)
-            #print(texts[attr])
             self.data_df[attr]=texts[attr]
         cols = self.data_df.columns.difference([self.doc_ids_label]+self.extra_cols)
         self.data_df[cols] = self.data_df[cols].applymap(lambda y: np.nan if (type(y)==int or len(y)==0) else y)#.dropna(how="any")
@@ -357,8 +383,6 @@ class Topic_Model_plus():
         best_num_of_topics = topic_num[index_best_num_of_topics]
         self.lda_num_topics[attr] = best_num_of_topics
         
-
-    
     def lda_optimization(self, max_topics=50,training_iterations=1000, iteration_step=10, remove_pct=0.3, **kwargs):
         #needs work
         start = time()
@@ -368,8 +392,6 @@ class Topic_Model_plus():
             self.find_optimized_lda_topic_num(attr, max_topics, training_iterations=1000, iteration_step=10, remove_pct=0.3, **kwargs)
             print(self.lda_num_topics[attr], " topics for ", attr)
         print("LDA topic optomization: ", (time()-start)/60, " minutes")
-        
-        
     
     def lda(self, num_topics={}, training_iterations=1000, iteration_step=10, remove_pct=0.3, **kwargs):
         start = time()
@@ -660,7 +682,6 @@ class Topic_Model_plus():
             print(error.__class__.__name__ + ": " + error.message)
             print("GraphViz not installed. Please see:\n https://pypi.org/project/graphviz/ \n https://www.graphviz.org/download/")
             return
-        
         df = pd.read_csv(self.folder_path+"/"+attr+"_hlda_topics.csv")
         dot = Digraph(comment="hLDA topic network")
         colors = {'1':"paleturquoise1", '2':"turquoise"}
@@ -687,5 +708,3 @@ class Topic_Model_plus():
         dot.attr(layout='twopi')
         dot.attr(overlap="voronoi")
         dot.render(filename = self.folder_path+"/"+attr+"_hlda_network", format = 'png')
-        
-
