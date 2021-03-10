@@ -59,7 +59,7 @@ import pkg_resources
       -add hyper parameter tuning for lda (alpha and beta) and hlda (eta, alpha, gamma)"""
 
 class Topic_Model_plus():
-    def __init__(self, document_id_col="", csv_file="", list_of_attributes=[], extra_cols = [], name="output data/", combine_cols=False):
+    def __init__(self, document_id_col="", csv_file="", list_of_attributes=[], extra_cols = [], name="output data/", combine_cols=False,LLIS=0,spellcheck=0):
         self.data_csv = csv_file
         self.doc_ids_label = document_id_col
         self.list_of_attributes = list_of_attributes
@@ -69,6 +69,8 @@ class Topic_Model_plus():
         if combine_cols == True: 
             self.name += "_combined"
         self.combine_cols = combine_cols
+        self.LLIS = LLIS
+        self.spellcheck = spellcheck
         
     def load_data(self, **kwargs):
             self.data_df = pd.read_csv(open(self.data_csv,encoding='utf8',errors='ignore'), **kwargs)
@@ -116,10 +118,7 @@ class Topic_Model_plus():
             self.combine_columns()
         print("data preparation: ", (time()-start_time)/60,"minutess \n")
         
-    def preprocess_data(self, domain_stopwords=[], ngrams=True, ngram_range=3, threshold=15, min_count=5,LLIS=0,spellcheck=1):
-        '''
-        LLIS: optional parameter; if set to 1, a specialized preprocessing step will be completed to handle misplaced "quot" additions to words, which occurs frequently in the LLIS
-        '''
+    def preprocess_data(self, domain_stopwords=[], ngrams=True, ngram_range=3, threshold=15, min_count=5):
         english_vocab = set([w.lower() for w in words.words()])
         if ngrams == True:
             self.ngrams = "custom"
@@ -161,13 +160,13 @@ class Topic_Model_plus():
             sym_spell.load_dictionary(dictionary_path, term_index=0, count_index=1)
             def canonize_text(text,LLIS,spellcheck):
                 if not isinstance(text,float):
-                    if LLIS == 1:
+                    if self.LLIS == 1:
                         for word in text:
                             if word not in english_vocab:
                                 w_tmp = word.replace('quot','')
                                 if w_tmp in english_vocab:
                                     text = list(map(lambda x: x if x != word else w_tmp,text))
-                    if spellcheck == 1:
+                    if self.spellcheck == 1:
                         for word in text:
                             if word not in english_vocab:
                                 suggestions = sym_spell.lookup(word,Verbosity.CLOSEST,           max_edit_distance=2,include_unknown=True)
