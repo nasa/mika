@@ -59,7 +59,7 @@ import pkg_resources
       -add hyper parameter tuning for lda (alpha and beta) and hlda (eta, alpha, gamma)"""
 
 class Topic_Model_plus():
-    def __init__(self, document_id_col="", csv_file="", list_of_attributes=[], extra_cols = [], name="output data/", combine_cols=False):
+    def __init__(self, document_id_col="", csv_file="", list_of_attributes=[], extra_cols = [], name="output data/", combine_cols=False,quot_correction=False,spellcheck=False,segmentation=False):
         self.data_csv = csv_file
         self.doc_ids_label = document_id_col
         self.list_of_attributes = list_of_attributes
@@ -69,6 +69,10 @@ class Topic_Model_plus():
         if combine_cols == True: 
             self.name += "_combined"
         self.combine_cols = combine_cols
+        self.quot_correction = quot_correction
+        self.spellcheck = spellcheck
+        self.segmentation = segmentation
+        self.correction_list = []
         
     def load_data(self, **kwargs):
             self.data_df = pd.read_csv(open(self.data_csv,encoding='utf8',errors='ignore'), **kwargs)
@@ -116,10 +120,7 @@ class Topic_Model_plus():
             self.combine_columns()
         print("data preparation: ", (time()-start_time)/60,"minutess \n")
         
-    def preprocess_data(self, domain_stopwords=[], ngrams=True, ngram_range=3, threshold=15, min_count=5,LLIS=0,spellcheck=1):
-        '''
-        LLIS: optional parameter; if set to 1, a specialized preprocessing step will be completed to handle misplaced "quot" additions to words, which occurs frequently in the LLIS
-        '''
+    def preprocess_data(self, domain_stopwords=[], ngrams=True, ngram_range=3, threshold=15, min_count=5):
         english_vocab = set([w.lower() for w in words.words()])
         if ngrams == True:
             self.ngrams = "custom"
@@ -155,33 +156,44 @@ class Topic_Model_plus():
                 return text
             texts = [rm_stopwords(text) for text in texts]
             return texts
-        def canonize_texts(texts,LLIS,spellcheck):
+        def canonize_texts(self,texts):
             sym_spell = SymSpell()
             dictionary_path = pkg_resources.resource_filename("symspellpy", "frequency_dictionary_en_82_765.txt")
             sym_spell.load_dictionary(dictionary_path, term_index=0, count_index=1)
-            def canonize_text(text,LLIS,spellcheck):
-                if not isinstance(text,float):
-                    if LLIS == 1:
-                        for word in text:
-                            if word not in english_vocab:
-                                w_tmp = word.replace('quot','')
-                                if w_tmp in english_vocab:
-                                    text = list(map(lambda x: x if x != word else w_tmp,text))
-                    if spellcheck == 1:
-                        for word in text:
-                            if word not in english_vocab:
-                                suggestions = sym_spell.lookup(word,Verbosity.CLOSEST,           max_edit_distance=2,include_unknown=True)
-                                correction = suggestions[0].term
-                                if correction == word:
-                                    segmented_word = sym_spell.word_segmentation(word).corrected_string
-                                    if segmented_word.split()[0] != word:
-                                        text_str = ' '.join(text)
-                                        text_str = text_str.replace(word,segmented_word)
-                                        text = text_str.split()
-                                else:
-                                    text = list(map(lambda x: x if x != word else correction,text))
+            def quot_normalize(text):
+                for word in text:
+                    if word not in english_vocab:
+                        w_tmp = word.replace('quot','')
+                        if w_tmp in english_vocab:
+                            text = list(map(lambda x: x if x != word else w_tmp,text))
                 return text
-            texts = [canonize_text(text,LLIS,spellcheck) for text in texts]
+            def spellchecker(text): # TODO: a list of words not to correct; way of detecting acronyms that should not be corrected
+                for word in text:
+                    if word not in english_vocab:
+                        suggestions = sym_spell.lookup(word,Verbosity.CLOSEST,           max_edit_distance=2,include_unknown=True)
+                        correction = suggestions[0].term
+                        if correction != word:
+                            text = list(map(lambda x: x if x != word else correction,text))
+                            self.correction_list.append(word+' --> '+correction)
+                return text
+            def segment_text(text):
+                for word in text:
+                    if word not in english_vocab:
+                        segmented_word = sym_spell.word_segmentation(word).corrected_string
+                        if segmented_word.split()[0] != word and len(segmented_word.split())>1:
+                            text_str = ' '.join(text)
+                            text_str = text_str.replace(word,segmented_word)
+                            text = text_str.split()
+                            self.correction_list.append(word+' --> '+segmented_word)
+                return text
+            for text in texts:
+                if not isinstance(text,float):
+                    if self.quot_correction == True:
+                        text = quot_normalize(text)
+                    if self.spellcheck == True:
+                        text = spellchecker(text)
+                    if self.segmentation == True:
+                        text = segment_text(text)
             return texts
         def trigram_texts(texts, ngram_range, threshold, min_count):
             ngrams = []
@@ -214,7 +226,7 @@ class Topic_Model_plus():
             return ngrams
         def preprocess(texts,domain_stopwords=[], ngrams=True, ngram_range=3, threshold=15, min_count=5,LLIS=0,spellcheck=1):
             texts = clean_texts(texts)
-            texts = canonize_texts(texts,LLIS,spellcheck)
+            texts = canonize_texts(self,texts)
             texts = lemmatize_texts(texts)
             texts = remove_stopwords(texts,domain_stopwords)
             if ngrams == True:
