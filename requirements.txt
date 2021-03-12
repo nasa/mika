@@ -1,0 +1,12 @@
+pandas
+tomotopy
+numpy
+time
+tqdm
+datetime
+nltk
+gensim
+pyLDAvis
+matplotlib
+sklearn
+symspellpy
