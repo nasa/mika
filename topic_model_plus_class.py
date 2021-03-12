@@ -413,7 +413,7 @@ class Topic_Model_plus():
         pct = np.round(pct_*num_docs)
         indicies_to_drop = []
         for attr in self.list_of_attributes:
-            for i in range(0,len(self.data_df)):
+            for i in tqdm(range(0,len(self.data_df)), attr+" removing frequent words…"):
                 text = self.data_df.iloc[i][attr]
                 new_text = []
                 for word in text:
@@ -829,7 +829,7 @@ class Topic_Model_plus():
             for doc in mdl.docs: 
                 topic_nums = doc.path
                 for level in range(1, self.levels):
-                    taxonomy_data[attr+" Level "+str(level)].append( ", ".join([word[0] for word in mdl.get_topic_words(topic_nums[level], top_n=mdl.get_count_by_topics()[topic_nums[level]])]))
+                    taxonomy_data[attr+" Level "+str(level)].append( ", ".join([word[0] for word in mdl.get_topic_words(topic_nums[level], top_n=500)]))
         self.taxonomy_data = taxonomy_data
         taxonomy_df = pd.DataFrame(taxonomy_data)
         taxonomy_df = taxonomy_df.drop_duplicates()
