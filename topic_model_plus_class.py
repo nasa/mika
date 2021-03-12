@@ -99,9 +99,6 @@ class Topic_Model_plus():
 #   are the I/O options generalizable to other databases? e.g. doc_ids_label
 #   some of the attributes are ambiguously named - can we make these clearer? e.g. name, combine_cols
 #   some docstring short descriptions may be improved
-
-    # public attributes
-    correction_list = []
     
     # private attributes
     __english_vocab = set([w.lower() for w in words.words()])
@@ -133,6 +130,7 @@ class Topic_Model_plus():
         self.extra_cols = extra_cols
         self.folder_path = ""
         self.name = name
+        self.correction_list = []
         if combine_cols == True: 
             self.name += "_combined"
         self.combine_cols = combine_cols
