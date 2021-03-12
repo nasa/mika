@@ -16,7 +16,7 @@ from nltk.corpus import wordnet
 from nltk.corpus import words
 from nltk.stem import WordNetLemmatizer
 from nltk import pos_tag
-from gensim.utils import simple_preprocess
+from gensim.utils import simple_tokenize
 from gensim.models import Phrases
 import pyLDAvis
 import matplotlib.pyplot as plt
@@ -121,6 +121,10 @@ class Topic_Model_plus():
             defines output file names
         combine_cols : boolean
             defines whether to combine attributes
+        min_word_len : int
+            minimum word length during tokenization
+        max_word_len : int
+            maxumum word length during tokenization
         """
         
         # public attributes
@@ -130,6 +134,8 @@ class Topic_Model_plus():
         self.extra_cols = extra_cols
         self.folder_path = ""
         self.name = name
+        self.min_word_len = 2
+        self.max_word_len = 15
         self.correction_list = []
         if combine_cols == True: 
             self.name += "_combined"
@@ -185,8 +191,13 @@ class Topic_Model_plus():
             self.__combine_columns()
         print("data preparation: ", (time()-start_time)/60,"minutes \n")
         
-    def __clean_texts(self,texts):
-        texts = [simple_preprocess(text) for text in texts if not isinstance(text,float)]
+    def __tokenize_texts(self,texts):
+        texts = [simple_tokenize(text) for text in texts if not isinstance(text,float)]
+        texts = [[word for word in text if len(word)>self.min_word_len and len(word)<self.max_word_len] for text in texts if not isinstance(text,float)]
+        return texts
+        
+    def __lowercase_texts(self,texts):
+        texts = [[word.lower() for word in text] for text in texts]
         return texts
         
     def __lemmatize_texts(self,texts):
@@ -216,15 +227,15 @@ class Topic_Model_plus():
                             text = list(map(lambda x: x if x != word else w_tmp,text))
         return texts
     
-    def __spellchecker(self,texts): # TODO: a list of words not to correct; way of detecting acronyms that should not be corrected - all caps??
+    def __spellchecker(self,texts):
         sym_spell = SymSpell()
         dictionary_path = pkg_resources.resource_filename("symspellpy", "frequency_dictionary_en_82_765.txt")
         sym_spell.load_dictionary(dictionary_path, term_index=0, count_index=1)
         for text in texts:
             if not isinstance(text,float):
                 for word in text:
-                    if word not in self.__english_vocab:
-                        suggestions = sym_spell.lookup(word,Verbosity.CLOSEST,           max_edit_distance=2,include_unknown=True)
+                    if word not in self.__english_vocab and not word.isupper():
+                        suggestions = sym_spell.lookup(word,Verbosity.CLOSEST,           max_edit_distance=2,include_unknown=True,transfer_casing=True)
                         correction = suggestions[0].term
                         if correction != word:
                             text = list(map(lambda x: x if x != word else correction,text))
@@ -238,7 +249,7 @@ class Topic_Model_plus():
         for text in texts:
             if not isinstance(text,float):
                 for word in text:
-                    if word not in self.__english_vocab:
+                    if word not in self.__english_vocab and not word.isupper():
                         segmented_word = sym_spell.word_segmentation(word).corrected_string
                         if segmented_word.split()[0] != word and len(segmented_word.split())>1:
                             text_str = ' '.join(text)
@@ -307,13 +318,14 @@ class Topic_Model_plus():
         texts = {}
         sleep(0.5)
         for attr in tqdm(self.list_of_attributes,desc="Preprocessing data…"):
-            self.data_df[attr] = self.__clean_texts(self.data_df[attr])
+            self.data_df[attr] = self.__tokenize_texts(self.data_df[attr])
             if quot_correction == True:
                 self.data_df[attr] = self.__quot_normalize(self.data_df[attr])
             if spellcheck == True:
                 self.data_df[attr] = self.__spellchecker(self.data_df[attr])
             if segmentation == True:
                 self.data_df[attr] = self.__segment_text(self.data_df[attr])
+            self.data_df[attr] = self.__lowercase_texts(self.data_df[attr])
             self.data_df[attr] = self.__lemmatize_texts(self.data_df[attr])
             self.data_df[attr] = self.__remove_stopwords(self.data_df[attr],domain_stopwords)
             if ngrams == True:
