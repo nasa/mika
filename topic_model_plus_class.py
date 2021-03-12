@@ -182,6 +182,7 @@ class Topic_Model_plus():
                 #ngram = (bigrams_+trigrams_+words)
                 ngrams.append(ngram)
             return ngrams
+
         def preprocess(texts,domain_stopwords=[], ngrams=True, ngram_range=3, threshold=15, min_count=5):
             texts = [clean_text(text) for text in texts]
             #print(len(texts))
@@ -193,6 +194,7 @@ class Topic_Model_plus():
                 texts = trigram_texts(texts, ngram_range,threshold, min_count)
             #print(len(texts))
             return texts
+        
         start = time()
         texts = {}
         sleep(0.5)
@@ -203,9 +205,35 @@ class Topic_Model_plus():
         cols = self.data_df.columns.difference([self.doc_ids_label]+self.extra_cols)
         self.data_df[cols] = self.data_df[cols].applymap(lambda y: np.nan if (type(y)==int or len(y)==0) else y)#.dropna(how="any")
         self.data_df = self.data_df.dropna(how="any").reset_index(drop=True)
+        #self.remove_words_in_pct_of_docs(pct_=percent)
         self.doc_ids = self.data_df[self.doc_ids_label].tolist()
         print("Processing time: ", (time()-start)/60, " minutes")
         sleep(0.5)
+        
+    def remove_words_in_pct_of_docs(self, pct_=0.3):
+            num_docs = len(self.data_df)
+            pct = np.round(pct_*num_docs)
+            indicies_to_drop = []
+            for attr in self.list_of_attributes:
+                all_words = list(set([word for text in self.data_df[attr] for word in text]))
+                good_words = []
+                for word in all_words:
+                    count = 0
+                    for text in self.data_df[attr]:
+                        if word in text:
+                            count+=1
+                    if count<pct:
+                        good_words.append(word)
+                i = 0
+                for text in self.data_df[attr]:
+                    text = [word for word in text if word in good_words]
+                    self.data_df.at[i,attr] = text
+                    if text == []:
+                        indicies_to_drop.append(i)
+            indicies_to_drop = list(set(indicies_to_drop))
+            self.data_df = self.data_df.drop(indicies_to_drop).reset_index(drop=True)
+            self.doc_ids = self.data_df[self.doc_ids_label].tolist()
+            return
         
     def create_folder(self, itr=""): #itr is an optional argument to pass in a number for multiple runs on same day
         if self.folder_path == "":
@@ -257,6 +285,7 @@ class Topic_Model_plus():
         scores['std dev'] = np.std(scores["per topic"])
         return scores
     
+    """
     def remove_words_in_pct_of_docs(self, pct_=0.3):
         num_docs = len(self.data_df)
         pct = np.round(pct_*num_docs)
@@ -281,6 +310,7 @@ class Topic_Model_plus():
         self.data_df = self.data_df.drop(indicies_to_drop).reset_index(drop=True)
         self.doc_ids = self.data_df[self.doc_ids_label].tolist()
         return
+    """
     
     def create_corpus_of_ngrams(self, texts):
         corpus = tp.utils.Corpus()
