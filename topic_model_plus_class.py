@@ -218,44 +218,44 @@ class Topic_Model_plus():
         return texts
     
     def __quot_normalize(self,texts):
-        for text in texts:
-            if not isinstance(text,float):
-                for word in text:
-                    if word not in self.__english_vocab:
-                        w_tmp = word.replace('quot','')
-                        if w_tmp in self.__english_vocab:
-                            text = list(map(lambda x: x if x != word else w_tmp,text))
+        def quot_replace(word):
+            if word not in self.__english_vocab:
+                w_tmp = word.replace('quot','')
+                if w_tmp in self.__english_vocab:
+                    word = w_tmp
+            return word
+        texts = [[quot_replace(word) for word in text] for text in texts if not isinstance(text,float)]
         return texts
     
     def __spellchecker(self,texts):
+        def spelling_replace(word):
+            if word not in self.__english_vocab and not word.isupper():
+                suggestions = sym_spell.lookup(word,Verbosity.CLOSEST,           max_edit_distance=2,include_unknown=True,transfer_casing=True)
+                correction = suggestions[0].term
+                self.correction_list.append(word+' --> '+correction)
+                word = correction
+            return word
         sym_spell = SymSpell()
         dictionary_path = pkg_resources.resource_filename("symspellpy", "frequency_dictionary_en_82_765.txt")
         sym_spell.load_dictionary(dictionary_path, term_index=0, count_index=1)
-        for text in texts:
-            if not isinstance(text,float):
-                for word in text:
-                    if word not in self.__english_vocab and not word.isupper():
-                        suggestions = sym_spell.lookup(word,Verbosity.CLOSEST,           max_edit_distance=2,include_unknown=True,transfer_casing=True)
-                        correction = suggestions[0].term
-                        if correction != word:
-                            text = list(map(lambda x: x if x != word else correction,text))
-                            self.correction_list.append(word+' --> '+correction)
+        texts = [[spelling_replace(word) for word in text] for text in texts if not isinstance(text,float)]
         return texts
     
     def __segment_text(self,texts):
+        def segment_replace(text):
+            for word in text:
+                if word not in self.__english_vocab and not word.isupper():
+                    segmented_word = sym_spell.word_segmentation(word).corrected_string
+                    if len(segmented_word.split())>1:
+                        text_str = ' '.join(text)
+                        text_str = text_str.replace(word,segmented_word)
+                        text = text_str.split()
+                        self.correction_list.append(word+' --> '+segmented_word)
+            return text
         sym_spell = SymSpell()
         dictionary_path = pkg_resources.resource_filename("symspellpy", "frequency_dictionary_en_82_765.txt")
         sym_spell.load_dictionary(dictionary_path, term_index=0, count_index=1)
-        for text in texts:
-            if not isinstance(text,float):
-                for word in text:
-                    if word not in self.__english_vocab and not word.isupper():
-                        segmented_word = sym_spell.word_segmentation(word).corrected_string
-                        if segmented_word.split()[0] != word and len(segmented_word.split())>1:
-                            text_str = ' '.join(text)
-                            text_str = text_str.replace(word,segmented_word)
-                            text = text_str.split()
-                            self.correction_list.append(word+' --> '+segmented_word)
+        texts = [segment_replace(text) for text in texts if not isinstance(text,float)]
         return texts
         
     def __trigram_texts(self, texts, ngram_range, threshold, min_count):
