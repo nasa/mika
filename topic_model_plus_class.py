@@ -16,7 +16,7 @@ from nltk.corpus import wordnet
 from nltk.corpus import words
 from nltk.stem import WordNetLemmatizer
 from nltk import pos_tag
-from gensim.utils import simple_preprocess
+from gensim.utils import simple_tokenize
 from gensim.models import Phrases
 import pyLDAvis
 import matplotlib.pyplot as plt
@@ -99,9 +99,6 @@ class Topic_Model_plus():
 #   are the I/O options generalizable to other databases? e.g. doc_ids_label
 #   some of the attributes are ambiguously named - can we make these clearer? e.g. name, combine_cols
 #   some docstring short descriptions may be improved
-
-    # public attributes
-    correction_list = []
     
     # private attributes
     __english_vocab = set([w.lower() for w in words.words()])
@@ -124,6 +121,10 @@ class Topic_Model_plus():
             defines output file names
         combine_cols : boolean
             defines whether to combine attributes
+        min_word_len : int
+            minimum word length during tokenization
+        max_word_len : int
+            maxumum word length during tokenization
         """
         
         # public attributes
@@ -133,6 +134,9 @@ class Topic_Model_plus():
         self.extra_cols = extra_cols
         self.folder_path = ""
         self.name = name
+        self.min_word_len = 2
+        self.max_word_len = 15
+        self.correction_list = []
         if combine_cols == True: 
             self.name += "_combined"
         self.combine_cols = combine_cols
@@ -187,8 +191,13 @@ class Topic_Model_plus():
             self.__combine_columns()
         print("data preparation: ", (time()-start_time)/60,"minutes \n")
         
-    def __clean_texts(self,texts):
-        texts = [simple_preprocess(text) for text in texts if not isinstance(text,float)]
+    def __tokenize_texts(self,texts):
+        texts = [simple_tokenize(text) for text in texts if not isinstance(text,float)]
+        texts = [[word for word in text if len(word)>self.min_word_len and len(word)<self.max_word_len] for text in texts if not isinstance(text,float)]
+        return texts
+        
+    def __lowercase_texts(self,texts):
+        texts = [[word.lower() for word in text] for text in texts]
         return texts
         
     def __lemmatize_texts(self,texts):
@@ -209,44 +218,44 @@ class Topic_Model_plus():
         return texts
     
     def __quot_normalize(self,texts):
-        for text in texts:
-            if not isinstance(text,float):
-                for word in text:
-                    if word not in self.__english_vocab:
-                        w_tmp = word.replace('quot','')
-                        if w_tmp in self.__english_vocab:
-                            text = list(map(lambda x: x if x != word else w_tmp,text))
+        def quot_replace(word):
+            if word not in self.__english_vocab:
+                w_tmp = word.replace('quot','')
+                if w_tmp in self.__english_vocab:
+                    word = w_tmp
+            return word
+        texts = [[quot_replace(word) for word in text] for text in texts if not isinstance(text,float)]
         return texts
     
-    def __spellchecker(self,texts): # TODO: a list of words not to correct; way of detecting acronyms that should not be corrected - all caps??
+    def __spellchecker(self,texts):
+        def spelling_replace(word):
+            if word not in self.__english_vocab and not word.isupper():
+                suggestions = sym_spell.lookup(word,Verbosity.CLOSEST,           max_edit_distance=2,include_unknown=True,transfer_casing=True)
+                correction = suggestions[0].term
+                self.correction_list.append(word+' --> '+correction)
+                word = correction
+            return word
         sym_spell = SymSpell()
         dictionary_path = pkg_resources.resource_filename("symspellpy", "frequency_dictionary_en_82_765.txt")
         sym_spell.load_dictionary(dictionary_path, term_index=0, count_index=1)
-        for text in texts:
-            if not isinstance(text,float):
-                for word in text:
-                    if word not in self.__english_vocab:
-                        suggestions = sym_spell.lookup(word,Verbosity.CLOSEST,           max_edit_distance=2,include_unknown=True)
-                        correction = suggestions[0].term
-                        if correction != word:
-                            text = list(map(lambda x: x if x != word else correction,text))
-                            self.correction_list.append(word+' --> '+correction)
+        texts = [[spelling_replace(word) for word in text] for text in texts if not isinstance(text,float)]
         return texts
     
     def __segment_text(self,texts):
+        def segment_replace(text):
+            for word in text:
+                if word not in self.__english_vocab and not word.isupper():
+                    segmented_word = sym_spell.word_segmentation(word).corrected_string
+                    if len(segmented_word.split())>1:
+                        text_str = ' '.join(text)
+                        text_str = text_str.replace(word,segmented_word)
+                        text = text_str.split()
+                        self.correction_list.append(word+' --> '+segmented_word)
+            return text
         sym_spell = SymSpell()
         dictionary_path = pkg_resources.resource_filename("symspellpy", "frequency_dictionary_en_82_765.txt")
         sym_spell.load_dictionary(dictionary_path, term_index=0, count_index=1)
-        for text in texts:
-            if not isinstance(text,float):
-                for word in text:
-                    if word not in self.__english_vocab:
-                        segmented_word = sym_spell.word_segmentation(word).corrected_string
-                        if segmented_word.split()[0] != word and len(segmented_word.split())>1:
-                            text_str = ' '.join(text)
-                            text_str = text_str.replace(word,segmented_word)
-                            text = text_str.split()
-                            self.correction_list.append(word+' --> '+segmented_word)
+        texts = [segment_replace(text) for text in texts if not isinstance(text,float)]
         return texts
         
     def __trigram_texts(self, texts, ngram_range, threshold, min_count):
@@ -312,6 +321,8 @@ class Topic_Model_plus():
             pbar = tqdm(total=100, desc="Preprocessing "+attr+"…")
             self.data_df[attr] = self.__clean_texts(self.data_df[attr])
             pbar.update(10)
+            self.data_df[attr] = self.__tokenize_texts(self.data_df[attr])
+            pbar.update(10)
             if quot_correction == True:
                 self.data_df[attr] = self.__quot_normalize(self.data_df[attr])
             pbar.update(10)
@@ -321,24 +332,26 @@ class Topic_Model_plus():
             if segmentation == True:
                 self.data_df[attr] = self.__segment_text(self.data_df[attr])
             pbar.update(10)
+            self.data_df[attr] = self.__lowercase_texts(self.data_df[attr])
+            pbar.update(10)
             self.data_df[attr] = self.__lemmatize_texts(self.data_df[attr])
             pbar.update(20)
             self.data_df[attr] = self.__remove_stopwords(self.data_df[attr],domain_stopwords)
-            pbar.update(20)
+            pbar.update(10)
             if ngrams == True:
                 self.data_df[attr] = self.__trigram_texts(self.data_df[attr], ngram_range,threshold,min_count)
-            pbar.update(20)
+            pbar.update(10)
             sleep(0.5)
             pbar.close()
         cols = self.data_df.columns.difference([self.doc_ids_label]+self.extra_cols)
         self.data_df[cols] = self.data_df[cols].applymap(lambda y: np.nan if (type(y)==int or len(y)==0) else y)
         self.data_df = self.data_df.dropna(how="any").reset_index(drop=True)
-        self.remove_words_in_pct_of_docs(pct_=percent)
+        self.__remove_words_in_pct_of_docs(pct_=percent)
         self.doc_ids = self.data_df[self.doc_ids_label].tolist()
         print("Processing time: ", (time()-start)/60, " minutes")
         sleep(0.5)
         
-    def remove_words_in_pct_of_docs(self, pct_=0.3):
+    def __remove_words_in_pct_of_docs(self, pct_=0.3):
             num_docs = len(self.data_df)
             pct = np.round(pct_*num_docs)
             indicies_to_drop = []
@@ -840,7 +853,7 @@ class Topic_Model_plus():
             for doc in mdl.docs: 
                 topic_nums = doc.path
                 for level in range(1, self.levels):
-                    taxonomy_data[attr+" Level "+str(level)].append( ", ".join([word[0] for word in mdl.get_topic_words(topic_nums[level], top_n=mdl.get_count_by_topics()[topic_nums[level]])]))
+                    taxonomy_data[attr+" Level "+str(level)].append( ", ".join([word[0] for word in mdl.get_topic_words(topic_nums[level], top_n=500)]))
         self.taxonomy_data = taxonomy_data
         taxonomy_df = pd.DataFrame(taxonomy_data)
         taxonomy_df = taxonomy_df.drop_duplicates()

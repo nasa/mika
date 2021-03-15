@@ -1,22 +1,38 @@
 # -*- coding: utf-8 -*-
 """
 @author: hswalsh
-This script allows you to run only the data preparation and preprocessing portions of the topic modeling code for testing purposes.
+Test code for preprocessing and related functions.
 """
+
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/..")
 
+import unittest
+
 from topic_model_plus_class import Topic_Model_plus
 
-list_of_attributes = ['Lesson(s) Learned','Driving Event','Recommendation(s)']
-document_id_col = 'Lesson ID'
-csv_file_name = "input data/train_set_expanded_H.csv" 
-name = "output data/test"
-num_topics ={'Lesson(s) Learned':5, 'Driving Event':5, 'Recommendation(s)':5}
+class test_preprocessing_methods(unittest.TestCase):
+    def test_tokenize_texts(self):
+        test_class = Topic_Model_plus()
+        test_tokenize_texts_result = test_class._Topic_Model_plus__tokenize_texts(['the quick brown fox jumps over the lazy dog'])
+        correct_tokenization = [['the','quick','brown','fox','jumps','over','the','lazy','dog']]
+        self.assertEqual(test_tokenize_texts_result,correct_tokenization)
+    def test_quot_normalize(self):
+        test_class = Topic_Model_plus()
+        test_quot_normalize_result = test_class._Topic_Model_plus__quot_normalize([['quotation','devicequot','quotring','adaquotpt']])
+        correct_quot_normalization = [['quotation','device','ring','adapt']]
+        self.assertEqual(test_quot_normalize_result,correct_quot_normalization)
+    def test_spellchecker(self):
+        test_class = Topic_Model_plus()
+        test_spellchecker_result = test_class._Topic_Model_plus__spellchecker([['strted','nasa','NASA','CalTech','pyrolitic']])
+        correct_spellcheck = [['started','casa','NASA','CaTch','pyrolytic']]
+        self.assertEqual(test_spellchecker_result,correct_spellcheck)
+    def test_segment_text(self):
+        test_class = Topic_Model_plus()
+        test_segment_text_result = test_class._Topic_Model_plus__segment_text([['devicesthe','nasa','correct']])
+        correct_segmentation = [['devices','the','as','a','correct']]
+        self.assertEqual(test_segment_text_result,correct_segmentation)
 
-test = Topic_Model_plus(list_of_attributes=list_of_attributes, document_id_col=document_id_col, csv_file=csv_file_name, name=name, combine_cols=True)
-test.prepare_data()
-test.preprocess_data()
-
-print(test.data_df)
+if __name__ == '__main__':
+    unittest.main()
