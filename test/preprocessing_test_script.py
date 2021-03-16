@@ -11,6 +11,7 @@ sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/..")
 import unittest
 
 from topic_model_plus_class import Topic_Model_plus
+import pandas as pd
 
 class test_preprocessing_methods(unittest.TestCase):
     def test_tokenize_texts(self):
@@ -48,6 +49,17 @@ class test_preprocessing_methods(unittest.TestCase):
         test_remove_stopwords_result = test_class._Topic_Model_plus__remove_stopwords([['system','that','can','be']],domain_stopwords=[])
         correct_remove_stopwords = [['system']]
         self.assertEqual(test_remove_stopwords_result,correct_remove_stopwords)
+    def test_remove_frequent_words(self):
+        in_df = pd.DataFrame({"docs": [['this', 'is', 'a', 'test'],['is', 'test'],['test'],
+                                       ['cat'],['black','cat'],['python'],['python', 'is', 'good'],
+                                       ['is'],['end']], "ids":[0,1,2,3,4,5,6,7,8]})
+        test_class = Topic_Model_plus()
+        test_word_removal = test_class._Topic_Model_plus__remove_words_in_pct_of_docs(data_df=in_df, list_of_attributes=['docs'])
+        correct_word_removal = pd.DataFrame({
+            "docs":[["this", "a"], ["cat"], ["black", "cat"],["python"],["python", "good"], ["end"]],
+            "ids": [0,3,4,5,6,8]})
+        self.assertEqual(test_word_removal.equals(correct_word_removal),True)
+
 
 if __name__ == '__main__':
     unittest.main()

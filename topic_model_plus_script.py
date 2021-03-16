@@ -15,7 +15,7 @@ name = "output data/test" #optional, used at beginning of folder for identificat
 num_topics ={'Lesson(s) Learned':5, 'Driving Event':5, 'Recommendation(s)':5}
 
 #creating object
-test = Topic_Model_plus(list_of_attributes=list_of_attributes, document_id_col=document_id_col, csv_file=csv_file_name, name=name, combine_cols=True)
+test = Topic_Model_plus(list_of_attributes=list_of_attributes, document_id_col=document_id_col, csv_file=csv_file_name, name=name)
 #preparing the data: loading, dropping columns and rows
 #parameters: none required, any kwargs for pd.read_csv can be passed
 test.prepare_data()
@@ -31,14 +31,14 @@ print(test.data_df)
 ##perform lda: can pass in any parameter used in tp model
 #parameters: optional
 
-#test.lda(min_cf=1, num_topics=num_topics)
+test.lda(min_cf=1, num_topics=num_topics)
 #saving various lda results
 
 #test.save_lda_taxonomy()
 
 #test.save_lda_document_topic_distribution()
 #test.save_lda_models()
-#test.save_lda_coherence()
+test.save_lda_coherence()
 #LDA visualization using pyLDAvis, saves html link to folder
 #for attr in list_of_attributes:
 #    test.lda_visual(attr)
