@@ -89,7 +89,7 @@ class Topic_Model_plus():
         saves hlda taxonomy at level n
     hlda_extract_models(self, file_path)
         gets hlda models from file
-    hlda_display_tp(self, attr, levels = 3, num_words = 5, max_level_1_nodes = 1, max_level_2_nodes = 6)
+    hlda_display(self, attr, num_words = 5, display_options={"level 1": 1, "level 2": 6}, colors='bupu')
         saves graphviz visualization of hlda tree structure
     """
 
@@ -319,7 +319,7 @@ class Topic_Model_plus():
         sleep(0.5)
         for attr in tqdm(self.list_of_attributes,desc="Preprocessing data…"):
             pbar = tqdm(total=100, desc="Preprocessing "+attr+"…")
-            self.data_df[attr] = self.__clean_texts(self.data_df[attr])
+            #self.data_df[attr] = self.__clean_texts(self.data_df[attr])
             pbar.update(10)
             self.data_df[attr] = self.__tokenize_texts(self.data_df[attr])
             pbar.update(10)
@@ -906,7 +906,7 @@ class Topic_Model_plus():
         taxonomy_level_df["number of documents for row"] = num_lessons_per_row
         taxonomy_level_df = taxonomy_level_df.sort_values(by=[key for key in taxonomy_level_data])
         taxonomy_level_df = taxonomy_level_df.reset_index(drop=True)
-        taxonomy_level_df.to_csv(self.folder_path+"/hlda_level1_taxonomy.csv")
+        taxonomy_level_df.to_csv(self.folder_path+"/hlda_level"+lev+"_taxonomy.csv")
         print("hLDA level "+str(lev)+" taxonomy saved to: ", self.folder_path+"/hlda_level1_taxonomy.csv")
         
     def hlda_extract_models(self, file_path):
@@ -924,8 +924,7 @@ class Topic_Model_plus():
             self.hlda_models[attr]=tp.HLDAModel.load(file_path+attr+"_hlda_model_object.bin")
         print("hLDA models extracted from: ", file_path)
         
-    def hlda_display_tp(self, attr, levels = 3, num_words = 5, max_level_1_nodes = 1, max_level_2_nodes = 6):
-        # TO DO: can the last param be optional? what if you only wanted to print lv 1 nodes?
+    def hlda_display(self, attr, num_words = 5, display_options={"level 1": 1, "level 2": 6}, colors='bupu'):
         # TO DO: levels/level/lev are used inconsistently as params throughout this class
         """
         saves graphviz visualization of hlda tree structure
@@ -934,16 +933,16 @@ class Topic_Model_plus():
         ---------
         attr : str
             attribute of interest
-        levels : int
-            number of levels to displauy
         num_words : int
             number of words per node
-        max_level_1_nodes : int
-            maximum number of nodes at level 1 to display
-        max_level_2_nodes : maximum number of nodes at level 2 to display
-        """
+        display_options : dict, nested
+            keys are levels, values are max nodes
+            {"level 1": n} n is the max number over level 1 nodes
+        colors: str
+            brewer colorscheme used, default is blue-purple
+            see http://graphviz.org/doc/info/colors.html#brewer for options
         
-        #adapt to general number of levels
+        """
         try:
             from graphviz import Digraph
         except ImportError as error:
@@ -951,29 +950,31 @@ class Topic_Model_plus():
             print(error.__class__.__name__ + ": " + error.message)
             print("GraphViz not installed. Please see:\n https://pypi.org/project/graphviz/ \n https://www.graphviz.org/download/")
             return
+        if self.folder_path == "":
+            self.save_hlda_topics()
         df = pd.read_csv(self.folder_path+"/"+attr+"_hlda_topics.csv")
         dot = Digraph(comment="hLDA topic network")
-        colors = {'1':"paleturquoise1", '2':"turquoise"}
-        level_1_nodes = []; level_2_nodes = 0
-        for i in range(2, len(df)):
+        color_scheme = '/'+colors+str(max(3,len(display_options)+1))+"/"
+        nodes = {key:[] for key in display_options}
+        for i in range(len(df)):
             if int(df.iloc[i]["topic level"]) == 0 and int(df.iloc[i]["number of documents in topic"]) > 0:
                 root_words = df.iloc[i]["topic words"].split(", ")
                 root_words = "\\n".join([root_words[i] for i in range(0,min(num_words,int(df.iloc[i]["number of words"])))])
-                dot.node(str(df.iloc[i]["topic number"]), root_words)
+                dot.node(str(df.iloc[i]["topic number"]), root_words, style="filled", fillcolor=color_scheme+str(1))
             elif int(df.iloc[i]["number of documents in topic"])>0 and str(df.iloc[i]["topic level"]) != '0':
-                if (len(level_1_nodes) <= max_level_1_nodes and int(df.iloc[i]['topic level']) == 1) or (level_2_nodes <= max_level_2_nodes and int(df.iloc[i]['topic level']) == 2):
+                if (len(nodes["level "+str(df.iloc[i]["topic level"])]) <= display_options["level "+str(df.iloc[i]["topic level"])]):
                     words = df.iloc[i]["topic words"].split(", ")
                     words = "\\n".join([words[i] for i in range(0,min(num_words,int(df.iloc[i]["number of words"])))])
                     topic_id = df.iloc[i]["topic number"]
                     parent_id = df.iloc[i]["parent"]
                     level = df.iloc[i]['topic level']
-                    if int(level) == 2 and parent_id not in level_1_nodes: 
+                    if int(level)>1 and parent_id not in nodes["level "+str(level-1)]: 
                         continue
                     else:
-                        dot.node(str(topic_id), words,color=colors[str(level)], style="filled", fillcolor=colors[str(level)])
+                        dot.node(str(topic_id), words, style="filled", fillcolor=color_scheme+str(level+1))
                         dot.edge(str(parent_id),str(topic_id))
-                        if int(level) == 1 : level_1_nodes.append(topic_id)
-                        elif int(level) == 2: level_2_nodes+=1
+                        nodes["level "+str(level)].append(topic_id)
+
         dot.attr(layout='twopi')
         dot.attr(overlap="voronoi")
         dot.render(filename = self.folder_path+"/"+attr+"_hlda_network", format = 'png')
