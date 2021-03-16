@@ -346,38 +346,39 @@ class Topic_Model_plus():
         cols = self.data_df.columns.difference([self.doc_ids_label]+self.extra_cols)
         self.data_df[cols] = self.data_df[cols].applymap(lambda y: np.nan if (type(y)==int or len(y)==0) else y)
         self.data_df = self.data_df.dropna(how="any").reset_index(drop=True)
-        self.__remove_words_in_pct_of_docs(pct_=percent)
+        self.data_df = self.__remove_words_in_pct_of_docs(self.data_df, self.list_of_attributes, pct_=percent)
         self.doc_ids = self.data_df[self.doc_ids_label].tolist()
         print("Processing time: ", (time()-start)/60, " minutes")
         sleep(0.5)
         
-    def __remove_words_in_pct_of_docs(self, pct_=0.3):
-            num_docs = len(self.data_df)
+    def __remove_words_in_pct_of_docs(self, data_df, list_of_attributes, pct_=0.3):
+            num_docs = len(data_df)
             pct = np.round(pct_*num_docs)
             indicies_to_drop = []
             sleep(0.5)
-            for attr in tqdm(self.list_of_attributes,"Removing frequent words…"):
-                all_words = list(set([word for text in self.data_df[attr] for word in text]))
+            for attr in tqdm(list_of_attributes,"Removing frequent words…"):
+                all_words = list(set([word for text in data_df[attr] for word in text]))
                 good_words = []
                 for word in all_words:
                     count = 0
-                    for text in self.data_df[attr]:
+                    for text in data_df[attr]:
                         if word in text:
                             count+=1
                     if count<pct:
                         good_words.append(word)
                 i = 0
-                for text in self.data_df[attr]:#tqdm(self.data_df[attr],attr+" removing frequent words…"):
+                for text in data_df[attr]:
                     text = [word for word in text if word in good_words]
-                    self.data_df.at[i,attr] = text
+                    data_df.at[i,attr] = text
                     if text == []:
                         indicies_to_drop.append(i)
                     i+=1
             sleep(0.5)
             indicies_to_drop = list(set(indicies_to_drop))
-            self.data_df = self.data_df.drop(indicies_to_drop).reset_index(drop=True)
-            self.doc_ids = self.data_df[self.doc_ids_label].tolist()
-            return
+            self.data_df = data_df.drop(indicies_to_drop).reset_index(drop=True)
+            #print(self.data_df)
+            #self.doc_ids = self.data_df[self.doc_ids_label].tolist()
+            return self.data_df
         
     def __create_folder(self, itr=""): #itr is an optional argument to pass in a number for multiple runs on same day
         if self.folder_path == "":

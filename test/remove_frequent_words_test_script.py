@@ -147,7 +147,7 @@ This secondary test demonstrates the function in the topic_model_plus class is t
 as the one in this test function, evident by having the same output and same run time.
 """
 start = time.time()
-test_df.remove_words_in_pct_of_docs()
+test_df._Topic_Model_plus__remove_words_in_pct_of_docs(data_df=test_df.data_df, list_of_attributes=list_of_attributes)
 runtime = time.time() - start
 test.old_method_df = test_df.data_df
 test.old_run_time = runtime
@@ -181,7 +181,7 @@ as the one in this test function, evident by having the same output and same run
 """
 test_df.data_df = test_df.data_df[:5000].reset_index(drop=True)
 start = time.time()
-test_df.remove_words_in_pct_of_docs()
+test_df._Topic_Model_plus__remove_words_in_pct_of_docs(data_df=test_df.data_df, list_of_attributes=["Combined Text"])
 runtime = time.time() - start
 test.old_method_df = test_df.data_df
 test.old_run_time = runtime
