@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-@author: hswalsh
+@author: hswalsh, srandrad
 Test code for preprocessing and related functions.
 """
 
@@ -10,7 +10,7 @@ sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/..")
 
 import unittest
 
-from topic_model_plus_class import Topic_Model_plus
+from module.topic_model_plus_class import Topic_Model_plus
 import pandas as pd
 
 class test_preprocessing_methods(unittest.TestCase):
@@ -59,7 +59,16 @@ class test_preprocessing_methods(unittest.TestCase):
             "docs":[["this", "a"], ["cat"], ["black", "cat"],["python"],["python", "good"], ["end"]],
             "ids": [0,3,4,5,6,8]})
         self.assertEqual(test_word_removal.equals(correct_word_removal),True)
-
+    def test_preprocess_data(self): # integration test
+        test_data_df = pd.DataFrame({"docs":['this is a test','is test','test',
+        'cat','black cat','python','python is good','is','end'],"ids":[0,1,2,3,4,5,6,7,8]})
+        test_class = Topic_Model_plus(document_id_col = 'ids')
+        test_class.data_df = test_data_df
+        test_class.list_of_attributes = ['docs']
+        test_class.preprocess_data(quot_correction=True,spellcheck=True,segmentation=True)
+        test_preprocess_data_result = test_class.data_df
+        correct_preprocess_data_result = pd.DataFrame({"docs":[['black'],['good']],"ids":[4,6]})
+        self.assertEqual(test_preprocess_data_result.equals(correct_preprocess_data_result),True)
 
 if __name__ == '__main__':
     unittest.main()
