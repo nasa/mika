@@ -319,8 +319,6 @@ class Topic_Model_plus():
         sleep(0.5)
         for attr in tqdm(self.list_of_attributes,desc="Preprocessing data…"):
             pbar = tqdm(total=100, desc="Preprocessing "+attr+"…")
-            self.data_df[attr] = self.__clean_texts(self.data_df[attr])
-            pbar.update(10)
             self.data_df[attr] = self.__tokenize_texts(self.data_df[attr])
             pbar.update(10)
             if quot_correction == True:
@@ -340,7 +338,7 @@ class Topic_Model_plus():
             pbar.update(10)
             if ngrams == True:
                 self.data_df[attr] = self.__trigram_texts(self.data_df[attr], ngram_range,threshold,min_count)
-            pbar.update(10)
+            pbar.update(20)
             sleep(0.5)
             pbar.close()
         cols = self.data_df.columns.difference([self.doc_ids_label]+self.extra_cols)

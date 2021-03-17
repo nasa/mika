@@ -10,7 +10,7 @@ sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/..")
 
 import unittest
 
-from topic_model_plus_class import Topic_Model_plus
+from module.topic_model_plus_class import Topic_Model_plus
 import pandas as pd
 
 class test_preprocessing_methods(unittest.TestCase):
