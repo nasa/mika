@@ -400,7 +400,7 @@ class Topic_Model_plus():
         
         self.__create_folder()
         name = "/preprocessed_data.csv"
-        if self.combine_columns == True:
+        if self.combine_cols == True:
             name = "/preprocessed_data_combined_text.csv"
         self.data_df.to_csv(self.folder_path+name, index=False)
         print("Preprocessed data saves to: ", self.folder_path+name)
@@ -589,11 +589,11 @@ class Topic_Model_plus():
         """
         saves lda models to file
         """
-        
         self.__create_folder()
         for attr in self.list_of_attributes:
             mdl = self.lda_models[attr]
             mdl.save(self.folder_path+"/"+attr+"_lda_model_object.bin")
+        self.save_preprocessed_data()
     
     def save_lda_document_topic_distribution(self):
         """
@@ -651,9 +651,7 @@ class Topic_Model_plus():
                 #    words = words[0:words.rfind(", ")]
                 taxonomy_data[attr].append(words)
         taxonomy_df = pd.DataFrame(taxonomy_data)
-        #print(taxonomy_df, taxonomy_data)
         taxonomy_df = taxonomy_df.drop_duplicates()
-        taxonomy_df.to_csv(self.folder_path+"/lda_taxonomy_test.csv")
         lesson_nums_per_row = []
         num_lessons_per_row = []
         for i in range(len(taxonomy_df)):
@@ -682,11 +680,18 @@ class Topic_Model_plus():
         file_path : str
             path to file
         """
-        
+        self.lda_coherence = {}
         self.lda_models = {}
         for attr in self.list_of_attributes:
-            self.lda_models[attr] = tp.LDAModel.load(file_path+attr+"_lda_model_object.bin")
+            self.lda_models[attr] = tp.LDAModel.load(file_path+"/"+attr+"_lda_model_object.bin")
+            self.lda_coherence[attr] = self.coherence_scores(self.lda_models[attr], "lda")
         print("LDA models extracted from: ", file_path)
+        preprocessed_filepath = file_path+"/preprocessed_data"
+        if self.list_of_attributes == ['Combined Text']:
+            self.combine_cols = True
+            preprocessed_filepath += "_combined_text"
+        self.extract_preprocessed_data(preprocessed_filepath+".csv")
+        self.folder_path = file_path
         
     def lda_visual(self, attr):
         """
@@ -774,13 +779,14 @@ class Topic_Model_plus():
         """
         saves hlda models to file
         """
-        
+        ##TO DO: add save preprocessed data
         self.__create_folder()
         for attr in self.list_of_attributes:
             mdl = self.hlda_models[attr]
             mdl.save(self.folder_path+"/"+attr+"_hlda_model_object.bin")
             print("hLDA model for "+attr+" saved to: ", (self.folder_path+"/"+attr+"_hlda_model_object.bin"))
-            
+        self.save_preprocessed_data()
+        
     def save_hlda_topics(self):
         """
         saves hlda topics to file
@@ -918,13 +924,22 @@ class Topic_Model_plus():
         file_path : str
             path to file
         """
-        
+        #TO DO: add extract preprocessed data, use existing folder
         self.hlda_models = {}
+        self.hlda_coherence = {}
         for attr in self.list_of_attributes:
-            self.hlda_models[attr]=tp.HLDAModel.load(file_path+attr+"_hlda_model_object.bin")
+            self.hlda_models[attr]=tp.HLDAModel.load(file_path+"/"+attr+"_hlda_model_object.bin")
+            self.levels = self.hlda_models[attr].depth
+            self.hlda_coherence[attr] = self.coherence_scores(self.hlda_models[attr], "hlda")
         print("hLDA models extracted from: ", file_path)
+        preprocessed_filepath = file_path+"/preprocessed_data"
+        if self.list_of_attributes == ['Combined Text']:
+            self.combine_cols = True
+            preprocessed_filepath += "_combined_text"
+        self.extract_preprocessed_data(preprocessed_filepath+".csv")
+        self.folder_path = file_path
         
-    def hlda_display(self, attr, num_words = 5, display_options={"level 1": 1, "level 2": 6}, colors='bupu'):
+    def hlda_display(self, attr, num_words = 5, display_options={"level 1": 1, "level 2": 6}, colors='bupu', filename=''):
         # TO DO: levels/level/lev are used inconsistently as params throughout this class
         """
         saves graphviz visualization of hlda tree structure
@@ -941,6 +956,9 @@ class Topic_Model_plus():
         colors: str
             brewer colorscheme used, default is blue-purple
             see http://graphviz.org/doc/info/colors.html#brewer for options
+        filename: str
+            can input a filename for where the topics are stored in order to make display 
+            after hlda; must be an ouput from "save_hlda_topics()" or hlda.bin object
         
         """
         try:
@@ -950,8 +968,16 @@ class Topic_Model_plus():
             print(error.__class__.__name__ + ": " + error.message)
             print("GraphViz not installed. Please see:\n https://pypi.org/project/graphviz/ \n https://www.graphviz.org/download/")
             return
-        if self.folder_path == "":
-            self.save_hlda_topics()
+        if filename != '':
+            #handles saved topic inputs
+            paths = filename.split("\\")
+            self.folder_path = "\\".join([paths[i] for i in range(len(paths)-1)])
+            self.hlda_extract_models(self.folder_path+"\\")
+            if paths[len(paths)-1] == attr+"_hlda_model_object.bin":
+                #handles bin inputs
+                self.hlda_extract_models(self.folder_path+"\\")
+                #self.save_hlda_topics()
+        self.save_hlda_topics()
         df = pd.read_csv(self.folder_path+"/"+attr+"_hlda_topics.csv")
         dot = Digraph(comment="hLDA topic network")
         color_scheme = '/'+colors+str(max(3,len(display_options)+1))+"/"
@@ -962,7 +988,7 @@ class Topic_Model_plus():
                 root_words = "\\n".join([root_words[i] for i in range(0,min(num_words,int(df.iloc[i]["number of words"])))])
                 dot.node(str(df.iloc[i]["topic number"]), root_words, style="filled", fillcolor=color_scheme+str(1))
             elif int(df.iloc[i]["number of documents in topic"])>0 and str(df.iloc[i]["topic level"]) != '0':
-                if (len(nodes["level "+str(df.iloc[i]["topic level"])]) <= display_options["level "+str(df.iloc[i]["topic level"])]):
+                if (len(nodes["level "+str(df.iloc[i]["topic level"])]) <= display_options["level "+str(df.iloc[i]["topic level"])]) and not isinstance(df.iloc[i]["topic words"],float):
                     words = df.iloc[i]["topic words"].split(", ")
                     words = "\\n".join([words[i] for i in range(0,min(num_words,int(df.iloc[i]["number of words"])))])
                     topic_id = df.iloc[i]["topic number"]
