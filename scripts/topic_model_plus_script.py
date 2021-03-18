@@ -4,7 +4,11 @@ Created on Wed Feb 24 16:40:39 2021
 
 @author: srandrad
 """
-from topic_model_plus_class import Topic_Model_plus
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/..")
+
+from module.topic_model_plus_class import Topic_Model_plus
 
 #these variables must be defined to create the object
 list_of_attributes = ['Lesson(s) Learned','Driving Event','Recommendation(s)']

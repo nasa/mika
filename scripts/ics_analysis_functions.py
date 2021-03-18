@@ -28,8 +28,12 @@ Functions for ICS-209-PLUS
     - apply lda or hlda
     - words from topics = hazards
     """
-from topic_model_plus_class import Topic_Model_plus
-from ICS_stop_words import stop_words
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/..")
+
+from module.topic_model_plus_class import Topic_Model_plus
+from module.stopwords.ICS_stop_words import stop_words
 
 ICS_stop_words = stop_words
 
