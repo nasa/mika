@@ -94,9 +94,7 @@ class Topic_Model_plus():
     """
 
 #   TO DO:
-#   when extracting preprocessed data or bins, save results to existing folder rather than new one
-#   add hyper parameter tuning for lda (alpha and beta) and hlda (eta, alpha, gamma)
-#   are the I/O options generalizable to other databases? e.g. doc_ids_label
+#   add hyper parameter tuning for lda (alpha and beta and k/number of topics) and hlda (eta, alpha, gamma)
 #   some of the attributes are ambiguously named - can we make these clearer? e.g. name, combine_cols
 #   some docstring short descriptions may be improved
     
@@ -129,7 +127,10 @@ class Topic_Model_plus():
         
         # public attributes
         self.data_csv = csv_file
-        self.doc_ids_label = document_id_col
+        if document_id_col == "":
+            self.doc_ids_label = "index"
+        else:
+            self.doc_ids_label = document_id_col
         self.list_of_attributes = list_of_attributes
         self.extra_cols = extra_cols
         self.folder_path = ""
@@ -140,9 +141,13 @@ class Topic_Model_plus():
         if combine_cols == True: 
             self.name += "_combined"
         self.combine_cols = combine_cols
+        self.hlda_models = {}
+        self.lda_models = {}
         
     def __load_data(self, **kwargs):
         self.data_df = pd.read_csv(open(self.data_csv,encoding='utf8',errors='ignore'), **kwargs)
+        if self.doc_ids_label == "index":
+            self.data_df['index'] = self.data_df.index
         self.doc_ids = self.data_df[self.doc_ids_label].tolist()
      
     def __combine_columns(self):
@@ -380,12 +385,12 @@ class Topic_Model_plus():
         
     def __create_folder(self, itr=""): #itr is an optional argument to pass in a number for multiple runs on same day
         if self.folder_path == "":
-            path = os.getcwd()
+            #path = os.getcwd()
             today_str = datetime.date.today().strftime("%b-%d-%Y")
             if itr != "":
                 itr = "-"+str(itr)
             filename = self.name+'topics-'+today_str+str(itr)
-            self.folder_path = path+"/"+filename
+            self.folder_path = filename#path+"/"+filename
             os.makedirs(self.folder_path, exist_ok = True)
             print("folder created")
         else:
@@ -678,11 +683,13 @@ class Topic_Model_plus():
         file_path : str
             path to file
         """
+        self.lda_num_topics = {}
         self.lda_coherence = {}
         self.lda_models = {}
         for attr in self.list_of_attributes:
             self.lda_models[attr] = tp.LDAModel.load(file_path+"/"+attr+"_lda_model_object.bin")
             self.lda_coherence[attr] = self.coherence_scores(self.lda_models[attr], "lda")
+            self.lda_num_topics[attr] = self.lda_models[attr].k
         print("LDA models extracted from: ", file_path)
         preprocessed_filepath = file_path+"/preprocessed_data"
         if self.list_of_attributes == ['Combined Text']:
@@ -910,7 +917,7 @@ class Topic_Model_plus():
         taxonomy_level_df["number of documents for row"] = num_lessons_per_row
         taxonomy_level_df = taxonomy_level_df.sort_values(by=[key for key in taxonomy_level_data])
         taxonomy_level_df = taxonomy_level_df.reset_index(drop=True)
-        taxonomy_level_df.to_csv(self.folder_path+"/hlda_level"+lev+"_taxonomy.csv")
+        taxonomy_level_df.to_csv(self.folder_path+"/hlda_level"+str(lev)+"_taxonomy.csv")
         print("hLDA level "+str(lev)+" taxonomy saved to: ", self.folder_path+"/hlda_level1_taxonomy.csv")
         
     def hlda_extract_models(self, file_path):
@@ -967,16 +974,16 @@ class Topic_Model_plus():
             print("GraphViz not installed. Please see:\n https://pypi.org/project/graphviz/ \n https://www.graphviz.org/download/")
             return
         if filename != '':
-            #handles saved topic inputs
+            #handles saved topic inputs, bin inputs
             paths = filename.split("\\")
             self.folder_path = "\\".join([paths[i] for i in range(len(paths)-1)])
-            self.hlda_extract_models(self.folder_path+"\\")
-            if paths[len(paths)-1] == attr+"_hlda_model_object.bin":
-                #handles bin inputs
+            if self.hlda_models == {}:
                 self.hlda_extract_models(self.folder_path+"\\")
-                #self.save_hlda_topics()
-        self.save_hlda_topics()
-        df = pd.read_csv(self.folder_path+"/"+attr+"_hlda_topics.csv")
+        try:
+            df = pd.read_csv(self.folder_path+"/"+attr+"_hlda_topics.csv")
+        except: 
+            self.save_hlda_topics()
+            df = pd.read_csv(self.folder_path+"/"+attr+"_hlda_topics.csv")
         dot = Digraph(comment="hLDA topic network")
         color_scheme = '/'+colors+str(max(3,len(display_options)+1))+"/"
         nodes = {key:[] for key in display_options}
