@@ -18,7 +18,7 @@ if platform == "darwin":
 elif platform == "win32":
     sys.path.append('../')
     smart_nlp_path = os.getcwd()
-    smart_nlp_path = "\\".join([smart_nlp_path.split("\\")[i] for i in range(0,len(smart_nlp_path.split("\\"))-1)]+"/")
+    smart_nlp_path = "\\".join([smart_nlp_path.split("\\")[i] for i in range(0,len(smart_nlp_path.split("\\"))-1)])
     
 from module.topic_model_plus_class import Topic_Model_plus
 

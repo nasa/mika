@@ -417,7 +417,17 @@ class Topic_Model_plus():
         file_name : str
             file name for extracting data
         """
-        
+        def check_for_ngrams():
+            for i in range(len(self.data_df)):
+                for attr in self.list_of_attributes:
+                    for word in self.data_df.iloc[i][attr]:
+                        words = word.split(" ")
+                        if len(words)>1:
+                            self.ngrams = "custom"
+                            return
+            self.ngrams = "tp"
+            return
+            
         def remove_quote_marks(word_list):
             word_list = word_list.strip("[]").split(", ")
             word_list = [w.replace("'","") for w in word_list]
@@ -426,7 +436,9 @@ class Topic_Model_plus():
         cols = self.list_of_attributes
         self.data_df[cols] = self.data_df[cols].applymap(lambda y: remove_quote_marks(y))
         self.doc_ids = self.data_df[self.doc_ids_label].tolist()
+        check_for_ngrams()
         print("Preprocessed data extracted from: ", file_name)
+        
         
     def coherence_scores(self, mdl, lda_or_hlda, measure='c_v'):
         """
@@ -635,7 +647,7 @@ class Topic_Model_plus():
                 coherence_per_topic.append("n/a")
             coherence_score[attr] += coherence_per_topic
         coherence_df = pd.DataFrame(coherence_score)
-        coherence_df.to_csv(self.folder_path+"/lda_coherence_scores.csv")
+        coherence_df.to_csv(self.folder_path+"/lda_coherence.csv")
     
     def save_lda_taxonomy(self):
         """
@@ -899,6 +911,10 @@ class Topic_Model_plus():
         """
         
         self.__create_folder()
+        try:
+            pd.read_csv(self.folder_path+"/hlda_taxonomy.csv")
+        except:
+            self.save_hlda_taxonomy()
         taxonomy_level_data = {attr+" Level "+str(lev): self.taxonomy_data[attr+" Level "+str(lev)] for attr in self.list_of_attributes}
         taxonomy_level_df = pd.DataFrame(taxonomy_level_data)
         taxonomy_level_df = taxonomy_level_df.drop_duplicates()
@@ -918,7 +934,7 @@ class Topic_Model_plus():
         taxonomy_level_df = taxonomy_level_df.sort_values(by=[key for key in taxonomy_level_data])
         taxonomy_level_df = taxonomy_level_df.reset_index(drop=True)
         taxonomy_level_df.to_csv(self.folder_path+"/hlda_level"+str(lev)+"_taxonomy.csv")
-        print("hLDA level "+str(lev)+" taxonomy saved to: ", self.folder_path+"/hlda_level1_taxonomy.csv")
+        print("hLDA level "+str(lev)+" taxonomy saved to: ", self.folder_path+"/hlda_level"+str(lev)+"_taxonomy.csv")
         
     def hlda_extract_models(self, file_path):
         """
