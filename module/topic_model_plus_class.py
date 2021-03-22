@@ -234,7 +234,7 @@ class Topic_Model_plus():
     
     def __spellchecker(self,texts):
         def spelling_replace(word):
-            if word not in self.__english_vocab and not word.isupper():
+            if word not in self.__english_vocab and not word.isupper() and not sum(1 for c in word if c.isupper()) > 1:
                 suggestions = sym_spell.lookup(word,Verbosity.CLOSEST,           max_edit_distance=2,include_unknown=True,transfer_casing=True)
                 correction = suggestions[0].term
                 self.correction_list.append(word+' --> '+correction)

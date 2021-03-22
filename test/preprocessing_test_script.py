@@ -27,7 +27,7 @@ class test_preprocessing_methods(unittest.TestCase):
     def test_spellchecker(self):
         test_class = Topic_Model_plus()
         test_spellchecker_result = test_class._Topic_Model_plus__spellchecker([['strted','nasa','NASA','CalTech','pyrolitic']])
-        correct_spellcheck = [['started','casa','NASA','CaTch','pyrolytic']]
+        correct_spellcheck = [['started','casa','NASA','CalTech','pyrolytic']]
         self.assertEqual(test_spellchecker_result,correct_spellcheck)
     def test_segment_text(self):
         test_class = Topic_Model_plus()
