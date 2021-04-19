@@ -1,0 +1,138 @@
+term,source,value
+abs,zalaco,1
+assembly,zalaco,1
+backlash,zalaco,1
+bearing,zalaco,1
+boss,zalaco,1
+bushing,zalaco,1
+cad (computer aided design),zalaco,1
+cam (computer aided manufacturing),zalaco,1
+chamfer,zalaco,1
+conceptual design,zalaco,1
+counterbore,zalaco,1
+crowdfunding,zalaco,1
+crowdsourcing,zalaco,1
+datum,zalaco,1
+detailed design,zalaco,1
+dfa (design for assembly),zalaco,1
+dfm (design for manufacture),zalaco,1
+drawing,zalaco,1
+eccentric,zalaco,1
+fillet,zalaco,1
+fixture,zalaco,1
+industrial design(er),zalaco,1
+iterative design ,zalaco,1
+lead in,zalaco,1
+mechanism,zalaco,1
+mold,zalaco,1
+pdm (product data management),zalaco,1
+pitch,zalaco,1
+preload,zalaco,1
+prototype,zalaco,1
+rendered image,zalaco,1
+rendered animation,zalaco,1
+tapped hole,zalaco,1
+tolerance,zalaco,1
+tooling,zalaco,1
+alias,design1st,1
+animation,design1st,1
+anthropometrics,design1st,1
+backend,design1st,1
+bill of materials (bom),design1st,1
+brief,design1st,1
+"cmf (color, material, finish)",design1st,1
+cnc (computer numberically controlled),design1st,1
+commercialization,design1st,1
+component,design1st,1
+concept design,design1st,1
+contract manufacturer (cm),design1st,1
+control drawing,design1st,1
+design thinking,design1st,1
+detail design,design1st,1
+dimension,design1st,1
+eco-design,design1st,1
+ergonomics,design1st,1
+exploded view,design1st,1
+fea (finite element analysis),design1st,1
+finish,design1st,1
+form study,design1st,1
+front end,design1st,1
+general assembly (ga),design1st,1
+human factors,design1st,1
+ideation,design1st,1
+illustrator,design1st,1
+industrial design (id),design1st,1
+intellectual property (ip),design1st,1
+interface,design1st,1
+model (including cad),design1st,1
+mood board,design1st,1
+native,design1st,1
+new product introduction (npi),design1st,1
+original design manufacturer (odm),design1st,1
+original equipment manufacturer (oem),design1st,1
+off-tool sample (ots),design1st,1
+organic,design1st,1
+part,design1st,1
+percentile ,design1st,1
+phase,design1st,1
+pilot run,design1st,1
+pro/e,design1st,1
+project,design1st,1
+proposal,design1st,1
+quality management systems,design1st,1
+rapid prototyping (rp),design1st,1
+rendering,design1st,1
+ research,design1st,1
+ rhinoceros (rhino),design1st,1
+sample,design1st,1
+scale,design1st,1
+schematic,design1st,1
+ sketch,design1st,1
+solidworks,design1st,1
+stage,design1st,1
+styling freeze,design1st,1
+sub assembly,design1st,1
+supplier,design1st,1
+system architect,design1st,1
+system architecture plan,design1st,1
+theme board,design1st,1
+thermal management,design1st,1
+thermal simulation,design1st,1
+user,design1st,1
+vendor,design1st,1
+coupling,ISU,1
+variables,ISU,1
+constraint,ISU,1
+objective,ISU,1
+analysis,ISU,1
+design,LLIS,1
+configuration,LLIS,1
+manufacturing,,
+testing,,
+construction,,
+transport,,
+factor,,
+method,,
+travel,,
+assembly,,
+manufacturer,,
+concept of operations,,
+conops,,
+requirements,,
+optimization,,
+design decision,,
+integration,,
+system test,,
+sizing,,
+specification,,
+verification,,
+validation,,
+v&v,,
+system architecture,,
+function,,
+behavior,,
+component,,
+structure,,
+reliability,,
+systems engineering,,
+evaluation,,
