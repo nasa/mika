@@ -389,6 +389,8 @@ class Topic_Model_plus():
             today_str = datetime.date.today().strftime("%b-%d-%Y")
             if itr != "":
                 itr = "-"+str(itr)
+            if self.name != "output data/":
+                self.name += "_"
             filename = self.name+'topics-'+today_str+str(itr)
             self.folder_path = filename#path+"/"+filename
             os.makedirs(self.folder_path, exist_ok = True)
@@ -610,9 +612,9 @@ class Topic_Model_plus():
             mdl.save(self.folder_path+"/"+attr+"_lda_model_object.bin")
         self.save_preprocessed_data()
     
-    def save_lda_document_topic_distribution(self):
+    def save_lda_document_topic_distribution(self, return_df=False):
         """
-        saves lda document topic distribution to file
+        saves lda document topic distribution to file or returns the dataframe to another function
         """
         
         #identical to hlda function except for lda tag
@@ -624,12 +626,14 @@ class Topic_Model_plus():
             for doc in mdl.docs:
                 doc_data[attr].append(doc.get_topic_dist())
         doc_df = pd.DataFrame(doc_data)
+        if return_df == True:
+            return doc_df
         doc_df.to_csv(self.folder_path+"/lda_topic_dist_per_doc.csv")
         print("LDA topic distribution per document saved to: ",self.folder_path+"/lda_topic_dist_per_doc.csv")
     
-    def save_lda_coherence(self):
+    def save_lda_coherence(self, return_df=False):
         """
-        saves lda coherence to file
+        saves lda coherence to file or returns the dataframe to another function
         """
         
         self.__create_folder()
@@ -647,11 +651,13 @@ class Topic_Model_plus():
                 coherence_per_topic.append("n/a")
             coherence_score[attr] += coherence_per_topic
         coherence_df = pd.DataFrame(coherence_score)
+        if return_df == True:
+            return coherence_df
         coherence_df.to_csv(self.folder_path+"/lda_coherence.csv")
     
-    def save_lda_taxonomy(self):
+    def save_lda_taxonomy(self, return_df=False):
         """
-        saves lda taxonomy to file
+        saves lda taxonomy to file or returns the dataframe to another function
         """
         
         self.__create_folder()
@@ -683,8 +689,24 @@ class Topic_Model_plus():
         taxonomy_df = taxonomy_df.sort_values(by=[key for key in taxonomy_data])
         taxonomy_df = taxonomy_df.reset_index(drop=True)
         self.lda_taxonomy_df = taxonomy_df
+        if return_df == True:
+            return taxonomy_df
         taxonomy_df.to_csv(self.folder_path+"/lda_taxonomy.csv")
         print("LDA taxonomy saved to: ", self.folder_path+"/lda_taxonomy.csv")
+        
+    def save_lda_results(self):
+        """
+        saves the taxonomy, coherence, and document topic distribution in one excel file
+        """
+        self.__create_folder()
+        data = {}
+        data["taxonomy"] = self.save_lda_taxonomy(return_df=True)
+        data["coherence"] = self.save_lda_coherence(return_df=True)
+        data["document topic distribution"] = self.save_lda_document_topic_distribution(return_df=True)
+        with pd.ExcelWriter(self.folder_path+"/lda_results.xlsx") as writer2:
+            for results in data:
+                data[results].to_excel(writer2, sheet_name = results, index = False)
+        print("LDA results saved to: ", self.folder_path+"/lda_results.xlsx")
         
     def lda_extract_models(self, file_path):
         """
@@ -776,7 +798,7 @@ class Topic_Model_plus():
         print("hLDA: ", (time()-start)/60, " minutes")
         return
     
-    def save_hlda_document_topic_distribution(self):
+    def save_hlda_document_topic_distribution(self, return_df=False):
         """
         saves hlda document topic distribution to file
         """
@@ -789,6 +811,8 @@ class Topic_Model_plus():
             for doc in mdl.docs:
                 doc_data[attr].append(doc.get_topic_dist())
         doc_df = pd.DataFrame(doc_data)
+        if return_df == True:
+            return doc_df
         doc_df.to_csv(self.folder_path+"/hlda_topic_dist_per_doc.csv")
         print("hLDA topic distribution per document saved to: ",self.folder_path+"/hlda_topic_dist_per_doc.csv")
     
@@ -796,7 +820,6 @@ class Topic_Model_plus():
         """
         saves hlda models to file
         """
-        ##TO DO: add save preprocessed data
         self.__create_folder()
         for attr in self.list_of_attributes:
             mdl = self.hlda_models[attr]
@@ -804,13 +827,13 @@ class Topic_Model_plus():
             print("hLDA model for "+attr+" saved to: ", (self.folder_path+"/"+attr+"_hlda_model_object.bin"))
         self.save_preprocessed_data()
         
-    def save_hlda_topics(self):
+    def save_hlda_topics(self, return_df=False):
         """
         saves hlda topics to file
         """
-        
         #saving raw topics with coherence
         self.__create_folder()
+        dfs = {}
         for attr in self.list_of_attributes:
             mdl = self.hlda_models[attr]
             topics_data = {"topic level": [],
@@ -842,10 +865,14 @@ class Topic_Model_plus():
                     i += 1
                 topics_data["best document"].append(docs_in_topic[probs.index(max(probs))])
             df = pd.DataFrame(topics_data)
-            df.to_csv(self.folder_path+"/"+attr+"_hlda_topics.csv")
-            print("hLDA topics for "+attr+" saved to: ",self.folder_path+"/"+attr+"_hlda_topics.csv")
+            dfs[attr] = df
+            if return_df == False:
+                df.to_csv(self.folder_path+"/"+attr+"_hlda_topics.csv")
+                print("hLDA topics for "+attr+" saved to: ",self.folder_path+"/"+attr+"_hlda_topics.csv")
+        if return_df == True:
+            return dfs
             
-    def save_hlda_coherence(self):
+    def save_hlda_coherence(self, return_df=False):
         """
         saves hlda coherence to file
         """
@@ -862,10 +889,12 @@ class Topic_Model_plus():
                     coherence_data[attr+" average"].append(self.hlda_coherence[attr]["level "+str(level)+" average"])
         index = ["total"]+["level "+str(i) for i in range(1, self.levels)]
         coherence_df = pd.DataFrame(coherence_data, index=index)
+        if return_df == True:
+            return coherence_df
         coherence_df.to_csv(self.folder_path+"/"+"hlda_coherence.csv")
         print("hLDA coherence scores saved to: ",self.folder_path+"/"+"hlda_coherence.csv")
     
-    def save_hlda_taxonomy(self):
+    def save_hlda_taxonomy(self, return_df=False):
         """
         saves hlda taxonomy to file
         """
@@ -897,10 +926,12 @@ class Topic_Model_plus():
         taxonomy_df = taxonomy_df.sort_values(by=[key for key in taxonomy_data])
         taxonomy_df = taxonomy_df.reset_index(drop=True)
         self.taxonomy_df = taxonomy_df
+        if return_df == True:
+            return taxonomy_df
         taxonomy_df.to_csv(self.folder_path+"/hlda_taxonomy.csv")
         print("hLDA taxonomy saved to: ", self.folder_path+"/hlda_taxonomy.csv")
     
-    def save_hlda_level_n_taxonomy(self, lev=1):
+    def save_hlda_level_n_taxonomy(self, lev=1, return_df=False):
         """
         saves hlda taxonomy at level n
         
@@ -914,7 +945,7 @@ class Topic_Model_plus():
         try:
             pd.read_csv(self.folder_path+"/hlda_taxonomy.csv")
         except:
-            self.save_hlda_taxonomy()
+            self.save_hlda_taxonomy(return_df = True)
         taxonomy_level_data = {attr+" Level "+str(lev): self.taxonomy_data[attr+" Level "+str(lev)] for attr in self.list_of_attributes}
         taxonomy_level_df = pd.DataFrame(taxonomy_level_data)
         taxonomy_level_df = taxonomy_level_df.drop_duplicates()
@@ -933,9 +964,28 @@ class Topic_Model_plus():
         taxonomy_level_df["number of documents for row"] = num_lessons_per_row
         taxonomy_level_df = taxonomy_level_df.sort_values(by=[key for key in taxonomy_level_data])
         taxonomy_level_df = taxonomy_level_df.reset_index(drop=True)
+        if return_df == True:
+            return taxonomy_level_df
         taxonomy_level_df.to_csv(self.folder_path+"/hlda_level"+str(lev)+"_taxonomy.csv")
         print("hLDA level "+str(lev)+" taxonomy saved to: ", self.folder_path+"/hlda_level"+str(lev)+"_taxonomy.csv")
-        
+    
+    def save_hlda_results(self):
+        """
+        saves the taxonomy, level 1 taxonomy, raw topics coherence, and document topic distribution in one excel file
+        """
+        self.__create_folder()
+        data = {}
+        data["taxonomy"] = self.save_hlda_taxonomy(return_df=True)
+        data["level 1 taxonomy"] = self.save_hlda_level_n_taxonomy(lev=1, return_df=True)
+        topics_dict = self.save_hlda_topics(return_df=True)
+        data.update(topics_dict)
+        data["coherence"] = self.save_hlda_coherence(return_df=True)
+        data["document topic distribution"] = self.save_hlda_document_topic_distribution(return_df=True)
+        with pd.ExcelWriter(self.folder_path+"/hlda_results.xlsx") as writer2:
+            for results in data:
+                data[results].to_excel(writer2, sheet_name = results, index = False)
+        print("LDA results saved to: ", self.folder_path+"/hlda_results.xlsx")
+    
     def hlda_extract_models(self, file_path):
         """
         gets hlda models from file

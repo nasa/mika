@@ -18,6 +18,7 @@ elif platform == "win32":
     sys.path.append('../')
     smart_nlp_path = os.getcwd()
     smart_nlp_path = "\\".join([smart_nlp_path.split("\\")[i] for i in range(0,len(smart_nlp_path.split("\\"))-1)])
+    smart_nlp_path = smart_nlp_path+"\\"
 
 #print(smart_nlp_path)
 #these variables must be defined to create the object
@@ -32,30 +33,34 @@ num_topics ={'Lesson(s) Learned':5, 'Driving Event':5, 'Recommendation(s)':5}
 test = Topic_Model_plus(list_of_attributes=list_of_attributes, document_id_col=document_id_col, csv_file=csv_file_name, name=name)
 #preparing the data: loading, dropping columns and rows
 #parameters: none required, any kwargs for pd.read_csv can be passed
-#test.prepare_data()
+test.prepare_data()
 #preprocessing the data: cleaning, lemmatizing, bigrams (optional, pass ngrams=False to skip)
 #parameters: domain_stopwords, ngrams=True (used for custom ngrams), ngram_range=3, threshold=15, min_count=5
-#test.preprocess_data()
+test.preprocess_data()
 
-#print(test.data_df)
+print(test.data_df)
 #optimize lda: needs work, generally outputs the max_topics, can use coherence or loglikelihood
 #parameters: optional, can pass max_topics and any kwargs for tp.lda model
 #outpus: saves the optimized num of topics in a member variable, need to optimize hyper params alpha and beta as well
 #test.lda_optimization(min_cf=1, max_topics = 100)
+
 ##perform lda: can pass in any parameter used in tp model
 #parameters: optional
+test.lda(min_cf=1, num_topics=num_topics)
+test.save_lda_results()
 
-#test.lda(min_cf=1, num_topics=num_topics)
 #saving various lda results
-
 #test.save_lda_taxonomy()
-
 #test.save_lda_document_topic_distribution()
 #test.save_lda_models()
 #test.save_lda_coherence()
 #LDA visualization using pyLDAvis, saves html link to folder
 #for attr in list_of_attributes:
 #    test.lda_visual(attr)
+
+test.hlda()
+test.save_hlda_results()
+
 #test.hlda(levels=4)
 #test.save_hlda_models()
 #display_options = {"level 1": 1,
