@@ -6,6 +6,7 @@ Created on Fri Apr 23 12:14:51 2021
 """
 import numpy as np
 import pandas as pd
+import scipy.stats as stats
 
 def normalize_data(df, features, years, flag='minmax'):  
     num_features = len(features)
@@ -55,6 +56,17 @@ def minmax_scale(data_list):
         scaled_data = (data-min_)/max_
         scaled_list.append(scaled_data)
     return scaled_list
+
+def corr_sig(df=None):
+    p_matrix = np.zeros(shape=(df.shape[1],df.shape[1]))
+    for col in df.columns:
+        for col2 in df.drop(col,axis=1).columns:
+            _ , p = stats.pearsonr(df[col],df[col2])
+            p_matrix[df.columns.to_list().index(col),df.columns.to_list().index(col2)] = p
+    return p_matrix
+
+def multiple_reg(hazard_freq, totals):
+    return
 
 def check_rates():
     return 

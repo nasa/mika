@@ -61,6 +61,8 @@ class Topic_Model_plus():
         computes and returns coherence scores
     lda(self, num_topics={}, training_iterations=1000, iteration_step=10, remove_pct=0.3, **kwargs)
         performs lda topic modeling
+    save_lda_results(self):
+        saves the taxonomy, coherence, and document topic distribution in one excel file
     save_lda_models(self)
         saves lda models to file
     save_lda_document_topic_distribution(self)
@@ -75,6 +77,8 @@ class Topic_Model_plus():
         saves pyLDAvis output from lda to file
     hlda(self, levels=3, training_iterations=1000, iteration_step=10, remove_pct=0.3, **kwargs)
         performs hlda topic modeling
+    save_hlda_results(self):
+        saves the taxonomy, level 1 taxonomy, raw topics coherence, and document topic distribution in one excel file
     save_hlda_document_topic_distribution(self)
         saves hlda document topic distribution to file
     save_hlda_models(self)
