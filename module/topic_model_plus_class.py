@@ -659,6 +659,46 @@ class Topic_Model_plus():
             return coherence_df
         coherence_df.to_csv(self.folder_path+"/lda_coherence.csv")
     
+    def save_lda_topics(self, return_df=False):
+        """
+        saves lda topics to file
+        """
+        #saving raw topics with coherence
+        self.__create_folder()
+        dfs = {}
+        for attr in self.list_of_attributes:
+            mdl = self.lda_models[attr]
+            topics_data = {"topic number": [],           
+                           "number of documents in topic": [],
+                           "topic words": [],
+                           "number of words": [],
+                           "best document": [],
+                           "coherence": []}
+            topics_data["coherence"] = self.lda_coherence[attr]["per topic"]
+            for k in range(mdl.k):
+                topics_data["topic number"].append(k)
+                topics_data["number of words"].append(mdl.get_count_by_topics()[k])
+                topics_data["topic words"].append(", ".join([word[0] for word in mdl.get_topic_words(k, top_n=mdl.get_count_by_topics()[k])]))
+            docs_in_topic ={k:[] for k in range(mdl.k)}
+            probs = {k:[] for k in range(mdl.k)}
+            i = 0
+            for doc in mdl.docs:
+                for topic, weight in doc.get_topics(top_n=5):
+                    docs_in_topic[topic].append(self.doc_ids[i])
+                    probs[topic].append(weight)
+                i+=1
+            for k in docs_in_topic:
+                #highest_prob = 
+                topics_data["best document"].append(docs_in_topic[k][probs[k].index(max(probs[k]))])
+                topics_data["number of documents in topic"].append(len(docs_in_topic[k]))
+            df = pd.DataFrame(topics_data)
+            dfs[attr] = df
+            if return_df == False:
+                df.to_csv(self.folder_path+"/"+attr+"_lda_topics.csv")
+                print("LDA topics for "+attr+" saved to: ",self.folder_path+"/"+attr+"_lda_topics.csv")
+        if return_df == True:
+            return dfs
+    
     def save_lda_taxonomy(self, return_df=False):
         """
         saves lda taxonomy to file or returns the dataframe to another function
@@ -704,6 +744,8 @@ class Topic_Model_plus():
         """
         self.__create_folder()
         data = {}
+        topics_dict = self.save_lda_topics(return_df=True)
+        data.update(topics_dict)
         data["taxonomy"] = self.save_lda_taxonomy(return_df=True)
         data["coherence"] = self.save_lda_coherence(return_df=True)
         data["document topic distribution"] = self.save_lda_document_topic_distribution(return_df=True)
@@ -762,6 +804,43 @@ class Topic_Model_plus():
         )
         pyLDAvis.save_html(prepared_data, self.folder_path+'/'+attr+'_ldavis.html')
         print("LDA Visualization for "+attr+" saved to: "+self.folder_path+'/'+attr+'_ldavis.html')
+    
+    def hlda_visual(self, attr):
+        """
+        saves pyLDAvis output from hlda to file
+        
+        ARGUMENTS
+        ---------
+        attr : str
+            reference to attribute of interest
+        """
+        self.__create_folder()
+        mdl = self.hlda_models[attr]
+        topics = [k for k in range(mdl.k) if mdl.is_live_topic(k)]
+        
+        topic_term_dists = np.stack([mdl.get_topic_word_dist(k) for k in range(mdl.k) if mdl.is_live_topic(k)])
+        doc_topic_dists_pre_stack = []
+        for doc in mdl.docs:
+            doc_topics = []
+            for k in topics:
+                if k in doc.path:
+                    doc_topics.append(list(doc.path).index(k))
+                else:
+                    doc_topics.append(0)
+            doc_topic_dists_pre_stack.append(doc_topics)
+        doc_topic_dists = np.stack(doc_topic_dists_pre_stack)
+        doc_lengths = np.array([len(doc.words) for doc in mdl.docs])
+        vocab = list(mdl.used_vocabs)
+        term_frequency = mdl.used_vocab_freq
+        prepared_data = pyLDAvis.prepare(
+            topic_term_dists, 
+            doc_topic_dists, 
+            doc_lengths, 
+            vocab, 
+            term_frequency
+        )
+        pyLDAvis.save_html(prepared_data, self.folder_path+'/'+attr+'_hldavis.html')
+        print("hLDA Visualization for "+attr+" saved to: "+self.folder_path+'/'+attr+'_hldavis.html')
     
     def hlda(self, levels=3, training_iterations=1000, iteration_step=10, **kwargs):
         """
