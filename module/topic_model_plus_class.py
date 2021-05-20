@@ -268,6 +268,7 @@ class Topic_Model_plus():
         return texts
         
     def __trigram_texts(self, texts, ngram_range, threshold, min_count):
+        #NEEDS WORK
         ngrams = []
         ngram_models = {}
         for n in range(2, ngram_range+1):
