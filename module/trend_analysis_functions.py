@@ -74,7 +74,7 @@ def multiple_reg_feature_importance(predictors, hazards, correlation_mat_total):
     #predictors and hazards must be values from the correlation_mat_total
     data = correlation_mat_total
     predictors = predictors
-    hazards = hazards
+    hazards = ["total "+ h for h in hazards]
     full_model_score = []
     full_model_MSE = []
     xi_score = {predictor+" removed score":[] for predictor in predictors}
@@ -122,25 +122,30 @@ def check_rates():
 
 def remove_outliers(data, threshold=1.5):
     #print(data)
+    if data == []:
+        return data
     Q1 = np.quantile(data,0.25)
     Q3 = np.quantile(data,0.75)
     IQR = Q3 - Q1
     new_data = [pt for pt in data if (pt>(Q1-1.5*IQR)) and (pt<(Q3+1.5*IQR))]
+    #print(len(data), len(new_data))
     return new_data
 
-def calc_metrics(hazard_file, years, preprocessed_df, remove_outliers=True):
+def calc_metrics(hazard_file, years, preprocessed_df, rm_outliers=True):
      hazard_info = pd.read_excel(hazard_file, sheet_name=['Hazard-focused'])
      hazards = hazard_info['Hazard-focused']['Hazard name'].tolist()
-     categories = hazard_info['Hazard-focuse']['Hazard Category'].tolist()
+     categories = hazard_info['Hazard-focused']['Hazard Category'].tolist()
      time_of_occurence_days = {name:{str(year):[] for year in years} for name in hazards}
      time_of_occurence_pct_contained = {name:{str(year):[] for year in years} for name in hazards}
      frequency = {name:{str(year):0 for year in years} for name in hazards}
      fires = {name:{str(year):[] for year in years} for name in hazards}
+     years = preprocessed_df["START_YEAR"].unique()
+     years.sort()
      for year in tqdm(years):
-        temp_df = preprocessed_df.loc[preprocessed_df["START_YEAR"]==year]
+        temp_df = preprocessed_df.loc[preprocessed_df["START_YEAR"]==year].reset_index(drop=True)
         fire_ids = temp_df["INCIDENT_ID"].unique()
         for id_ in fire_ids:
-            temp_fire_df = temp_df.loc[temp_df["INCIDENT_ID"]==id_]
+            temp_fire_df = temp_df.loc[temp_df["INCIDENT_ID"]==id_].reset_index(drop=True)
             #date corrections
             start_date = temp_fire_df["DISCOVERY_DOY"].unique() #should only have one start date
             if len(start_date) != 1: 
@@ -150,8 +155,9 @@ def calc_metrics(hazard_file, years, preprocessed_df, remove_outliers=True):
             if start_date == 365:
                     start_date = 0
         
-            for i in range(len(temp_fire_df)):
-                text = temp_fire_df.iloc[i]["Combined Text"]
+            for j in range(len(temp_fire_df)):
+                text = temp_fire_df.iloc[j]["Combined Text"]
+                #print(text, type(text))
                 #check for hazard
                 for i in range(len(hazard_info['Hazard-focused'])):
                     hazard_name = hazard_info['Hazard-focused'].iloc[i]['Hazard name']
@@ -160,18 +166,23 @@ def calc_metrics(hazard_file, years, preprocessed_df, remove_outliers=True):
                     hazard_words = [list_.split(", ") for list_ in hazard_words]
                     negation_words = hazard_info['Hazard-focused'].iloc[i]['Negation words']
                     #need to check if a word in text is in hazard words, for each list in hazard words, no words in negation words
-                    
+                    #print(hazard_words)
                     for word_list in hazard_words:
                         hazard_found = False #ensures a word from each list must show up
                         for word in word_list:
                             if word in text:
                                 hazard_found = True
-                    for word in negation_words: #removes texts that have negation words
-                        if word in text:
-                            hazard_found = False 
+                        if hazard_found == False: #ensures a word from each list must show up
+                            break 
+                    
+                    if not np.isnan(negation_words):
+                        for word in negation_words.split(", "): #removes texts that have negation words
+                            if word in text:
+                                hazard_found = False 
+                    
                     if hazard_found == True:
-                        time_of_hazard = int(temp_fire_df.iloc[i]["REPORT_DOY"])
-                        
+                        time_of_hazard = int(temp_fire_df.iloc[j]["REPORT_DOY"])
+                    
                         #correct dates
                         if time_of_hazard<start_date: 
                             #print(time_of_hazard, start_date)
@@ -184,10 +195,10 @@ def calc_metrics(hazard_file, years, preprocessed_df, remove_outliers=True):
                                 time_of_hazard = temp_start
                                 #print(time_of_hazard, start_date)
                         time_of_occurence_days[hazard_name][str(year)].append(time_of_hazard-int(start_date))
-                        time_of_occurence_pct_contained[hazard_name][str(year)].append(temp_fire_df.iloc[i]["PCT_CONTAINED_COMPLETED"])
+                        time_of_occurence_pct_contained[hazard_name][str(year)].append(temp_fire_df.iloc[j]["PCT_CONTAINED_COMPLETED"])
                         fires[hazard_name][str(year)].append(id_)
                         frequency[hazard_name][str(year)] += 1
-     if remove_outliers == True:
+     if rm_outliers == True:
          for year in years:
              for hazard in hazards:
                  time_of_occurence_days[hazard][str(year)] = remove_outliers(time_of_occurence_days[hazard][str(year)])
@@ -200,21 +211,34 @@ def create_primary_results_table(time_of_occurence_days, time_of_occurence_pct_c
     data_df = {"Hazard Category": categories,
                "Hazard Name": hazards}
     #OTTO days average += std dev; interval
-    days_total_data = {hazard: [time_of_occurence_days[hazard][year] for hazard in hazards for year in years] for hazard in hazards}
+    days_total_data = {}
+    for hazard in hazards:
+        days_total_data[hazard] = []
+        for year in years:
+            for val in time_of_occurence_days[hazard][year]:
+                days_total_data[hazard].append(val)
     days_av = {hazard: np.average(days_total_data[hazard]) for hazard in hazards}
+    #print(days_av)
+    #print(days_total_data[hazards[0]])
     days_std = {hazard: np.std(days_total_data[hazard]) for hazard in hazards}
     data_df["OTTO days"] = [str(days_av[hazard])+"+-"+str(days_std[hazard]) for hazard in hazards]
     data_df["OTTO days interval"] = [stats.t.interval(alpha=0.95, df=len(days_total_data[hazard])-1, loc=np.mean(days_total_data[hazard]), scale=stats.sem(days_total_data[hazard])) for hazard in hazards]
     #OTTO percent average += std dev; interval
-    pct_total_data = {hazard: [time_of_occurence_pct_contained[hazard][year] for hazard in hazards for year in years] for hazard in hazards}
+    pct_total_data = {}
+    for hazard in hazards:
+        pct_total_data[hazard] = []
+        for year in years:
+            for val in time_of_occurence_pct_contained[hazard][year]:
+                pct_total_data[hazard].append(val)
     pct_av = {hazard: np.average(pct_total_data[hazard]) for hazard in hazards}
     pct_std = {hazard: np.std(pct_total_data[hazard]) for hazard in hazards}
     data_df["OTTO %"] = [str(pct_av[hazard])+"+-"+str(pct_std[hazard]) for hazard in hazards]
     data_df["OTTO % interval"] = [stats.t.interval(alpha=0.95, df=len(pct_total_data[hazard])-1, loc=np.mean(pct_total_data[hazard]), scale=stats.sem(pct_total_data[hazard])) for hazard in hazards]
     #total frequency
-    data_df["Total Frequency"] = [np.sum([frequency[hazard][year] for hazard in fires for year in fires[hazard]])]
+    data_df["Total Frequency"] = [np.sum([frequency[hazard][year] for year in years]) for hazard in hazards]
     #rate per year
-    sums_per_hazard = [np.sum([len(set(fires[hazard][year])) for hazard in fires for year in fires[hazard]])]
+    sums_per_hazard = [np.sum([len(set(fires[hazard][year])) for year in years]) for hazard in hazards]
+    data_df["Total Fire Frequency"] = sums_per_hazard
     data_df["Average Occurrences per year"] = [val/len(years) for val in sums_per_hazard]
     #fires per rate
     total_fires = total_fires = len(hazard_df["INCIDENT_ID"].unique())

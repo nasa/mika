@@ -18,7 +18,16 @@ various information. This is basically pulling relevant words from topics and
 aggregating to a hazard.
 
 For example, we could have the following results for a row:
-hazard words -> tortoise, beetle, endangered, endangered species habitat
+
+hazard words -> tortoise, beetle, species; endangered, endangered species habitat, habitat
+
+***NOTE: when multiple words are required to define a hazard, such as both "speces" and "endangered",
+separate the two type of lists with a semicolon
+ex1: ground; heli, helicopter, aircraft, airtanker, tanker, aerial
+ex2: highway, road, traffic; close, closure, impacts
+ex3: resource, crew; limited, share, lack, fatigue
+****
+
 hazard level 1 topics -> 10, 6
 hazard level 2 topics -> 33, 26, 17, 11
 Best documents (for each of the topics) -> 2006_1224_MULTIPLE JUNE FIRES,
@@ -26,7 +35,8 @@ Best documents (for each of the topics) -> 2006_1224_MULTIPLE JUNE FIRES,
 2014_WA-WFS-513_SAND RIDGE, 2014_96_BEAR
 hazard category -> environmental
 hazard name -> ecosystem considerations
-  
+
+See "hazard_interpretation_test" for an example of a filled out hazard sheet
 
 Next, begin interpretation:
 0. From the pyLDAvis output, go through each topic, for each topic:
@@ -47,7 +57,6 @@ with the same hazards, we cannot use just the raw topics as the equivalent of a 
 Instead, we will use the "Hazard words" in the hazard-focused results spread sheet to identify
 occurences for each hazard found.*
 
-See "ICS quantitative analysis.ipynb" section "HAZARD METRIC ANALYSIS", cell 3 for 
-an example of how this was done for the preliminary resuls.
+See "trend_analysis_functions.py" for the functions of how this is implemented.
 
 *note: this method is not perfect and is prone to errors, future work may develop better methods
