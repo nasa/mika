@@ -7,7 +7,7 @@ First open all necessary documents:
 2. Open the hlda results output
 (ex: ICS_full_combined_topics-May-17-2021/hlda_results.xlsx)
 3. Open the raw text of the dataset
-(ex: ICS_raw_text_filtered.csv)
+(ex: ICS_raw_text.csv)
 4. Open a spread sheet for recording results
 (ex: hazard_interpretation_template)
 
