@@ -105,7 +105,7 @@ class Topic_Model_plus():
     # private attributes
     __english_vocab = set([w.lower() for w in words.words()])
 
-    def __init__(self, document_id_col="", csv_file="", list_of_attributes=[], extra_cols = [], name="output data/", combine_cols=False):
+    def __init__(self, document_id_col="", csv_file="", list_of_attributes=[], extra_cols = [], name="output data/", combine_cols=False, create_ids=False):
         """
         CLASS CONSTRUCTORS
         ------------------
@@ -147,6 +147,7 @@ class Topic_Model_plus():
         self.combine_cols = combine_cols
         self.hlda_models = {}
         self.lda_models = {}
+        self.create_ids = create_ids
         
     def __load_data(self, **kwargs):
         self.data_df = pd.read_csv(open(self.data_csv,encoding='utf8',errors='ignore'), **kwargs)
@@ -186,6 +187,22 @@ class Topic_Model_plus():
         self.data_df = self.data_df.drop(list(set(rows_to_drop)), axis=0)
         self.data_df = self.data_df.reset_index(drop=True)
         self.doc_ids = self.data_df[self.doc_ids_label].tolist()
+    
+    def __create_unique_ids(self):
+        unique_ids = []
+        prev_id = None
+        j = 0
+        for i in tqdm(range(len(self.data_df)), "Creating Unique IDs…"):
+            current_id = self.data_df.iloc[i][self.doc_ids_label]
+            if current_id == prev_id:
+                j+=1
+            else:
+                j=0
+            unique_ids.append(current_id+"_"+str(j))
+            prev_id = current_id
+        self.data_df["Unique IDs"] = unique_ids
+        self.doc_ids_label = "Unique IDs"
+        self.doc_ids = self.data_df["Unique IDs"].tolist()
          
     def prepare_data(self, **kwargs):
         """
@@ -198,6 +215,8 @@ class Topic_Model_plus():
             self.__remove_incomplete_rows()
         if self.combine_cols == True:
             self.__combine_columns()
+        if self.create_ids == True:
+            self.__create_unique_ids()
         print("data preparation: ", (time()-start_time)/60,"minutes \n")
         
     def __tokenize_texts(self,texts):
