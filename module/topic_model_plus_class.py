@@ -344,7 +344,6 @@ class Topic_Model_plus():
         else: 
             self.ngrams = "tp"
         start = time()
-        texts = {}
         sleep(0.5)
         for attr in tqdm(self.list_of_attributes,desc="Preprocessing data…"):
             pbar = tqdm(total=100, desc="Preprocessing "+attr+"…")
@@ -370,6 +369,8 @@ class Topic_Model_plus():
             pbar.update(20)
             sleep(0.5)
             pbar.close()
+        self.__drop_duplicate_docs(self.list_of_attributes)
+        self.__drop_short_docs()
         cols = self.data_df.columns.difference([self.doc_ids_label]+self.extra_cols)
         self.data_df[cols] = self.data_df[cols].applymap(lambda y: np.nan if (type(y)==int or len(y)==0) else y)
         self.data_df = self.data_df.dropna(how="any").reset_index(drop=True)
@@ -422,6 +423,17 @@ class Topic_Model_plus():
         else:
             return
         
+    def __drop_duplicate_docs(self, cols):
+        self.data_df = self.data_df.loc[self.data_df.astype(str).drop_duplicates(subset=cols, keep='last').index].reset_index(drop=True)
+        
+    def __drop_short_docs(self, thres=3):
+        indx_to_drop = []
+        for i in range(len(self.data_df)):
+            for attr in self.list_of_attributes:
+                if len(self.data_df.iloc[i][attr])<thres:
+                    indx_to_drop.append(i)
+        self.data_df = self.data_df.drop(indx_to_drop).reset_index(drop=True)
+    
     def save_preprocessed_data(self):
         """
         saves preprocessed data to a file
@@ -433,6 +445,7 @@ class Topic_Model_plus():
             name = "/preprocessed_data_combined_text.csv"
         self.data_df.to_csv(self.folder_path+name, index=False)
         print("Preprocessed data saves to: ", self.folder_path+name)
+        
     
     def extract_preprocessed_data(self, file_name):
         """
@@ -461,6 +474,8 @@ class Topic_Model_plus():
         self.data_df = pd.read_csv(file_name)
         cols = self.list_of_attributes
         self.data_df[cols] = self.data_df[cols].applymap(lambda y: remove_quote_marks(y))
+        self.__drop_duplicate_docs(cols)
+        self.__drop_short_docs()
         self.doc_ids = self.data_df[self.doc_ids_label].tolist()
         check_for_ngrams()
         print("Preprocessed data extracted from: ", file_name)
@@ -679,7 +694,7 @@ class Topic_Model_plus():
             return coherence_df
         coherence_df.to_csv(self.folder_path+"/lda_coherence.csv")
     
-    def save_lda_topics(self, return_df=False):
+    def save_lda_topics(self, return_df=False, p_thres=0.01):
         """
         saves lda topics to file
         """
@@ -691,14 +706,18 @@ class Topic_Model_plus():
             topics_data = {"topic number": [],           
                            "number of documents in topic": [],
                            "topic words": [],
+                           "total number of words": [],
                            "number of words": [],
                            "best document": [],
                            "coherence": []}
             topics_data["coherence"] = self.lda_coherence[attr]["per topic"]
             for k in range(mdl.k):
                 topics_data["topic number"].append(k)
-                topics_data["number of words"].append(mdl.get_count_by_topics()[k])
-                topics_data["topic words"].append(", ".join([word[0] for word in mdl.get_topic_words(k, top_n=mdl.get_count_by_topics()[k])]))
+                topics_data["total number of words"].append(mdl.get_count_by_topics()[k])
+                probs = mdl.get_topic_word_dist(k)
+                probs = [p for p in probs if p>p_thres]
+                topics_data["number of words"].append(len(probs))
+                topics_data["topic words"].append(", ".join([word[0] for word in mdl.get_topic_words(k, top_n=len(probs))]))
             docs_in_topic ={k:[] for k in range(mdl.k)}
             probs = {k:[] for k in range(mdl.k)}
             i = 0
@@ -930,7 +949,7 @@ class Topic_Model_plus():
             print("hLDA model for "+attr+" saved to: ", (self.folder_path+"/"+attr+"_hlda_model_object.bin"))
         self.save_preprocessed_data()
         
-    def save_hlda_topics(self, return_df=False):
+    def save_hlda_topics(self, return_df=False, p_thres=0.001):
         """
         saves hlda topics to file
         """
@@ -944,6 +963,7 @@ class Topic_Model_plus():
                 "parent": [],
                 "number of documents in topic": [],
                 "topic words": [],
+                "total number of words": [],
                 "number of words": [],
                 "best document": [],
                 "coherence": []}
@@ -955,8 +975,11 @@ class Topic_Model_plus():
                 topics_data["topic level"].append(mdl.level(k))
                 topics_data["number of documents in topic"].append(mdl.num_docs_of_topic(k))
                 topics_data["topic number"].append(k)
-                topics_data["number of words"].append(mdl.get_count_by_topics()[k])
-                topics_data["topic words"].append(", ".join([word[0] for word in mdl.get_topic_words(k, top_n=mdl.get_count_by_topics()[k])]))
+                probs = mdl.get_topic_word_dist(k)
+                probs = [p for p in probs if p>p_thres]
+                topics_data["number of words"].append(len(probs))
+                topics_data["total number of words"].append(mdl.get_count_by_topics()[k])
+                topics_data["topic words"].append(", ".join([word[0] for word in mdl.get_topic_words(k, top_n=len(probs))]))
                 i = 0
                 docs_in_topic = []
                 probs = []
@@ -1087,7 +1110,7 @@ class Topic_Model_plus():
         with pd.ExcelWriter(self.folder_path+"/hlda_results.xlsx") as writer2:
             for results in data:
                 data[results].to_excel(writer2, sheet_name = results, index = False)
-        print("LDA results saved to: ", self.folder_path+"/hlda_results.xlsx")
+        print("hLDA results saved to: ", self.folder_path+"/hlda_results.xlsx")
     
     def hlda_extract_models(self, file_path):
         """
