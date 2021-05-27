@@ -45,63 +45,67 @@ if platform == "darwin":
 elif platform == "win32":
     sys.path.append('../')
     smart_nlp_path = os.getcwd()
-    smart_nlp_path = "\\".join([smart_nlp_path.split("\\")[i] for i in range(0,len(smart_nlp_path.split("\\"))-1)]+["/"])
+    smart_nlp_path = "\\".join([smart_nlp_path.split("\\")[i] for i in range(0,len(smart_nlp_path.split("\\"))-1)])
     
 from module.topic_model_plus_class import Topic_Model_plus
 ICS_stop_words = stop_words
 
-#list_of_attributes = ["REMARKS", "SIGNIF_EVENTS_SUMMARY", "MAJOR_PROBLEMS"]
+import pandas as pd 
+
+extra_cols = ["CY","DISCOVERY_DATE", "START_YEAR", "REPORT_DOY", "DISCOVERY_DOY",
+              "TOTAL_PERSONNEL", "TOTAL_AERIAL", "PCT_CONTAINED_COMPLETED"]
+
+"""#Preprocess data
+list_of_attributes = ["REMARKS", "SIGNIF_EVENTS_SUMMARY", "MAJOR_PROBLEMS"]
 document_id_col = "INCIDENT_ID"
 extra_cols = ["CY","DISCOVERY_DATE", "START_YEAR", "REPORT_DOY", "DISCOVERY_DOY",
               "TOTAL_PERSONNEL", "TOTAL_AERIAL", "PCT_CONTAINED_COMPLETED"]
-#file_name = smart_nlp_path+"\input data\209-PLUS\ics209-plus-wildfire\ics209-plus-wildfire\ics209-plus-wf_sitreps_1999to2014.csv"
-name = smart_nlp_path+r"\output data\ICS_full"
+file_name = smart_nlp_path+r"\input data\209-PLUS\ics209-plus-wildfire\ics209-plus-wildfire\ics209-plus-wf_sitreps_1999to2014.csv"
+name = smart_nlp_path+r"\output data\ICS_"
+ICS = Topic_Model_plus(document_id_col=document_id_col, extra_cols=extra_cols, csv_file=file_name, list_of_attributes=list_of_attributes, name=name, combine_cols=True, create_ids=True)
+ICS.prepare_data(dtype=str)
+#use filtered reports
+file = smart_nlp_path+r"\input data\ICS_filtered_preprocessed_combined_data.csv"
+filtered_df = pd.read_csv(file)
+filtered_ids = filtered_df['INCIDENT_ID'].unique()
+ICS.data_df = ICS.data_df.loc[ICS.data_df['INCIDENT_ID'].isin(filtered_ids)].reset_index(drop=True)
+ICS.preprocess_data(domain_stopwords = ICS_stop_words, percent=0.5, ngrams=False, min_count=1)
+ICS.save_preprocessed_data()
+"""
+
+#"""#Extract preprocessed data
 list_of_attributes = ["Combined Text"]
-
-#ICS = Topic_Model_plus(document_id_col=document_id_col, extra_cols=extra_cols, csv_file=file_name, list_of_attributes=list_of_attributes, name=name, combine_cols=True)
-#ICS.prepare_data(dtype=str)
-#print(ICS.data_df)
-#ICS.data_df = ICS.data_df.loc[ICS.data_df["CY"]>="2006"]
-#ICS.data_df = ICS.data_df.reset_index(drop=True)
-#ICS.data_df = ICS.data_df[:5000].reset_index(drop=True)
-#print(ICS.data_df)
-#ICS.preprocess_data(domain_stopwords = ICS_stop_words)
-#print(ICS.data_df)
-#ICS.save_preprocessed_data()
-
-
-
-file = smart_nlp_path+r"\input data\ICS_filtered_preprocessed_combined.csv"
-ICS = Topic_Model_plus(document_id_col=document_id_col, extra_cols=extra_cols, list_of_attributes=list_of_attributes, name=name, combine_cols=True)
+name =  smart_nlp_path+r"\output data\ICS_"
+file = smart_nlp_path+r"\input data\ICS_filtered_preprocessed_combined_data.csv"
+filtered_df = pd.read_csv(file)
+filtered_ids = filtered_df['INCIDENT_ID'].unique()
+document_id_col = "Unique IDs"
+ICS = Topic_Model_plus(document_id_col=document_id_col, extra_cols=extra_cols, list_of_attributes=list_of_attributes, name=name, combine_cols=False)
 ICS.extract_preprocessed_data(file)
-ICS.ngrams = "custom"
+#"""
 
+#"""#Run topic modeling
+list_of_attributes = ["Combined Text"]
 #ICS.lda_optimization(min_cf=5, max_topics = 200)
 num_topics = {attr:160 for attr in list_of_attributes}
-print(ICS.data_df)
-ICS.lda(min_cf=5, num_topics=num_topics)
+ICS.lda(min_cf=1, min_df=1, num_topics=num_topics, alpha=1, eta=0.0001)
 ICS.save_lda_results()
-#ICS.save_lda_coherence()
-#ICS.save_lda_taxonomy()
-#for attr in list_of_attributes:
-#    ICS.lda_visual(attr)
-ICS.hlda(levels=3, eta=1.0)
-ICS.save_hlda_results()
+ICS.save_lda_models()
+for attr in list_of_attributes:
+    ICS.lda_visual(attr)
+ICS.hlda(levels=3, eta=0.50, min_cf=1, min_df=1)
 ICS.save_hlda_models()
-#ICS.save_hlda_coherence()
-#ICS.save_hlda_taxonomy()
-#ICS.save_hlda_level_n_taxonomy()
+ICS.save_hlda_results()
+for attr in list_of_attributes:
+    ICS.hlda_visual(attr)
+#"""
 
-"""Analyze hazard trends for each hazard: see notebook
-    -for each document: 
-        -find its most representative topics. for each word, if it is in the topic,
-        identify time of operational occurence, store in dictionary with years as keys 
-        and lists of times as values. 
-        **Two versions, one in raw time, one in percent containment
-        - go through the data set, if word present, add +1 to frequency dictionary. Frequency
-        dictionary has years as keys, frequency as value. Monthly frequecy has month-year as keys,
-        frequency as value. Also add the fire id to a dictionary with keys as hazards, values as lists of fire ids.
-        -find fire rate by doing total fire ids/ hazard fire ids
-        -find annual rate by dividing total frequency/ total years
-    - what time during operation it occurs: report doy - discovery doy
-    - frequency -> use this to derive how often it occurs """
+"""#Run Results from extracted models
+list_of_attributes = ["Combined Text"]
+document_id_col = "Unique IDs"
+ICS = Topic_Model_plus(document_id_col=document_id_col, extra_cols=extra_cols, list_of_attributes=list_of_attributes, combine_cols=False)
+ICS.combine_cols = True
+filepath = smart_nlp_path+r"\output data\ICS__combined_topics-May-26-2021"
+ICS.hlda_extract_models(filepath)
+ICS.save_hlda_results()
+"""
