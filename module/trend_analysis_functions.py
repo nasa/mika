@@ -161,11 +161,16 @@ def calc_metrics(hazard_file, years, preprocessed_df, rm_outliers=True):
                 #check for hazard
                 for i in range(len(hazard_info['Hazard-focused'])):
                     hazard_name = hazard_info['Hazard-focused'].iloc[i]['Hazard name']
-                    hazard_words = hazard_info['Hazard-focused'].iloc[i]['Hazard words']
-                    hazard_words = list(hazard_words.split("; "))
-                    hazard_words = [list_.split(", ") for list_ in hazard_words]
+                    hazard_subject_words = hazard_info['Hazard-focused'].iloc[i]['Hazard Noun/Subject']
+                    #hazard_subject_words = list(hazard_subject_words.split("; "))
+                    hazard_subject_words = hazard_subject_words.split(", ")#[list_.split(", ") for list_ in hazard_subject_words]
+                    hazard_action_words = hazard_info['Hazard-focused'].iloc[i]['Action/Descriptor']
+                    #hazard_action_words = list(hazard_action_words.split("; "))
+                    hazard_action_words = hazard_action_words.split(", ")#[list_.split(", ") for list_ in hazard_action_words]
                     negation_words = hazard_info['Hazard-focused'].iloc[i]['Negation words']
                     #need to check if a word in text is in hazard words, for each list in hazard words, no words in negation words
+                    #print(hazard_words)
+                    hazard_words = [hazard_subject_words, hazard_action_words]
                     #print(hazard_words)
                     for word_list in hazard_words:
                         hazard_found = False #ensures a word from each list must show up
