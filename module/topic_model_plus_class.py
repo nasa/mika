@@ -447,7 +447,7 @@ class Topic_Model_plus():
         print("Preprocessed data saves to: ", self.folder_path+name)
         
     
-    def extract_preprocessed_data(self, file_name):
+    def extract_preprocessed_data(self, file_name, drop_short_docs=True, drop_duplicates=True):
         """
         uses previously saved preprocessed data
         
@@ -474,8 +474,10 @@ class Topic_Model_plus():
         self.data_df = pd.read_csv(file_name)
         cols = self.list_of_attributes
         self.data_df[cols] = self.data_df[cols].applymap(lambda y: remove_quote_marks(y))
-        self.__drop_duplicate_docs(cols)
-        self.__drop_short_docs()
+        if drop_duplicates == True:
+            self.__drop_duplicate_docs(cols)
+        if drop_short_docs == True:
+            self.__drop_short_docs()
         self.doc_ids = self.data_df[self.doc_ids_label].tolist()
         check_for_ngrams()
         print("Preprocessed data extracted from: ", file_name)

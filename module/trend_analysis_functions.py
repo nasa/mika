@@ -157,21 +157,17 @@ def calc_metrics(hazard_file, years, preprocessed_df, rm_outliers=True):
         
             for j in range(len(temp_fire_df)):
                 text = temp_fire_df.iloc[j]["Combined Text"]
-                #print(text, type(text))
                 #check for hazard
                 for i in range(len(hazard_info['Hazard-focused'])):
                     hazard_name = hazard_info['Hazard-focused'].iloc[i]['Hazard name']
                     hazard_subject_words = hazard_info['Hazard-focused'].iloc[i]['Hazard Noun/Subject']
-                    #hazard_subject_words = list(hazard_subject_words.split("; "))
-                    hazard_subject_words = hazard_subject_words.split(", ")#[list_.split(", ") for list_ in hazard_subject_words]
+                    hazard_subject_words = hazard_subject_words.split(", ")
                     hazard_action_words = hazard_info['Hazard-focused'].iloc[i]['Action/Descriptor']
-                    #hazard_action_words = list(hazard_action_words.split("; "))
-                    hazard_action_words = hazard_action_words.split(", ")#[list_.split(", ") for list_ in hazard_action_words]
+                    hazard_action_words = hazard_action_words.split(", ")
                     negation_words = hazard_info['Hazard-focused'].iloc[i]['Negation words']
                     #need to check if a word in text is in hazard words, for each list in hazard words, no words in negation words
                     #print(hazard_words)
                     hazard_words = [hazard_subject_words, hazard_action_words]
-                    #print(hazard_words)
                     for word_list in hazard_words:
                         hazard_found = False #ensures a word from each list must show up
                         for word in word_list:
@@ -199,15 +195,15 @@ def calc_metrics(hazard_file, years, preprocessed_df, rm_outliers=True):
                                 start_date = time_of_hazard
                                 time_of_hazard = temp_start
                                 #print(time_of_hazard, start_date)
-                        time_of_occurence_days[hazard_name][str(year)].append(time_of_hazard-int(start_date))
-                        time_of_occurence_pct_contained[hazard_name][str(year)].append(temp_fire_df.iloc[j]["PCT_CONTAINED_COMPLETED"])
-                        fires[hazard_name][str(year)].append(id_)
-                        frequency[hazard_name][str(year)] += 1
+                        time_of_occurence_days[hazard_name][str(float(year))].append(time_of_hazard-int(start_date))
+                        time_of_occurence_pct_contained[hazard_name][str(float(year))].append(temp_fire_df.iloc[j]["PCT_CONTAINED_COMPLETED"])
+                        fires[hazard_name][str(float(year))].append(id_)
+                        frequency[hazard_name][str(float(year))] += 1
      if rm_outliers == True:
          for year in years:
              for hazard in hazards:
-                 time_of_occurence_days[hazard][str(year)] = remove_outliers(time_of_occurence_days[hazard][str(year)])
-                 time_of_occurence_pct_contained[hazard][str(year)] = remove_outliers(time_of_occurence_pct_contained[hazard][str(year)])
+                 time_of_occurence_days[hazard][str(float(year))] = remove_outliers(time_of_occurence_days[hazard][str(year)])
+                 time_of_occurence_pct_contained[hazard][str(float(year))] = remove_outliers(time_of_occurence_pct_contained[hazard][str(year)])
      return time_of_occurence_days, time_of_occurence_pct_contained, frequency, fires, categories, hazards
 
 
