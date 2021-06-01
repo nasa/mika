@@ -14,6 +14,7 @@ import seaborn as sn
 from tqdm import tqdm
 
 def normalize_data(df, features, years, flag='minmax'):  
+    ##NOTE: THIS IS UNUSED
     num_features = len(features)
     
     if flag == 'standard':
@@ -54,6 +55,16 @@ def normalize_data(df, features, years, flag='minmax'):
     return df
 
 def minmax_scale(data_list):
+    """
+    performs minmax scaling on a single data list in order to normalize the data.
+    normalization is required prior to regression and ML.
+    Also it is used for graphing multiple time series on the same axes.
+    
+    ARGUMENTS
+    ---------
+    data_list: list
+        list of numerical data that will be scaled using minmax scaling
+    """
     max_ = max(data_list)
     min_ = min(data_list)
     scaled_list = []
@@ -63,6 +74,14 @@ def minmax_scale(data_list):
     return scaled_list
 
 def corr_sig(df=None):
+    """returns the probability matrix for a correlation matrix
+    
+    ARGUMENTS
+    ---------
+    df: dataframe
+        df storing the data that is used to create the correlation matrix.
+        rows are years, columns are predictors + hazard frequencies
+    """
     p_matrix = np.zeros(shape=(df.shape[1],df.shape[1]))
     for col in df.columns:
         for col2 in df.drop(col,axis=1).columns:
@@ -71,6 +90,20 @@ def corr_sig(df=None):
     return p_matrix
 
 def multiple_reg_feature_importance(predictors, hazards, correlation_mat_total):
+    """
+    builds multiple regression model for hazrd frequency given the predictors.
+    also performs predictor importance to identify which predictors are most relevant to the hazards frequency
+    
+    ARGUMENTS
+    ---------
+    predictors: list
+        list of predictor names, used to identify inputs to multiple regression
+    hazards: list
+        list of hazard names, used to identify targets for multiple regression
+    correlation_mat_total: dataframe
+        stores the time series values that were used for correlation matrix. 
+        rows are years, columns are predictors + hazard frequencies
+    """
     #predictors and hazards must be values from the correlation_mat_total
     data = correlation_mat_total
     predictors = predictors
@@ -132,6 +165,20 @@ def remove_outliers(data, threshold=1.5):
     return new_data
 
 def calc_metrics(hazard_file, years, preprocessed_df, rm_outliers=True):
+     """
+    uses the hazard focused sheet in the hazard interpretation results to calculate metrics.
+    hazards are identified based on subject-action pairs 
+    ARGUMENTS
+     ---------
+     hazard_file: string
+         the location of the interpretation xlsx file
+     years: list
+         the years the data spans TODO: remove this 
+     preprocessed_df: string
+         the location of preprocessed data that was fed into the model
+     rm_outliers: boolean 
+         used to remove outliers or not
+     """
      hazard_info = pd.read_excel(hazard_file, sheet_name=['Hazard-focused'])
      hazards = hazard_info['Hazard-focused']['Hazard name'].tolist()
      categories = hazard_info['Hazard-focused']['Hazard Category'].tolist()
@@ -207,8 +254,131 @@ def calc_metrics(hazard_file, years, preprocessed_df, rm_outliers=True):
      return time_of_occurence_days, time_of_occurence_pct_contained, frequency, fires, categories, hazards
 
 
-def create_primary_results_table(time_of_occurence_days, time_of_occurence_pct_contained, frequency, fires, hazard_df, categories, hazards, years, interval=False):
+
+def topic_based_calc_metrics(hazard_file, years, preprocessed_df, results_file, rm_outliers=True):
+     """
+     Uses the topic-focused spread sheet, goes through each hazard relevant topic,
+     for each document in that topic, if the hazard relevant words appear in th document,
+     then metrics are calculated for that document.
+     
+     ARGUMENTS
+     ---------
+     hazard_file: string
+         the location of the interpretation xlsx file
+     years: list
+         the years the data spans TODO: remove this 
+     preprocessed_df: string
+         the location of preprocessed data that was fed into the model
+     results_file: string
+         the location of the results xlxs
+     rm_outliers: boolean 
+         used to remove outliers or not
+     """
+     hazard_info = pd.read_excel(hazard_file, sheet_name=['topic-focused'])
+     hazards = hazard_info['topic-focused']['Hazard name'].tolist()
+     categories = hazard_info['topic-focused']['Hazard Category'].tolist()
+     results = pd.read_excel(results_file, sheet_name=['Combined Text'])
+     
+     time_of_occurence_days = {name:{str(year):[] for year in years} for name in hazards}
+     time_of_occurence_pct_contained = {name:{str(year):[] for year in years} for name in hazards}
+     frequency = {name:{str(year):0 for year in years} for name in hazards}
+     fires = {name:{str(year):[] for year in years} for name in hazards}
+     years = preprocessed_df["START_YEAR"].unique()
+     years.sort()
+     
+     for i in range(len(hazards)):
+         num = hazard_info['topic-focused'].iloc[i]['Topic Number']
+         ids_ = results['Combined Text'].iloc[num]['documents']
+         temp_df = preprocessed_df.loc[preprocessed_df["Unique IDs"].isin(ids_)].reset_index(drop=True)
+         fire_ids = temp_df["INCIDENT_ID"].unique()
+         
+         for id_ in fire_ids:
+            temp_fire_df = temp_df.loc[temp_df["INCIDENT_ID"]==id_].reset_index(drop=True)
+            #date corrections
+            start_date = temp_fire_df["DISCOVERY_DOY"].unique() #should only have one start date
+            if len(start_date) != 1: 
+                start_date = min(start_date)
+            else: 
+                start_date = start_date[0]
+            if start_date == 365:
+                    start_date = 0
+        
+            for j in range(len(temp_fire_df)):
+                text = temp_fire_df.iloc[j]["Combined Text"]
+                #check for hazard -- looks at the hazard relevant words from the topic
+                for i in range(len(hazard_info['topic-focused'])):
+                    hazard_name = hazard_info['topic-focused'].iloc[i]['Hazard name']
+                    hazard_words = hazard_info['topic-focused'].iloc[i]['Relevant hazard words']
+                    hazard_words = hazard_words.split(", ")
+                    negation_words = hazard_info['topic-focused'].iloc[i]['Negation words']
+                    #need to check if a word in text is in hazard words
+                    hazard_found = False
+                    for word in hazard_words:
+                        if word in text:
+                            hazard_found = True
+                    
+                    if not np.isnan(negation_words):
+                        for word in negation_words.split(", "): #removes texts that have negation words
+                            if word in text:
+                                hazard_found = False 
+                    
+                    if hazard_found == True:
+                        time_of_hazard = int(temp_fire_df.iloc[j]["REPORT_DOY"])
+                    
+                        #correct dates
+                        if time_of_hazard<start_date: 
+                            #print(time_of_hazard, start_date)
+                            if time_of_hazard<30: #report day is days since start, not doy 
+                                time_of_hazard+=start_date
+                            else: #start and report day were incorrectly switched
+                                #print(time_of_hazard, start_date)
+                                temp_start = start_date
+                                start_date = time_of_hazard
+                                time_of_hazard = temp_start
+                                #print(time_of_hazard, start_date)
+                        year = temp_fire_df.iloc[j]["START_YEAR"]
+                        time_of_occurence_days[hazard_name][str(float(year))].append(time_of_hazard-int(start_date))
+                        time_of_occurence_pct_contained[hazard_name][str(float(year))].append(temp_fire_df.iloc[j]["PCT_CONTAINED_COMPLETED"])
+                        fires[hazard_name][str(float(year))].append(id_)
+                        frequency[hazard_name][str(float(year))] += 1
+     if rm_outliers == True:
+         for year in years:
+             for hazard in hazards:
+                 time_of_occurence_days[hazard][str(float(year))] = remove_outliers(time_of_occurence_days[hazard][str(year)])
+                 time_of_occurence_pct_contained[hazard][str(float(year))] = remove_outliers(time_of_occurence_pct_contained[hazard][str(year)])
+     return time_of_occurence_days, time_of_occurence_pct_contained, frequency, fires, categories, hazards
+
+
+
+def create_primary_results_table(time_of_occurence_days, time_of_occurence_pct_contained, frequency, fires, preprocessed_df, categories, hazards, years, interval=False):
     ##NOTE: Be wary of frequency and rate-> total frequency is different than number of fires!!
+    """
+    creates the primary results table consisting of average OTTO, frequency, and rate for each hazard
+    all arguments are outputs from calc_metrics
+    ARGUMENTS
+    ---------
+    time_of_occurence_days: nested dict
+        dict with keys as hazard names, values as dict.
+        inner dict has keys as years and values as list of OTTO in days.
+    time_of_occurence_pct_contained: nested dict
+        dict with keys as hazard names, values as dict.
+        inner dict has keys as years and values as list of OTTO in pct containment.
+    frequency: nested dict
+        dict with keys as hazard names, values as dict.
+        inner dict has keys as years and values as integer frequency
+    fires: nested dict
+        dict with keys as hazard names, values as dict.
+        inner dict has keys as years and values as list of fire ids with that hazard
+    preprocessed_df: dataframe
+        the preprocessed data df
+    categories: list
+        list of hazard categories
+    hazards: list 
+        list of hazard names
+    years: list
+        list of years the data spans
+    
+    """
     data_df = {"Hazard Category": categories,
                "Hazard Name": hazards}
     #OTTO days average += std dev; interval
@@ -242,12 +412,35 @@ def create_primary_results_table(time_of_occurence_days, time_of_occurence_pct_c
     data_df["Total Fire Frequency"] = sums_per_hazard
     data_df["Average Occurrences per year"] = [val/len(years) for val in sums_per_hazard]
     #fires per rate
-    total_fires = total_fires = len(hazard_df["INCIDENT_ID"].unique())
+    total_fires = len(preprocessed_df["INCIDENT_ID"].unique())
     data_df["Average fires per occurrence"] = [total_fires/val for val in sums_per_hazard]
     
     return data_df
 
 def create_metrics_time_series(time_of_occurence_days, time_of_occurence_pct_contained, frequency, fire, years, combined=True):
+    """
+    creates the time series graphs for OTTO, frequency, and rate for each hazard
+    arguments are outputs from calc_metrics
+    ARGUMENTS
+    ---------
+    time_of_occurence_days: nested dict
+        dict with keys as hazard names, values as dict.
+        inner dict has keys as years and values as list of OTTO in days.
+    time_of_occurence_pct_contained: nested dict
+        dict with keys as hazard names, values as dict.
+        inner dict has keys as years and values as list of OTTO in pct containment.
+    frequency: nested dict
+        dict with keys as hazard names, values as dict.
+        inner dict has keys as years and values as integer frequency
+    fires: nested dict
+        dict with keys as hazard names, values as dict.
+        inner dict has keys as years and values as list of fire ids with that hazard
+    years: list
+        list of years the data spans
+    combined: bool
+        combines all the time series into one graph if true, seperate graphs if false
+    
+    """
     days_averages = {hazard: [np.average(time_of_occurence_days[hazard][year]) for year in time_of_occurence_days[hazard]] for hazard in time_of_occurence_days}
     days_stddevs = {hazard: [np.std(time_of_occurence_days[hazard][year]) for year in time_of_occurence_days[hazard]] for hazard in time_of_occurence_days}
     pct_averages = {hazard: [np.average(time_of_occurence_pct_contained[hazard][year]) for year in time_of_occurence_pct_contained[hazard]] for hazard in time_of_occurence_pct_contained}
@@ -312,6 +505,17 @@ def create_metrics_time_series(time_of_occurence_days, time_of_occurence_pct_con
     return days_averages, days_stddevs, pct_averages, pct_stddevs, frequencies, hazard_freqs_scaled
 
 def create_correlation_matrix(predictors_scaled, frequencies_scaled):
+    """
+    creates the correlation matrix between all predictors and all hazard frequencies
+    all arguments are outputs from create_metrics_time_series
+    
+    ARGUMENTS
+    ---------
+    predictors_scaled: dict
+        dictionary with keys as predictor names, values as a time series list of values scaled using minmax
+    frequencies_scaled: dict
+        dictionary with keys as hazard names, values as times series list of frequencies scaled using minmax
+    """
     correlation_mat_data = predictors_scaled
     for hazard in frequencies_scaled:
         correlation_mat_data["total " +hazard] = frequencies_scaled[hazard]

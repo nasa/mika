@@ -524,12 +524,12 @@ class Topic_Model_plus():
         for text in texts:
             corpus.add_doc(text)
         #identifies n_grams
-        cands = corpus.extract_ngrams(min_cf=5, min_df=1, max_len=3)
+        cands = corpus.extract_ngrams(min_cf=1, min_df=1, max_len=3)
         #transforms corpus to contain n_grams
         corpus.concat_ngrams(cands, delimiter=' ')
         return corpus
     
-    def __find_optimized_lda_topic_num(self, attr, max_topics, training_iterations=1000, iteration_step=10, remove_pct=0.3, **kwargs):
+    def __find_optimized_lda_topic_num(self, attr, max_topics, training_iterations=1000, iteration_step=10, thres = 0.005, **kwargs):
         coherence = []
         LL = []
         perplexity = []
@@ -587,18 +587,22 @@ class Topic_Model_plus():
         #want to minimize perplexity, maximize coherence, look for max difference between the two
         diff = [coherence[i]-perplexity[i] for i in range(len(topic_num))]
         change_in_diff = [abs(diff[i]-diff[i+1])-abs(diff[i+1]-diff[i+2]) for i in range(0, len(diff)-2)]
-        index_best_num_of_topics = np.argmax(change_in_diff) + 1
-        #index_best_num_of_topics = np.argmax(diff)
-        best_num_of_topics = topic_num[index_best_num_of_topics]
+        best_index = 0
+        for val in change_in_diff:
+            if val < thres:
+                best_index = change_in_diff.index(val)
+                break
+        if best_index == 0:
+            index_best_num_of_topics = np.argmax(change_in_diff) + 1
+        best_num_of_topics = topic_num[best_index]
         self.lda_num_topics[attr] = best_num_of_topics
         
-    def __lda_optimization(self, max_topics=50,training_iterations=1000, iteration_step=10, remove_pct=0.3, **kwargs):
+    def __lda_optimization(self, max_topics=200,training_iterations=1000, iteration_step=10, thres = 0.005, **kwargs):
         #needs work
         start = time()
         self.lda_num_topics = {}
-        self.__remove_words_in_pct_of_docs()
         for attr in self.list_of_attributes:
-            self.__find_optimized_lda_topic_num(attr, max_topics, training_iterations=1000, iteration_step=10, remove_pct=0.3, **kwargs)
+            self.__find_optimized_lda_topic_num(attr, max_topics, training_iterations=1000, iteration_step=10, thres = 0.005, **kwargs)
             print(self.lda_num_topics[attr], " topics for ", attr)
         print("LDA topic optomization: ", (time()-start)/60, " minutes")
     
@@ -711,7 +715,8 @@ class Topic_Model_plus():
                            "total number of words": [],
                            "number of words": [],
                            "best document": [],
-                           "coherence": []}
+                           "coherence": [],
+                           "documents": []}
             topics_data["coherence"] = self.lda_coherence[attr]["per topic"]
             for k in range(mdl.k):
                 topics_data["topic number"].append(k)
@@ -729,9 +734,9 @@ class Topic_Model_plus():
                     probs[topic].append(weight)
                 i+=1
             for k in docs_in_topic:
-                #highest_prob = 
                 topics_data["best document"].append(docs_in_topic[k][probs[k].index(max(probs[k]))])
                 topics_data["number of documents in topic"].append(len(docs_in_topic[k]))
+                topics_data["documents"].append(docs_in_topic[k])
             df = pd.DataFrame(topics_data)
             dfs[attr] = df
             if return_df == False:
@@ -968,7 +973,8 @@ class Topic_Model_plus():
                 "total number of words": [],
                 "number of words": [],
                 "best document": [],
-                "coherence": []}
+                "coherence": [],
+                "documents": []}
             topics_data["coherence"] = self.hlda_coherence[attr]["per topic"]
             for k in range(mdl.k):
                 if not mdl.is_live_topic(k) or mdl.num_docs_of_topic(k)<0:
@@ -992,6 +998,7 @@ class Topic_Model_plus():
                         probs.append(prob)
                     i += 1
                 topics_data["best document"].append(docs_in_topic[probs.index(max(probs))])
+                topics_data["documents"].append(docs_in_topic[k])
             df = pd.DataFrame(topics_data)
             dfs[attr] = df
             if return_df == False:
