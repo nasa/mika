@@ -585,15 +585,15 @@ class Topic_Model_plus():
 #        self.__create_folder()
 #        plt.savefig(self.folder_path+"/LDA_optimization_LL_"+attr+"_.png")
         #want to minimize perplexity, maximize coherence, look for max difference between the two
-        diff = [coherence[i]-perplexity[i] for i in range(len(topic_num))]
-        change_in_diff = [abs(diff[i]-diff[i+1])-abs(diff[i+1]-diff[i+2]) for i in range(0, len(diff)-2)]
+        #diff = [coherence[i]-perplexity[i] for i in range(len(topic_num))]
+        #change_in_diff = [abs(diff[i]-diff[i+1])-abs(diff[i+1]-diff[i+2]) for i in range(0, len(diff)-2)]
+        
         best_index = 0
-        for val in change_in_diff:
-            if val < thres:
-                best_index = change_in_diff.index(val)
+        diffs = [abs(coherence[i]-coherence[i-1]) for i in range(1, len(coherence))]
+        for diff in diffs:
+            if diff<thres:
+                best_index = diffs.index(diff)
                 break
-        if best_index == 0:
-            index_best_num_of_topics = np.argmax(change_in_diff) + 1
         best_num_of_topics = topic_num[best_index]
         self.lda_num_topics[attr] = best_num_of_topics
         
@@ -606,7 +606,7 @@ class Topic_Model_plus():
             print(self.lda_num_topics[attr], " topics for ", attr)
         print("LDA topic optomization: ", (time()-start)/60, " minutes")
     
-    def lda(self, num_topics={}, training_iterations=1000, iteration_step=10, **kwargs):
+    def lda(self, num_topics={}, training_iterations=1000, iteration_step=10, max_topics=0, **kwargs):
         # TO DO: the function of the num_topics var is not easy to understand - nd to make clearer and revise corresponding argument description in docstring
         """
         performs lda topic modeling
@@ -628,7 +628,9 @@ class Topic_Model_plus():
         self.lda_models = {}
         self.lda_coherence = {}
         if num_topics == {}:
-            self.__lda_optimization(**kwargs)
+            if max_topics == 0:
+                max_topics = 200
+            self.__lda_optimization(max_topics=max_topics, **kwargs)
         else:
             self.lda_num_topics = num_topics
         for attr in self.list_of_attributes:
