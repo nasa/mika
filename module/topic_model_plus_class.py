@@ -242,7 +242,7 @@ class Topic_Model_plus():
         all_stopwords = stopwords.words('english')+domain_stopwords
         all_stopwords = [word.lower() for word in all_stopwords]
         texts = [[w for w in text if not w in all_stopwords] for text in texts if not isinstance(text,float)]
-        texts = [[w for w in text if len(w)>3] for text in texts if not isinstance(text,float)]
+        texts = [[w for w in text if len(w)>=3] for text in texts if not isinstance(text,float)]
         return texts
     
     def __quot_normalize(self,texts):
@@ -317,7 +317,7 @@ class Topic_Model_plus():
             ngrams.append(ngram)
         return ngrams
     
-    def preprocess_data(self, domain_stopwords=[], ngrams=True, ngram_range=3, threshold=15, min_count=5,quot_correction=False,spellcheck=False,segmentation=False, percent=0.3):
+    def preprocess_data(self, domain_stopwords=[], ngrams=True, ngram_range=3, threshold=15, min_count=5,quot_correction=False,spellcheck=False,segmentation=False, percent=0.3, save_words=[]):
         """
         performs data preprocessing steps as defined by user
         
@@ -374,19 +374,19 @@ class Topic_Model_plus():
         cols = self.data_df.columns.difference([self.doc_ids_label]+self.extra_cols)
         self.data_df[cols] = self.data_df[cols].applymap(lambda y: np.nan if (type(y)==int or len(y)==0) else y)
         self.data_df = self.data_df.dropna(how="any").reset_index(drop=True)
-        self.data_df = self.__remove_words_in_pct_of_docs(self.data_df, self.list_of_attributes, pct_=percent)
+        self.data_df = self.__remove_words_in_pct_of_docs(self.data_df, self.list_of_attributes, pct_=percent, save_words=save_words)
         self.doc_ids = self.data_df[self.doc_ids_label].tolist()
         print("Processing time: ", (time()-start)/60, " minutes")
         sleep(0.5)
         
-    def __remove_words_in_pct_of_docs(self, data_df, list_of_attributes, pct_=0.3):
+    def __remove_words_in_pct_of_docs(self, data_df, list_of_attributes, pct_=0.3, save_words=[]):
             num_docs = len(data_df)
             pct = np.round(pct_*num_docs)
             indicies_to_drop = []
             sleep(0.5)
             for attr in tqdm(list_of_attributes,"Removing frequent words…"):
                 all_words = list(set([word for text in data_df[attr] for word in text]))
-                good_words = []
+                good_words = save_words
                 for word in all_words:
                     count = 0
                     for text in data_df[attr]:

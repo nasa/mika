@@ -79,8 +79,9 @@ stop_words = states + counties + rivers + natl_parks + state_parks + natl_forest
 stop_words = [word.lower() for term in stop_words for word in term.split(" ")]
 words_remove = ["forest", "creek","river", "lake", "ocean", "bayou", "area",
                 "mountain", "valley", "ground", "canyon", "preserve", "road", "brook",
-                "stream", "water", "rock"]
+                "stream", "water", "rock", "low", 'nation', 'buffalo', 'national', 'heritage',
+                'power', 'gas', 'wind', 'flag', 'strong', 'red', 'resources', 'hot', 'dry']
 stop_words = list(set(stop_words)-set(words_remove))
-#print(stop_words.index("site"))
+
 #ICS_stop_word_df = pd.DataFrame({ key:pd.Series(value) for key, value in ICS_stop_word_data.items() })
 #ICS_stop_word_df.to_csv("/inputs/ICS_stop_words.csv")

@@ -223,7 +223,7 @@ def calc_metrics(hazard_file, years, preprocessed_df, rm_outliers=True):
                         if hazard_found == False: #ensures a word from each list must show up
                             break 
                     
-                    if not np.isnan(negation_words):
+                    if isinstance(negation_words,str):
                         for word in negation_words.split(", "): #removes texts that have negation words
                             if word in text:
                                 hazard_found = False 

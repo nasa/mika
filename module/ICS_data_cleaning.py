@@ -136,7 +136,8 @@ total_ids = [id_ for id_ in sitrep_ids if id_ not in fire_ids_to_drop]
 incident_summary_df = incident_summary_df.loc[incident_summary_df['INCIDENT_ID'].isin(total_ids)].reset_index(drop=True)
 sitrep_df = sitrep_df.loc[sitrep_df['INCIDENT_ID'].isin(total_ids)].reset_index(drop=True)
 
-sitrep_df.to_csv(smart_nlp_path+r"\input data\ICS_filtered_preprocessed_combined.csv")
+#sitrep_df.to_csv(smart_nlp_path+r"\input data\ICS_filtered_preprocessed_combined.csv")
+incident_summary_df.to_csv(smart_nlp_path+r"\input data\summary_reports_cleaned.csv")
 
 print(len(incident_summary_df),len(sitrep_df))
 
