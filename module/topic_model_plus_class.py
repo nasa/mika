@@ -820,9 +820,9 @@ class Topic_Model_plus():
             self.lda_num_topics[attr] = self.lda_models[attr].k
         print("LDA models extracted from: ", file_path)
         preprocessed_filepath = file_path+"/preprocessed_data"
-        if self.list_of_attributes == ['Combined Text']:
-            self.combine_cols = True
-            preprocessed_filepath += "_combined_text"
+        #if self.list_of_attributes == ['Combined Text']:
+        #    self.combine_cols = True
+        #    preprocessed_filepath += "_combined_text"
         self.extract_preprocessed_data(preprocessed_filepath+".csv")
         self.folder_path = file_path
         
