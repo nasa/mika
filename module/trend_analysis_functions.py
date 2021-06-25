@@ -14,6 +14,7 @@ from sklearn import linear_model
 from sklearn.metrics import mean_squared_error, accuracy_score, r2_score
 import seaborn as sn
 from tqdm import tqdm
+import random
 
 
 def minmax_scale(data_list):
@@ -193,7 +194,7 @@ def check_anamolies(time_of_occurence_days, time_of_occurence_pct_contained, fre
             anoms = True
     return anomolous_hazards, anoms
 
-def calc_metrics(hazard_file, preprocessed_df, rm_outliers=True):
+def calc_metrics(hazard_file, preprocessed_df, rm_outliers=True, distance=3):
      """
     uses the hazard focused sheet in the hazard interpretation results to calculate metrics.
     hazards are identified based on subject-action pairs 
@@ -216,6 +217,7 @@ def calc_metrics(hazard_file, preprocessed_df, rm_outliers=True):
      time_of_occurence_pct_contained = {name:{year:[] for year in years} for name in hazards}
      frequency = {name:{year:0 for year in years} for name in hazards}
      fires = {name:{year:[] for year in years} for name in hazards}
+     unique_ids = {name:{year:[] for year in years} for name in hazards}
      frequency_fires ={name:{year:0 for year in years} for name in hazards}
 
      for year in tqdm(years):
@@ -243,6 +245,23 @@ def calc_metrics(hazard_file, preprocessed_df, rm_outliers=True):
                     hazard_action_words = hazard_action_words.split(", ")
                     negation_words = hazard_info['Hazard-focused'].iloc[i]['Negation words']
                     #check if a word in text is in hazard words, for each list in hazard words, no words in negation words
+                    hazard_found = False
+                    for word in hazard_subject_words:
+                        if word in text:
+                            hazard_found = True
+                            subject_index = text.index(word)
+                            break
+                    if hazard_found == True:
+                        hazard_found = False
+                        for word in hazard_action_words:
+                            if word in text:
+                                hazard_index = text.index(word)
+                                if abs(hazard_index-subject_index)<=distance:
+                                    hazard_found = True
+                                    break
+                                else:
+                                    hazard_found = False
+                    """
                     hazard_words = [hazard_subject_words, hazard_action_words]
                     for word_list in hazard_words:
                         hazard_found = False #ensures a word from each list must show up
@@ -250,7 +269,8 @@ def calc_metrics(hazard_file, preprocessed_df, rm_outliers=True):
                             if word in text:
                                 hazard_found = True
                         if hazard_found == False: #ensures a word from each list must show up
-                            break 
+                            break
+                    """
                     
                     if isinstance(negation_words,str):
                         for word in negation_words.split(", "): #removes texts that have negation words
@@ -275,6 +295,7 @@ def calc_metrics(hazard_file, preprocessed_df, rm_outliers=True):
                         time_of_occurence_days[hazard_name][year].append(time_of_hazard-int(start_date))
                         time_of_occurence_pct_contained[hazard_name][year].append(temp_fire_df.iloc[j]["PCT_CONTAINED_COMPLETED"])
                         fires[hazard_name][year].append(id_)
+                        unique_ids[hazard_name][year].append( temp_fire_df.iloc[j]["Unique IDs"])
                         frequency[hazard_name][year] += 1
      for name in frequency_fires:
          for year in frequency_fires[name]:
@@ -288,10 +309,10 @@ def calc_metrics(hazard_file, preprocessed_df, rm_outliers=True):
      if rm_outliers == True:
          for year in years:
              for hazard in hazards:
-                 if hazard != 'Law Violations':
-                     time_of_occurence_days[hazard][year] = remove_outliers(time_of_occurence_days[hazard][year])
-                     time_of_occurence_pct_contained[hazard][year] = remove_outliers(time_of_occurence_pct_contained[hazard][year])
-     return time_of_occurence_days, time_of_occurence_pct_contained, frequency, fires, frequency_fires, categories, hazards, years
+                 if len(time_of_occurence_pct_contained[hazard][year])>9 and hazard != 'Law Violations':
+                    time_of_occurence_days[hazard][year] = remove_outliers(time_of_occurence_days[hazard][year])
+                    time_of_occurence_pct_contained[hazard][year] = remove_outliers(time_of_occurence_pct_contained[hazard][year])
+     return time_of_occurence_days, time_of_occurence_pct_contained, frequency, fires, frequency_fires, categories, hazards, years, unique_ids
 
 
 
@@ -403,7 +424,7 @@ def topic_based_calc_metrics(hazard_file, years, preprocessed_df, results_file, 
 
 
 
-def create_primary_results_table(time_of_occurence_days, time_of_occurence_pct_contained, frequency, fires, preprocessed_df, categories, hazards, years, interval=False):
+def create_primary_results_table(time_of_occurence_days, time_of_occurence_pct_contained, frequency, fire_freq, preprocessed_df, categories, hazards, years, interval=False):
     """
     creates the primary results table consisting of average OTTO, frequency, and rate for each hazard
     all arguments are outputs from calc_metrics
@@ -443,7 +464,8 @@ def create_primary_results_table(time_of_occurence_days, time_of_occurence_pct_c
     days_av = {hazard: np.average(days_total_data[hazard]) for hazard in hazards}
     days_std = {hazard: np.std(days_total_data[hazard]) for hazard in hazards}
     data_df["OTTO days"] = [str(round(days_av[hazard],3))+"+-"+str(round(days_std[hazard],3)) for hazard in hazards]
-    data_df["OTTO days interval"] = [stats.t.interval(alpha=0.95, df=len(days_total_data[hazard])-1, loc=np.mean(days_total_data[hazard]), scale=stats.sem(days_total_data[hazard])) for hazard in hazards]
+    if interval == True:
+        data_df["OTTO days interval"] = [stats.t.interval(alpha=0.95, df=len(days_total_data[hazard])-1, loc=np.mean(days_total_data[hazard]), scale=stats.sem(days_total_data[hazard])) for hazard in hazards]
     #OTTO percent average += std dev; interval
     pct_total_data = {}
     for hazard in hazards:
@@ -454,20 +476,22 @@ def create_primary_results_table(time_of_occurence_days, time_of_occurence_pct_c
     pct_av = {hazard: np.average(pct_total_data[hazard]) for hazard in hazards}
     pct_std = {hazard: np.std(pct_total_data[hazard]) for hazard in hazards}
     data_df["OTTO %"] = [str(round(pct_av[hazard],3))+"+-"+str(round(pct_std[hazard],3)) for hazard in hazards]
-    data_df["OTTO % interval"] = [stats.t.interval(alpha=0.95, df=len(pct_total_data[hazard])-1, loc=np.mean(pct_total_data[hazard]), scale=stats.sem(pct_total_data[hazard])) for hazard in hazards]
-    #total frequency
-    data_df["Total Frequency"] = [np.sum([frequency[hazard][year] for year in frequency[hazard]]) for hazard in hazards]
+    if interval == True:
+        data_df["OTTO % interval"] = [stats.t.interval(alpha=0.95, df=len(pct_total_data[hazard])-1, loc=np.mean(pct_total_data[hazard]), scale=stats.sem(pct_total_data[hazard])) for hazard in hazards]
     #rate per year
-    sums_per_hazard = [np.sum([len(set(fires[hazard][year])) for year in fires[hazard]]) for hazard in hazards]
-    data_df["Total Fire Frequency"] = sums_per_hazard
+    sums_per_hazard = [np.sum([fire_freq[hazard][year] for year in fire_freq[hazard]]) for hazard in hazards]
     data_df["Average Occurrences per year"] = [round(val/len(years),3) for val in sums_per_hazard]
     #fires per rate
     total_fires = len(preprocessed_df["INCIDENT_ID"].unique())
     data_df["Average fires per occurrence"] = [round(total_fires/val,3) for val in sums_per_hazard]
 
+    #total frequency
+    data_df["Total Frequency"] = [np.sum([frequency[hazard][year] for year in frequency[hazard]]) for hazard in hazards]
+    #fire frequency
+    data_df["Total Fire Frequency"] = sums_per_hazard
     return data_df
 
-def create_metrics_time_series(time_of_occurence_days, time_of_occurence_pct_contained, frequency, frequency_fires, fire, years, combined=True):
+def create_metrics_time_series(time_of_occurence_days, time_of_occurence_pct_contained, frequency, frequency_fires, years, categories, combined=True):
     """
     creates the time series graphs for OTTO, frequency, and rate for each hazard
     arguments are outputs from calc_metrics
@@ -500,7 +524,9 @@ def create_metrics_time_series(time_of_occurence_days, time_of_occurence_pct_con
     
     colors = cm.tab20(np.linspace(0, 1, len(days_averages)))
     line_styles = ['--', ':','-']
-    marker_styles = ['.', 'v', '^', 's', 'D', 'X']
+    line_style_dict = {list(set(categories))[i]:line_styles[i] for i in range(len(list(set(categories))))}
+    category_counter = {list(set(categories))[i]:0 for i in range(len(list(set(categories))))}
+    marker_styles = ['.', 'v', '^', 's', 'D', 'X', '+']
     years_plot = years#[year.strip('0').strip('.') for year in years]
     #plot OTTO
     if combined == True:
@@ -509,15 +535,11 @@ def create_metrics_time_series(time_of_occurence_days, time_of_occurence_pct_con
         plt.xlabel("Year", fontsize=16)
         plt.ylabel("% Containment", fontsize=16)
         i=0
-        line_counter = 0
-        marker_counter = 0
         for hazard in pct_averages:
-            plt.errorbar(years_plot, pct_averages[hazard], yerr=pct_stddevs[hazard], color=colors[i], marker=marker_styles[marker_counter%len(marker_styles)], linestyle=line_styles[line_counter], label=hazard, capsize=5, markeredgewidth=1)
+            category = categories[i]
+            plt.errorbar(years_plot, pct_averages[hazard], yerr=pct_stddevs[hazard], color=colors[i], marker=marker_styles[category_counter[category]], linestyle=line_style_dict[category], label=hazard, capsize=5, markeredgewidth=1)
+            category_counter[category] += 1
             i += 1
-            marker_counter += 1
-            if i%len(marker_styles) == 0:
-                line_counter += 1
-            
         plt.legend(bbox_to_anchor=(1, 1.1), loc='upper left', fontsize=14)
         plt.tick_params(labelsize=16)
         plt.show()
@@ -529,12 +551,12 @@ def create_metrics_time_series(time_of_occurence_days, time_of_occurence_pct_con
         i=0
         line_counter = 0
         marker_counter = 0
+        category_counter = {list(set(categories))[i]:0 for i in range(len(list(set(categories))))}
         for hazard in pct_averages:
-            plt.errorbar(years_plot, days_averages[hazard], yerr=days_stddevs[hazard], color=colors[i], marker=marker_styles[marker_counter%len(marker_styles)], linestyle=line_styles[line_counter], label=hazard, capsize=5, markeredgewidth=1)
+            category = categories[i]
+            plt.errorbar(years_plot, days_averages[hazard], yerr=days_stddevs[hazard], color=colors[i], marker=marker_styles[category_counter[category]], linestyle=line_style_dict[category], label=hazard, capsize=5, markeredgewidth=1)
+            category_counter[category] += 1
             i += 1 
-            marker_counter += 1
-            if i%len(marker_styles) == 0:
-                line_counter += 1
             
         plt.tick_params(labelsize=16)
         plt.legend(bbox_to_anchor=(1, 1.1), loc='upper left', fontsize=14)
@@ -559,6 +581,7 @@ def create_metrics_time_series(time_of_occurence_days, time_of_occurence_pct_con
             plt.legend(fontsize=16)
             plt.show()
     #plot frequency
+    category_counter = {list(set(categories))[i]:0 for i in range(len(list(set(categories))))}
     frequencies = {hazard: [frequency[hazard][year] for year in frequency[hazard]] for hazard in frequency}
     hazard_freqs_scaled = {hazard: minmax_scale(frequencies[hazard]) for hazard in frequencies}
     frequencies_fire = {hazard: [frequency_fires[hazard][year] for year in frequency_fires[hazard]] for hazard in frequency_fires}
@@ -569,14 +592,11 @@ def create_metrics_time_series(time_of_occurence_days, time_of_occurence_pct_con
         plt.xlabel("Year", fontsize=16)
         #plt.title("Change in Hazard Frequency from 2006-2014")
         i = 0
-        line_counter = 0
-        marker_counter = 0
         for hazard in hazard_freqs_scaled:
-            plt.plot(years_plot, hazard_freqs_scaled[hazard], color=colors[i], label=hazard, marker=marker_styles[marker_counter%len(marker_styles)], linestyle=line_styles[line_counter])
+            category = categories[i]
+            plt.plot(years_plot, hazard_freqs_scaled[hazard], color=colors[i], label=hazard, marker=marker_styles[category_counter[category]], linestyle=line_style_dict[category])
+            category_counter[category] += 1
             i += 1
-            marker_counter += 1
-            if i%len(marker_styles) == 0:
-                line_counter += 1
             
         plt.legend(bbox_to_anchor=(1, 1.1), loc='upper left', fontsize=14)
         plt.tick_params(labelsize=16)
@@ -587,14 +607,12 @@ def create_metrics_time_series(time_of_occurence_days, time_of_occurence_pct_con
         plt.xlabel("Year", fontsize=16)
         #plt.title("Change in Hazard Frequency from 2006-2014")
         i = 0
-        line_counter = 0
-        marker_counter = 0
+        category_counter = {list(set(categories))[i]:0 for i in range(len(list(set(categories))))}
         for hazard in hazard_freqs_scaled:
-            plt.plot(years_plot, fire_freqs_scaled[hazard], color=colors[i], label=hazard, marker=marker_styles[marker_counter%len(marker_styles)], linestyle=line_styles[line_counter])
+            category = categories[i]
+            plt.plot(years_plot, fire_freqs_scaled[hazard], color=colors[i], label=hazard,marker=marker_styles[category_counter[category]], linestyle=line_style_dict[category])
+            category_counter[category] += 1
             i += 1
-            marker_counter += 1
-            if i%len(marker_styles) == 0:
-                line_counter += 1
             
         plt.legend(bbox_to_anchor=(1, 1.1), loc='upper left', fontsize=14)
         plt.tick_params(labelsize=16)
@@ -638,6 +656,7 @@ def create_correlation_matrix(predictors_scaled, frequencies_scaled, graph=True)
         sn.heatmap(corrMatrix, annot=True)
         plt.title("Correlational Matrix for Trends in \n Fires, Operations, Intensity, and Hazard Frequency per year")
         plt.show()
+
     return corrMatrix, correlation_mat_total, p_values
 
 def reshape_correlation_matrix(corrMatrix, p_values, predictors, hazards):
@@ -698,3 +717,29 @@ def reshape_correlation_matrix(corrMatrix, p_values, predictors, hazards):
     cbar.ax.tick_params(labelsize=16) 
     plt.show()
     
+
+def hazard_accuracy(ids, num, results_path):
+    sampled_hazard_ids = {hazard:[] for hazard in ids}
+    num_total_ids = {hazard:0 for hazard in ids}
+    data = {}
+    for hazard in ids:
+        total_ids = [id_ for year in ids[hazard] for id_ in ids[hazard][year]]
+        sampled_ids = random.sample(total_ids, min(num, len(total_ids)))
+        sampled_hazard_ids[hazard] = sampled_ids
+        num_total_ids[hazard] = len(total_ids)
+        data[hazard] = pd.DataFrame({"ID": sampled_ids,
+                                     "Contains Hazard": [0 for id_ in sampled_ids]})
+        #print(hazard, "sampled IDS: ", sampled_ids)
+        #print(hazard, "total number of ids: ", len(total_ids))
+    data["Summary"] = pd.DataFrame({"Hazards": [hazard for hazard in ids],
+                       "# Total IDs": [num_total_ids[hazard] for hazard in num_total_ids],
+                       "# Sampled IDs": [len(sampled_hazard_ids[hazard]) for hazard in sampled_hazard_ids],
+                       "% Sampled": [len(sampled_hazard_ids[hazard])/num_total_ids[hazard] for hazard in num_total_ids],
+                       "# Correct Sampled IDs": [0 for hazard in ids],
+                       "Accuracy": [0 for hazard in ids]
+                       })
+
+    with pd.ExcelWriter(results_path+"/hazard_extraction_accuracy.xlsx") as writer:
+            for results in data:
+                data[results].to_excel(writer, sheet_name = results, index = False)
+    return sampled_hazard_ids, total_ids
