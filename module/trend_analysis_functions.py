@@ -52,6 +52,62 @@ def corr_sig(df=None):
             p_matrix[df.columns.to_list().index(col),df.columns.to_list().index(col2)] = p
     return p_matrix
 
+def regression_feature_importance(predictors, hazards, correlation_mat_total):
+    data = correlation_mat_total
+    predictors = predictors
+    hazards = ["total "+ h for h in hazards]
+    full_model_score = []
+    full_model_MSE = []
+    xi_score = {predictor+" score":[] for predictor in predictors}
+    xi_MSE = {predictor+" MSE":[] for predictor in predictors}
+
+    importance_data = {}
+    for hazard in hazards:
+        X = data[predictors]
+        y = data[[hazard]]
+        regr = linear_model.LinearRegression()
+        regr.fit(X,y)
+        y_pred = regr.predict(X)
+        model_score = r2_score(y, y_pred)#regr.score(X,y)
+        full_model_score.append(round(model_score,3))
+        model_MSE = mean_squared_error(y_pred,y)
+        full_model_MSE.append(round(model_MSE,3))
+        importance = regr.coef_
+        importance_data[hazard] = importance[0]
+        #run regression for each predictor individually
+        for predictor in predictors:
+            X = data[[predictor]]
+            y = data[[hazard]]
+            regr = linear_model.LinearRegression()
+            regr.fit(X,y)
+            y_pred = regr.predict(X)
+            model_score = r2_score(y, y_pred)
+            xi_score[predictor+" score"].append(round(model_score,3))
+            model_MSE = mean_squared_error(y_pred,y)
+            xi_MSE[predictor+" MSE"].append(round(model_MSE,3))
+    results_data = {"hazard":hazards, "R2 for full model":full_model_score, "MSE for full model": full_model_MSE}
+    results_data.update(xi_score)
+    results_data.update(xi_MSE)
+    results_df = pd.DataFrame(results_data)
+    
+    #graph feature importance
+    X_axis = np.arange(len(predictors))
+    num_bars = len(hazards)
+    width = 1/(num_bars+2)
+    i=1
+    colors = cm.tab20(np.linspace(0, 1, num_bars))
+    plt.figure(figsize=(len(hazards),4))
+    for hazard in importance_data:
+        plt.bar(X_axis+(width*i), importance_data[hazard], width, label=hazard.replace("total ",""), color=colors[i-1])
+        i+=1
+    plt.xticks(X_axis+(width*np.ceil(num_bars/2)), [pred.replace("total ","") for pred in predictors], rotation=70)
+    plt.tick_params(labelsize=14)
+    plt.xlabel("Predictors", fontsize=14)
+    plt.ylabel("Importance", fontsize=14)
+    plt.legend(bbox_to_anchor=(1, 1.1), loc='upper left', fontsize=14)
+    plt.show()
+    
+    return results_df
 
 def multiple_reg_feature_importance(predictors, hazards, correlation_mat_total):
     """
@@ -261,6 +317,19 @@ def calc_metrics(hazard_file, preprocessed_df, rm_outliers=True, distance=3):
                                     break
                                 else:
                                     hazard_found = False
+                    """
+                    additional_action_words = hazard_info['Hazard-focused'].iloc[i]['Action']
+                    if hazard_found == True and not isinstance(additional_action_words,float):
+                        hazard_found = False
+                        for word in additional_action_words.split(", "):
+                            if word in text:
+                                hazard_index = text.index(word)
+                                if abs(hazard_index-subject_index)<=distance:
+                                    hazard_found = True
+                                    break
+                                else:
+                                    hazard_found = False
+                                    """
                     """
                     hazard_words = [hazard_subject_words, hazard_action_words]
                     for word_list in hazard_words:
@@ -719,6 +788,24 @@ def reshape_correlation_matrix(corrMatrix, p_values, predictors, hazards):
     
 
 def hazard_accuracy(ids, num, results_path):
+    """
+    Parameters
+    ----------
+    ids : TYPE
+        DESCRIPTION.
+    num : TYPE
+        DESCRIPTION.
+    results_path : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    sampled_hazard_ids : TYPE
+        DESCRIPTION.
+    total_ids : TYPE
+        DESCRIPTION.
+
+    """
     sampled_hazard_ids = {hazard:[] for hazard in ids}
     num_total_ids = {hazard:0 for hazard in ids}
     data = {}
