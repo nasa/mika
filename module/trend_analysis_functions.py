@@ -383,7 +383,26 @@ def calc_metrics(hazard_file, preprocessed_df, rm_outliers=True, distance=3):
                     time_of_occurence_pct_contained[hazard][year] = remove_outliers(time_of_occurence_pct_contained[hazard][year])
      return time_of_occurence_days, time_of_occurence_pct_contained, frequency, fires, frequency_fires, categories, hazards, years, unique_ids
 
-
+def calc_severity(fires, summary_reports):
+    severity_total = {}
+    for hazard in fires:
+        severity_total[hazard] = {}
+        for year in fires[hazard]:
+            severity_total[hazard][year] = []
+            ids = list(set(fires[hazard][year]))
+            for id_ in ids:
+                id_df = summary_reports.loc[summary_reports['INCIDENT_ID'] == id_].reset_index(drop=True)
+                severity = int(id_df.iloc[0]["STR_DESTROYED_TOTAL"]) + int(id_df.iloc[0]["STR_DAMAGED_TOTAL"])+ int(id_df.iloc[0]["INJURIES_TOTAL"])+ int(id_df.iloc[0]["FATALITIES"])
+                severity_total[hazard][year].append(severity)
+    severity_table = pd.DataFrame({"Hazard": [hazard for hazard in severity_total],
+                                    "Average Severity": [round(np.average(remove_outliers([val for year in severity_total[hazard] for val in severity_total[hazard][year]])),3) for hazard in severity_total],
+                                    "std dev Severity": [round(np.std(remove_outliers([val for year in severity_total[hazard] for val in severity_total[hazard][year]])),3) for hazard in severity_total],
+                                    "n total": [len([val for year in severity_total[hazard] for val in severity_total[hazard][year]]) for hazard in severity_total],
+                                    "n after outliers": [len(remove_outliers([val for year in severity_total[hazard] for val in severity_total[hazard][year]])) for hazard in severity_total],
+                                    "formatted": [str(round(np.average(remove_outliers([val for year in severity_total[hazard] for val in severity_total[hazard][year]])),3))+"+-"+str(round(np.std(remove_outliers([val for year in severity_total[hazard] for val in severity_total[hazard][year]])),3)) for hazard in severity_total]
+                                    }
+                                    )
+    return severity_total, severity_table
 
 def topic_based_calc_metrics(hazard_file, years, preprocessed_df, results_file, rm_outliers=True):
      """
