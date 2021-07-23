@@ -250,7 +250,7 @@ def check_anamolies(time_of_occurence_days, time_of_occurence_pct_contained, fre
             anoms = True
     return anomolous_hazards, anoms
 
-def calc_metrics(hazard_file, preprocessed_df, rm_outliers=True, distance=3):
+def calc_metrics(hazard_file, preprocessed_df, rm_outliers=True, distance=3, target='Combined Text', ids="INCIDENT_ID", unique_ids_col="INCIDENT_ID"):
      """
     uses the hazard focused sheet in the hazard interpretation results to calculate metrics.
     hazards are identified based on subject-action pairs 
@@ -278,9 +278,9 @@ def calc_metrics(hazard_file, preprocessed_df, rm_outliers=True, distance=3):
 
      for year in tqdm(years):
         temp_df = preprocessed_df.loc[preprocessed_df["START_YEAR"]==year].reset_index(drop=True)
-        fire_ids = temp_df["INCIDENT_ID"].unique()
+        fire_ids = temp_df[ids].unique()
         for id_ in fire_ids:
-            temp_fire_df = temp_df.loc[temp_df["INCIDENT_ID"]==id_].reset_index(drop=True)
+            temp_fire_df = temp_df.loc[temp_df[ids]==id_].reset_index(drop=True)
             #date corrections
             start_date = temp_fire_df["DISCOVERY_DOY"].unique() #should only have one start date
             if len(start_date) != 1: 
@@ -291,7 +291,7 @@ def calc_metrics(hazard_file, preprocessed_df, rm_outliers=True, distance=3):
                     start_date = 0
         
             for j in range(len(temp_fire_df)):
-                text = temp_fire_df.iloc[j]["Combined Text"]
+                text = temp_fire_df.iloc[j][target]
                 #check for hazard
                 for i in range(len(hazard_info['Hazard-focused'])):
                     hazard_name = hazard_info['Hazard-focused'].iloc[i]['Hazard name']
@@ -364,7 +364,7 @@ def calc_metrics(hazard_file, preprocessed_df, rm_outliers=True, distance=3):
                         time_of_occurence_days[hazard_name][year].append(time_of_hazard-int(start_date))
                         time_of_occurence_pct_contained[hazard_name][year].append(temp_fire_df.iloc[j]["PCT_CONTAINED_COMPLETED"])
                         fires[hazard_name][year].append(id_)
-                        unique_ids[hazard_name][year].append( temp_fire_df.iloc[j]["Unique IDs"])
+                        unique_ids[hazard_name][year].append(temp_fire_df.iloc[j][unique_ids_col])
                         frequency[hazard_name][year] += 1
      for name in frequency_fires:
          for year in frequency_fires[name]:
