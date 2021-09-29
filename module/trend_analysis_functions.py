@@ -405,6 +405,7 @@ def calc_severity(fires, summary_reports):
     return severity_total, severity_table
 
 def topic_based_calc_metrics(hazard_file, years, preprocessed_df, results_file, rm_outliers=True):
+    ###TODO: change from metric calc to just identifying docs, then metric calc separate
      """
      Uses the topic-focused spread sheet, goes through each hazard relevant topic,
      for each document in that topic, if the hazard relevant words appear in th document,

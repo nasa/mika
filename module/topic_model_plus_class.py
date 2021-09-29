@@ -149,8 +149,9 @@ class Topic_Model_plus():
         self.lda_models = {}
         self.create_ids = create_ids
         
-    def __load_data(self, **kwargs):
-        self.data_df = pd.read_csv(open(self.data_csv,encoding='utf8',errors='ignore'), **kwargs)
+    def __load_data(self, csv=True, sheet_name=None, **kwargs):
+        if csv: self.data_df = pd.read_csv(open(self.data_csv,encoding='utf8',errors='ignore'), **kwargs)
+        else: self.data_df = pd.read_excel(self.data_csv, sheet_name=sheet_name, **kwargs)
         if self.doc_ids_label == "index":
             self.data_df['index'] = self.data_df.index
         self.doc_ids = self.data_df[self.doc_ids_label].tolist()
@@ -317,7 +318,7 @@ class Topic_Model_plus():
             ngrams.append(ngram)
         return ngrams
     
-    def preprocess_data(self, domain_stopwords=[], ngrams=True, ngram_range=3, threshold=15, min_count=5,quot_correction=False,spellcheck=False,segmentation=False, percent=0.3, save_words=[]):
+    def preprocess_data(self, domain_stopwords=[], ngrams=True, ngram_range=3, threshold=15, min_count=5,quot_correction=False,spellcheck=False,segmentation=False, percent=0.3, drop_na=False, save_words=[]):
         """
         performs data preprocessing steps as defined by user
         
@@ -373,7 +374,7 @@ class Topic_Model_plus():
         self.__drop_short_docs()
         cols = self.data_df.columns.difference([self.doc_ids_label]+self.extra_cols)
         self.data_df[cols] = self.data_df[cols].applymap(lambda y: np.nan if (type(y)==int or len(y)==0) else y)
-        self.data_df = self.data_df.dropna(how="any").reset_index(drop=True)
+        if drop_na: self.data_df = self.data_df.dropna(how="any").reset_index(drop=True)
         self.data_df = self.__remove_words_in_pct_of_docs(self.data_df, self.list_of_attributes, pct_=percent, save_words=save_words)
         self.doc_ids = self.data_df[self.doc_ids_label].tolist()
         print("Processing time: ", (time()-start)/60, " minutes")
@@ -735,6 +736,7 @@ class Topic_Model_plus():
                     docs_in_topic[topic].append(self.doc_ids[i])
                     probs[topic].append(weight)
                 i+=1
+            #print(probs)
             for k in docs_in_topic:
                 topics_data["best document"].append(docs_in_topic[k][probs[k].index(max(probs[k]))])
                 topics_data["number of documents in topic"].append(len(docs_in_topic[k]))
@@ -1000,6 +1002,7 @@ class Topic_Model_plus():
                         probs.append(prob)
                     i += 1
                 topics_data["best document"].append(docs_in_topic[probs.index(max(probs))])
+                #print(k, docs_in_topic)
                 topics_data["documents"].append(docs_in_topic[k])
             df = pd.DataFrame(topics_data)
             dfs[attr] = df
