@@ -105,7 +105,7 @@ class Topic_Model_plus():
     # private attributes
     __english_vocab = set([w.lower() for w in words.words()])
 
-    def __init__(self, document_id_col="", csv_file="", list_of_attributes=[], extra_cols = [], name="output data/", combine_cols=False, create_ids=False):
+    def __init__(self, document_id_col="", csv_file="", list_of_attributes=[], extra_cols = [], name='results', combine_cols=False, create_ids=False):
         """
         CLASS CONSTRUCTORS
         ------------------
@@ -143,7 +143,7 @@ class Topic_Model_plus():
         self.max_word_len = 15
         self.correction_list = []
         if combine_cols == True: 
-            self.name += "_combined"
+            self.name = os.path.join(name,'_combined')
         self.combine_cols = combine_cols
         self.hlda_models = {}
         self.lda_models = {}
@@ -415,9 +415,9 @@ class Topic_Model_plus():
             today_str = datetime.date.today().strftime("%b-%d-%Y")
             if itr != "":
                 itr = "-"+str(itr)
-            if self.name != "output data/":
-                self.name += "_"
-            filename = self.name+'topics-'+today_str+str(itr)
+            if self.name != 'results':
+                self.name = os.path.join(self.name,'_')
+            filename = os.path.join(self.name,'topics-',today_str,str(itr))
             self.folder_path = filename#path+"/"+filename
             os.makedirs(self.folder_path, exist_ok = True)
             print("folder created")

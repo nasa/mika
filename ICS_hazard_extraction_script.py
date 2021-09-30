@@ -28,26 +28,14 @@ Functions for ICS-209-PLUS
     - apply lda or hlda
     - words from topics = hazards
     """
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/..")
 
 from module.topic_model_plus_class import Topic_Model_plus
 from module.stopwords.ICS_stop_words import stop_words
-
-import sys
-import os
-
-from sys import platform
-if platform == "darwin":
-    #sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/..")
-    smart_nlp_path = ''
-elif platform == "win32":
-    sys.path.append('../')
-    smart_nlp_path = os.getcwd()
-    smart_nlp_path = "\\".join([smart_nlp_path.split("\\")[i] for i in range(0,len(smart_nlp_path.split("\\"))-1)])
     
 from module.topic_model_plus_class import Topic_Model_plus
+
+import os
+
 ICS_stop_words = stop_words
 
 import pandas as pd 
@@ -60,12 +48,15 @@ list_of_attributes = ["REMARKS", "SIGNIF_EVENTS_SUMMARY", "MAJOR_PROBLEMS"]
 document_id_col = "INCIDENT_ID"
 extra_cols = ["CY","DISCOVERY_DATE", "START_YEAR", "REPORT_DOY", "DISCOVERY_DOY",
               "TOTAL_PERSONNEL", "TOTAL_AERIAL", "PCT_CONTAINED_COMPLETED"]
-file_name = smart_nlp_path+r"\input data\209-PLUS\ics209-plus-wildfire\ics209-plus-wildfire\ics209-plus-wf_sitreps_1999to2014.csv"
-name = smart_nlp_path+r"\output data\ICS_0"
+
+file_name = os.path.join('data','209-PLUS','ics209-plus-wildfire','ics209-plus-wildfire','ics209-plus-wf_sitreps_1999to2014.csv')
+name = os.path.join('output data','ICS_0')
+
 ICS = Topic_Model_plus(document_id_col=document_id_col, extra_cols=extra_cols, csv_file=file_name, list_of_attributes=list_of_attributes, name=name, combine_cols=True, create_ids=True)
 ICS.prepare_data(dtype=str)
+
 #use filtered reports
-file = smart_nlp_path+r"\input data\ICS_filtered_preprocessed_combined_data.csv"
+file = os.path.join('data','ICS_filtered_preprocessed_combined_data.csv')
 filtered_df = pd.read_csv(file)
 filtered_ids = filtered_df['INCIDENT_ID'].unique()
 ICS.data_df = ICS.data_df.loc[ICS.data_df['INCIDENT_ID'].isin(filtered_ids)].reset_index(drop=True)
