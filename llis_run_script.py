@@ -12,12 +12,12 @@ from module.topic_model_plus_class import Topic_Model_plus
 list_of_attributes = ['Lesson(s) Learned','Driving Event','Recommendation(s)']
 document_id_col = 'Lesson ID'
 csv_file_name = os.path.join('data','train_set_expanded_H.csv')
-name = os.path.join('results','test_lda') # optional, used at beginning of folder for identification
+database_name = 'LLIS' # optional, used at beginning of folder for identification
 # optional, can use optimize instead
-num_topics ={'Lesson(s) Learned':5, 'Driving Event':5, 'Recommendation(s)':5}
+num_topics ={'Lesson(s) Learned':95, 'Driving Event':96, 'Recommendation(s)':93}
 
 # creating object
-tm = Topic_Model_plus(list_of_attributes=list_of_attributes, document_id_col=document_id_col, csv_file=csv_file_name, name=name)
+tm = Topic_Model_plus(list_of_attributes=list_of_attributes, document_id_col=document_id_col, csv_file=csv_file_name, database_name=database_name)
 
 # preparing the data: loading, dropping columns and rows
 # parameters: none required, any kwargs for pd.read_csv can be passed

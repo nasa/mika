@@ -40,7 +40,7 @@ class Topic_Model_plus():
         a list of strings defining any extra columns in the database
     folder_path : str
         defines path to folder where output files are stored
-    name : str
+    database_name : str
         defines output file names
     combine_cols : boolean
         defines whether to combine attributes
@@ -105,7 +105,7 @@ class Topic_Model_plus():
     # private attributes
     __english_vocab = set([w.lower() for w in words.words()])
 
-    def __init__(self, document_id_col="", csv_file="", list_of_attributes=[], extra_cols = [], name='results', combine_cols=False, create_ids=False):
+    def __init__(self, document_id_col="", csv_file="", list_of_attributes=[], extra_cols = [], database_name='', combine_cols=False, create_ids=False):
         """
         CLASS CONSTRUCTORS
         ------------------
@@ -138,12 +138,12 @@ class Topic_Model_plus():
         self.list_of_attributes = list_of_attributes
         self.extra_cols = extra_cols
         self.folder_path = ""
-        self.name = name
+        self.database_name = database_name
         self.min_word_len = 2
         self.max_word_len = 15
         self.correction_list = []
         if combine_cols == True: 
-            self.name = os.path.join(name,'_combined')
+            self.database_name = os.path.join(self.database_name+'_combined')
         self.combine_cols = combine_cols
         self.hlda_models = {}
         self.lda_models = {}
@@ -415,9 +415,7 @@ class Topic_Model_plus():
             today_str = datetime.date.today().strftime("%b-%d-%Y")
             if itr != "":
                 itr = "-"+str(itr)
-            if self.name != 'results':
-                self.name = os.path.join(self.name,'_')
-            filename = os.path.join(self.name,'topics-',today_str,str(itr))
+            filename = os.path.join('results',self.database_name+'_topics_'+today_str+str(itr))
             self.folder_path = filename#path+"/"+filename
             os.makedirs(self.folder_path, exist_ok = True)
             print("folder created")
@@ -701,7 +699,7 @@ class Topic_Model_plus():
         coherence_df = pd.DataFrame(coherence_score)
         if return_df == True:
             return coherence_df
-        coherence_df.to_csv(os.path.join(self.folder_path,"/lda_coherence.csv"))
+        coherence_df.to_csv(os.path.join(self.folder_path,"lda_coherence.csv"))
     
     def save_lda_topics(self, return_df=False, p_thres=0.01):
         """
@@ -1003,7 +1001,7 @@ class Topic_Model_plus():
                     i += 1
                 topics_data["best document"].append(docs_in_topic[probs.index(max(probs))])
                 #print(k, docs_in_topic)
-                topics_data["documents"].append(docs_in_topic[k])
+                topics_data["documents"].append(docs_in_topic)
             df = pd.DataFrame(topics_data)
             dfs[attr] = df
             if return_df == False:
@@ -1113,6 +1111,7 @@ class Topic_Model_plus():
         """
         saves the taxonomy, level 1 taxonomy, raw topics coherence, and document topic distribution in one excel file
         """
+        
         self.__create_folder()
         data = {}
         data["taxonomy"] = self.save_hlda_taxonomy(return_df=True)
@@ -1135,6 +1134,7 @@ class Topic_Model_plus():
         file_path : str
             path to file
         """
+        
         #TO DO: add extract preprocessed data, use existing folder
         self.hlda_models = {}
         self.hlda_coherence = {}
@@ -1172,6 +1172,7 @@ class Topic_Model_plus():
             after hlda; must be an ouput from "save_hlda_topics()" or hlda.bin object
         
         """
+        
         try:
             from graphviz import Digraph
         except ImportError as error:
