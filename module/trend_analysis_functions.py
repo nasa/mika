@@ -403,6 +403,55 @@ def calc_severity(fires, summary_reports):
                                     )
     return severity_total, severity_table
 
+def identify_docs_per_hazard(hazard_file, preprocessed_df, results_file, text_field, time_field, id_field):
+    hazard_info = pd.read_excel(hazard_file, sheet_name=['topic-focused'])
+    hazards = list(set(hazard_info['topic-focused']['Hazard name'].tolist()))
+    hazards = [hazard for hazard in hazards if isinstance(hazard,str)]
+    time_period = preprocessed_df[time_field].unique()
+    categories = hazard_info['topic-focused']['Hazard Category'].tolist()
+    results = pd.read_excel(results_file, sheet_name=[text_field])
+    frequency = {name:{str(time_p):0 for time_p in time_period} for name in hazards}
+    docs_per_hazard = {hazard:{str(time_p):[] for time_p in time_period} for hazard in hazards}
+    for i in range(len(hazards)):
+         num_df = hazard_info['topic-focused'].loc[hazard_info['topic-focused']['Hazard name'] == hazards[i]]
+         nums = num_df['Topic Number'].to_list() #identifies all topics related to this hazard
+         ids_df = results[text_field].loc[nums]
+         ids_ = ids_df['documents'].to_list()
+         ids_ = ids_[0].strip("[]").split(", ")
+         ids_= [w.replace("'","") for w in ids_]
+         #print(ids_)
+         temp_df = preprocessed_df.loc[preprocessed_df[id_field].astype(str).isin(ids_)].reset_index(drop=True)
+         fire_ids = temp_df[id_field].unique()
+         for id_ in fire_ids:
+            temp_fire_df = temp_df.loc[temp_df[id_field]==id_].reset_index(drop=True)
+            for j in range(len(temp_fire_df)):
+                text = temp_fire_df.iloc[j][text_field]
+                #check for hazard -- looks at the hazard relevant words from the topic
+                hazard_name = hazards[i]
+                hazard_words = num_df['Relevant hazard words'].to_list()
+                hazard_words = [word for words in hazard_words for word in words.split(", ")]
+                #print(hazard_words, len(hazard_words), hazard_words[0])
+                negation_words = num_df['Negation words'].to_list()
+                negation_words = [word for word in negation_words if isinstance(word, str)]
+                #need to check if a word in text is in hazard words
+                hazard_found = False
+                for word in hazard_words:
+                    if word in text:
+                        hazard_found = True
+                
+                if negation_words!=[]:
+                    for words in negation_words:
+                        for word in words.split(", "):#removes texts that have negation words
+                            if word in text:
+                                hazard_found = False 
+                
+                if hazard_found == True:
+                    year = temp_fire_df.iloc[j][time_field]
+                    docs_per_hazard[hazard_name][str(year)].append(id_)
+                    frequency[hazard_name][str(year)] += 1
+    return frequency, docs_per_hazard
+     
+
 def topic_based_calc_metrics(hazard_file, years, preprocessed_df, results_file, rm_outliers=True):
     ###TODO: change from metric calc to just identifying docs, then metric calc separate
      """
