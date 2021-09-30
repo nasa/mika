@@ -5,21 +5,10 @@ Created on Tue Sep 21 13:19:22 2021
 @author: srandrad
 """
 import pandas as pd
-import sys
 import os
-sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/..")
-from sys import platform
 
 from module.topic_model_plus_class import Topic_Model_plus
 
-if platform == "darwin":
-    sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/..")
-    smart_nlp_path = ''
-elif platform == "win32":
-    sys.path.append('../')
-    smart_nlp_path = os.getcwd()
-    smart_nlp_path = "\\".join([smart_nlp_path.split("\\")[i] for i in range(0,len(smart_nlp_path.split("\\"))-1)])
-    smart_nlp_path = smart_nlp_path+"\\"
 
 list_of_attributes = ['narr_public']#, 'corrective_public', 'notes']
 extra_cols = ['region', 'agency', 'duplicate_yn', 'completed_yn', 'rep_by_org',
@@ -32,8 +21,8 @@ extra_cols = ['region', 'agency', 'duplicate_yn', 'completed_yn', 'rep_by_org',
                    'public_yn', 'sequence_number', 'fiscal_year', 'unitid', 'safecomid',
                    'id']
 document_id_col = 'id'
-csv_file_name = smart_nlp_path+"input data/safecom-2011-present-NASA.xlsx" 
-name = smart_nlp_path+"output data/test_safecom"
+csv_file_name = os.path.join('data','safecom-2011-present-NASA.xlsx')
+name = os.path.join('results','test_safecom')
 """
 test = Topic_Model_plus(list_of_attributes=list_of_attributes, document_id_col=document_id_col, 
                         csv_file=csv_file_name, name=name, extra_cols=extra_cols)
@@ -52,7 +41,7 @@ for attr in list_of_attributes:
 
 #"""#Extract preprocessed data
 
-file = smart_nlp_path+r"/output data/test_safecom_topics-Sep-21-2021/preprocessed_data.csv"
+file = os.path.join('results','test_safecom_topics-Sep-21-2021','preprocessed_data.csv')
 safecom = Topic_Model_plus(document_id_col=document_id_col, extra_cols=extra_cols, list_of_attributes=list_of_attributes, name=name, combine_cols=False)
 safecom.extract_preprocessed_data(file)
 #"""
