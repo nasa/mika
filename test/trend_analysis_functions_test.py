@@ -7,7 +7,7 @@ Created on Wed May 19 12:35:15 2021
 
 import sys
 import os
-sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/..")
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)),".."))
 
 import unittest
 
@@ -15,22 +15,12 @@ from module.topic_model_plus_class import Topic_Model_plus
 from module.trend_analysis_functions import *
 import pandas as pd
 
-from sys import platform
-if platform == "darwin":
-    #sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/..")
-    smart_nlp_path = ''
-elif platform == "win32":
-    sys.path.append('../')
-    smart_nlp_path = os.getcwd()
-    smart_nlp_path = "\\".join([smart_nlp_path.split("\\")[i] for i in range(0,len(smart_nlp_path.split("\\"))-1)])
-
-
-hazard_file = smart_nlp_path+r"\test\hazard_interpretation_test.xlsx"
+hazard_file = os.path.join("test","hazard_interpretation_test.xlsx")
 document_id_col = "INCIDENT_ID"
 extra_cols = ["CY","DISCOVERY_DATE", "START_YEAR", "REPORT_DOY", "DISCOVERY_DOY",
               "TOTAL_PERSONNEL", "TOTAL_AERIAL", "PCT_CONTAINED_COMPLETED"]
 list_of_attributes = ["Combined Text"]
-file = smart_nlp_path+r"\input data\ICS_filtered_preprocessed_combined_data.csv"
+file = os.path.join("data","ICS_filtered_preprocessed_combined_data.csv")
 
 ICS = Topic_Model_plus(document_id_col=document_id_col, extra_cols=extra_cols, list_of_attributes=list_of_attributes, combine_cols=False)
 ICS.extract_preprocessed_data(file)
@@ -67,7 +57,7 @@ class test_trend_analysis_functions(unittest.TestCase):
         frequency ={'Resource Issues': {2006: 293, 2007: 213, 2008: 261, 2009: 36, 2010: 36, 2011: 88, 2012: 139, 2013: 91, 2014: 11}, 'Traffic Hazard': {2006: 460, 2007: 496, 2008: 480, 2009: 278, 2010: 152, 2011: 219, 2012: 573, 2013: 456, 2014: 142}, 'Aerial Grounding': {2006: 34, 2007: 32, 2008: 40, 2009: 16, 2010: 28, 2011: 23, 2012: 35, 2013: 28, 2014: 11}}
         frequency_fires = {'Resource Issues': {2006: 102, 2007: 93, 2008: 50, 2009: 18, 2010: 21, 2011: 38, 2012: 54, 2013: 46, 2014: 7}, 'Traffic Hazard': {2006: 148, 2007: 143, 2008: 102, 2009: 80, 2010: 73, 2011: 120, 2012: 160, 2013: 98, 2014: 35}, 'Aerial Grounding': {2006: 13, 2007: 21, 2008: 18, 2009: 10, 2010: 12, 2011: 17, 2012: 27, 2013: 18, 2014: 8}}
         
-        hazard_info = pd.read_excel(smart_nlp_path+r"\test\hazard_interpretation_test.xlsx", sheet_name=['Hazard-focused'])
+        hazard_info = pd.read_excel(os.path.join("test","hazard_interpretation_test.xlsx"), sheet_name=['Hazard-focused'])
         hazards = hazard_info['Hazard-focused']['Hazard name'].tolist()
         
         hazard_df = preprocessed_df 
@@ -221,12 +211,12 @@ class test_trend_analysis_functions(unittest.TestCase):
         check2 = pd.testing.assert_frame_equal(delta_df, correct_delta_df, check_exact=False, rtol = 0.05, atol=0.05)
     
     def test_simple_input_integration(self):
-        hazard_file = smart_nlp_path+r"\test\hazard_interpretation_test.xlsx"
+        hazard_file = os.path.join("test","hazard_interpretation_test.xlsx")
         document_id_col = "INCIDENT_ID"
         extra_cols = ["CY","DISCOVERY_DATE", "START_YEAR", "REPORT_DOY", "DISCOVERY_DOY",
                       "TOTAL_PERSONNEL", "TOTAL_AERIAL", "PCT_CONTAINED_COMPLETED"]
         list_of_attributes = ["Combined Text"]
-        file = smart_nlp_path+r"\test\trend_analysis_test_input.csv"
+        file = os.path.join("test","trend_analysis_test_input.csv")
         ICS = Topic_Model_plus(document_id_col=document_id_col, extra_cols=extra_cols, list_of_attributes=list_of_attributes, combine_cols=False)
         ICS.extract_preprocessed_data(file, drop_short_docs=False, drop_duplicates=False)
         preprocessed_df = ICS.data_df

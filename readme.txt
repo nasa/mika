@@ -18,3 +18,10 @@ smart_nlp (main project directory)
 	---test/ - test files, using python unittest
 
 # Quick Start
+
+There is a separate run script for each database available for analysis. Please run whichever script is desired.
+
+# To Do
+
+- some tests fail - fix this
+- condense test files so you only have to run things once

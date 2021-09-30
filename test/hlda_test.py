@@ -5,6 +5,9 @@ Created on Thu Mar 18 17:33:36 2021
 @author: srandrad
 """
 
+import sys, os
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)),".."))
+
 from module.topic_model_plus_class import Topic_Model_plus
 import pandas as pd
 test_preprocessed_data = pd.DataFrame()
@@ -38,7 +41,7 @@ class test_hlda_methods(unittest.TestCase):
     def test_hlda_functions(self): # integration test
         list_of_attributes = ['Lesson(s) Learned','Driving Event','Recommendation(s)']
         document_id_col = 'Lesson ID'
-        csv_file_name = os.path.join('..','data','preprocessed_data_LLIS.csv')
+        csv_file_name = os.path.join('data','preprocessed_data_LLIS.csv')
         test_hlda = Topic_Model_plus(list_of_attributes=list_of_attributes, document_id_col=document_id_col)
         test_hlda.extract_preprocessed_data(csv_file_name)
         test_hlda.hlda(training_iterations=100)

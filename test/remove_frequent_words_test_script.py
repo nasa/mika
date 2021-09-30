@@ -8,17 +8,9 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 import time
-import sys
-import os
 
-from sys import platform
-if platform == "darwin":
-    sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/..")
-    smart_nlp_path = ''
-elif platform == "win32":
-    sys.path.append('../')
-    smart_nlp_path = os.getcwd()
-    smart_nlp_path = "\\".join([smart_nlp_path.split("\\")[i] for i in range(0,len(smart_nlp_path.split("\\"))-1)])
+import sys, os
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)),".."))
     
 from module.topic_model_plus_class import Topic_Model_plus
 
@@ -136,10 +128,7 @@ Also shows some of the runtime difference.
 """
 list_of_attributes = ['Lesson(s) Learned','Driving Event','Recommendation(s)']
 document_id_col = 'Lesson ID'
-if platform == "darwin":
-    csv_filename = smart_nlp_path+"input data/train_set_expanded_H.csv"
-elif platform == "win32":
-    csv_filename = smart_nlp_path+"/input data/train_set_expanded_H.csv"
+csv_filename = os.path.join("data","train_set_expanded_H.csv")
 
 test_df = Topic_Model_plus(list_of_attributes=list_of_attributes, document_id_col=document_id_col, csv_file=csv_filename)
 test_df.prepare_data()
@@ -172,10 +161,7 @@ the same output as the old method.
 """
 list_of_attributes = ["REMARKS", "SIGNIF_EVENTS_SUMMARY", "MAJOR_PROBLEMS"]
 document_id_col = "INCIDENT_ID"
-if platform == "darwin":
-    csv_filename = smart_nlp_path+"input data/209-PLUS/ics209-plus-wildfire/ics209-plus-wildfire/ics209-plus-wf_sitreps_1999to2014.csv"
-elif platform == "win32":
-    csv_filename = smart_nlp_path+r"\input data\209-PLUS\ics209-plus-wildfire\ics209-plus-wildfire\ics209-plus-wf_sitreps_1999to2014.csv"
+csv_filename = os.path.join("data","209-PLUS","ics209-plus-wildfire","ics209-plus-wildfire","ics209-plus-wf_sitreps_1999to2014.csv")
 
 test_df = Topic_Model_plus(list_of_attributes=list_of_attributes, document_id_col=document_id_col, csv_file=csv_filename, combine_cols=True)
 test_df.prepare_data(dtype=str)

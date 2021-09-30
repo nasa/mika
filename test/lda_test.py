@@ -5,17 +5,8 @@ integration test for lda functions. Run this to ensure updates do not break the 
 @author: srandrad
 """
 
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/..")
-from sys import platform
-if platform == "darwin":
-    sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/..")
-    smart_nlp_path = ''
-elif platform == "win32":
-    sys.path.append('../')
-    smart_nlp_path = os.getcwd()
-    smart_nlp_path = "\\".join([smart_nlp_path.split("\\")[i] for i in range(0,len(smart_nlp_path.split("\\"))-1)])
+import sys, os
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)),".."))
     
 import unittest
 
@@ -51,7 +42,7 @@ class test_lda_methods(unittest.TestCase):
     #add asserts for comaring the output csvs/dfs
         list_of_attributes = ['Lesson(s) Learned','Driving Event','Recommendation(s)']
         document_id_col = 'Lesson ID'
-        csv_file_name = smart_nlp_path+"\input data\preprocessed_data.csv"
+        csv_file_name = os.path.join("data","preprocessed_data_LLIS.csv")
         num_topics ={'Lesson(s) Learned':5, 'Driving Event':5, 'Recommendation(s)':5}
         test_lda = Topic_Model_plus(list_of_attributes=list_of_attributes, document_id_col=document_id_col)
         test_lda.extract_preprocessed_data(csv_file_name)
@@ -62,9 +53,9 @@ class test_lda_methods(unittest.TestCase):
         test_lda.save_lda_taxonomy()
         file_path = test_lda.folder_path #path from saved
         
-        doc_topics1 = pd.read_csv(file_path+"/lda_topic_dist_per_doc.csv")#.applymap(str)
-        tax1 = pd.read_csv(file_path+"/lda_taxonomy.csv").applymap(str)
-        coherence_1 = pd.read_csv(file_path+"/"+"lda_coherence.csv").applymap(str)
+        doc_topics1 = pd.read_csv(os.path.join(file_path,"lda_topic_dist_per_doc.csv"))#.applymap(str)
+        tax1 = pd.read_csv(os.path.join(file_path,"lda_taxonomy.csv")).applymap(str)
+        coherence_1 = pd.read_csv(os.path.join(file_path,"lda_coherence.csv")).applymap(str)
         
         #testing functions from bin
         test_lda.lda_extract_models(file_path)
@@ -72,9 +63,9 @@ class test_lda_methods(unittest.TestCase):
         test_lda.save_lda_coherence()
         test_lda.save_lda_taxonomy()
         
-        doc_topics2 = pd.read_csv(file_path+"/lda_topic_dist_per_doc.csv")#.applymap(str)
-        tax2 = pd.read_csv(file_path+"/lda_taxonomy.csv").applymap(str)
-        coherence_2 = pd.read_csv(file_path+"/"+"lda_coherence.csv").applymap(str)
+        doc_topics2 = pd.read_csv(os.path.join(file_path,"lda_topic_dist_per_doc.csv"))#.applymap(str)
+        tax2 = pd.read_csv(os.path.join(file_path,"lda_taxonomy.csv")).applymap(str)
+        coherence_2 = pd.read_csv(os.path.join(file_path,"lda_coherence.csv")).applymap(str)
         
         #delete test folder/everything in it
         for root, dirs, files in os.walk(file_path):
@@ -82,7 +73,7 @@ class test_lda_methods(unittest.TestCase):
                 os.remove(os.path.join(root, file))
         #print("=========",file_path)
         os.rmdir(file_path)
-        os.rmdir(os.getcwd()+"/output data")
+        os.rmdir(os.path.join(os.getcwd(),"output data"))
         
         #rounding to account for differences in float number system
         for i in range(len(doc_topics1)):
