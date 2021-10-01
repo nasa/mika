@@ -16,7 +16,6 @@ import seaborn as sn
 from tqdm import tqdm
 import random
 
-
 def minmax_scale(data_list):
     """
     performs minmax scaling on a single data list in order to normalize the data.

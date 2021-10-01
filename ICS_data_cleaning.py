@@ -19,26 +19,18 @@ from pingouin import rcorr
 
 import sys
 import os
-
-from sys import platform
-if platform == "darwin":
-    sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/..")
-    smart_nlp_path = ''
-elif platform == "win32":
-    sys.path.append('../')
-    smart_nlp_path = os.getcwd()
-    smart_nlp_path = "\\".join([smart_nlp_path.split("\\")[i] for i in range(0,len(smart_nlp_path.split("\\"))-1)]+["/"])
+sys.path.append(os.path.join('..'))
 
 from module.trend_analysis_functions import *
 from module.topic_model_plus_class import Topic_Model_plus
 
-incident_file = smart_nlp_path+r"input data\209-PLUS\ics209-plus-wildfire\ics209-plus-wildfire\ics209-plus-wf_incidents_1999to2014.csv"
+incident_file = os.path.join('data','209-PLUS','ics209-plus-wildfire','ics209-plus-wildfire','ics209-plus-wf_incidents_1999to2014.csv')
 incident_summary_df = pd.read_csv(incident_file)
 incident_summary_df = incident_summary_df.drop("Unnamed: 0", axis=1)
 incident_summary_df = incident_summary_df.loc[incident_summary_df["START_YEAR"]>=2006].reset_index(drop=True)
 print(len(incident_summary_df))
 
-preprocessed_file = smart_nlp_path+r"\input data\ICS_filtered_preprocessed_combined_data.csv"
+preprocessed_file = os.path.join('data','ICS_filtered_preprocessed_combined_data.csv')
 sitrep_df = pd.read_csv(preprocessed_file)
 sitrep_df = sitrep_df.loc[sitrep_df["START_YEAR"]>2005].reset_index(drop=True)
 print(len(sitrep_df))
@@ -137,7 +129,7 @@ incident_summary_df = incident_summary_df.loc[incident_summary_df['INCIDENT_ID']
 sitrep_df = sitrep_df.loc[sitrep_df['INCIDENT_ID'].isin(total_ids)].reset_index(drop=True)
 
 #sitrep_df.to_csv(smart_nlp_path+r"\input data\ICS_filtered_preprocessed_combined.csv")
-incident_summary_df.to_csv(smart_nlp_path+r"\input data\summary_reports_cleaned.csv")
+incident_summary_df.to_csv(os.path.join('data','summary_reports_cleaned.csv'))
 
 print(len(incident_summary_df),len(sitrep_df))
 
