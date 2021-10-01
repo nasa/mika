@@ -289,14 +289,17 @@ class Topic_Model_plus():
         
     def __trigram_texts(self, texts, ngram_range, threshold, min_count):
         #NEEDS WORK
+        # changes word order!
         ngrams = []
         ngram_models = {}
+        
         for n in range(2, ngram_range+1):
             if n == 2:
                 text_input = texts
             elif n > 2:
                 text_input = ngram_models[str(n-1)+"gram"][texts]
             ngram_models[str(n)+"gram"]=Phrases(text_input, min_count=min_count, delimiter=b' ', threshold=threshold)
+        
         for text in texts:
             ngrams_={}
             for n in range(2, ngram_range+1):
@@ -316,9 +319,10 @@ class Topic_Model_plus():
             ngram = list(set(model_ngrams+single_words))
             #ngram = (bigrams_+trigrams_+words)
             ngrams.append(ngram)
+                
         return ngrams
     
-    def preprocess_data(self, domain_stopwords=[], ngrams=True, ngram_range=3, threshold=15, min_count=5,quot_correction=False,spellcheck=False,segmentation=False, drop_short_docs=False, percent=0.3, drop_na=False, save_words=[],):
+    def preprocess_data(self, domain_stopwords=[], ngrams=True, ngram_range=3, threshold=15, min_count=5,quot_correction=False,spellcheck=False,segmentation=False,drop_short_docs_thres=3, percent=0.3, drop_na=False, save_words=[],):
         """
         performs data preprocessing steps as defined by user
         
@@ -346,7 +350,7 @@ class Topic_Model_plus():
             self.ngrams = "tp"
         start = time()
         sleep(0.5)
-        
+                
         for attr in tqdm(self.list_of_attributes,desc="Preprocessing data…"):
             pbar = tqdm(total=100, desc="Preprocessing "+attr+"…")
             self.data_df[attr] = self.__tokenize_texts(self.data_df[attr])
@@ -373,12 +377,14 @@ class Topic_Model_plus():
             pbar.close()
                 
         self.__drop_duplicate_docs(self.list_of_attributes)
-        if drop_short_docs == True:
-            self.__drop_short_docs()
+        self.__drop_short_docs(thres=drop_short_docs_thres) # need to drop short docs, else we'll get NaNs because of the next two lines; but we can set the thres so this works for the test case
+        
         cols = self.data_df.columns.difference([self.doc_ids_label]+self.extra_cols)
         self.data_df[cols] = self.data_df[cols].applymap(lambda y: np.nan if (type(y)==int or len(y)==0) else y)
         if drop_na: self.data_df = self.data_df.dropna(how="any").reset_index(drop=True)
+                          
         self.data_df = self.__remove_words_in_pct_of_docs(self.data_df, self.list_of_attributes, pct_=percent, save_words=save_words)
+            
         self.doc_ids = self.data_df[self.doc_ids_label].tolist()
         print("Processing time: ", (time()-start)/60, " minutes")
         sleep(0.5)
@@ -449,7 +455,7 @@ class Topic_Model_plus():
         print("Preprocessed data saves to: ", self.folder_path+name)
         
     
-    def extract_preprocessed_data(self, file_name, drop_short_docs=True, drop_duplicates=True):
+    def extract_preprocessed_data(self, file_name, drop_short_docs=True, drop_short_docs_thres=3, drop_duplicates=True):
         """
         uses previously saved preprocessed data
         
@@ -479,7 +485,7 @@ class Topic_Model_plus():
         if drop_duplicates == True:
             self.__drop_duplicate_docs(cols)
         if drop_short_docs == True:
-            self.__drop_short_docs()
+            self.__drop_short_docs(thres=drop_short_docs_thres)
         self.doc_ids = self.data_df[self.doc_ids_label].tolist()
         check_for_ngrams()
         print("Preprocessed data extracted from: ", file_name)

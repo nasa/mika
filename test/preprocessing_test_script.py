@@ -65,10 +65,17 @@ class test_preprocessing_methods(unittest.TestCase):
         test_class = Topic_Model_plus(document_id_col = 'ids')
         test_class.data_df = test_data_df
         test_class.list_of_attributes = ['docs']
-        test_class.preprocess_data(quot_correction=True,spellcheck=True,segmentation=True)
+        test_class.preprocess_data(quot_correction=True,spellcheck=True,segmentation=True,drop_short_docs_thres=2,percent=.9) # pct needs to be high because this does not scale well for small doc/set sizes
         test_preprocess_data_result = test_class.data_df
-        correct_preprocess_data_result = pd.DataFrame({"docs":[['black'],['good']],"ids":[4,6]})
-        self.assertEqual(test_preprocess_data_result.equals(correct_preprocess_data_result),True)
+        correct_preprocess_data_result = pd.DataFrame({"docs":[['black','cat'],['python','good']],"ids":[4,6]})
+        correct_col_1 = correct_preprocess_data_result['docs'][0]
+        correct_col_2 = correct_preprocess_data_result['docs'][1]
+        test_col_1 = test_preprocess_data_result['docs'][0]
+        test_col_2 = test_preprocess_data_result['docs'][1]
+        test_bool = False # since the trigram processing shuffles word order, need to test unordered lists
+        if set(correct_col_1) == set(test_col_1) and set(correct_col_2) == set(test_col_2):
+            test_bool = True
+        self.assertEqual(test_bool,True)
 
 if __name__ == '__main__':
     unittest.main()

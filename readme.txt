@@ -23,6 +23,7 @@ There is a separate run script for each database available for analysis. Please 
 
 # To Do
 
-- some tests fail - lda/hlda tests have issues with the folders they reference, preprocessing fails on line 392 - appears to be an issue with empty docs after certain preprocessing steps
-- __remove_words_in_pct_of_docs needs a test - possible bug
+- some tests fail - lda/hlda tests have issues with the folders they reference
+- __remove_words_in_pct_of_docs needs a test
+- trigram function shuffles word order
 - condense test files so you only have to run things once
