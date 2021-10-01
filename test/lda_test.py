@@ -38,13 +38,14 @@ class test_lda_methods(unittest.TestCase):
         #make sure it saves, use test object for consistency
         return
     """
+    
     def test_lda_functions(self): # integration test
     #add asserts for comaring the output csvs/dfs
         list_of_attributes = ['Lesson(s) Learned','Driving Event','Recommendation(s)']
         document_id_col = 'Lesson ID'
         csv_file_name = os.path.join("data","preprocessed_data_LLIS.csv")
         num_topics ={'Lesson(s) Learned':5, 'Driving Event':5, 'Recommendation(s)':5}
-        test_lda = Topic_Model_plus(list_of_attributes=list_of_attributes, document_id_col=document_id_col)
+        test_lda = Topic_Model_plus(list_of_attributes=list_of_attributes, document_id_col=document_id_col,database_name='test')
         test_lda.extract_preprocessed_data(csv_file_name)
         test_lda.lda(num_topics=num_topics)
         test_lda.save_lda_models()
@@ -73,7 +74,6 @@ class test_lda_methods(unittest.TestCase):
                 os.remove(os.path.join(root, file))
         #print("=========",file_path)
         os.rmdir(file_path)
-        os.rmdir(os.path.join(os.getcwd(),"results"))
         
         #rounding to account for differences in float number system
         for i in range(len(doc_topics1)):

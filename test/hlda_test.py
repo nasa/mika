@@ -42,7 +42,7 @@ class test_hlda_methods(unittest.TestCase):
         list_of_attributes = ['Lesson(s) Learned','Driving Event','Recommendation(s)']
         document_id_col = 'Lesson ID'
         csv_file_name = os.path.join('data','preprocessed_data_LLIS.csv')
-        test_hlda = Topic_Model_plus(list_of_attributes=list_of_attributes, document_id_col=document_id_col)
+        test_hlda = Topic_Model_plus(list_of_attributes=list_of_attributes, document_id_col=document_id_col,database_name='test')
         test_hlda.extract_preprocessed_data(csv_file_name)
         test_hlda.hlda(training_iterations=100)
         test_hlda.save_hlda_models()
@@ -82,9 +82,7 @@ class test_hlda_methods(unittest.TestCase):
         for root, dirs, files in os.walk(file_path):
             for file in files:
                 os.remove(os.path.join(root, file))
-        os.rmdir(file_path)
-        os.rmdir(os.path.join(os.getcwd(),"results"))
-        
+        os.rmdir(file_path)        
         
         #rounding to account for differences due to float number system
         for i in range(len(doc_topics1)):
