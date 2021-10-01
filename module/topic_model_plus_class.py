@@ -427,7 +427,7 @@ class Topic_Model_plus():
             filename = os.path.join('results',self.database_name+'_topics_'+today_str+str(itr))
             self.folder_path = filename#path+"/"+filename
             os.makedirs(self.folder_path, exist_ok = True)
-            print("folder created")
+            #print("folder created")
         else:
             return
         
@@ -452,7 +452,7 @@ class Topic_Model_plus():
         if self.combine_cols == True:
             name = "preprocessed_data_combined_text.csv"
         self.data_df.to_csv(os.path.join(self.folder_path,name), index=False)
-        print("Preprocessed data saves to: ", self.folder_path+name)
+        #print("Preprocessed data saves to: ", self.folder_path+name)
         
     
     def extract_preprocessed_data(self, file_name, drop_short_docs=True, drop_short_docs_thres=3, drop_duplicates=True):
@@ -488,7 +488,7 @@ class Topic_Model_plus():
             self.__drop_short_docs(thres=drop_short_docs_thres)
         self.doc_ids = self.data_df[self.doc_ids_label].tolist()
         check_for_ngrams()
-        print("Preprocessed data extracted from: ", file_name)
+        #print("Preprocessed data extracted from: ", file_name)
         
         
     def coherence_scores(self, mdl, lda_or_hlda, measure='c_v'):
@@ -559,7 +559,7 @@ class Topic_Model_plus():
             coherence.append(self.coherence_scores(lda, "lda")["average"])
             LL.append(lda.ll_per_word)
             perplexity.append(lda.perplexity)
-        print(coherence, perplexity)
+        #print(coherence, perplexity)
         coherence = normalize(np.array([coherence,np.zeros(len(coherence))]))[0]
         perplexity = normalize(np.array([perplexity,np.zeros(len(perplexity))]))[0]
         #plots optomization graph
@@ -611,7 +611,7 @@ class Topic_Model_plus():
         self.lda_num_topics = {}
         for attr in self.list_of_attributes:
             self.__find_optimized_lda_topic_num(attr, max_topics, training_iterations=1000, iteration_step=10, thres = 0.005, **kwargs)
-            print(self.lda_num_topics[attr], " topics for ", attr)
+            #print(self.lda_num_topics[attr], " topics for ", attr)
         print("LDA topic optomization: ", (time()-start)/60, " minutes")
     
     def lda(self, num_topics={}, training_iterations=1000, iteration_step=10, max_topics=0, **kwargs):
@@ -684,7 +684,7 @@ class Topic_Model_plus():
         if return_df == True:
             return doc_df
         doc_df.to_csv(os.path.join(self.folder_path,"lda_topic_dist_per_doc.csv"))
-        print("LDA topic distribution per document saved to: ",self.folder_path+"/lda_topic_dist_per_doc.csv")
+        #print("LDA topic distribution per document saved to: ",self.folder_path+"/lda_topic_dist_per_doc.csv")
     
     def save_lda_coherence(self, return_df=False):
         """
@@ -752,7 +752,7 @@ class Topic_Model_plus():
             dfs[attr] = df
             if return_df == False:
                 df.to_csv(os.path.join(self.folder_path,attr+"_lda_topics.csv"))
-                print("LDA topics for "+attr+" saved to: ",self.folder_path+"/"+attr+"_lda_topics.csv")
+                #print("LDA topics for "+attr+" saved to: ",self.folder_path+"/"+attr+"_lda_topics.csv")
         if return_df == True:
             return dfs
     
@@ -793,7 +793,7 @@ class Topic_Model_plus():
         if return_df == True:
             return taxonomy_df
         taxonomy_df.to_csv(os.path.join(self.folder_path,'lda_taxonomy.csv'))
-        print("LDA taxonomy saved to: ", os.path.join(self.folder_path,'lda_taxonomy.csv'))
+        #print("LDA taxonomy saved to: ", os.path.join(self.folder_path,'lda_taxonomy.csv'))
         
     def save_lda_results(self):
         """
@@ -809,7 +809,7 @@ class Topic_Model_plus():
         with pd.ExcelWriter(os.path.join(self.folder_path,'lda_results.xlsx')) as writer2:
             for results in data:
                 data[results].to_excel(writer2, sheet_name = results, index = False)
-        print("LDA results saved to: ", os.path.join(self.folder_path,'lda_results.xlsx'))
+        #print("LDA results saved to: ", os.path.join(self.folder_path,'lda_results.xlsx'))
         
     def lda_extract_models(self, file_path):
         """
@@ -827,7 +827,7 @@ class Topic_Model_plus():
             self.lda_models[attr] = tp.LDAModel.load(os.path.join(file_path,attr+"_lda_model_object.bin"))
             self.lda_coherence[attr] = self.coherence_scores(self.lda_models[attr], "lda")
             self.lda_num_topics[attr] = self.lda_models[attr].k
-        print("LDA models extracted from: ", file_path)
+        #print("LDA models extracted from: ", file_path)
         preprocessed_filepath = os.path.join(file_path,"preprocessed_data")
         #if self.list_of_attributes == ['Combined Text']:
         #    self.combine_cols = True
@@ -860,7 +860,7 @@ class Topic_Model_plus():
             term_frequency
         )
         pyLDAvis.save_html(prepared_data, os.path.join(self.folder_path,attr+'_ldavis.html'))
-        print("LDA Visualization for "+attr+" saved to: "+self.folder_path+'/'+attr+'_ldavis.html')
+        #print("LDA Visualization for "+attr+" saved to: "+self.folder_path+'/'+attr+'_ldavis.html')
     
     def hlda_visual(self, attr):
         """
@@ -897,7 +897,7 @@ class Topic_Model_plus():
             term_frequency
         )
         pyLDAvis.save_html(prepared_data, os.path.join(self.folder_path,attr+'_hldavis.html'))
-        print("hLDA Visualization for "+attr+" saved to: "+self.folder_path+'/'+attr+'_hldavis.html')
+        #print("hLDA Visualization for "+attr+" saved to: "+self.folder_path+'/'+attr+'_hldavis.html')
     
     def hlda(self, levels=3, training_iterations=1000, iteration_step=10, **kwargs):
         """
@@ -954,7 +954,7 @@ class Topic_Model_plus():
         if return_df == True:
             return doc_df
         doc_df.to_csv(os.path.join(self.folder_path,'hlda_topic_dist_per_doc.csv'))
-        print("hLDA topic distribution per document saved to: ",self.folder_path+"hlda_topic_dist_per_doc.csv")
+        #print("hLDA topic distribution per document saved to: ",self.folder_path+"hlda_topic_dist_per_doc.csv")
     
     def save_hlda_models(self):
         """
@@ -964,7 +964,7 @@ class Topic_Model_plus():
         for attr in self.list_of_attributes:
             mdl = self.hlda_models[attr]
             mdl.save(os.path.join(self.folder_path,attr+"_hlda_model_object.bin"))
-            print("hLDA model for "+attr+" saved to: ", (self.folder_path+"/"+attr+"_hlda_model_object.bin"))
+            #print("hLDA model for "+attr+" saved to: ", (self.folder_path+"/"+attr+"_hlda_model_object.bin"))
         self.save_preprocessed_data()
         
     def save_hlda_topics(self, return_df=False, p_thres=0.001):
@@ -1015,7 +1015,7 @@ class Topic_Model_plus():
             dfs[attr] = df
             if return_df == False:
                 df.to_csv(os.path.join(self.folder_path,attr+"_hlda_topics.csv"))
-                print("hLDA topics for "+attr+" saved to: ",self.folder_path+"/"+attr+"_hlda_topics.csv")
+                #print("hLDA topics for "+attr+" saved to: ",self.folder_path+"/"+attr+"_hlda_topics.csv")
         if return_df == True:
             return dfs
             
@@ -1039,7 +1039,7 @@ class Topic_Model_plus():
         if return_df == True:
             return coherence_df
         coherence_df.to_csv(os.path.join(self.folder_path,"hlda_coherence.csv"))
-        print("hLDA coherence scores saved to: ",self.folder_path+"/"+"hlda_coherence.csv")
+        #print("hLDA coherence scores saved to: ",self.folder_path+"/"+"hlda_coherence.csv")
     
     def save_hlda_taxonomy(self, return_df=False):
         """
@@ -1076,7 +1076,7 @@ class Topic_Model_plus():
         if return_df == True:
             return taxonomy_df
         taxonomy_df.to_csv(os.path.join(self.folder_path,'hlda_taxonomy.csv'))
-        print("hLDA taxonomy saved to: ", self.folder_path+"/hlda_taxonomy.csv")
+        #print("hLDA taxonomy saved to: ", self.folder_path+"/hlda_taxonomy.csv")
     
     def save_hlda_level_n_taxonomy(self, lev=1, return_df=False):
         """
@@ -1114,7 +1114,7 @@ class Topic_Model_plus():
         if return_df == True:
             return taxonomy_level_df
         taxonomy_level_df.to_csv(os.path.join(self.folder_path,"hlda_level"+str(lev)+"_taxonomy.csv"))
-        print("hLDA level "+str(lev)+" taxonomy saved to: ", self.folder_path+"/hlda_level"+str(lev)+"_taxonomy.csv")
+        #print("hLDA level "+str(lev)+" taxonomy saved to: ", self.folder_path+"/hlda_level"+str(lev)+"_taxonomy.csv")
     
     def save_hlda_results(self):
         """
@@ -1132,7 +1132,7 @@ class Topic_Model_plus():
         with pd.ExcelWriter(os.path.join(self.folder_path,"hlda_results.xlsx")) as writer2:
             for results in data:
                 data[results].to_excel(writer2, sheet_name = results, index = False)
-        print("hLDA results saved to: ", self.folder_path+"/hlda_results.xlsx")
+        #print("hLDA results saved to: ", self.folder_path+"/hlda_results.xlsx")
     
     def hlda_extract_models(self, file_path):
         """
@@ -1151,7 +1151,7 @@ class Topic_Model_plus():
             self.hlda_models[attr]=tp.HLDAModel.load(os.path.join(file_path,attr+"_hlda_model_object.bin"))
             self.levels = self.hlda_models[attr].depth
             self.hlda_coherence[attr] = self.coherence_scores(self.hlda_models[attr], "hlda")
-        print("hLDA models extracted from: ", file_path)
+        #print("hLDA models extracted from: ", file_path)
         preprocessed_filepath = os.path.join(file_path,"preprocessed_data")
         if self.list_of_attributes == ['Combined Text']:
             self.combine_cols = True

@@ -23,6 +23,4 @@ There is a separate run script for each database available for analysis. Please 
 
 # To Do
 
-- __remove_words_in_pct_of_docs needs a test
 - trigram function shuffles word order
-- condense test files so you only have to run things once
