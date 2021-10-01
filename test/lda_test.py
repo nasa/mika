@@ -73,7 +73,7 @@ class test_lda_methods(unittest.TestCase):
                 os.remove(os.path.join(root, file))
         #print("=========",file_path)
         os.rmdir(file_path)
-        os.rmdir(os.path.join(os.getcwd(),"output data"))
+        os.rmdir(os.path.join(os.getcwd(),"results"))
         
         #rounding to account for differences in float number system
         for i in range(len(doc_topics1)):
