@@ -318,7 +318,7 @@ class Topic_Model_plus():
             ngrams.append(ngram)
         return ngrams
     
-    def preprocess_data(self, domain_stopwords=[], ngrams=True, ngram_range=3, threshold=15, min_count=5,quot_correction=False,spellcheck=False,segmentation=False, percent=0.3, drop_na=False, save_words=[]):
+    def preprocess_data(self, domain_stopwords=[], ngrams=True, ngram_range=3, threshold=15, min_count=5,quot_correction=False,spellcheck=False,segmentation=False, drop_short_docs=False, percent=0.3, drop_na=False, save_words=[],):
         """
         performs data preprocessing steps as defined by user
         
@@ -346,6 +346,7 @@ class Topic_Model_plus():
             self.ngrams = "tp"
         start = time()
         sleep(0.5)
+        
         for attr in tqdm(self.list_of_attributes,desc="Preprocessing data…"):
             pbar = tqdm(total=100, desc="Preprocessing "+attr+"…")
             self.data_df[attr] = self.__tokenize_texts(self.data_df[attr])
@@ -370,8 +371,10 @@ class Topic_Model_plus():
             pbar.update(20)
             sleep(0.5)
             pbar.close()
+                
         self.__drop_duplicate_docs(self.list_of_attributes)
-        self.__drop_short_docs()
+        if drop_short_docs == True:
+            self.__drop_short_docs()
         cols = self.data_df.columns.difference([self.doc_ids_label]+self.extra_cols)
         self.data_df[cols] = self.data_df[cols].applymap(lambda y: np.nan if (type(y)==int or len(y)==0) else y)
         if drop_na: self.data_df = self.data_df.dropna(how="any").reset_index(drop=True)
@@ -379,7 +382,7 @@ class Topic_Model_plus():
         self.doc_ids = self.data_df[self.doc_ids_label].tolist()
         print("Processing time: ", (time()-start)/60, " minutes")
         sleep(0.5)
-        
+                
     def __remove_words_in_pct_of_docs(self, data_df, list_of_attributes, pct_=0.3, save_words=[]):
             num_docs = len(data_df)
             pct = np.round(pct_*num_docs)
