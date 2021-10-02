@@ -10,3 +10,4 @@ pyLDAvis
 matplotlib
 sklearn
 symspellpy
+collections

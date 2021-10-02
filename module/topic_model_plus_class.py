@@ -384,7 +384,7 @@ class Topic_Model_plus():
         if drop_na: self.data_df = self.data_df.dropna(how="any").reset_index(drop=True)
                           
         self.data_df = self.__remove_words_in_pct_of_docs(self.data_df, self.list_of_attributes, pct_=percent, save_words=save_words)
-            
+                
         self.doc_ids = self.data_df[self.doc_ids_label].tolist()
         print("Processing time: ", (time()-start)/60, " minutes")
         sleep(0.5)
@@ -714,6 +714,7 @@ class Topic_Model_plus():
         """
         saves lda topics to file
         """
+        
         #saving raw topics with coherence
         self.__create_folder()
         dfs = {}
