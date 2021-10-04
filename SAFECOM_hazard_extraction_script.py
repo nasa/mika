@@ -22,7 +22,7 @@ extra_cols = ['region', 'agency', 'duplicate_yn', 'completed_yn', 'rep_by_org',
                    'id']
 document_id_col = 'id'
 csv_file_name = os.path.join('data','safecom-2011-present-NASA.xlsx')
-name = os.path.join('results','test_safecom')
+name = os.path.join('test_safecom')
 """
 test = Topic_Model_plus(list_of_attributes=list_of_attributes, document_id_col=document_id_col, 
                         csv_file=csv_file_name, name=name, extra_cols=extra_cols)
@@ -42,7 +42,7 @@ for attr in list_of_attributes:
 #"""#Extract preprocessed data
 
 file = os.path.join('results','test_safecom_topics-Sep-21-2021','preprocessed_data.csv')
-safecom = Topic_Model_plus(document_id_col=document_id_col, extra_cols=extra_cols, list_of_attributes=list_of_attributes, name=name, combine_cols=False)
+safecom = Topic_Model_plus(document_id_col=document_id_col, extra_cols=extra_cols, list_of_attributes=list_of_attributes, database_name=name, combine_cols=False)
 safecom.extract_preprocessed_data(file)
 #"""
 
