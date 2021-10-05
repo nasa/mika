@@ -36,15 +36,15 @@ class word_intrusion_class():
         self.shuffled_topics = []
         self.intruded_topics = []
                 
-    def __load_topic_model(self,file,sheet,column_name):
+    def __load_topic_model(self,file,column_name,header=0):
         """
         Load a topic model for word intrusion analysis.
         """
         
-        tm_df = pd.read_excel(file,sheet_name=sheet)
-        self.topics = [topic.split() for topic in tm_df[column_name].to_list()]
-        self.topics = [[word.replace(',', '') for word in topic] for topic in self.topics]
-
+        tm_df = pd.read_csv(file)
+        self.topics = [topic.split(',') for topic in tm_df[column_name].tolist()]
+        self.topics = self.topics[header:]
+        
     def __get_common_words(self,perc_common=.1):
         """
         Get common words in entire topic model, for use in generating word intruders.
@@ -68,8 +68,8 @@ class word_intrusion_class():
         """
         For a single topic, generate word intruder.
         """
-
-        candidate_intruders = list(set(topic) - set(self.common_words))
+        
+        candidate_intruders = list(set(self.common_words)-set(topic))
         if not candidate_intruders:
             print('Error - topic does not contain any uncommon words; please decrease percentage of words considered common and try again.')
             intruder = []
@@ -88,12 +88,12 @@ class word_intrusion_class():
     
         return topic
         
-    def generate_intruded_topics(self,file,sheet,column_name,num_samples=20,max_topic_size=7):
+    def generate_intruded_topics(self,file,column_name,num_samples=20,max_topic_size=7,header=0):
         """
         Generate topics with word intruders for analysis.
         """
         
-        self.__load_topic_model(file,sheet,column_name)
+        self.__load_topic_model(file=file,column_name=column_name,header=header)
         self.__get_common_words()
         
         self.topics = [topic[:max_topic_size] for topic in self.topics]
@@ -107,7 +107,7 @@ class word_intrusion_class():
         
         return self.shuffled_topics
     
-    def save_intruded_topics(self,filepath,sheet):
+    def save_intruded_topics(self,filepath):
         """
         Saves intruded topics.
         """
@@ -115,4 +115,4 @@ class word_intrusion_class():
         intruded_topics_str = [', '.join(topic) for topic in self.intruded_topics]
         
         it_df = pd.DataFrame(intruded_topics_str,columns = ['Topic Words'])
-        it_df.to_excel(filepath,sheet_name=sheet)
+        it_df.to_csv(filepath)
