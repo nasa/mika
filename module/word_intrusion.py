@@ -14,10 +14,22 @@ class word_intrusion_class():
     
     Attributes
     ----------
+    topics : list of lists of strings
+        all topics loaded from file
+    selected_topics : list of lists of strings
+        topics randomly selected for intrusion
+    common_words : list of strings
+        words commonly occurring in topics
+    intruded_topics : list of lists of strings
+        intruded topics for experiment
     
     Methods
     -------
+    generate_intruded_topics(file,column_name,num_samples=20,max_topic_size=7,header=0)
+        create intruded topics from base topics loaded from file
     
+    save_intruded_topics(filepath)
+        save intruded topics to file
     """
 
     # private attributes
@@ -33,7 +45,6 @@ class word_intrusion_class():
         self.topics = []
         self.selected_topics = []
         self.common_words = []
-        self.shuffled_topics = []
         self.intruded_topics = []
                 
     def __load_topic_model(self,file,column_name,header=0):
@@ -91,6 +102,24 @@ class word_intrusion_class():
     def generate_intruded_topics(self,file,column_name,num_samples=20,max_topic_size=7,header=0):
         """
         Generate topics with word intruders for analysis.
+        
+        PARAMETERS
+        ----------
+        file : str
+            file from which to load topics
+        column_name : str
+            name of column in file from which to load topics
+        num_samples : int
+            number of intruded topics to produce
+        max_topic_size : int
+            limits number of words to present in a topic
+        header : int
+            allows for multiple header lines in file from which to load topics
+            
+        RETURNS
+        -------
+        intruded topics : list of lists of words
+            intruded topics for experiment
         """
         
         self.__load_topic_model(file=file,column_name=column_name,header=header)
@@ -105,11 +134,16 @@ class word_intrusion_class():
             shuffled_topic = self.__add_word_intruder(topic,intruder)
             self.intruded_topics.append(shuffled_topic)
         
-        return self.shuffled_topics
+        return self.intruded_topics
     
     def save_intruded_topics(self,filepath):
         """
         Saves intruded topics.
+        
+        PARAMETERS
+        ----------
+        filepath : str
+            path to file to which the intruded topics will be saved
         """
         
         intruded_topics_str = [', '.join(topic) for topic in self.intruded_topics]
