@@ -45,6 +45,7 @@ class word_intrusion_class():
         self.topics = []
         self.selected_topics = []
         self.common_words = []
+        self.intruders = []
         self.intruded_topics = []
                 
     def __load_topic_model(self,file,column_name,header=0):
@@ -53,6 +54,7 @@ class word_intrusion_class():
         """
         
         tm_df = pd.read_csv(file)
+        tm_df = tm_df.loc[tm_df.astype(str).drop_duplicates(subset=column_name, keep='last').index].reset_index(drop=True)
         self.topics = [topic.split(',') for topic in tm_df[column_name].tolist()]
         self.topics = self.topics[header:]
         
@@ -131,6 +133,7 @@ class word_intrusion_class():
         self.intruded_topics = []
         for topic in self.selected_topics:
             intruder = self.__generate_word_intruder(topic)
+            self.intruders.append(intruder)
             shuffled_topic = self.__add_word_intruder(topic,intruder)
             self.intruded_topics.append(shuffled_topic)
         
@@ -148,5 +151,5 @@ class word_intrusion_class():
         
         intruded_topics_str = [', '.join(topic) for topic in self.intruded_topics]
         
-        it_df = pd.DataFrame(intruded_topics_str,columns = ['Topic Words'])
+        it_df = pd.DataFrame({'Topic Words':intruded_topics_str,'Intruder':self.intruders})
         it_df.to_csv(filepath)

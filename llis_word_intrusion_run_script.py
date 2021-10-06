@@ -13,5 +13,5 @@ save_filepath = os.path.join('results','IDETC_2021_intruded_topics.csv')
 column_name = 'Lesson(s) Learned Level 1'
 header = 2
 
-shuffled_topics = wi.generate_intruded_topics(file=filepath,column_name=column_name,header=header)
+shuffled_topics = wi.generate_intruded_topics(file=filepath,column_name=column_name,header=header,max_topic_size=5)
 wi.save_intruded_topics(filepath=save_filepath)

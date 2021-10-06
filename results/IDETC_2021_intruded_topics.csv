@@ -1,21 +1,21 @@
-,Topic Words
-0," general,  emergency,  option, lose,  housekeep,  sample,  data,  bond"
-1," mission,  liquid,  line,  valve,  propellant, purge,  propulsion,  engine"
-2," planning,  mishap investigation, drawing,  operating condition,  high pressure,  manner,  task,  primary"
-3,"purge,  propellant,  engine,  liquid,  propulsion,  line,  valve,  component"
-4," approve,  final,  module, draw,  redundancy,  item,  identification,  sequence"
-5," failure,  damage,  flight hardware,  power,  personnel injury,  hardware,  propulsion, damage flight hardware"
-6," failure,  personnel injury,  found,  damage,  power,  flight hardware, damage flight hardware,  hardware"
-7," inadvertent,  proven,  adhere,  loss life,  life,  failure adhere,  loss mission, loss"
-8," failure adhere,  loss mission,  loss life,  life, loss,  proven,  adhere,  operating condition"
-9," propulsion, purge,  valve,  identify,  engine,  liquid,  line,  propellant"
-10," operating condition,  proven,  loss mission,  failure adhere,  life, loss,  adhere,  loss life"
-11," sequence,  redundancy, manual, draw,  identification,  approve,  item,  final"
-12," longer,  vibration,  engine,  space shuttle, maximum,  surface,  operating,  change"
-13,"stress,  qualification,  analysis,  temperature,  limit,  test,  maintenance,  hardware"
-14," radiation,  duration,  health,  approximately, assign, loss,  radiation exposure,  astronaut"
-15," space shuttle,  reliable,  engine,  longer, maximum,  change,  operating,  surface"
-16," liquid,  propulsion,  line,  valve,  engine,  exposure,  propellant, purge"
-17," hardware,  damage,  personnel injury,  failure,  power,  inspection, damage flight hardware,  flight hardware"
-18,"controller,  find,  liquid,  solid,  allow,  series,  removal,  replace"
-19," propellant,  valve,  line, purge,  propulsion,  liquid,  engine,  accident"
+,Topic Words,Intruder
+0," failure,  flight hardware,  activate,  damage,  hardware, damage flight hardware", activate
+1," link,  challenge,  destructive,  vehicle,  resolution, segment", destructive
+2," flight hardware,  operating, maximum,  surface,  engine,  space shuttle", flight hardware
+3,"production,  package,  destructive,  packaging,  operating,  radiation", operating
+4,"replacement,  hardware,  assembly,  flight hardware,  individual,  point", hardware
+5," break,  free,  hoist,  locate,  inadequate, platform", locate
+6," flight hardware,  magnetic,  scientific,  attitude control system, scientific data,  orbit", flight hardware
+7,"controller,  series,  allow,  find,  solid,  locate", locate
+8," astronaut,  activate,  radiation exposure,  approximately, assign,  radiation", activate
+9," flight hardware,  option,  data,  general,  sample, lose", flight hardware
+10," excess,  emergency,  accident,  injury, wear,  strength", emergency
+11," train,  harness,  post,  connector, wiring,  locate", locate
+12," line,  locate, purge,  propellant,  engine,  liquid", locate
+13," line,  prevent,  locate, activation,  activate,  emergency", emergency
+14," weight,  reliable,  great, manual,  automate,  hardware", hardware
+15," identification,  item,  redundancy,  engine,  sequence, draw", engine
+16," analysis, stress,  qualification,  incorrectly,  hardware,  test", incorrectly
+17," adhere,  failure adhere,  life, loss,  analysis,  loss mission", analysis
+18," detect,  improper,  difficult,  screw,  line, mount", line
+19," emergency,  high pressure, drawing,  primary,  manner,  mishap investigation", emergency
