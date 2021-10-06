@@ -47,6 +47,9 @@ class word_intrusion_class():
         self.common_words = []
         self.intruders = []
         self.intruded_topics = []
+        self.random_seed = 0
+        
+        random.seed(self.random_seed)
                 
     def __load_topic_model(self,file,column_name,header=0):
         """

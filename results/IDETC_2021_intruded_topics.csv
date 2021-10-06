@@ -1,21 +1,21 @@
 ,Topic Words,Intruder
-0," failure,  flight hardware,  activate,  damage,  hardware, damage flight hardware", activate
-1," link,  challenge,  destructive,  vehicle,  resolution, segment", destructive
-2," flight hardware,  operating, maximum,  surface,  engine,  space shuttle", flight hardware
-3,"production,  package,  destructive,  packaging,  operating,  radiation", operating
-4,"replacement,  hardware,  assembly,  flight hardware,  individual,  point", hardware
-5," break,  free,  hoist,  locate,  inadequate, platform", locate
-6," flight hardware,  magnetic,  scientific,  attitude control system, scientific data,  orbit", flight hardware
-7,"controller,  series,  allow,  find,  solid,  locate", locate
-8," astronaut,  activate,  radiation exposure,  approximately, assign,  radiation", activate
-9," flight hardware,  option,  data,  general,  sample, lose", flight hardware
-10," excess,  emergency,  accident,  injury, wear,  strength", emergency
-11," train,  harness,  post,  connector, wiring,  locate", locate
-12," line,  locate, purge,  propellant,  engine,  liquid", locate
-13," line,  prevent,  locate, activation,  activate,  emergency", emergency
-14," weight,  reliable,  great, manual,  automate,  hardware", hardware
-15," identification,  item,  redundancy,  engine,  sequence, draw", engine
-16," analysis, stress,  qualification,  incorrectly,  hardware,  test", incorrectly
-17," adhere,  failure adhere,  life, loss,  analysis,  loss mission", analysis
-18," detect,  improper,  difficult,  screw,  line, mount", line
-19," emergency,  high pressure, drawing,  primary,  manner,  mishap investigation", emergency
+0," package,  radiation,  packaging,  destructive, production,  prevent", prevent
+1,"purge,  switch,  line,  propellant,  engine,  liquid", switch
+2," approximately,  radiation exposure,  prevent, assign,  astronaut,  radiation", prevent
+3," great,  automate,  reliable, manual,  weight,  vehicle", vehicle
+4,"activation,  attitude control system,  scientific, scientific data,  magnetic,  orbit",activation
+5," hardware,  sample, lose,  general,  option,  data", hardware
+6,"activation,  connector,  harness, wiring,  train,  post",activation
+7,"draw,  redundancy,  incorrectly,  identification,  sequence,  item", incorrectly
+8," failure adhere,  prevent,  adhere,  loss mission,  life, loss", prevent
+9," high pressure,  manner, drawing,  primary,  analysis,  mishap investigation", analysis
+10," space shuttle,  operating,  surface,  engine,  radiation, maximum", radiation
+11,"damage flight hardware,  flight hardware,  damage,  hardware,  failure,  prevent", prevent
+12,"controller,  solid,  series,  find,  manner,  allow", manner
+13," free,  prevent,  hoist, platform,  break,  inadequate", prevent
+14," test,  line, stress,  analysis,  qualification,  hardware", line
+15," flight hardware,  locate,  prevent,  line, activation,  activate", flight hardware
+16," individual,  assembly, activation,  flight hardware, replacement,  point",activation
+17," challenge,  resolution,  vehicle, segment,  emergency,  link", emergency
+18," excess,  strength,  accident, wear,  line,  injury", line
+19," improper,  difficult,  detect,  screw,  flight hardware, mount", flight hardware
