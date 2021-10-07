@@ -12,6 +12,27 @@ class word_intrusion_class():
     """
     A class for automating word intrusion experimental design and analysis.
     
+    Excerpt from the original paper: "Reading Tea Leaves: How Humans Interpret Topic Models" by Chang et al
+    
+    In the word intrusion task, the subject is presented with a randomly ordered set of six words.
+    The task of the user is to find the word which is out of place or does not belong with the others,
+    i.e., the intruder. When the set of words minus the intruder makes sense together, then the subject
+    should easily identify the intruder.
+    
+    In order to construct a set to present to the subject, we first select at random a topic from the model.
+    We then select the five most probable words from that topic. In addition to these words, an intruder
+    word is selected at random from a pool of words with low probability in the current topic (to reduce
+    the possibility that the intruder comes from the same semantic group) but high probability in some
+    other topic (to ensure that the intruder is not rejected outright due solely to rarity). All six words are
+    then shuffled and presented to the subject.
+    
+    Subjects were instructed to focus on the meanings of words, not their syntactic usage or orthography. We
+    also presented subjects with the option of viewing the “correct” answer after they submitted their own
+    response, to make the tasks more engaging. Here the “correct” answer was determined by the model which
+    generated the data, presented as if it were the response of another user. At the same time, subjects were
+    encouraged to base their responses on their own opinions, not to try to match other subjects’ (the models’)
+    selections. In small experiments, we have found that this extra information did not bias subjects’ responses.
+    
     Attributes
     ----------
     topics : list of lists of strings
@@ -104,7 +125,7 @@ class word_intrusion_class():
     
         return topic
         
-    def generate_intruded_topics(self,file,column_name,num_samples=20,max_topic_size=7,header=0):
+    def generate_intruded_topics(self,file,column_name,num_samples=20,max_topic_size=5,header=0):
         """
         Generate topics with word intruders for analysis.
         
@@ -117,7 +138,7 @@ class word_intrusion_class():
         num_samples : int
             number of intruded topics to produce
         max_topic_size : int
-            limits number of words to present in a topic
+            limits number of words to present in a topic; 5 is the number recommended by Chang et al
         header : int
             allows for multiple header lines in file from which to load topics
             
