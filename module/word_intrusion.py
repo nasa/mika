@@ -5,8 +5,10 @@
 
 import pandas as pd
 import numpy as np
-import random
 from collections import Counter
+
+import random
+random.seed(0)
 
 class word_intrusion_class():
     """
@@ -37,16 +39,12 @@ class word_intrusion_class():
     ----------
     topics : list of lists of strings
         all topics loaded from file
-    selected_topics : list of lists of strings
-        topics randomly selected for intrusion
     common_words : list of strings
         words commonly occurring in topics
-    intruded_topics : list of lists of strings
-        intruded topics for experiment
     
     Methods
     -------
-    generate_intruded_topics(file,column_name,num_samples=20,max_topic_size=7,header=0)
+    generate_intruded_topics(file,topic_column_name,num_samples=20,max_topic_size=7,header=0)
         create intruded topics from base topics loaded from file
     
     save_intruded_topics(filepath)
@@ -64,23 +62,28 @@ class word_intrusion_class():
         
         # public attributes
         self.topics = []
-        self.selected_topics = []
+        self.docs = []
         self.common_words = []
         self.intruders = []
-        self.intruded_topics = []
-        self.random_seed = 0
-        
-        random.seed(self.random_seed)
+        self.intruder_topics_idx = []
                 
-    def __load_topic_model(self,file,column_name,header=0):
+    def __load_topic_model(self, file, topic_column_name, doc_column_name, header=0):
         """
         Load a topic model for word intrusion analysis.
         """
         
         tm_df = pd.read_csv(file)
-        tm_df = tm_df.loc[tm_df.astype(str).drop_duplicates(subset=column_name, keep='last').index].reset_index(drop=True)
-        self.topics = [topic.split(',') for topic in tm_df[column_name].tolist()]
+        tm_df = tm_df.loc[tm_df.astype(str).drop_duplicates(subset=topic_column_name, keep='last').index].reset_index(drop=True)
+        self.topics = [topic.replace(' ','') for topic in tm_df[topic_column_name].tolist()]
+        self.topics = [topic.split(',') for topic in self.topics]
         self.topics = self.topics[header:]
+        self.docs = tm_df[doc_column_name].tolist()
+        self.docs = self.docs[header:]
+        self.docs = [doc.replace('[','') for doc in self.docs]
+        self.docs = [doc.replace(']','') for doc in self.docs]
+        self.docs = [doc.replace(' ','') for doc in self.docs]
+        self.docs = [doc.split(',') for doc in self.docs]
+        self.all_docs = list(set([doc for doc_in_topic in self.docs for doc in doc_in_topic]))
         
     def __get_common_words(self,perc_common=.1):
         """
@@ -99,7 +102,36 @@ class word_intrusion_class():
         
         num_topics = len(self.topics)
         sample_idx = random.sample(range(num_topics),num_samples)
-        self.selected_topics = list(map(self.topics.__getitem__,sample_idx))
+        selected_topics = list(map(self.topics.__getitem__,sample_idx))
+        
+        return selected_topics
+        
+    def __select_sample_docs(self,num_samples=5):
+        """
+        Select sample of docs in topic model for experiment.
+        """
+        
+        num_docs = len(self.all_docs)
+        sample_idx = random.sample(range(num_docs),num_samples)
+        selected_docs = list(map(self.all_docs.__getitem__,sample_idx))
+                
+        return selected_docs, sample_idx
+        
+    def __get_topics_of_docs(self,top=3):
+        """
+        Get topics associated with docs.
+        """
+        
+        # this doesn't grab the "top" topics though - need topic distributions to do this
+        topics_of_docs = [] # this is by doc index
+        for j in range(0,len(self.all_docs)): # self.all_docs: list of all docs; j is doc index
+            topics_of_docs.append([])
+            for i in range(0,len(self.docs)): # self.docs: list of docs per topic; i is topic index
+                if self.all_docs[j] in self.docs[i]: # if current doc is in the current sublist of docs per topic
+                    if len(topics_of_docs[j]) < top: # only take top n topics
+                        topics_of_docs[j].append(i) # save index of topic to topics_of_docs
+                    
+        return topics_of_docs
                 
     def __generate_word_intruder(self,topic):
         """
@@ -108,7 +140,7 @@ class word_intrusion_class():
         
         candidate_intruders = list(set(self.common_words)-set(topic))
         if not candidate_intruders:
-            print('Error - topic does not contain any uncommon words; please decrease percentage of words considered common and try again.')
+            print('Error - topic contains all uncommon words; please decrease percentage of words considered common and try again.')
             intruder = []
         else:
             intruder = candidate_intruders[random.randint(0,len(candidate_intruders)-1)]
@@ -125,7 +157,7 @@ class word_intrusion_class():
     
         return topic
         
-    def generate_intruded_topics(self,file,column_name,num_samples=20,max_topic_size=5,header=0):
+    def generate_intruded_topics(self, file, topic_column_name, doc_column_name, num_samples=20, max_topic_size=5, header=0):
         """
         Generate topics with word intruders for analysis.
         
@@ -133,8 +165,10 @@ class word_intrusion_class():
         ----------
         file : str
             file from which to load topics
-        column_name : str
+        topic_column_name : str
             name of column in file from which to load topics
+        doc_column_name : str
+            name of column in file from which to load doc numbers
         num_samples : int
             number of intruded topics to produce
         max_topic_size : int
@@ -148,20 +182,69 @@ class word_intrusion_class():
             intruded topics for experiment
         """
         
-        self.__load_topic_model(file=file,column_name=column_name,header=header)
+        self.__load_topic_model(file=file, topic_column_name=topic_column_name, doc_column_name=doc_column_name, header=header)
         self.__get_common_words()
         
-        self.topics = [topic[:max_topic_size] for topic in self.topics]
+        selected_topics = self.__select_sample_topics(num_samples=num_samples)
+        selected_topics = [topic[:max_topic_size] for topic in selected_topics]
         
-        self.__select_sample_topics(num_samples=20)
-        self.intruded_topics = []
-        for topic in self.selected_topics:
+        intruded_topics = []
+        for topic in selected_topics:
             intruder = self.__generate_word_intruder(topic)
             self.intruders.append(intruder)
             shuffled_topic = self.__add_word_intruder(topic,intruder)
-            self.intruded_topics.append(shuffled_topic)
+            intruded_topics.append(shuffled_topic)
         
-        return self.intruded_topics
+        self.intruded_topics = intruded_topics
+        
+        return intruded_topics
+    
+    def generate_intruded_docs(self, file, topic_column_name, doc_column_name, num_samples=5, max_num_topics=3, header=0):
+        """
+        Generate docs with topic intruders for analysis.
+        
+        PARAMETERS
+        ----------
+        file : str
+            file from which to load topics
+        topic_column_name : str
+            name of column in file from which to load topics
+        doc_column_name : str
+            name of column in file from which to load doc numbers
+        num_samples : int
+            number of intruded docs to produce
+        max_num_topics : int
+            limits number of topics to present for a doc
+        header : int
+            allows for multiple header lines in file from which to load topics
+            
+        RETURNS
+        -------
+        intruded docs : list of lists of words
+            intruded docs for experiment
+        """
+        
+        self.__load_topic_model(file=file, topic_column_name=topic_column_name, doc_column_name=doc_column_name, header=header)
+        
+        self.selected_docs, selected_docs_idx = self.__select_sample_docs(num_samples=num_samples)
+        doc_topics = self.__get_topics_of_docs(top=max_num_topics)
+        selected_doc_topics = list(map(doc_topics.__getitem__,selected_docs_idx))
+        
+        all_topic_idx = range(0,len(self.topics))
+        
+        intruded_docs = []
+        for doc_topic in selected_doc_topics:
+            intruded_docs.append(doc_topic)
+            sample_idx_options = set(all_topic_idx) - set(doc_topic)
+            sample_topic_idx = random.sample(sample_idx_options,1)[0]
+            intruded_docs[-1].append(sample_topic_idx)
+            random.shuffle(intruded_docs[-1])
+            self.intruder_topics_idx.append(sample_topic_idx)
+            
+        self.intruded_docs = intruded_docs
+            
+        return intruded_docs
+        
     
     def save_intruded_topics(self,filepath):
         """
@@ -172,8 +255,29 @@ class word_intrusion_class():
         filepath : str
             path to file to which the intruded topics will be saved
         """
+                
+        it_df = pd.DataFrame({'Topic Words':self.intruded_topics,'Intruder':self.intruders})
+        it_df.to_csv(filepath)
+    
+    def save_intruded_docs(self,filepath):
+        """
+        Saves intruded docs.
         
-        intruded_topics_str = [', '.join(topic) for topic in self.intruded_topics]
+        PARAMETERS
+        ----------
+        filepath : str
+            path to file to which the intruded docs will be saved
+        """
         
-        it_df = pd.DataFrame({'Topic Words':intruded_topics_str,'Intruder':self.intruders})
+        doc_intruded_topics = []
+        for intruded_doc in self.intruded_docs:
+            doc_intruded_topics.append([])
+            for topic in intruded_doc:
+                doc_intruded_topics[-1].append(self.topics[topic])
+        
+        intruder_topics = []
+        for intruder_topic_idx in self.intruder_topics_idx:
+            intruder_topics.append(self.topics[intruder_topic_idx])
+        
+        it_df = pd.DataFrame({'Lesson Number':self.selected_docs,'Topics':doc_intruded_topics,'Intruder':intruder_topics})
         it_df.to_csv(filepath)
