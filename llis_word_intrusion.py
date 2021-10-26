@@ -3,6 +3,8 @@
 @author: hswalsh
 """
 
+import os
+
 import pandas as pd
 import numpy as np
 from collections import Counter
@@ -65,7 +67,6 @@ class word_intrusion_class():
         self.docs = []
         self.common_words = []
         self.intruders = []
-        self.intruder_topics_idx = []
                 
     def __load_topic_model(self, file, topic_column_name, doc_column_name, header=0):
         """
@@ -73,16 +74,28 @@ class word_intrusion_class():
         """
         
         tm_df = pd.read_csv(file)
-        tm_df = tm_df.loc[tm_df.astype(str).drop_duplicates(subset=topic_column_name, keep='last').index].reset_index(drop=True)
-        self.topics = [topic.replace(' ','') for topic in tm_df[topic_column_name].tolist()]
-        self.topics = [topic.split(',') for topic in self.topics]
-        self.topics = self.topics[header:]
-        self.docs = tm_df[doc_column_name].tolist()
-        self.docs = self.docs[header:]
-        self.docs = [doc.replace('[','') for doc in self.docs]
-        self.docs = [doc.replace(']','') for doc in self.docs]
-        self.docs = [doc.replace(' ','') for doc in self.docs]
-        self.docs = [doc.split(',') for doc in self.docs]
+        topics_with_duplicates = [topic.replace(' ','') for topic in tm_df[topic_column_name].tolist()]
+        topics_with_duplicates = [topic.split(',') for topic in topics_with_duplicates]
+        topics_with_duplicates = topics_with_duplicates[header:]
+        self.topics = []
+        for topic in topics_with_duplicates:
+            if topic not in self.topics:
+                self.topics.append(topic) # self.topics does not have duplicates
+                
+        topic_docs_not_consolidated = tm_df[doc_column_name].tolist()
+        topic_docs_not_consolidated = topic_docs_not_consolidated[header:]
+        topic_docs_not_consolidated = [doc.replace('[','') for doc in topic_docs_not_consolidated]
+        topic_docs_not_consolidated = [doc.replace(']','') for doc in topic_docs_not_consolidated]
+        topic_docs_not_consolidated = [doc.replace(' ','') for doc in topic_docs_not_consolidated]
+        topic_docs_not_consolidated = [doc.split(',') for doc in topic_docs_not_consolidated]
+        self.docs = []
+        for topic in self.topics:
+            self.docs.append([])
+            for i in range(0,len(topic_docs_not_consolidated)):
+                if topics_with_duplicates[i] == topic:
+                    for doc in topic_docs_not_consolidated[i]:
+                        self.docs[-1].append(doc) # list of docs for consolidated topics
+
         self.all_docs = list(set([doc for doc_in_topic in self.docs for doc in doc_in_topic]))
         
     def __get_common_words(self,perc_common=.1):
@@ -116,22 +129,6 @@ class word_intrusion_class():
         selected_docs = list(map(self.all_docs.__getitem__,sample_idx))
                 
         return selected_docs, sample_idx
-        
-    def __get_topics_of_docs(self,top=3):
-        """
-        Get topics associated with docs.
-        """
-        
-        # this doesn't grab the "top" topics though - need topic distributions to do this
-        topics_of_docs = [] # this is by doc index
-        for j in range(0,len(self.all_docs)): # self.all_docs: list of all docs; j is doc index
-            topics_of_docs.append([])
-            for i in range(0,len(self.docs)): # self.docs: list of docs per topic; i is topic index
-                if self.all_docs[j] in self.docs[i]: # if current doc is in the current sublist of docs per topic
-                    if len(topics_of_docs[j]) < top: # only take top n topics
-                        topics_of_docs[j].append(i) # save index of topic to topics_of_docs
-                    
-        return topics_of_docs
                 
     def __generate_word_intruder(self,topic):
         """
@@ -199,53 +196,6 @@ class word_intrusion_class():
         
         return intruded_topics
     
-    def generate_intruded_docs(self, file, topic_column_name, doc_column_name, num_samples=5, max_num_topics=3, header=0):
-        """
-        Generate docs with topic intruders for analysis.
-        
-        PARAMETERS
-        ----------
-        file : str
-            file from which to load topics
-        topic_column_name : str
-            name of column in file from which to load topics
-        doc_column_name : str
-            name of column in file from which to load doc numbers
-        num_samples : int
-            number of intruded docs to produce
-        max_num_topics : int
-            limits number of topics to present for a doc
-        header : int
-            allows for multiple header lines in file from which to load topics
-            
-        RETURNS
-        -------
-        intruded docs : list of lists of words
-            intruded docs for experiment
-        """
-        
-        self.__load_topic_model(file=file, topic_column_name=topic_column_name, doc_column_name=doc_column_name, header=header)
-        
-        self.selected_docs, selected_docs_idx = self.__select_sample_docs(num_samples=num_samples)
-        doc_topics = self.__get_topics_of_docs(top=max_num_topics)
-        selected_doc_topics = list(map(doc_topics.__getitem__,selected_docs_idx))
-        
-        all_topic_idx = range(0,len(self.topics))
-        
-        intruded_docs = []
-        for doc_topic in selected_doc_topics:
-            intruded_docs.append(doc_topic)
-            sample_idx_options = set(all_topic_idx) - set(doc_topic)
-            sample_topic_idx = random.sample(sample_idx_options,1)[0]
-            intruded_docs[-1].append(sample_topic_idx)
-            random.shuffle(intruded_docs[-1])
-            self.intruder_topics_idx.append(sample_topic_idx)
-            
-        self.intruded_docs = intruded_docs
-            
-        return intruded_docs
-        
-    
     def save_intruded_topics(self,filepath):
         """
         Saves intruded topics.
@@ -255,29 +205,83 @@ class word_intrusion_class():
         filepath : str
             path to file to which the intruded topics will be saved
         """
-                
-        it_df = pd.DataFrame({'Topic Words':self.intruded_topics,'Intruder':self.intruders})
+        
+        intruded_topics_str = []
+        for topic in self.intruded_topics:
+            intruded_topics_str.append(', '.join(topic))
+        
+        it_df = pd.DataFrame({'Topic Words':intruded_topics_str,'Intruder':self.intruders})
         it_df.to_csv(filepath)
-    
-    def save_intruded_docs(self,filepath):
-        """
-        Saves intruded docs.
-        
-        PARAMETERS
-        ----------
-        filepath : str
-            path to file to which the intruded docs will be saved
-        """
-        
-        doc_intruded_topics = []
-        for intruded_doc in self.intruded_docs:
-            doc_intruded_topics.append([])
-            for topic in intruded_doc:
-                doc_intruded_topics[-1].append(self.topics[topic])
-        
-        intruder_topics = []
-        for intruder_topic_idx in self.intruder_topics_idx:
-            intruder_topics.append(self.topics[intruder_topic_idx])
-        
-        it_df = pd.DataFrame({'Lesson Number':self.selected_docs,'Topics':doc_intruded_topics,'Intruder':intruder_topics})
-        it_df.to_csv(filepath)
+
+
+# LESSONS LEARNED LEVEL 1: 1 SAMPLES FOR WORD
+wi = word_intrusion_class()
+
+filepath = os.path.join('results','llis_idetc_results.csv')
+save_filepath = os.path.join('results','IDETC_2021_intruded_topics_lesson_1.csv')
+topic_column_name = 'Lesson(s) Learned Level 1'
+doc_column_name = 'Lesson IDs for row'
+header = 2
+
+shuffled_topics = wi.generate_intruded_topics(file=filepath, topic_column_name=topic_column_name, doc_column_name=doc_column_name, header=header, max_topic_size=5,num_samples=1)
+wi.save_intruded_topics(filepath=save_filepath)
+
+# LESSONS LEARNED LEVEL 2: 1 SAMPLES FOR WORD
+wi = word_intrusion_class()
+
+filepath = os.path.join('results','llis_idetc_results.csv')
+save_filepath = os.path.join('results','IDETC_2021_intruded_topics_lesson_2.csv')
+topic_column_name = 'Lesson(s) Learned Level 2'
+doc_column_name = 'Lesson IDs for row'
+header = 2
+
+shuffled_topics = wi.generate_intruded_topics(file=filepath, topic_column_name=topic_column_name, doc_column_name=doc_column_name, header=header, max_topic_size=5,num_samples=1)
+wi.save_intruded_topics(filepath=save_filepath)
+
+# DRIVING EVENT LEVEL 1: 1 SAMPLES FOR WORD
+wi = word_intrusion_class()
+
+filepath = os.path.join('results','llis_idetc_results.csv')
+save_filepath = os.path.join('results','IDETC_2021_intruded_topics_event_1.csv')
+topic_column_name = 'Driving Event Level 1'
+doc_column_name = 'Lesson IDs for row'
+header = 2
+
+shuffled_topics = wi.generate_intruded_topics(file=filepath, topic_column_name=topic_column_name, doc_column_name=doc_column_name, header=header, max_topic_size=5,num_samples=1)
+wi.save_intruded_topics(filepath=save_filepath)
+
+# DRIVING EVENT LEVEL 2: 1 SAMPLES FOR WORD
+wi = word_intrusion_class()
+
+filepath = os.path.join('results','llis_idetc_results.csv')
+save_filepath = os.path.join('results','IDETC_2021_intruded_topics_event_2.csv')
+topic_column_name = 'Driving Event Level 2'
+doc_column_name = 'Lesson IDs for row'
+header = 2
+
+shuffled_topics = wi.generate_intruded_topics(file=filepath, topic_column_name=topic_column_name, doc_column_name=doc_column_name, header=header, max_topic_size=5,num_samples=1)
+wi.save_intruded_topics(filepath=save_filepath)
+
+# RECOMMENDATIONS LEVEL 1: 1 SAMPLES FOR WORD
+wi = word_intrusion_class()
+
+filepath = os.path.join('results','llis_idetc_results.csv')
+save_filepath = os.path.join('results','IDETC_2021_intruded_topics_rec_1.csv')
+topic_column_name = 'Recommendation(s) Level 1'
+doc_column_name = 'Lesson IDs for row'
+header = 2
+
+shuffled_topics = wi.generate_intruded_topics(file=filepath, topic_column_name=topic_column_name, doc_column_name=doc_column_name, header=header, max_topic_size=5,num_samples=1)
+wi.save_intruded_topics(filepath=save_filepath)
+
+# RECOMMENDATIONS LEVEL 2: 1 SAMPLES FOR WORD
+wi = word_intrusion_class()
+
+filepath = os.path.join('results','llis_idetc_results.csv')
+save_filepath = os.path.join('results','IDETC_2021_intruded_topics_rec_2.csv')
+topic_column_name = 'Recommendation(s) Level 2'
+doc_column_name = 'Lesson IDs for row'
+header = 2
+
+shuffled_topics = wi.generate_intruded_topics(file=filepath, topic_column_name=topic_column_name, doc_column_name=doc_column_name, header=header, max_topic_size=5,num_samples=1)
+wi.save_intruded_topics(filepath=save_filepath)
