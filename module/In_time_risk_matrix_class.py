@@ -84,7 +84,11 @@ class In_Time_Risk_Matrix():
     def vectorize_inputs(self, input_df, target, model_type, nlp_model_type, nlp_model_number):
         if nlp_model_type == "tfidf":
             vectorizer = getattr(self, str(model_type)+'_nlp_model_'+str(nlp_model_number))
-            vect_df =  vectorizer.transform(input_df[target])
+            vect_df =  vectorizer.transform(input_df[target]).todense()
+            new_cols = vectorizer.get_feature_names()
+            vect_df = pd.DataFrame(vect_df, columns=new_cols)
+            #print(new_cols)
+            setattr(self, 'likelihood_model_inputs_'+str(nlp_model_number), new_cols)
         elif nlp_model_type == 'word2vec':
             #saves bigram and trigram dectector and tokenizer
             bigrams_detector = getattr(self, str(model_type)+'_nlp_model_bigram'+str(nlp_model_number))
@@ -100,12 +104,28 @@ class In_Time_Risk_Matrix():
             ## padding sequence
             vect_df = kprocessing.sequence.pad_sequences(lst_text2seq, maxlen=30,
                          padding="post", truncating="post")
+        #print(vect_df.shape)
+    
         return vect_df
     
     def predict_likelihoods(self, report_df):
         #complicated - depends on the models used
-        self.vectorize_input( )#TODO: implement this properly -> where does this go in the work flow?? -> in likelihood predictions
-        return 
+        #self.vectorize_input()#TODO: implement this properly -> where does this go in the work flow?? -> in likelihood predictions
+        for i in range(self.likelihood_model_count):
+            mdl = getattr(self, 'likelihood_model_'+str(i))
+            if i == 0:
+                #input_data = [l.reshape(-1, 1) for l in report_df[getattr(self, 'likelihood_model_inputs_'+str(i))].tolist()]
+                #print(getattr(self, 'likelihood_model_inputs_'+str(i)))
+                #print(report_df[getattr(self, 'likelihood_model_inputs_'+str(i))])
+                probs = mdl.predict_proba(report_df[getattr(self, 'likelihood_model_inputs_'+str(i))].values.reshape(1,-1))
+                probs_df = pd.Series(probs[0], index=self.hazards)
+            if i>0:
+                input_df = pd.concat([report_df[getattr(self, 'likelihood_model_inputs_'+str(i))], probs_df])
+                #print(input_df)
+                probs = mdl.predict_proba(input_df.values.reshape(1,-1))
+                probs_df = pd.DataFrame(probs, columns=self.hazards)
+        return probs_df
+    
     def predict_severity(self, report_df):
         #for each hazard, vary its occurrence
         self.hazards = ['Traffic','Command_Transitions', 'Evacuations', 'Inaccurate_Mapping',
@@ -116,22 +136,36 @@ class In_Time_Risk_Matrix():
         #for i in input_df:
         for hazard in self.hazards:
             temp_input = report_df
-            temp_input.at[0,hazard] = 1
+            temp_input.at[hazard] = 1
             for other_hazard in self.hazards:
                 if other_hazard != hazard:
-                    temp_input.at[0,other_hazard] = 0
-            severities[hazard] = self.severity_model_0.predict(temp_input[self.severity_model_inputs_0])
-            preds_df = pd.DataFrame(severities, 
-                                index=['Diff_Injuries', 'Diff_Structures_Damages', 
-                                         'Diff_Structures_Destroyed','Diff_Fatalities'])
+                    temp_input.at[other_hazard] = 0
+            severities[hazard] = np.around(self.severity_model_0.predict(temp_input[self.severity_model_inputs_0].values.reshape(1,-1))[0])
+        preds_df = pd.DataFrame(severities, 
+                            index=['Diff_Injuries', 'Diff_Structures_Damages', 
+                                     'Diff_Structures_Destroyed','Diff_Fatalities'])
         return preds_df
-    def get_likelihoods(self):
-        self.curr_likelihoods = {} #hazard: (likelihood, severity)
-        self.predict_likelihoods()
+    
+    def get_likelihoods(self, report_df):
+        self.curr_likelihoods = {hazard:0 for hazard in self.hazards} #hazard: (likelihood, severity)
+        probs_df = self.predict_likelihoods(report_df)
+        for hazard in self.hazards:
+            p = probs_df.at[0, hazard]
+            if p>=0.5:
+                likelihood = 'Highly Likely'
+            elif p>=0.05 and p<0.5:
+                likelihood = 'Likely'
+            elif p>=0.005 and p<0.05:
+                likelihood = 'Possible'
+            elif p>=0.0005 and p<0.005:
+                likelihood = 'Improbable'
+            elif p<0.0005:
+                likelihood = 'Extremely Improbable'
+            self.curr_likelihoods[hazard] = likelihood
         
-    def get_severities(self):
+    def get_severities(self, report_df):
         self.curr_severities = {}
-        preds_df = self.predict_severity()
+        preds_df = self.predict_severity(report_df)
         for hazard in preds_df.columns:
              injuries = preds_df.at['Diff_Injuries',hazard]
              str_dam = preds_df.at['Diff_Structures_Damages', hazard]
@@ -150,29 +184,46 @@ class In_Time_Risk_Matrix():
                     impact = 'Catastrophic Impact'
              self.curr_severities[hazard] = impact
         
-    def build_risk_matrix(self, input_reports, clean=False):
+    def build_risk_matrix(self, input_reports, clean=False, vectorize=False, condense_text=True, target=None, model_type=None, nlp_model_type=None, nlp_model_number=None,figsize=(9,5)):
         plt.rcParams["font.family"] = "Times New Roman"
         if clean: 
-            input_reports = self.prepare_input_data(input_reports)
-        
-        for report in input_reports:
-            annotation_df = pd.DataFrame([[[] for i in range(5)] for j in range(5)],
+            input_reports = self.prepare_input_data(input_reports, target)
+        if vectorize:
+            vect_df = self.vectorize_inputs(input_reports, target, model_type, nlp_model_type, nlp_model_number)
+            if nlp_model_type == "tfidf":
+                input_reports = pd.concat([input_reports, vect_df], axis=1)
+            #target, model_type, nlp_model_type, nlp_model_number
+        if condense_text: 
+            condense_dict = {self.hazards[i]:"H"+str(i) for i in range(len(self.hazards))}
+        for i in range(len(input_reports)):
+            report = input_reports.iloc[i][:]
+            
+            annotation_df = pd.DataFrame([["" for i in range(5)] for j in range(5)],
                              columns=['Minimal Impact', 'Minor Impact', 'Major Impact', 'Significant Critical Impact', 'Catastrophic Impact'],
                               index=['Highly Likely', 'Likely', 'Possible','Improbable', 'Extremely Improbable'])
-            
+            #print(report, type(report))
             self.get_likelihoods(report)
             self.get_severities(report)
+            hazards_per_row=0
             for hazard in self.hazards:
-                annotation_df.at[self.curr_likelihoods[hazard],self.curr_severities[hazard]].append(hazard)
+                if annotation_df.at[self.curr_likelihoods[hazard],self.curr_severities[hazard]]!= "":
+                    annotation_df.at[self.curr_likelihoods[hazard],self.curr_severities[hazard]] += ", "
+                    hazards_per_row+=1
+                    if hazards_per_row>2:
+                        annotation_df.at[self.curr_likelihoods[hazard],self.curr_severities[hazard]]+="\n"
+                        hazards_per_row=1
+                if condense_text: hazard_annot = condense_dict[hazard]
+                else: hazard_annot = hazard
+                annotation_df.at[self.curr_likelihoods[hazard],self.curr_severities[hazard]] += (str(hazard_annot))
                 
             df = pd.DataFrame([[0, 5, 10, 10, 10], [0, 5, 5, 10, 10], [0, 0, 5, 5, 10],
                     [0, 0, 0, 5, 5], [0, 0, 0, 0, 5]],
                   columns=['Minimal Impact', 'Minor Impact', 'Major Impact', 'Significant Critical Impact', 'Catastrophic Impact'],
                   index=['Highly Likely', 'Likely', 'Possible','Improbable', 'Extremely Improbable']
                   )
-            fig,ax = plt.subplots(figsize=(10,8))
+            fig,ax = plt.subplots(figsize=figsize)
             #annot df has hazards in the cell they belong to #annot=annotation_df
-            sn.heatmap(df, annot=annotation_df, annot_kws={'fontsize':16},cbar=False,cmap='RdYlGn_r')
+            sn.heatmap(df, annot=annotation_df, fmt='s',annot_kws={'fontsize':16},cbar=False,cmap='RdYlGn_r')
             plt.title("Risk Matrix", fontsize=16)
             ax.set_xticklabels(ax.get_xticklabels(), rotation=40, ha="right")
             ax.set_yticklabels(ax.get_yticklabels(), rotation=0)#, ha="right")
