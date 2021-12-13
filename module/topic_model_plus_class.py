@@ -1198,9 +1198,12 @@ class Topic_Model_plus():
                 self.hlda_extract_models(self.folder_path+"\\")
         try:
             df = pd.read_csv(os.path.join(self.folder_path,attr+"_hlda_topics.csv"))
-        except: 
-            self.save_hlda_topics()
-            df = pd.read_csv(os.path.join(self.folder_path,attr+"_hlda_topics.csv"))
+        except:
+            try:
+                df = pd.read_excel(os.path.join(self.folder_path,"hlda_results.xlsx"),sheet_name=attr)
+            except:
+                self.save_hlda_topics()
+                df = pd.read_csv(os.path.join(self.folder_path,attr+"_hlda_topics.csv"))
         dot = Digraph(comment="hLDA topic network")
         color_scheme = '/'+colors+str(max(3,len(display_options)+1))+"/"
         nodes = {key:[] for key in display_options}
