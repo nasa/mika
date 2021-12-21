@@ -351,7 +351,7 @@ class Topic_Model_plus():
         start = time()
         sleep(0.5)
                 
-        for attr in tqdm(self.list_of_attributes,desc="Preprocessing data…"):
+        for attr in self.list_of_attributes:
             pbar = tqdm(total=100, desc="Preprocessing "+attr+"…")
             self.data_df[attr] = self.__tokenize_texts(self.data_df[attr])
             pbar.update(10)
@@ -369,10 +369,10 @@ class Topic_Model_plus():
             self.data_df[attr] = self.__lemmatize_texts(self.data_df[attr])
             pbar.update(20)
             self.data_df[attr] = self.__remove_stopwords(self.data_df[attr],domain_stopwords)
-            pbar.update(10)
+            pbar.update(20)
             if ngrams == True:
                 self.data_df[attr] = self.__trigram_texts(self.data_df[attr], ngram_range,threshold,min_count)
-            pbar.update(20)
+            pbar.update(10)
             sleep(0.5)
             pbar.close()
                 
@@ -384,7 +384,7 @@ class Topic_Model_plus():
         if drop_na: self.data_df = self.data_df.dropna(how="any").reset_index(drop=True)
                           
         self.data_df = self.__remove_words_in_pct_of_docs(self.data_df, self.list_of_attributes, pct_=percent, save_words=save_words)
-                
+
         self.doc_ids = self.data_df[self.doc_ids_label].tolist()
         print("Processing time: ", (time()-start)/60, " minutes")
         sleep(0.5)
@@ -489,7 +489,6 @@ class Topic_Model_plus():
         self.doc_ids = self.data_df[self.doc_ids_label].tolist()
         check_for_ngrams()
         #print("Preprocessed data extracted from: ", file_name)
-        
         
     def coherence_scores(self, mdl, lda_or_hlda, measure='c_v'):
         """
@@ -710,7 +709,7 @@ class Topic_Model_plus():
             return coherence_df
         coherence_df.to_csv(os.path.join(self.folder_path,"lda_coherence.csv"))
     
-    def save_lda_topics(self, return_df=False, p_thres=0.01):
+    def save_lda_topics(self, return_df=False, p_thres=0.001):
         """
         saves lda topics to file
         """
@@ -757,7 +756,7 @@ class Topic_Model_plus():
         if return_df == True:
             return dfs
     
-    def save_lda_taxonomy(self, return_df=False):
+    def save_lda_taxonomy(self, return_df=False, use_labels=False):
         """
         saves lda taxonomy to file or returns the dataframe to another function
         """
@@ -768,8 +767,11 @@ class Topic_Model_plus():
             mdl = self.lda_models[attr]
             for doc in mdl.docs: 
                 topic_num = int(doc.get_topics(top_n=1)[0][0])
-                num_words = min(mdl.get_count_by_topics()[topic_num], 100)
-                words =  ", ".join([word[0] for word in mdl.get_topic_words(topic_num, top_n=num_words)])
+                if use_labels == False:
+                    num_words = min(mdl.get_count_by_topics()[topic_num], 100)
+                    words =  ", ".join([word[0] for word in mdl.get_topic_words(topic_num, top_n=num_words)])
+                else:
+                    words = ", ".join(self.lda_labels[attr][topic_num])
                 #if len(words) > 35000:
                 #    words = words[0:words.rfind(", ")]
                 taxonomy_data[attr].append(words)
@@ -795,11 +797,12 @@ class Topic_Model_plus():
             return taxonomy_df
         taxonomy_df.to_csv(os.path.join(self.folder_path,'lda_taxonomy.csv'))
         #print("LDA taxonomy saved to: ", os.path.join(self.folder_path,'lda_taxonomy.csv'))
-        
+    
     def save_lda_results(self):
         """
         saves the taxonomy, coherence, and document topic distribution in one excel file
         """
+        
         self.__create_folder()
         data = {}
         topics_dict = self.save_lda_topics(return_df=True)
@@ -899,6 +902,150 @@ class Topic_Model_plus():
         )
         pyLDAvis.save_html(prepared_data, os.path.join(self.folder_path,attr+'_hldavis.html'))
         #print("hLDA Visualization for "+attr+" saved to: "+self.folder_path+'/'+attr+'_hldavis.html')
+    
+    def label_lda_topics(self, extractor_min_cf=5, extractor_min_df=3, extractor_max_len=5, extractor_max_cand=5000, labeler_min_df=5, labeler_smoothing=1e-2, labeler_mu=0.25, label_top_n=3):
+        """
+        Uses tomotopy's auto topic labeling tool to label topics. Stores labels in class; after running this function, a flag can be used to use labels or not in taxonomy saving functions.
+        
+        ARGUMENTS
+        ---------
+        extractor_min_cf : int
+            from tomotopy docs: "minimum collection frequency of collocations. Collocations with a smaller collection frequency than min_cf are excluded from the candidates. Set this value large if the corpus is big"
+        extractor_min_df : int
+            from tomotopy docs: "minimum document frequency of collocations. Collocations with a smaller document frequency than min_df are excluded from the candidates. Set this value large if the corpus is big"
+        extractor_max_len : int
+            from tomotopy docs: "maximum length of collocations"
+        extractor_max_cand : int
+            from tomotopy docs: "maximum number of candidates to extract"
+        labeler_min_df : int
+            from tomotopy docs: "minimum document frequency of collocations. Collocations with a smaller document frequency than min_df are excluded from the candidates. Set this value large if the corpus is big"
+        labeler_smoothing : float
+            from tomotopy docs: "a small value greater than 0 for Laplace smoothing"
+        labeler_mu : float
+            from tomotopy docs: "a discriminative coefficient. Candidates with high score on a specific topic and with low score on other topics get the higher final score when this value is the larger."
+        label_top_n : int
+            from tomotopy docs: "the number of labels"
+        """
+        
+        extractor = tp.label.PMIExtractor(min_cf=extractor_min_cf, min_df=extractor_min_df, max_len=extractor_max_len, max_cand=extractor_max_cand)
+        
+        self.lda_labels = {}
+        for attr in self.list_of_attributes:
+            cands = extractor.extract(self.lda_models[attr])
+            labeler = tp.label.FoRelevance(self.lda_models[attr], cands, min_df=labeler_min_df, smoothing=labeler_smoothing, mu=labeler_mu)
+            self.lda_labels[attr] = []
+            for k in range(self.lda_models[attr].k):
+                label_w_probs = labeler.get_topic_labels(k,top_n=label_top_n)
+                label = [word for word,prob in label_w_probs]
+                self.lda_labels[attr].append(label)
+        
+    def label_hlda_topics(self, extractor_min_cf=5, extractor_min_df=3, extractor_max_len=5, extractor_max_cand=5000, labeler_min_df=5, labeler_smoothing=1e-2, labeler_mu=0.25, label_top_n=3):
+        """
+        Uses tomotopy's auto topic labeling tool to label topics. Stores labels in class; after running this function, a flag can be used to use labels or not in taxonomy saving functions.
+        
+        ARGUMENTS
+        ---------
+        extractor_min_cf : int
+            from tomotopy docs: "minimum collection frequency of collocations. Collocations with a smaller collection frequency than min_cf are excluded from the candidates. Set this value large if the corpus is big"
+        extractor_min_df : int
+            from tomotopy docs: "minimum document frequency of collocations. Collocations with a smaller document frequency than min_df are excluded from the candidates. Set this value large if the corpus is big"
+        extractor_max_len : int
+            from tomotopy docs: "maximum length of collocations"
+        extractor_max_cand : int
+            from tomotopy docs: "maximum number of candidates to extract"
+        labeler_min_df : int
+            from tomotopy docs: "minimum document frequency of collocations. Collocations with a smaller document frequency than min_df are excluded from the candidates. Set this value large if the corpus is big"
+        labeler_smoothing : float
+            from tomotopy docs: "a small value greater than 0 for Laplace smoothing"
+        labeler_mu : float
+            from tomotopy docs: "a discriminative coefficient. Candidates with high score on a specific topic and with low score on other topics get the higher final score when this value is the larger."
+        label_top_n : int
+            from tomotopy docs: "the number of labels"
+        """
+        
+        extractor = tp.label.PMIExtractor(min_cf=extractor_min_cf, min_df=extractor_min_df, max_len=extractor_max_len, max_cand=extractor_max_cand)
+        
+        self.hlda_labels = {}
+        for attr in self.list_of_attributes:
+            cands = extractor.extract(self.hlda_models[attr])
+            labeler = tp.label.FoRelevance(self.lda_models[attr], cands, min_df=labeler_min_df, smoothing=labeler_smoothing, mu=labeler_mu)
+            self.hlda_labels[attr] = []
+            for k in range(self.hlda_models[attr].k):
+                label_w_probs = labeler.get_topic_labels(k,top_n=label_top_n)
+                label = [word for word,prob in label_w_probs]
+                self.hlda_labels[attr].append(label)
+    
+    def save_mixed_taxonomy(self,use_labels=False):
+        """
+        A custom mixed lda/hlda model taxonomy. Must run lda and hlda with desired parameters first.
+        
+        ARGUMENTS
+        ---------
+        
+        """
+        
+        attr_for_lda = [self.list_of_attributes[i] for i in [0,2]]
+        attr_for_hlda = self.list_of_attributes[1]
+        
+        self.__create_folder()
+        taxonomy_data = {'Lesson(s) Learned':[],'Driving Event Level 1':[],'Driving Event Level 2':[],'Recommendation(s)':[]}
+
+        # first attribute; lda
+        attr = self.list_of_attributes[0]
+        mdl = self.lda_models[attr]
+        for doc in mdl.docs:
+            topic_num = int(doc.get_topics(top_n=1)[0][0])
+            if use_labels == False:
+                num_words = min(mdl.get_count_by_topics()[topic_num], 100)
+                words =  ", ".join([word[0] for word in mdl.get_topic_words(topic_num, top_n=num_words)])
+            else:
+                words = ", ".join(self.lda_labels[attr][topic_num])
+            taxonomy_data[attr].append(words)
+        
+        # second attribute; hlda
+        attr = self.list_of_attributes[1]
+        mdl = self.hlda_models[attr]
+        for doc in mdl.docs:
+            topic_nums = doc.path
+            for level in range(1, self.levels):
+                if use_labels == False:
+                    words =  ", ".join([word[0] for word in mdl.get_topic_words(topic_nums[level], top_n=500)])
+                else:
+                    words = ", ".join(self.hlda_labels[attr][topic_nums[level]])
+                taxonomy_data[attr+" Level "+str(level)].append(words)
+                
+        # third attribute; lda
+        attr = self.list_of_attributes[2]
+        mdl = self.lda_models[attr]
+        for doc in mdl.docs:
+            topic_num = int(doc.get_topics(top_n=1)[0][0])
+            if use_labels == False:
+                num_words = min(mdl.get_count_by_topics()[topic_num], 100)
+                words =  ", ".join([word[0] for word in mdl.get_topic_words(topic_num, top_n=num_words)])
+            else:
+                words = ", ".join(self.lda_labels[attr][topic_num])
+            taxonomy_data[attr].append(words)
+        
+        self.taxonomy_data = taxonomy_data
+        taxonomy_df = pd.DataFrame(taxonomy_data)
+        taxonomy_df = taxonomy_df.drop_duplicates()
+        lesson_nums_per_row = []
+        num_lessons_per_row = []
+        for i in range(len(taxonomy_df)):
+            lesson_nums = []
+            tax_row  = "\n".join([taxonomy_df.iloc[i][key] for key in taxonomy_data])
+            for j in range(len(self.doc_ids)):
+                doc_row = "\n".join([taxonomy_data[key][j] for key in taxonomy_data])
+                if doc_row == tax_row:
+                    lesson_nums.append(self.doc_ids[j])
+            lesson_nums_per_row.append(lesson_nums)
+            num_lessons_per_row.append(len(lesson_nums))
+        taxonomy_df["document IDs for row"] = lesson_nums_per_row
+        taxonomy_df["number of documents for row"] = num_lessons_per_row
+        taxonomy_df = taxonomy_df.sort_values(by=[key for key in taxonomy_data])
+        taxonomy_df = taxonomy_df.reset_index(drop=True)
+        self.taxonomy_df = taxonomy_df
+        taxonomy_df.to_csv(os.path.join(self.folder_path,'mixed_taxonomy.csv'))
     
     def hlda(self, levels=3, training_iterations=1000, iteration_step=10, **kwargs):
         """
@@ -1042,7 +1189,7 @@ class Topic_Model_plus():
         coherence_df.to_csv(os.path.join(self.folder_path,"hlda_coherence.csv"))
         #print("hLDA coherence scores saved to: ",self.folder_path+"/"+"hlda_coherence.csv")
     
-    def save_hlda_taxonomy(self, return_df=False):
+    def save_hlda_taxonomy(self, return_df=False, use_labels=False):
         """
         saves hlda taxonomy to file
         """
@@ -1054,7 +1201,11 @@ class Topic_Model_plus():
             for doc in mdl.docs: 
                 topic_nums = doc.path
                 for level in range(1, self.levels):
-                    taxonomy_data[attr+" Level "+str(level)].append( ", ".join([word[0] for word in mdl.get_topic_words(topic_nums[level], top_n=500)]))
+                    if use_labels == False:
+                        words = ", ".join([word[0] for word in mdl.get_topic_words(topic_nums[level], top_n=500)])
+                    else:
+                        words = ", ".join(self.hlda_labels[attr][topic_nums[level]])
+                    taxonomy_data[attr+" Level "+str(level)].append(words)
         self.taxonomy_data = taxonomy_data
         taxonomy_df = pd.DataFrame(taxonomy_data)
         taxonomy_df = taxonomy_df.drop_duplicates()
