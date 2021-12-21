@@ -1,0 +1,37 @@
+Query: ,"The HLS shall secure all data and systems including traditional IT, operational technology, and specialized space systems. These cyber measures not only include systems internal to the HLS but also apply to interconnection interfaces with other space assets (Orion, Gateway, etc.)"
+--------------------------------------
+Lesson ID: ,1250
+ Title: ,Network Security/Reduction of Vulnerabilities/Penetration Exercises
+ LLIS-Designated Topics: ,nan
+ Phase: ,Not Specified
+ Section: ,Lesson(s) Learned
+Score: 0.5024
+"The terrorist attacks on September 11 emphasized the need for increased security of all national assets including NASA's computer systems. Since many of these systems safeguard the lives of astronauts and cosmonauts and the safety of valuable international assets, it is crucial that security vulnerabilities be fully understood and closely managed."
+Lesson ID: ,1619
+ Title: ,"Mate/Demate, Verify, and Document Connectors One-at-a-Time (2003)"
+ LLIS-Designated Topics: ,nan
+ Phase: ,Not Specified
+ Section: ,Evidence
+Score: 0.4944
+"JPL will reference this lesson learned as additional rationale and guidance supporting Paragraph 6.12.6 (Protection and Security of Flight Hardware) in the Jet Propulsion Laboratory standard Flight Project Practices, Rev. 6, JPL DocID 58032, March 6, 2006, and supporting Paragraph 8.3.2.1 (System Integration) in the JPL standard Design, Verification/Validation and Operations Principles for Flight Systems (Design Principles), JPL Document D-17868, Rev. 3, December 11, 2006."
+Lesson ID: ,1464
+ Title: ,Accident Investigations/Information Technology (IT) Security Constraints and Policy Governing IT system support to Major Mishap Investigations.
+ LLIS-Designated Topics: ,nan
+ Phase: ,Not Specified
+ Section: ,Recommendation(s)
+Score: 0.4922
+"NASA must: Implement clear and consistent IT security policies across all NASA Centers as it relates to the care and management of ITAR, export control, and investigation sensitive information."
+Lesson ID: ,1464
+ Title: ,Accident Investigations/Information Technology (IT) Security Constraints and Policy Governing IT system support to Major Mishap Investigations.
+ LLIS-Designated Topics: ,nan
+ Phase: ,Not Specified
+ Section: ,Lesson(s) Learned
+Score: 0.4882
+"It is critical that NASA has in-place, clear and consistent IT security policies across all NASA centers as it relates to the care and management of ITAR, export control and investigation sensitive information."
+Lesson ID: ,1133
+ Title: ,Computer Hardware-Software/International Space Station/Uplink Encryption
+ LLIS-Designated Topics: ,nan
+ Phase: ,Not Specified
+ Section: ,Recommendation(s)
+Score: 0.4857
+NASA should engage the National Security Agency to conduct a thorough evaluation of the level of protection provided by the current system and proceed as rapidly as feasible with its plans for a more secure encryption system for the ISS. Potential vulnerabilities of the ground elements of the system should also be assessed.

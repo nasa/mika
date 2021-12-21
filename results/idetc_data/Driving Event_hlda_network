@@ -1,0 +1,24 @@
+// hLDA topic network
+digraph {
+	0 [label="time\nflight\nrequire\ncontrol\nproblem"]
+	8 [label="base reliability\nprefer\nreliability\nimplementation method\ntechnical" color=paleturquoise1 fillcolor=paleturquoise1 style=filled]
+	0 -> 8
+	9 [label="tunnel\ntransonic\naerodynamic\ntest mach\ntunnel blade" color=paleturquoise1 fillcolor=paleturquoise1 style=filled]
+	0 -> 9
+	16 [label="follow recommendation\ntorque analog\nbase legacy\nneed great hinge\nnecessary torque include" color=turquoise fillcolor=turquoise style=filled]
+	8 -> 16
+	17 [label="shaker\nrandom vibration\nsine burst\nopen loop\nrandom" color=turquoise fillcolor=turquoise style=filled]
+	9 -> 17
+	19 [label="optic\nspherical\naberration\nlens\nspie" color=turquoise fillcolor=turquoise style=filled]
+	8 -> 19
+	23 [label="international metal\ncontrol international metal\namerican\nnondestructive test\namerican society" color=turquoise fillcolor=turquoise style=filled]
+	8 -> 23
+	24 [label="connector\ndischarge\nelectrostatic\nvoltage\nelectrostatic discharge" color=turquoise fillcolor=turquoise style=filled]
+	8 -> 24
+	27 [label="relevant historical\nrelevant\nhistorical\nsolder\nprint" color=turquoise fillcolor=turquoise style=filled]
+	9 -> 27
+	28 [label="crew return\ncrew return vehicle\nstaff\nexperimental\nroutine maintenance" color=turquoise fillcolor=turquoise style=filled]
+	9 -> 28
+	layout=twopi
+	overlap=voronoi
+}

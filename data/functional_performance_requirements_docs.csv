@@ -1,0 +1,387 @@
+﻿ID,Title,Requirement,Rationale
+HLS-S-R-0321,Space System Cyber Security,"The HLS shall secure all data and systems including traditional IT, operational technology, and specialized space systems. These cyber measures not only include systems internal to the HLS but also apply to interconnection interfaces with other space assets (Orion, Gateway, etc.)","Per the recent release of Space Policy Directive-5, NASA-STD-1006 Space System Protection Standard, and the cyber requirements levied by the contractual requirements included by the NASA FAR Supplement 1852.204-76. NASA is not alone in the lunar regime, including some adversaries who might be interested in interfering with the operations of NASA assets."
+HLS-S-R-0004,Failure Tolerance to Catastrophic Events,"The HLS shall provide at least single failure tolerance for the control of catastrophic
+hazards, with the specific level of failure tolerance (one or more) and implementation
+(the use of similar or dissimilar redundancy) derived from an analysis of hazards, failure
+modes, and risk associated with the system.
+Failure tolerance capability is without the use of: aborts; emergency equipment and
+systems; or corrective maintenance.
+Note: Additional details are provided in HEOMD-003, Crewed Deep Space Systems
+Certification Requirements and Standards for NASA Missions section 5.2.2.
+Exemption A: Failure of primary structure, structural failure of pressure vessel walls, and
+structural failure of pressurized lines are exempted from the failure tolerance
+requirement provided the potentially catastrophic failures are controlled through a
+defined process in which approved standards and margins are implemented that
+account for the absence of failure tolerance.
+Exemption B: Other potentially catastrophic hazards that cannot be controlled using
+failure tolerance are exempted from the failure tolerance requirements with mandatory
+concurrence from the HLS Program Manager, Director JSC (for crew risk acceptance),
+and the HLS Program Technical Authorities provided the hazards are controlled through
+a defined process in which approved standards and margins are implemented that
+account for the absence of failure tolerance. For selected cases where use of a
+reliability-informed approach is required, as agreed by the HLS Program Manager, Director JSC, and HLS Program Technical Authorities, the reliability requirements shall
+be verified with appropriate confidence intervals using robust reliability approach that is
+substantially anchored in actual test data verifying margins to environments (natural and
+induced), life requirements, operational boundaries, and failure modes.","The overall objective is to provide the safest design that can accomplish
+the mission, given the constraints imposed on the Program. Since a HLS development
+will always have mass, volume, schedule, and cost constraints, choosing where and
+how to apply failure tolerance requires integrated analyses at the system level to
+assess safety and mission risks.
+First and foremost, when failure tolerance is practical, the failure tolerance is applied
+at the overall system level - to include all capabilities of the system. While failure
+tolerance is a term frequently used to describe minimum acceptable redundancy, it
+may also be used to describe two similar systems, dissimilar systems, dissimilar down
+mode, cross-strapping, or functional interrelationships that ensure minimally
+acceptable system performance despite failures, or additional features that completely
+mitigate the effects of failures. Even when assessing failure tolerance at the integrated
+system level, the increased complexity and the additional utilization of system
+resources (e.g. mass, power) required by a failure tolerant design may negatively
+impact overall system safety as the level of failure tolerance is increased.
+Ultimately, the level and type of redundancy (similar or dissimilar) is an important and
+often controversial aspect of system design. Since redundancy does not, by itself,
+make a system safe, it is the responsibility of the engineering and safety teams to
+determine the design that optimizes safety given the mission requirements and
+constraints. In such a design, both the risk from individual contributors (e.g., hazards
+or failure modes) and the total risk for the reference mission are below acceptable
+levels."
+HLS-S-R-0110,Fault Isolation and Control,"The HLS shall provide the capability to isolate and recover from faults identified during
+system development or mission operations that would result in a catastrophic event","To meet agency human rating requirements for space vehicles, the HLS
+must provide the capability isolate and control identified faults."
+HLS-S-R-0027,HLS Reliability,"Each reference missions shall have the following minimum per mission reliability from
+Crew Staging Vehicle (CSV) separation to CSV return. ","The HLS must maintain a minimum reliability for each follow on mission,
+which may increase mission objectives (such as longer duration) that will require a
+robust hardware reliability improvement task. The scope of the requirement includes
+the HLS hardware reliability associated with must work and must not work functions
+for the life of the program. In addition, HLS allocated hardware reliability supports HLS
+compliance with program-level Loss of Crew and Loss of Mission requirements. Also,
+software was explicitly excluded because there is not a standard methodology for
+performing software reliability. In addition, hardware reliability does not consider
+damage due to MMOD environment or human actions associated with its operation.
+Defined mission environment includes loads, thermal, radiation etc. HLS hardware
+reliability includes HLS hardware required to support performance of the EVAs
+required per mission (e.g. Airlock cycles) but does not include the reliability associated
+with the EVA suit which is not considered HLS hardware. Hardware reliability does not
+consider fire or medical risk."
+HLS-S-R-0307,HLS Operation Mass Delivery from Earth,"The HLS shall deliver 1,132 kg of GFP from Earth surface to NRHO for the Orion Direct
+Sortie, 867 kg (threshold) and 1,768 kg (goal) of GFP from Earth surface to NRHO for
+two-crew sortie missions, and 1,524 kg (threshold) and 2,576 kg (goal) from Earth
+surface to NRHO for four-crew extended missions.","This requirement provides robustness to the HLS in the event that Gateway
+will not be able to provide supplies to HLS. The masses defined within this requirement
+are based on two crew and GFP for sortie missions and four crew and GFP for
+Extended missions and establish minimum operational capabilities for surface
+operations. Operational uses of the delivered mass will be determined during mission
+planning. Masses assume a specific delivery implementation for EVA and launch and
+entry suits for the missions. Mass also includes consumables Orion needs during the
+lunar surface mission. Other implementations are possible, which may change the
+required delivery mass."
+HLS-S-R-0308,Utilization Cargo Delivery from Earth,"Utilization Cargo Delivery from Earth [DRM-001, DRM-003, DRM-ODS]
+The HLS shall be capable of delivering from Earth surface to NRHO utilization cargo of
+150 kg (TBR) and 1.59 m^3 (TBR) volume (threshold) and 1000 kg (TBR) and 7.09 m^3
+(TBR) volume (goal), inclusive of tare, in accordance with the parameters that are
+notionally specified in","Specified mass does not include operations mass return. Sustaining HLS
+missions are expected to deliver utilization equipment and tools to accomplish
+objectives. They are also desired to have a freezer in order to return lunar volatiles
+and biological/human health samples. The intent of this table is to provide
+requirements for pressurized and unpressurized volumes and mass allocations for
+initial proposal and design purposes. The listed hardware is notional, generally
+reflecting high level NASA desires. Specific hardware to fill mass/volume allocations
+will be determined later by NASA on a mission-specific basis."
+HLS-S-R-0309,Utilization Cargo Delivery from Earth,"The HLS shall be capable of delivering from Earth surface to NRHO utilization cargo of
+50 kg (TBR) and 1.43 m^3 (TBR) volume (threshold) and 1000 kg (TBR) and 7.09 m^3
+(TBR) volume (goal), inclusive of tare, in accordance with the parameters that are
+notionally specified in","Specified mass does not include operations mass return. Sustaining HLS
+missions are expected to deliver utilization equipment and tools to accomplish
+objectives. They are also desired to have a freezer in order to return lunar volatiles
+and biological/human health samples. The intent of this table is to provide
+requirements for pressurized and unpressurized volumes and mass allocations for
+initial proposal and design purposes. The listed hardware is notional, generally
+reflecting high level NASA desires. Specific hardware to fill mass/volume allocations
+will be determined later by NASA on a mission-specific basis. Reduced down mass
+threshold for 4 crew missions assumes that additional tools/utilization hardware are
+pre-deployed on other surface assets."
+HLS-S-R-0322,Quiescent Lunar Orbit Operations,"The HLS shall be capable of maintaining quiescent operations for no less than 60 days
+(threshold) and 90 days (goal) at Near Rectilinear Halo Orbit (NRHO).","For the specified DRMS, the Crew will not launch until Lunar Orbit Checkout
+Review (LOCR). The HLS may need to remain in NRHO for 90 days after the HLS is
+confirmed operational, to await crew and cargo delivery, including potential launch
+scrubs and mission delays."
+HLS-S-R-0304,HLS Automated RPODU,"The HLS shall be capable of automated rendezvous, proximity operations, docking and
+undocking with both Gateway and Orion.","The HLS will need Rendezvous, Proximity Operations, Docking and
+Undocking (RPODU) capability to transfer crew and cargo to and from HLS.
+The HLS must provide compatible docking mechanism to both Gateway and Orion as
+well as a full automated RPODU functionality to dock with both. The HLS must have the
+contingency capability to dock with Orion on a Gateway mission."
+HLS-S-R-0061,Automated Missions,"The HLS shall be capable of conducting an automated landing on the lunar surface and
+return to NRHO.","Automated landing and return is required to reduce crew workload during
+critical operations."
+HLS-S-R-0109,Remote Operation of the HLS,"The HLS shall provide the capability for the surface crew, orbiting crew, and Mission
+Systems, to monitor, operate, and control the HLS elements and subsystems remotely,
+when
+a) The remote capability is necessary to execute the mission; or
+b) The remote capability would prevent a catastrophic event; or
+c) The remote capability would prevent an abort.","To meet agency human rating requirements for space vehicles, the HLS
+must provide the specific capability."
+HLS-S-R-0325,Remote operation of uncrewed spacecraft by the HLS,"The HLS shall provide the capability for the crew to monitor, operate, and control an uncrewed
+spacecraft during proximity operations, where:
+a) The capability is necessary to execute the mission; or
+b) The capability would prevent a catastrophic event; or
+c) The capability would prevent an abort.
+Note 1: Proximity operations cover several scenarios, but this term is specifically
+defined as two (or more) systems operating in space (not on a planetary surface) within
+the prescribed safe zone for either system
+Note 2: When an uncrewed space system is the active spacecraft performing proximity
+operations with a crewed spacecraft, this requirement includes the capability for the
+crew to monitor the trajectory of the uncrewed system. At a minimum, the crewed
+system will have the capability to send basic trajectory commands to hold/stop,
+continue, and breakout to the uncrewed spacecraft. Active means the spacecraft is
+changing the flight trajectory and orbital parameters to effect the desired result during
+proximity operations.","To meet agency human rating requirements for space vehicles, the HLS
+must provide the specific capability"
+HLS-S-R-0324,HLS Habitation Capability,"The HLS shall provide a habitable environment for two (2) to four (4) crew for at least
+eight (8) (TBR) Earth days.","The HLS must be able to provide habitability for the specified duration,
+whether the crew complement is two or four."
+HLS-S-R-0073,Window(s) for Crew Tasks,"The HLS shall provide one or more window(s) for crew use through all phases of flight
+that provides direct, non-electronic, through-the-hull viewing and the unobstructed fieldof-
+view necessary to perform critical crew viewing tasks.","During descent and landing, and while performing RPOD (rendezvous,
+proximity operations, and docking) as the chaser vehicle, the crew must check the
+performance of automatic systems and ensure landing zone hazard avoidance. A
+suite of electronic sensors, cameras and window(s) support automatic and blended
+automatic/manual control capabilities. Windows increase crew safety and mission
+success probability by enabling critical crew viewing functions:
+1. Provide situational & spatial awareness for the crew to monitor the automated
+system and make Go/No-Go decisions until touchdown for landing, or until docking
+contact for RPOD
+2. Provide cues to confirm the Landing Zone location, and that it is clear of hazards
+prior to touchdown
+3. Provide cues for the crew to validate acceptable descent, lateral and longitudinal
+drift rates throughout terminal descent until touchdown for landing or until docking
+contact for RPOD
+4. Provide cues to confirm HLS is within the docking cone, is in proper attitude, and
+that the two vehicles remain in alignment until docking interface contact and capture
+5. Provide insight enabling crew re-designation of an alternate landing target
+6. Support manual/blended control if primary automated system degrades or fails"
+HLS-S-R-0318,HLS Operation Mass Delivery from NRHO,"The HLS shall deliver 770 kg (threshold) and 820 kg (goal) of crew and GFP from
+NRHO to the lunar surface for two-crew sortie missions and shall deliver 1,550 kg
+(threshold) and 1,700 kg (goal) from NRHO to the lunar surface for four-crew extended
+missions.","The masses defined within this requirement are based on two crew and GFP
+for sortie missions and four crew and GFP for Extended missions and establish
+minimum operational capabilities for surface operations. Operational uses of the
+delivered mass will be determined during mission planning. Masses assume a specific delivery implementation for EVA and launch and entry suits for the missions. Other
+implementations are possible, which may change the required delivery mass."
+HLS-S-R-0356,Utilization Cargo Delivery from NRHO,"The HLS shall be capable of delivering from NRHO to the lunar surface utilization cargo
+of 150 kg (TBR) and 1.59 m^3 (TBR) volume (threshold) and 1000 kg (TBR) and 7.09
+m^3 (TBR) volume (goal), inclusive of tare, in accordance with the parameters that are
+notionally specified in","Specified mass does not include operations mass return. Sustaining HLS
+missions are expected to deliver utilization equipment and tools to accomplish
+objectives. They are also desired to have a freezer in order to return lunar volatiles
+and biological/human health samples. The intent of this table is to provide
+requirements for pressurized and unpressurized volumes and mass allocations for
+initial proposal and design purposes. The listed hardware is notional, generally
+reflecting high level NASA desires. Specific hardware to fill mass/volume allocations
+will be determined later by NASA on a mission-specific basis."
+HLS-S-R-0326,Utilization Cargo Delivery from NRHO,"The HLS shall be capable of delivering from NRHO to the lunar surface utilization cargo
+of 50 kg (TBR) and 1.43 m^3 (TBR) volume (threshold) and 1000 kg (TBR) and 7.09
+m^3 (TBR) volume (goal), inclusive of tare, in accordance with the parameters that are
+notionally specified in","Specified mass does not include operations mass return. Sustaining HLS
+missions are expected to deliver utilization equipment and tools to accomplish
+objectives. They are also desired to have a freezer in order to return lunar volatiles
+and biological/human health samples. The intent of this table is to provide
+requirements for pressurized and unpressurized volumes and mass allocations for
+initial proposal and design purposes. The listed hardware is notional, generally
+reflecting high level NASA desires. Specific hardware to fill mass/volume allocations
+will be determined later by NASA on a mission-specific basis. Reduced down mass
+threshold for 4 crew missions assumes that additional tools/utilization hardware are
+pre-deployed on other surface assets."
+HLS-S-R-0108,Manual Control,"The HLS shall provide the capability for the crew to manually control the flight path and
+attitude.","The capability for the crew to control the spacecraft's flight path is a
+fundamental element of crew survival and mission success. A minimum
+implementation of manual control for lunar landing allows the crew to bypass the automated guidance of the vehicle to affect flight path. In addition, a minimum
+implementation for RPODU allows for manual attitude control. Selection of an
+alternate landing site/target is an expected capability of an automated landing system,
+however, limiting the crew to choices presented by the automated guidance function is
+not a valid implementation of manual control.
+The intent of this requirement is to provide the crew the ability to take control of the
+spacecraft during all crewed phases of flight, especially during critical phases, if there
+are issues with the automated system (failures or unexpected performance) to (1)
+protect crew survivability and (2) enable mission success. Applied to a lunar lander,
+the most critical phase is the actual terminal descent and landing on the lunar surface
+that is populated with landing zone hazards. An automated flight control system will be
+a closed loop system continuously working toward a precision landing at the
+designated landing site while performing landing zone hazard detection, analysis, and
+avoidance during the terminal landing phase. One possible implementation of this
+requirement for a lunar lander would be that the crew can exit the closed loop
+automated software and algorithms that are making the decisions on both precision
+landing and hazard avoidance while then making the key inputs to manually control/fly
+the spacecraft to avoid hazards and achieve a safe and successful landing. A specific
+example for this terminal landing phase would be the crew controlling descent, lateral
+and longitudinal drift rates with automation likely handling other facets of the vehicle
+control such as vehicle attitude. These would be considered “blended” manual control
+solutions and other blended solutions may exist. Other critical phases of flight include
+undock/back-away to start the lunar surface mission and the approach/rendezvous
+return to complete the lunar surface mission. Reference CA-19-0023 Human Landing
+Systems White Paper for Manual Control Systems.
+Note: Manual control cannot be safely or accurately performed without the spatial and
+situational awareness tools to provide status, feedback, and flight control direction.
+Safe operation requires both accuracy of crew inputs and Level 1 handling qualities to
+meet human rating requirements. Tools include, but are not limited to, telemetry,
+displays, video, instrumentation, and windows. Manual control implementation and the
+supporting tools will be verified in a cockpit environment to ensure they are adequate
+to support manual control and operations appropriate for the lunar lander."
+HLS-S-R-0306,Surface Access,The HLS shall provide the following spatial access to the lunar surface:,"HLS will be capable of crewed sorties to high-value locations in addition to
+the lunar South Pole. Sorties will require polar (DRM-001 and DRM-ODS) and
+nonpolar (DRM-003) access, while extended surface stay missions (DRM-002 and
+DRM-004) will always be to the South Pole. Specific mission profiles will be defined
+on a site-by-site basis to determine appropriate surface durations while maintaining
+manageable energy requirements and while considering mission support roles from
+other available government lunar assets. The HLS will be capable of operating in a
+range of thermal and solar environments as dictated by the latitude and longitude of
+the sites selected however considerations will be made for local surface topography"
+HLS-S-R-0090,Digital High Resolution Imagery & Audio Capability,"The HLS shall be capable of providing interior and exterior digital high resolution still
+and digital high-resolution motion imagery with associated audio and metadata, of
+critical mission events and major human-interest events, to the crew and to Mission
+Systems, during all mission phases, including periods of daylight and darkness.","The agency has established a strategic objective of capturing and
+streaming imagery of major human-interest events, crew activities, critical mission
+events for scientific, verification, safety, anomaly resolution, public affairs, STEM and
+crew health and medical purposes. Simultaneous bi-directional audio and video
+streams are needed to support all required operations and flight phases for the HLS,
+while also being able to concurrently conduct nominal and off-nominal operations.
+Because NASA TV will be native UHD/4K by 2024, the term ‘High-Resolution’, in this
+context, means: video streams of at least Full High Definition (1080p30) but preferably
+UHD (2160p60). Still Imagery should be composed of at least 20 Megapixels with the
+goal of matching (or exceeding) the imagery provided by the Apollo missions. Video
+imagery should support human interest events such as nominal and off nominal crew
+operations, including medical conferences, private family conferences, engineering
+discussions, and STEM outreach, lunar surface EVA operations. GFP camera
+system(s) (including xEMU suits helmet cameras) will be provided and can be used to
+meet this requirement where feasible.
+Mission phases and critical events are defined in HLS-CONOP-006, HLS Program
+Concept of Operations, and include the following events: Trans-lunar transit, Lunar
+orbit operations, RPODU operations, Lunar descent & landing, Surface Operations,
+Lunar Ascent, Return RPODU and post-mission operations. Additional surface
+activities that are of value include lander “deck” activities (e.g. dust mitigation),
+descent element platform operations, EVA prep activities (suit donning, tool prep,
+etc.), Lunar Surface EVAs (first steps, sample collections etc.), post-EVA activities
+(lander ingress, suit doffing, regolith decontamination, etc.) Sustaining missions may
+have critical mission events that take place in darkness (EVAs, lunar ascent, etc) and
+so capability to provide clear and viewable imagery of the event must be accounted
+for in the design. Although this functionality is expected to be available during all mission phases, it
+does not imply continuous exercise of that functionality. Transmission of the imagery
+data is described in the HLS-IRD-004, Human Landing System to Mission Systems
+Interface Requirements Document and EVA-EXP-0067, HLS Exploration Extra
+Vehicular Activity Interface Requirements Control Document. For example, there may
+be times when the communication links cannot support sufficiently-high data rates—
+particularly during periods of attitude instability (lunar descent/ascent) where accurate
+antenna-pointing is difficult—and this requirement is not meant to imply that multiple
+concurrent video streams are required at these times. It is most important to have this
+capability during lunar surface EVAs and during RPODU operations (and during other
+critical mission events and public interest events), and it would be ‘nice’ to have it
+available at other times, when possible. In the event that live video cannot be
+provided, the imagery may be recorded for later dissemination. In the event that
+internal and external HLS imagery data exceeds transmission capability, as described
+in the L2-HLS-MS-0053 (Simultaneous Digital Audio/Video Streams) requirement in
+HLS-IRD-004 (Human Landing System to Mission Systems Interface Requirements
+Document)(or there is a LOS), the imagery should be recorded for later
+downlink/transfer back to Earth."
+HLS-S-R-0021,HLS Landing Accuracy,The HLS shall be capable of landing within 100m (3-sigma) of target landing site.,"The HLS is expected to be able to land within an accessible distance of
+preselected surface destinations in order to optimize EVA resources, scientific
+objectives, fuel consumption, vehicle navigation capabilities, and crew schedule.
+The agency has determined that 100 m, or less, is an appropriately accessible
+distance that will optimize mission resources. Accuracy better than 100m will be
+subject to evaluation."
+HLS-S-R-0071,Surface Operations Vertical Orientation,"The HLS shall provide vertical orientation of 0 to 8° (threshold) and 0 to 5° (goal) from
+local vertical for surface operations.","The HLS must support all post-landing crew activities. It is expected that
+the slope tolerance (landed stability) of the HLS will exceed the acceptable lander tilt
+angles for the safe and effective execution of critical crew functions during the lunar
+surface mission. As a result, some means of tilt mitigation may be required. Critical
+crew habitation operations impacted by lander attitude include EVA suit don/doff, EVA
+suit undock and re-dock to donning stand, IVA mobility, eating, sleeping, hygiene, as
+well as operation and maintenance of equipment. Critical EVA operations impacted by
+lander attitude include hatch ingress/egress, lander “deck” activities (e.g. dust
+mitigation), descent element platform translation between the hatch and the ladder, ladder descent/ascent, transition between the ladder and the lunar surface, transport
+of tools/equipment to the lunar surface, access to externally stowed tools/equipment,
+transport of lunar samples/sample containers to the ascent element, and assistance to
+impaired or recovery of an incapacitated crew member (e.g. rescue from the surface
+to the interior of the ascent element)."
+HLS-S-R-0042,Surface Duration,"The HLS shall be capable of operating on the lunar surface for a minimum of 6.5 Earth
+days, when pre-emplaced surface assets are not available.","The optimal NRHO has a period, apolune and perilune that drives the
+architecture to a 6.5 Earth day surface stay capability when no additional surface
+assets are available."
+HLS-S-R-0051,Surface Transfer,"The HLS shall be capable of transferring crew and cargo between the HLS and another
+habitable surface asset.","Some sustained reference missions require the crew to transfer from the
+HLS to a habitable surface asset. This transfer may be performed in shirtsleeves or
+may require crew to EVA one or more times to re"
+HLS-S-R-0043,Extended Surface Duration,"The HLS shall be capable of operating on the lunar surface for a minimum of 32
+(TBR) Earth days, including up to 28 (TBR) days in uninhabited standby mode, when
+pre-emplaced surface assets are available.","The accessibility of pre-emplaced surface assets allows an extended
+mission, during part of which HLS will be uninhabited."
+HLS-S-R-0314,Operational Cabin Pressure Range,"The HLS shall be capable of operating with a cabin pressure that ranges from the
+vacuum of space to a maximum of 10.8 psia.","The crewed staging vehicles that HLS will dock with in NRHO will nominally
+operate at 10.2 psia, which requires the capability to operate at the upper bound of
+10.8 psia, the maximum design pressure. HLS will need to provide pressure relief for
+unexpected overpressure events (above 10.2 psia) for the integrated stack of crew
+staging vehicles and HLS while HLS is docked to the crew staging vehicles. The minimum bound is driven by the need for HLS to continue to successfully operate in a
+full depressurization scenario. Additionally, any volumes exposed to the lunar
+environment to enable crew egress or ingress for EVA will be exposed to a vacuum
+environment during surface operations."
+HLS-S-R-0315,Lunar Surface Operational Cabin Pressure,"The HLS shall be capable of operating at a steady state cabin pressure of 8.2 psia (56.5
+kPa) +/- (TBD) on the lunar surface.","8.2 psia operating pressure facilitates EVA operations, and balances
+timeline impacts of pre-breathe protocols, flammability risk of increased oxygen
+partial pressures, and two types of risk to the crew: risk of decompression
+sickness and risk of reduced performance due to hypobaric hypoxia."
+HLS-S-R-0029,Concurrent RF Communication,"The HLS shall be capable of concurrent RF communications with crew staging vehicle,
+Mission Systems, Spacesuits and Surface assets.","Some HLS operations may require the capability to communicate with EVA
+Crew, Mission Systems and the crew staging vehicle at the same time. The ability to
+communicate concurrently is expected to be available during all mission phases,
+including HLS lunar surface operations, when physics and line-of-sight allows, but
+does not imply continuous exercise of that functionality. In context of sustaining
+missions, “Space Suits” can be interpreted as meaning not only the xEVA suits
+themselves, but also other lunar surface assets, such as Lunar Terrian Vehicle (LTV),
+Pressurized Rover, and Foundational Service Hab."
+HLS-S-R-0070,Surface Lighting Conditions,"The HLS shall be capable of operating in continuous daylight conditions on the surface
+with intermittent periods of 150 hours (threshold) and 192 hours (goal) of continuous
+darkness.","In the sustained architecture, the HLS will be required to survive periods of
+lunar night, periods of eclipse and periods of occultation in addition to periods of
+daylight."
+HLS-S-R-0048,EVA Duration,"The HLS shall be capable of supporting EVAs lasting a minimum of 8 hours, plus one
+hour allocated for contingency.","For safety purposes, EVAs are always performed in a two crewmembers
+buddy system. Final determination on duration of EVAs will be made by the science and
+surface operations team. For a nominal mission, the contingency hour of consumables
+will be filled on the initial fill and never used. These consumables are stored separate
+from the nominal consumables. If a contingency happens during an EVA and the
+contingency hour is used and subsequent EVAs are planned and followed through with,
+the contingency hour consumables would have to be refilled."
+HLS-S-R-0050,EVAs per Reference Mission,The HLS shall be capable of providing the following planned and unplanned EVAs:,"Exploration and Science mission objectives require EVAs for mission
+success.
+ For [DRM-001 and DRM-ODS], HLS must support four nominal EVAs and one
+unplanned EVA for events required to protect crew safety or mission success.
+ For [DRM-003], HLS must at minimum be configurable to support from one to four
+nominal EVAs and one unplanned EVA.
+ For [DRM-002] and [DRM-004], the HLS must support one unplanned EVA for every
+two crewmembers.
+Additional capability must be allocated if a vendor design requires an EVA for
+departure prep/clean-up or ascent performance mitigation."
+HLS-S-R-0319,HLS Operations Mass Delivery Return to NRHO,"The HLS shall return 750 kg (threshold) and 800 kg (goal) of crew and GFP from the
+lunar surface to NRHO for two-crew sortie missions and shall return 970 kg (threshold)
+and 1,620 kg (goal) from Near Rectilinear Halo Orbit (NRHO) to the lunar surface for
+four-crew extended missions.","The masses defined within this requirement are based on two crew and GFP
+for Sortie missions and four crew and GFP for Extended missions and establish
+minimum operational capabilities for surface operations. Masses assume a specific
+return implementation for EVA and launch and entry suits for the missions. Other
+implementations are possible, which may change the required delivery mass."
+HLS-S-R-0056,Utilization Cargo Return to NRHO,"The HLS shall be capable of returning from lunar surface to NRHO utilization cargo of
+100 kg (TBR) and 0.17 m^3 volume (TBR) (Threshold), and 300 kg (TBR) and .47 m^s
+volume (TBR) (Goal) inclusive of tare, in accordance with the parameters that are
+notionally specified in Table 4-3: Utilization Cargo Return to NRHO.","Specified mass does not include operations mass return. Sustaining HLS
+missions are desired to have a freezer in order to return lunar volatiles and
+biological/human health samples. The intent of this table is to provide requirements for
+pressurized and unpressurized volumes and mass allocations for initial proposal and
+design purposes. The listed hardware is notional, generally reflecting high level NASA
+desires. Specific hardware to fill mass/volume allocations will be determined later by
+NASA on a mission-specific basis."
+HLS-S-R-0058,Abort to Crewed Staging Vehicle (CSV),"The HLS shall be capable of conducting a safe return and dock to the crewed staging
+vehicle within NRHO in the event of an abort.","The agency requires crewed vehicles to have the capability to abort to a
+safer location. For the case of a lunar surface mission, the requirement is for the
+crewed vehicle to be able to return to NRHO for rendezvous and dock. Astrodynamic
+considerations may dictate that the HLS provide a “shelter in place” capability until
+the next available launch window presents itself."
+HLS-S-R-0055,HLS Lunar Orbit Insertion,"The HLS shall be capable of completing lunar orbit insertion autonomously and without
+crew assistance.",The HLS will need to insert into various lunar orbits throughout the mission.
