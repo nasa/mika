@@ -15,7 +15,10 @@
 ######################
 .DS_Store
 .DS_Store?
+
+# python things
 __pycache__
+.ipynb_checkpoints
 
 # environments
 env
