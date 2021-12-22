@@ -1,0 +1,24 @@
+// hLDA topic network
+digraph {
+	0 [label="design\ntest\nsystem\ntime\nflight"]
+	8 [label="loss\nadhere\nfailure adhere\nloss mission\nlife" color=paleturquoise1 fillcolor=paleturquoise1 style=filled]
+	0 -> 8
+	9 [label="maximum\nengine\noperating\nspace shuttle\nsurface" color=paleturquoise1 fillcolor=paleturquoise1 style=filled]
+	0 -> 9
+	16 [label="space\nshuttle\nlogistics\nspace shuttle\nrepair" color=turquoise fillcolor=turquoise style=filled]
+	8 -> 16
+	17 [label="independent review\nprocedure\nfollow\nlockout\nexpertise" color=turquoise fillcolor=turquoise style=filled]
+	9 -> 17
+	18 [label="increase risk\nexist\ninstallation\nagreement\nidentical" color=turquoise fillcolor=turquoise style=filled]
+	8 -> 18
+	19 [label="result incomplete\nposition\nsupport\nlong duration\nincorrectly" color=turquoise fillcolor=turquoise style=filled]
+	8 -> 19
+	21 [label="failure mode\nspace shuttle\nlong term\nresult excessive\nfuture mission" color=turquoise fillcolor=turquoise style=filled]
+	8 -> 21
+	23 [label="human error\ntime consume\nentry\nland\nfuture" color=turquoise fillcolor=turquoise style=filled]
+	9 -> 23
+	24 [label="single point failure\nsingle point\npredict\nperson\nopen" color=turquoise fillcolor=turquoise style=filled]
+	9 -> 24
+	layout=twopi
+	overlap=voronoi
+}

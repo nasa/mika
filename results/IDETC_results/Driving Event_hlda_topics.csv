@@ -1,0 +1,98 @@
+,topic level,topic number,parent,number of documents in topic,topic words,number of words,best lesson,coherence
+0,average,average,average,average,average,average,average,0.8913312683293694
+1,std dev,std dev,std dev,std dev,std dev,std dev,std dev,0.04546912577354106
+2,0,0,-1,1639,"time, flight, require, control, problem, perform, component, failure, data, however",67747,2496,0.6261598914861679
+3,1,8,0,248,"base reliability, prefer, reliability, implementation method, technical, test benefit, reliability prefer, rationale, benefit, technical rationale",11052,547,0.7616257905960083
+4,1,9,0,103,"tunnel, transonic, aerodynamic, test mach, tunnel blade, transonic tunnel, mach, deflection, blade, vane",719,1264,0.9405075490474701
+5,1,10,0,296,"management, project, lack, formal, manager, organization, contractor, request, risk, development",5382,1368,0.7670530021190644
+6,1,11,0,206,"ssme, oxidizer, pump, liquid, fuel, propellant, shape, erosion, ring, space shuttle",3176,113,0.8129355192184449
+7,1,12,0,301,"valve, tank, pressure, leak, supply, line, vent, nitrogen, vent line, water",4261,745,0.7827950656414032
+8,1,13,0,74,"state microgravity, first united, microgravity, injury, fire occur, damage, first shift, ignite, united, mile",895,1710,0.8693558990955352
+9,1,14,0,62,"breaker, effective maintainability benefit, base maintainability, recommend technique, circuit breaker, cost saving, technique number, effective maintainability, fault, saving",659,1208,0.8715554714202881
+10,1,15,0,172,"orbiter, brake, fall, position, hydraulic fluid, mast, pull, operator, smoke, thermal protection system",1252,861,0.8560689568519593
+11,2,16,8,19,"follow recommendation, torque analog, base legacy, need great hinge, necessary torque include, great hinge, redesign accommodate, system redesign digital, redesign digital, flight pegasus",1083,1609,0.999997591972351
+12,2,17,9,3,"shaker, random vibration, sine burst, open loop, random, quasi, fixturing, sine, impart, random vibration test",240,6196,0.9269938826560974
+13,2,18,10,55,"lander, exploration rover, rover, land, martian, additional word, exploration, entry descent land, entry, entry descent",2513,1615,0.8794233977794648
+14,2,19,8,11,"optic, spherical, aberration, lens, spie, optical, focal, plane, beam, mirror",1174,718,0.8884984850883484
+15,2,20,10,41,"variable size, nasda, adeos, undetected, data capture, processing system seawinds, system seawinds, intermittent nature, interval data, early nasda report",1186,877,0.9805747210979462
+16,2,21,11,32,"rocket motor, challenger, case nozzle, review joint solid, challenger space shuttle, trigger detailed, joint catastrophic, challenger space, encounter challenger, rocket motor analysis",650,948,0.969486677646637
+17,2,22,12,28,"ventilation, fire department, alarm, perform task, general purpose, scene, technician perform task, extinguisher, fire alarm, contribute",961,291,0.9092580735683441
+18,2,23,8,9,"international metal, control international metal, american, nondestructive test, american society, society, inclusion, mcbride, bray mcbride, nondestructive",833,808,0.9337654829025268
+19,2,24,8,66,"connector, discharge, electrostatic, voltage, electrostatic discharge, electrical, additional word, chassis, shield, harness",2041,444,0.8295736730098724
+20,2,25,11,85,"injury, foot, approximately, crane, platform, side, technician, lift, floor, employee",2577,5496,0.8198411583900451
+21,2,26,10,78,"quick disconnect, orbiter, shuttle, space shuttle, disconnect, orbiter processing, space shuttle orbiter, processing, line replaceable, ground umbilical",1189,5396,0.8475480020046234
+22,2,27,9,50,"relevant historical, relevant, historical, solder, print, solder joint, print wiring, conformal, conformal coat, viking",726,1152,0.9073693811893463
+23,2,28,9,21,"crew return, crew return vehicle, staff, experimental, routine maintenance, bldg, information system llis, system llis, mishap report, duty",492,359,0.9124488890171051
+24,2,29,10,29,"caltech propulsion laboratory, caltech, caltech propulsion, science laboratory, document docid, problem failure report, docid, grail, integration test, rover",742,3596,0.8810621976852417
+25,2,30,12,127,"mishap occur, wind tunnel, research center, close call, serious injury, investigate committee, constellation program, tunnel, explosion occur, bolt remove",285,7156,0.9327238261699676
+26,2,31,10,11,"pyrovalve, combustion, initiator, pyrotechnic, aluminum, fire, pyro, pyroshock, pyrotechnic shock, pyrotechnic device",255,486,0.8705941081047058
+27,2,32,89,12,"weld joint, vibration induced, heat sink, maturity, furnace, cartridge, retesting, engineering drawing, open loop, dimensionally",157,28201,0.9249337792396546
+28,2,33,94,9,"james, rome development, clue, radc, baselined, labor intensive, development production, costly redesign, next step, adversely affect",86,756,0.9305956184864044
+29,2,34,12,36,"extravehicular mobility, extravehicular mobility unit, mishap investigation, thin wall, thin, wall, steam line, catastrophic failure, steam, exhaust",410,315,0.8972530543804169
+30,2,35,11,11,"administration, national, national aeronautics, space administration, aeronautics, main parachute, force base, earth atmosphere, jettison, contain",221,361,0.8722912788391113
+31,2,36,9,14,"antenna, deployed, stow, motion, conical, deployment sequence, reflector, deployment, partially, upper stage",410,922,0.8777384042739869
+32,2,37,13,43,"columbia accident, thermal protection system, thermal protection, limit switch, columbia, investigation board, accident, external tank, extend duration, lightning strike",290,4618,0.91642444729805
+33,2,38,13,17,"attributable, propagate, caltech, redact, itar, touchdown, terrain, regulation, traffic, copy",561,94,0.8991603016853332
+34,2,39,9,9,"descent stage, rover, caltech, science laboratory, descent, backshell, consume, heatshield, fatigue, built caltech",387,13801,0.8821136593818665
+35,2,40,11,15,"effective maintainability, technique number, base maintainability, recommend technique, maintainability, availability, technical memorandum, downtime, life cycle cost, recommend",1006,844,0.8514850854873657
+36,2,41,11,15,"scout, dallas, scout program, visual, visual examination, socket, examination, radial, connector, broken",373,447,0.8905257046222687
+37,2,42,11,18,"oxidizer, propellant, pressurization, tetroxide, tank, nitrogen tetroxide, maneuver, propellant load, fuel, valve",662,1001,0.8602131128311157
+38,2,43,11,12,"space station, productivity, safety hazard, tether, ease, visibility, suit, participation, recommend technique, effective maintainability",426,191,0.8882370531558991
+39,2,44,12,19,"oven, extent damage, concrete, arrow, arrow point, concrete floor, explode, blue, pitch, nose",295,1601,0.9151789367198944
+40,2,45,14,10,"electrolyte, capacity, nickel, cell, zinc, nickel hydrogen, nickel cadmium, lead acid, battery, cadmium",514,557,0.8968966901302338
+41,2,46,9,6,"power dissipation, dissipation, maximum operating, typical value, standard part list, microcircuit, junction temperature, dissipate, part list, maximum allowable",218,928,0.9316077470779419
+42,2,47,14,13,"manage, atmospheric carbon, orbit satellite, time dependent, mission manage, orbit carbon, caltech, dioxide, precise, guske",483,381,0.9131405889987946
+43,2,48,12,50,"attitude, attitude control, reaction wheel, anomaly, fault protection, surprise, command, incident surprise, aacs, spacecraft attitude",1176,25504,0.8532932102680206
+44,2,49,10,7,"extrude, conduction, list table, thermocouple, tendency, lerc, foreign material, insulator, room temperature, grease",356,686,0.9056067883968353
+45,2,50,13,14,"destructive physical, destructive physical analysis, power converter, pathfinder, hybrid, converter, tiger, effect transistor, tiger team, military specification",267,543,0.9148160934448242
+46,2,51,8,7,"lewis, acid, separate, corona discharge, thermodynamic, rudder, gradually, decompose, service life, degradation",247,1798,0.8879871368408203
+47,2,52,8,3,"organic material, deteriorate, moisture, life cycle, extremely high, salt, shock vibration, detrimental effect, dust, binding",355,651,0.8982038140296936
+48,2,53,8,8,"damper, deployable, gimbal, extreme temperature, stiffness, gradient, deployed, impose, shock, lock",217,1423,0.8718878388404846
+49,2,54,92,20,"space shuttle processing, inadequacy, safety policy, accountability, idea, authorize, definition, trend analysis, standardize, orderly",197,1022,0.9079774439334869
+50,2,55,10,7,"cape canaveral, accurately reflect, cape, telephone, apollo, close call, establishment, extra, calculation, focus",145,328,0.8895716488361358
+51,2,56,12,18,"crane, bridge, bridge crane, drive motor, recommend technique, effective maintainability, technique number, overhead, maintainability, relay",365,1274,0.8738691568374634
+52,2,57,15,22,"fiber optic, fiber, optic, fiber optic cable, transmission, launch countdown, receives, receiver, hardware software, input signal",350,563,0.8972760140895844
+53,2,58,15,83,"travel wave, tube amplifier, amplifier, telemetry, twta, wave, downlink, radio, relevant, tube",2124,1581,0.8825548768043519
+54,2,59,12,15,"logistics module, multi purpose, traffic, foreign, troubleshoot, ingres, vertically, accessible, foreign object, access",210,1323,0.8930405914783478
+55,2,60,15,8,"north south, south, correlate, correlation, north, thermal gradient, quartz, slope, consistently, heritage",230,915,0.9078016996383667
+56,2,61,10,15,"critical item list, activity involve, identifies, critical item, failure mode effect, trend analysis, mitigate effect, early identification, fmea, concurrent engineering",391,6956,0.9067157626152038
+57,2,62,15,16,"leak check, mass spectrometer, seal surface, proof test, gauge, liquid hydrogen, nondestructive, spectrometer, propulsion conference, quality assurance provision",309,12,0.9079525649547577
+58,2,63,15,25,"vacuum chamber, fourier transform, focal plane, spectrometer, fourier, transform, resolve issue, focal, clean room, take account",172,1099,0.9011463105678559
+59,2,64,10,37,"international space, huygens probe, software development, cassini spacecraft, international space station, probe, european space agency, european space, cassini, operation atlo",576,1390,0.9022003471851349
+60,2,65,93,5,"fell, severely damage, extraction, extract, flap, fold, suspension, telephone, compartment, unaware",31,517,0.9148164451122284
+61,2,66,8,8,"caution warn, microgravity science, microgravity, fault tolerance, probability occurrence, reliability block diagram, product assurance, payload, qualitative, mention",220,1017,0.9044568181037903
+62,2,67,11,7,"graphic, methodology, synergistic, currently available, significantly improve, team approach, ground rule, augment, developmental, integral part",355,1595,0.9135766565799713
+63,2,68,11,11,"purity, show table, excellent, table, galvanic corrosion, galvanic, later date, wipe, narrow, discontinuity",672,97,0.8920954167842865
+64,2,69,8,7,"elastic, cure, physical property, laminate, woven, modulus, tape, fabric, resin, composition",453,301,0.9110257148742675
+65,2,70,8,13,"radiation environment, proton, radiation hardness, radiation, solar flare, alpha, single event effect, flare, nuclear, hardness",600,1346,0.9035893201828002
+66,2,71,8,18,"residue, cleanliness, particulate, molecule, contamination control, volatile, contaminates, molecular, cleaning process, performance degradation",726,244,0.9167186856269837
+67,2,72,88,13,"receiver, destruct, range safety, clock, transmitter, officer, susceptible, error detection, eastern, protects",275,1123,0.8960304915904999
+68,2,73,8,14,"spare part, maintenance concept, logistics, removal replacement, mean time, extravehicular activity, wait, reliability maintainability, downtime, maintainability",582,197,0.9061274349689483
+69,2,74,90,12,"negotiate, altitude, incentive, strain relief, action item, successfully demonstrate, spacecraft integration test, pending, mail, platinum",94,5,0.9210112512111663
+70,2,75,91,3,"peer, cloud, work together, truly, male, drove, fasten, suppose, female, data acquisition system",37,895,0.9294982492923737
+71,2,76,90,10,"schedule delay, confusion, authority, accepted, situation, packed, entirely, night, cite, meaning",88,316,0.8992254793643951
+72,2,77,89,3,"server, traffic, propel, printer, line filter, programmable logic, expectancy, trickle charge, trickle, rectifier",113,5656,0.9280106544494628
+73,2,78,8,19,"random vibration, random vibration test, sinusoidal, random, octave, dynamic, vibration reliability prefer, vibroacoustic, sine, predict",1022,1018,0.8870260298252106
+74,2,79,12,8,"skirt, solid rocket, solid rocket booster, throat, external tank, installation removal, money, team member, adapter, plug",245,202,0.8842153191566468
+75,2,80,93,5,"catalog, mechanical engineer, cost schedule, benchmark, major element, size weight, important factor, ansi, feeder, root square",183,713,0.9121147274971009
+76,2,81,94,1,,0,241,0.8844909787178039
+77,2,82,10,8,"effect criticality, fmeca, analysis fmeca, single event effect, fault tree, single event, latch, pair, criticality, instance",323,799,0.8834140360355377
+78,2,83,91,35,"approximately hour, high resolution, trajectory, spacecraft trajectory, soil moisture, smap, illuminate, intervention, auto, soil",216,1189,0.9146997690200805
+79,2,84,88,30,"venus, scan platform, scan, mapping, solar panel, workarounds, eject, ejection, voyager, additional",397,1514,0.8711256921291352
+80,2,85,8,15,"peer review, project management, requirement levy, expendable, manual, collect data, feasibility, levy, experience show, junction temperature",239,1486,0.9045503854751586
+81,2,86,92,12,"provide traceability, socket, first step, insure, extravehicular activity, part list, traceability, aspect, spot, care",214,1116,0.9003623783588409
+82,2,87,14,33,"engine, main engine, main, space shuttle, abort, ssme, fuel pump, command data simulator, data simulator, large amount",294,1078,0.8665772676467896
+83,1,88,0,43,"click view, click, video, quicktime, version video, version, view, airlock, discussion, hatch",169,615,0.8929372549057006
+84,1,89,0,15,"anomaly investigation, centaur, thrust, potable water, atlas centaur, cape canaveral, hughes, general purpose computer, engine start, dewar",160,47,0.9225385069847107
+85,1,90,0,22,"review board, stabilization, success criterion, circumstance, closing, observer, observer loss, retesting, deluge, signal special",283,1299,0.9074236631393433
+86,1,91,0,38,"explosion, injury, employee, tighten, burn, electrical shock, injured, explode, newly, contact",446,491,0.8665457248687745
+87,1,92,0,39,"constellation program, constellation, risk management, communicate, role, mobile, life cycle, regard, size weight, timely manner",357,5862,0.8913524150848389
+88,1,93,0,10,"pound, research center, particle size, high density, manipulation, warning, solid propellant, larc, cast, destroyed",179,527,0.9074581086635589
+89,1,94,0,10,"passage, blockage, quick disconnect, science instrument, compression, flow path, alteration, loosen, horsepower, gathering",91,451,0.9145400702953339
+90,2,96,8,7,"book, disadvantage, marietta, expand, advantage disadvantage, penalty, advancement, economical, molecular, whole",263,439,0.907466322183609
+91,2,97,8,14,"monte carlo, probability failure, probabilistic, experimental, deterministic, stochastic, standard deviation, fracture mechanic, carlo, durability",579,213,0.911784040927887
+92,2,98,14,6,"supportability, provide basis, intervention, manpower, fund, logistics, challenge, balance, basis, continue",192,1243,0.8637477576732635
+93,2,99,8,10,"gauss, magnetic, magnetization, demagnetization, magnetize, moment, dipole, attachment point, alloy, disturbance",406,1226,0.9252694010734558
+94,2,101,92,7,"make difficult, inter, clock, repeat, attempt, baselined, obstruction, order prevent, operational sequence, gathering",121,1279,0.8858315229415894
+95,2,102,15,18,"data exchange, government industry, gidep, program gidep, exchange, government, industry, coordinate, advisory, twenty",354,1188,0.896856278181076
+96,2,103,10,8,"culture, explorer, prompt, survey, sensitive component, static charge, cost constraint, verify proper, tower, work shift",112,2917,0.9110467672348023

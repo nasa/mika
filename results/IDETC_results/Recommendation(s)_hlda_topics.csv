@@ -1,0 +1,96 @@
+,topic level,topic number,parent,number of documents in topic,topic words,number of words,best lesson,coherence
+0,average,average,average,average,average,average,average,0.8191798015948264
+1,std dev,std dev,std dev,std dev,std dev,std dev,std dev,0.054666817590617
+2,0,0,-1,1639,"system, requirement, process, design, flight, include, project, ensure, review, require",11478,1413,0.591247296333313
+3,1,8,0,44,"briefing, maximum, move, crew, practice, safe, communication, vehicle, land, verify",262,1710,0.7210396140813827
+4,1,9,0,245,"protection, fault protection, fault, shutdown, anomaly, spacecraft, detect, software, condition, hardware",229,18601,0.743142768740654
+5,1,10,0,253,"subject, thermal vacuum test, temperature, thermal vacuum, thermal, flight, test, reliability, fatigue, component",469,771,0.716526085138321
+6,1,11,0,306,"safety, hazardous, lift, procedure, hazard, equipment, remove, proper, handle, load",598,1338,0.7090237587690353
+7,1,12,0,95,"composite, composite material, cleanliness, seal, material, contamination, material property, precision, life cycle, inspection",228,672,0.8347832798957825
+8,1,13,0,77,"remote, compliance, pressurization, analysis fmea, rigor, fmea, exists, correction, pressure, human factor",251,24,0.8954148292541504
+9,1,14,0,80,"propellant, engine, cryogenic, liquid, propulsion system, propulsion, purge, coat, base, rocket",120,701,0.8790227174758911
+10,1,15,0,9,"electronics, tape, scenario, spacecraft, possibility, vent, consideration, position, significant, capability",100,640,0.783888864517212
+11,2,16,8,20,"piece part, mechanical, paper, relief, intend, verify, property, mount, stress, qualification",155,1581,0.7785204350948334
+12,2,17,9,144,"hardware software, manufacturing process, prior launch, full range, environmental condition, corrective action, concurrent engineering, solid state, operating condition, failure mode",182,4417,0.9186242580413818
+13,2,18,58,15,"color, ground support equipment, connect, operate, identification, ground support, pressure, procedure, hazardous material, traceability",68,302,0.7840252190828323
+14,2,19,10,26,"eliminate, reexamine, provide sufficient, effort, motor, upgrade, static, safety, supplier, risk",175,1077,0.7727936029434204
+15,2,20,10,13,"supply, power supply, power, length, cable, parallel, feed, breakdown, connector, redesign",163,1609,0.8241830945014954
+16,2,21,9,55,"valve, install, vent line, high pressure, check valve, utilize, prevent inadvertent, operation, system, vacuum",266,47,0.7628872007131576
+17,2,22,11,19,"emergency, emergency response, alarm, building, protective, hazardous condition, annual, responsible, facility, service",272,12101,0.8214380323886872
+18,2,23,10,160,"space flight, research center, prior start, high voltage, high temperature, take account, training certification, power source, potential hazard, test article",162,3516,0.8857827484607697
+19,2,24,9,32,"rocket, engine, rocket engine, actual performance, propulsion system, propulsion, propellant, data, acceptance test, test",176,14201,0.8078020513057709
+20,2,25,12,28,"whenever possible, hazardous operation, much, look, replacement, whenever, success, subject, well, balance",83,994,0.8154565095901489
+21,2,26,89,8,"network, patch, security, connection, example, appropriate action, accept, conductor, penetration, official",82,21301,0.8343955218791962
+22,2,27,11,228,"flight hardware, configuration control, fail safe, make sure, launch vehicle, quality assurance, project manager, personnel involve, period time, high fidelity",216,400,0.8418348491191864
+23,2,28,12,17,"pyrotechnic, reliability, property, application, functional, material, failure mode, mode, combine, material property",181,750,0.807862538099289
+24,2,29,13,33,"assure adequate, insulate, electrostatic discharge, power, conductive, ground, discharge, circuit, connection, range",243,404,0.8341523766517639
+25,2,30,11,22,"replace, inspect, block, contamination, hole, exist, completely, variety, fill, complete",125,1876,0.8036078751087189
+26,2,31,10,54,"space shuttle, space station, prime contractor, mate demate, safety mission assurance, access platform, mission assurance, shuttle, segment, avionics",149,959,0.9072307705879211
+27,2,32,12,17,"special, special attention, attention, possibility, path, raise, optical, permit, particularly, change",112,5216,0.7824821442365646
+28,2,33,8,16,"display, indicate, color, appropriately, isolate, occurrence, obvious, main, flag, cell",157,41,0.8832767844200134
+29,2,35,62,10,"develop implement, develop, team member, assign, member, official, carry, worker, vertical, held",50,2176,0.8170316994190217
+30,2,36,11,4,"close proximity, proximity, panel, detail, keep, crew, eliminate, list, task briefing, distance",65,27,0.8197191059589386
+31,2,37,60,19,"carefully evaluate, carefully review, heat, control, coat, significantly, evaluate, carefully, margin, thermal",116,2057,0.7758489161729812
+32,2,38,13,5,"proposal, explicitly, reserve, challenge, introduce, agree, arise, front, assist, deal",128,7216,0.8944961905479432
+33,2,39,59,5,"opportunity, radio, radio frequency, progress, suppression, incoming, emergency response, revisit, principal, portable",38,1780,0.8830443739891052
+34,2,40,14,71,"future program, long term, hypergolic propellant, evaluate effect, eliminate need, improve reliability, short term, software development, electronic part, reduce risk",98,1267,0.9067301869392395
+35,2,41,13,19,"preliminary design, preliminary, maintenance activity, give, build, ground processing, reach, milestone, development, consideration",98,395,0.8358480513095856
+36,2,42,58,9,"electronic, electronic part, survey, visual inspection, budget, inspector, vendor, list, technical, properly train",90,261,0.8381776034832
+37,2,43,59,46,"relief valve, human factor, wind tunnel, hazard, personal protective equipment, personal protective, relief, train personnel, rate, human",152,942,0.8531582176685333
+38,2,44,61,13,"help ensure, alarm, great, transition, properly train, furthermore, precaution, pull, suppression, department",62,955,0.8808921337127685
+39,2,45,61,16,"shape, sensor, terminal, transportation, local, land, orbit, mass, accurate, account",108,1514,0.8583993256092072
+40,2,46,91,6,"together, walk, reason, cross, pressurize, initiation, team, variable, pressurization, accuracy",77,947,0.8513047277927399
+41,2,47,89,15,"permanently, handbook, content, tether, line management, specifically, attach, general, aware, handle",99,5897,0.8465108096599578
+42,2,48,88,18,"charge, susceptible, electrostatic discharge, structural, mass, first, protect, damage, model, precaution",203,1330,0.8193236708641052
+43,2,49,8,8,"locate, shop, removal, authorization, work authorization document, approximately, control room, work authorization, discover, room",186,165,0.8678980767726898
+44,2,50,92,8,"late development, presentation, decision make, weekly, furthermore, contains, conflict, pull, face, schedule budget",115,541,0.8654157638549804
+45,2,51,90,32,"electrical power, approval process, ensure proper, packaging, critical item, packaging design, instead, generate, quality assurance, assurance",82,4056,0.8691221296787262
+46,2,52,61,10,"matrix, vulnerability, correction, fault, potential, lose, prime, reexamine, take step, assignment",78,28101,0.8441039562225342
+47,2,53,12,25,"soon possible, conduct thorough, possible, space shuttle, space shuttle program, soon, work group, term, long term, long",76,1003,0.8345289409160614
+48,2,54,12,8,"self, fully understand, article, configure, test article, input, unit, analyze, example, fully",92,6196,0.8173332870006561
+49,2,55,61,11,"peer review, detail, customer, accept, revisit, uncertainty, vertical, verification validation, sensitivity, sure",151,1016,0.8863003849983215
+50,1,56,0,18,"rate, destructive, solar, earth, appear, radiation, acceptable, general, state, error",107,693,0.8266014218330383
+51,1,57,0,36,"fabrication assembly, defect, effort make, fabrication, material, complex, effort, wiring, harness, connector",164,561,0.8220870971679688
+52,1,58,0,27,"circuit, temperature, redundant, part stress, transient, assume, selection, stress, mode, consider",211,348,0.8088485896587372
+53,1,59,0,63,"crane, strap, second, lift, load, redesign, release, secure, stop, modify",203,30,0.8262426495552063
+54,1,60,0,54,"vessel, pressure vessel, point, pressure, contact, internal, single point failure, routine, pertain, perform periodic",175,5396,0.8121473968029023
+55,1,61,0,64,"close, leak check, orbiter, open, position, valve, flow, open close, calibration, door",181,1383,0.832521402835846
+56,1,62,0,23,"vacuum, extend period, plate, hour, extend, carefully, consider, mount, period, temperature",121,1334,0.7821352362632752
+57,1,63,0,25,"install, feature, joint, assembly, component, opportunity, delivery, prior delivery, minimize potential, deal",134,150,0.8012877345085144
+58,2,64,94,11,"risk mitigation, mitigation, concern, risk management, plan, safety concern, contingency, capture, management, occur",120,1293,0.7926577270030976
+59,2,65,60,20,"original, employ, modify, force, replace, continue, application, equipment, memory, vulnerability",76,1333,0.7737302422523499
+60,2,66,56,18,"conduct periodic, corrective, action, close loop, inspection, prepare, periodic, corrective action, closeout, conduct independent",168,836,0.7987688183784485
+61,2,67,63,13,"capacity, redundant, frame, constrain, degree, fully, capability, line, operational, maintain",64,1221,0.7569834232330322
+62,2,68,57,28,"care, care take, lock device, clearly identify, spacecraft, highly, enable, fault, validation, cycle",191,284,0.8194128930568695
+63,2,69,14,2,"voyager, thus, analytical, occurs, thrust, benefit, discover, attitude, attitude control, capable",31,409,0.8689405739307403
+64,2,70,62,11,"mishap investigation, mishap, investigation, preliminary, timely manner, compound, official, balance, excessive, subsequently",121,1379,0.8755962729454041
+65,2,71,11,33,"vent, pressure, leak check, monitor, integrity, back, provide, design, interface, concentration",179,393,0.6962597131729126
+66,2,72,93,15,"stainless steel, show, thermal vacuum test, thermal vacuum, much, preparation, lack, spacecraft, various, cable",128,416,0.8417455792427063
+67,2,73,62,2,"furthermore, commitment, incoming, center wide, certain, rigor, compromise, expectation, lifecycle, circumstance",36,1345,0.8717609107494354
+68,2,74,59,12,"spacecraft instrument, frequent, sample, contamination, witness, cleanliness, plate, objective, instrument, level",93,329,0.8200473725795746
+69,2,75,57,8,"commercial, logic, usage, behavior, assumption, reporting, actual, less, developed, action",87,10701,0.7879874289035798
+70,2,76,13,20,"solder, research, indicate, instal, investigate, completion, avoid, experiment, connector, indication",121,402,0.8440174043178559
+71,2,77,14,6,"defect, occurs, image, typically, reason, reach, root, often, variety, methodology",47,17901,0.89412642121315
+72,2,78,91,37,"change, deviation, installation, document, write, procedure, work authorization, pressurize, caution, temporary",137,635,0.7340418666601181
+73,2,79,58,3,"develop detailed, isolation, fidelity, high fidelity, parameter, back, reduce, continue, available, establish",92,28105,0.7578940272331238
+74,2,80,9,14,"emergency, install, water, situation, manufacturer, fire, communication, suppression, shut, manufacturer recommendation",197,44,0.812503045797348
+75,2,81,61,14,"preventative maintenance, accessible, contact, service, penetration, floor, vibration, adequate, panel, repair",131,539,0.831173425912857
+76,2,82,88,12,"problem report, insight oversight, segment, doubt, automatic, routine, compromise, strongly, risk assessment, flag",54,1575,0.8961743354797364
+77,2,83,60,3,"prove, related, minute, launch site, safety related, contingency, anomalous, recommend, meet, interface",14,928,0.8027448058128357
+78,2,84,89,24,"subsystem, early possible, ability, test, generate, necessary, system, fully, noise, characterize",346,390,0.7088476181030273
+79,2,85,63,12,"follow recommendation, encompass, fidelity, free, high fidelity, reduce, path, handle, failure, annual",67,504,0.7780952155590057
+80,2,86,15,9,"flexible, encourage, produce, orbit, adopt, lack, contribute, mitigate, single, future",104,4019,0.8082053601741791
+81,2,87,90,2,,0,2316,0.7131291896104812
+82,1,88,0,30,"measure, bearing, constrain, impose, attitude control, frequency, limitation, constraint, condition, performance",82,769,0.776652354001999
+83,1,89,0,47,"degradation, deep space, station, compatibility, downlink, real, mission, effect, long term, term",234,1531,0.8065233051776886
+84,1,90,0,34,"installation, clearance, match, fidelity, examine, thoroughly, carefully, concern, correct, identify",108,6036,0.772256949543953
+85,1,91,0,43,"benefit, space shuttle, approach, space shuttle program, file, database, thoroughly, multiple, launch vehicle, processing",104,757,0.8211877644062042
+86,1,92,0,8,"risk assessment, self, orbital, constant, minute, radio frequency, personal, occurs, budget schedule, nature",138,1491,0.8683883070945739
+87,1,93,0,15,"proof, arise, coordinate, briefing, fail, electronic, personnel involve, clearly, monthly, fixture",84,786,0.8304140865802765
+88,1,94,0,11,"assumption, ensure proper, always, vent, placement, high priority, particle, pyro, precaution, doubt",65,1365,0.8542782247066498
+89,1,95,0,21,"real time, stable, share, command sequence, remote, real, reduce, likelihood, file, center wide",84,584,0.8497743427753448
+90,2,96,14,1,,0,1592,0.8080680549144745
+91,2,97,60,12,"preferably, trade, language, actively, volume, screen, trade study, group, success, estimate",113,247,0.8555663049221038
+92,2,98,104,11,"impose, constraint, configuration management, emphasis place, bring, late development, onboard, relieve, long duration, category",60,532,0.8783376574516296
+93,2,99,95,21,"electrical mechanical, mechanical, program gidep, bulletin, industry, attempt, government, back, prevent, application",73,680,0.7981128871440888
+94,1,104,0,11,"mandatory, conflict, safety concern, prior release, incoming, mandatory inspection, paper, space center, release, section",121,930,0.8618133306503296
