@@ -60,14 +60,20 @@ start_time = time.time() # start timer
 # get query embedding
 sbert_model = SentenceTransformer('all-MiniLM-L6-v2')
 query_embedding = sbert_model.encode(query, convert_to_tensor=True)
+query_embedding_time = time.time()
+query_embedding_time_delta = query_embedding_time - start_time
 
 # get corpus embeddings - eventually these should be pre-run and loaded for use in each query
 corpus_embeddings = sbert_model.encode(llis_corpus, convert_to_tensor=True)
+corpus_embeddings_time = time.time()
+corpus_embeddings_time_delta = corpus_embeddings_time - start_time - query_embedding_time_delta
 
 # semantic search
 hits = util.semantic_search(query_embedding, corpus_embeddings, top_k=5)
 hits = hits[0] # Get the hits for the first query
-run_time = time.time() - start_time # end timer
+search_time = time.time()
+search_time_delta = search_time - start_time - query_embedding_time_delta - corpus_embeddings_time_delta
+total_run_time = search_time - start_time # end timer
 
 # save outputs
 writer = csv.writer(open(os.path.join('results','llis_hls_query_results_1.csv'), "w"))
@@ -82,7 +88,17 @@ for hit in hits:
     writer.writerow(["Score: {:.4f}".format(hit['score'])])
     writer.writerow([llis_corpus[hit['corpus_id']]])
 
-if run_time < 60:
-    print("--- %s seconds ---" % (run_time))
-else:
-    print("--- %s minutes ---" % (run_time/60))
+def print_runtime(run_time):
+    if run_time < 60:
+        print("--- %s seconds ---" % (run_time))
+    else:
+        print("--- %s minutes ---" % (run_time/60))
+
+print('Query embedding run time: ')
+print_runtime(query_embedding_time_delta)
+print('Corpus embedding run time: ')
+print_runtime(corpus_embeddings_time_delta)
+print('Semantic search run time: ')
+print_runtime(search_time_delta)
+print('Total run time: ')
+print_runtime(total_run_time)
