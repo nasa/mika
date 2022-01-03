@@ -44,19 +44,27 @@ ICS_stop_words = stop_words
 import pandas as pd 
 
 extra_cols = ["CY","DISCOVERY_DATE", "START_YEAR", "REPORT_DOY", "DISCOVERY_DOY",
-              "TOTAL_PERSONNEL", "TOTAL_AERIAL", "PCT_CONTAINED_COMPLETED"]
+              "TOTAL_PERSONNEL", "TOTAL_AERIAL", "PCT_CONTAINED_COMPLETED",
+              "ACRES", "WF_FSR", "INJURIES", "FATALITIES","EST_IM_COST_TO_DATE", "STR_DAMAGED",
+              "STR_DESTROYED", "NEW_ACRES","POO_STATE", "POO_LATITUDE", "POO_LONGITUDE", "WEATHER_CONCERNS_NARR", "INC_MGMT_ORG_ABBREV",
+              "EVACUATION_IN_PROGRESS"]
 
 #"""#Preprocess data
 list_of_attributes = ["REMARKS", "SIGNIF_EVENTS_SUMMARY", "MAJOR_PROBLEMS"]
 document_id_col = "INCIDENT_ID"
-extra_cols = ["CY","DISCOVERY_DATE", "START_YEAR", "REPORT_DOY", "DISCOVERY_DOY",
-              "TOTAL_PERSONNEL", "TOTAL_AERIAL", "PCT_CONTAINED_COMPLETED"]
 
 file_name = os.path.join('data','209-PLUS','ics209-plus-wildfire','ics209-plus-wildfire','ics209-plus-wf_sitreps_1999to2014.csv')
-name = os.path.join('output data','ICS_0')
+name = os.path.join('ICS')
 
-ICS = Topic_Model_plus(document_id_col=document_id_col, extra_cols=extra_cols, csv_file=file_name, list_of_attributes=list_of_attributes, name=name, combine_cols=True, create_ids=True)
+ICS = Topic_Model_plus(document_id_col=document_id_col, extra_cols=extra_cols, csv_file=file_name, list_of_attributes=list_of_attributes, database_name=name, combine_cols=True, create_ids=True)
 ICS.prepare_data(dtype=str)
+save_words = ['jurisdictions', 'team', 'command', 'organization', 'type', 'involved', 'transition', 'transfer', 'impact', 'concern', 'site', 'nation', 'political', 'social', 'adjacent', 'community', 'cultural', 'tribal', 'monument', 'archeaological', 'highway', 'traffic', 'road', 'travel', 'interstate', 'closure', 'remain', 'remains', 'close', 'block', 'continue', 'impact', 'access', 'limit', 'limited', 'terrain', 'rollout', 'snag', 'steep', 'debris', 'access', 'terrian', 'concern', 'hazardous', 'pose', 'heavy', 'rugged', 'difficult', 'steep', 'narrow', 'violation', 'notification', 'respond', 'law', 'patrol', 'cattle', 'buffalo', 'grow', 'allotment', 'ranch', 'sheep', 'livestock', 'grazing', 'pasture', 'threaten', 'concern', 'risk', 'threat', 'evacuation', 'evacuate', ' threaten', 'threat', 'resident', ' residence', 'level', 'notice', 'community', 'structure', 'subdivision', 'mandatory', 'order', 'effect', 'remain', 'continue', 'issued', 'issue', 'injury', 'hospital', 'injured', 'accident', 'treatment', 'laceration', 'firefighter', 'treated', 'minor', 'report', 'transport', 'heat', 'shoulder', 'ankle', 'medical', 'released', 'military', 'unexploded', 'national', 'training', 'present', 'ordinance', 'guard', 'infrastructure', 'utility', 'powerline', 'water', 'electric', 'pipeline', 'powerlines', 'watershed', 'pole', 'power', 'gas', 'concern', 'near', 'hazard', 'critical', 'threaten', 'threat', 'off', 'weather', 'behavior', 'wind', 'thunderstorm', 'storm', 'gusty', 'lightning', 'flag', 'unpredictable', 'extreme', 'erratic', 'strong', 'red', 'warning', 'species', 'specie', 'habitat', 'animal', 'plant', 'conservation', 'threaten', 'endanger', 'threat', 'sensitive', 'threatened', 'endangered', 'risk', 'loss', 'impacts', 'unstaffed', 'resources', 'support', 'crew', 'aircraft', 'helicopter', 'engines', 'staffing', 'staff', 'lack', 'need', 'shortage', 'minimal', 'share', 'necessary', 'limited', 'limit', 'fatigue', 'flood', 'flashflood', 'flash', 'risk', 'potential', 'mapping', 'map', 'reflect', 'accurate', 'adjustment', 'change', 'reflect', 'aircraft', 'heli', 'helicopter', 'aerial', 'tanker', 'copter', 'grounded', 'ground', 'suspended', 'suspend', 'smoke', 'impact', 'hazard', 'windy', 'humidity', 'moisture', 'hot', 'drought', 'low', 'dry', 'prolonged']
+file = os.path.join('data','summary_reports_cleaned.csv')
+filtered_df = pd.read_csv(file)
+filtered_ids = filtered_df['INCIDENT_ID'].unique()
+ICS.data_df = ICS.data_df.loc[ICS.data_df['INCIDENT_ID'].isin(filtered_ids)].reset_index(drop=True)
+ICS.preprocess_data(domain_stopwords=ICS_stop_words, ngrams=False, min_count=1, save_words=save_words)
+ICS.save_preprocessed_data()
 
 #use filtered reports
 """

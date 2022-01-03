@@ -6,16 +6,8 @@ Created on Mon May 24 12:14:25 2021
 """
 
 import pandas as pd
-import numpy as np
-import matplotlib.style
-matplotlib.style.use("seaborn")
-import matplotlib.pyplot as plt
 
-import seaborn as sn
-import scipy.stats as st
 import math
-
-from pingouin import rcorr
 
 import sys
 import os
@@ -30,7 +22,7 @@ incident_summary_df = incident_summary_df.drop("Unnamed: 0", axis=1)
 incident_summary_df = incident_summary_df.loc[incident_summary_df["START_YEAR"]>=2006].reset_index(drop=True)
 print(len(incident_summary_df))
 
-preprocessed_file = os.path.join('data','ICS_filtered_preprocessed_combined_data.csv')
+preprocessed_file = os.path.join('data',"ICS_sitreps.csv")
 sitrep_df = pd.read_csv(preprocessed_file)
 sitrep_df = sitrep_df.loc[sitrep_df["START_YEAR"]>2005].reset_index(drop=True)
 print(len(sitrep_df))
@@ -91,7 +83,7 @@ for i in range(len(incident_summary_df)):
             if not math.isnan(final_report_date):
                 date = final_report_date
             else: 
-                expeceted_containment_date = convert_date_to_doy(incident_summary_df.iloc[i]['EXPECTED_CONTAINMENT_DATE'])
+                expected_containment_date = convert_date_to_doy(incident_summary_df.iloc[i]['EXPECTED_CONTAINMENT_DATE'])
                 if math.isnan(expected_containment_date):
                     fire_ids_to_drop.append(fire_id)
                 else:
@@ -128,9 +120,9 @@ total_ids = [id_ for id_ in sitrep_ids if id_ not in fire_ids_to_drop]
 incident_summary_df = incident_summary_df.loc[incident_summary_df['INCIDENT_ID'].isin(total_ids)].reset_index(drop=True)
 sitrep_df = sitrep_df.loc[sitrep_df['INCIDENT_ID'].isin(total_ids)].reset_index(drop=True)
 
-#sitrep_df.to_csv(smart_nlp_path+r"\input data\ICS_filtered_preprocessed_combined.csv")
-incident_summary_df.to_csv(os.path.join('data','summary_reports_cleaned.csv'))
+sitrep_df.to_csv(os.path.join('data',"ICS_sitreps_clean.csv"))
+incident_summary_df.to_csv(os.path.join('data','summary_reports_cleaned2.csv'))
 
 print(len(incident_summary_df),len(sitrep_df))
-
+print(len([id_ for id_ in sitrep_df["INCIDENT_ID"].unique() if id_ in incident_summary_df["INCIDENT_ID"].unique()]))
 sitrep_df

@@ -35,7 +35,7 @@ class Topic_Model_plus():
     doc_ids_label : str
         defines the document id column label name
     list_of_attributes : list of str
-        defines various attributes within a single database
+        defines various attributes within a single dataset
     extra_cols : list of str
         a list of strings defining any extra columns in the database
     folder_path : str
@@ -105,7 +105,7 @@ class Topic_Model_plus():
     # private attributes
     __english_vocab = set([w.lower() for w in words.words()])
 
-    def __init__(self, document_id_col="", csv_file="", list_of_attributes=[], extra_cols = [], database_name='', combine_cols=False, create_ids=False):
+    def __init__(self, document_id_col="", csv_file="", list_of_attributes=[], extra_cols = [], database_name='', combine_cols=False, create_ids=False, min_word_len=2, max_word_len=15):
         """
         CLASS CONSTRUCTORS
         ------------------
@@ -139,9 +139,9 @@ class Topic_Model_plus():
         self.extra_cols = extra_cols
         self.folder_path = ""
         self.database_name = database_name
-        self.min_word_len = 2
-        self.max_word_len = 15
-        self.correction_list = []
+        self.min_word_len = min_word_len # maybe these should be defined only in the tokenization/preprocessing function - unless they are needed for other functions, do not need to be object attributes can be regular variables
+        self.max_word_len = max_word_len # maybe these should be defined only in the tokenization/preprocessing function - unless they are needed for other functions, do not need to be object attributes can be regular variables
+        self.correction_list = [] # maybe this should be defined only in the correction function - unless they are needed for other functions, do not need to be object attributes can be regular variables
         if combine_cols == True: 
             self.database_name = os.path.join(self.database_name+'_combined')
         self.combine_cols = combine_cols
@@ -229,7 +229,7 @@ class Topic_Model_plus():
         texts = [[word.lower() for word in text] for text in texts]
         return texts
         
-    def __lemmatize_texts(self,texts):
+    def __lemmatize_texts(self,texts): #why is this so slow?
         def get_wordnet_pos(word):
             tag = pos_tag([word])[0][1][0].upper()
             tag_dict = {"J": wordnet.ADJ,"N": wordnet.NOUN,"V": wordnet.VERB,"R": wordnet.ADV}
@@ -322,7 +322,7 @@ class Topic_Model_plus():
                 
         return ngrams
     
-    def preprocess_data(self, domain_stopwords=[], ngrams=True, ngram_range=3, threshold=15, min_count=5,quot_correction=False,spellcheck=False,segmentation=False,drop_short_docs_thres=3, percent=0.3, drop_na=False, save_words=[],):
+    def preprocess_data(self, domain_stopwords=[], ngrams=True, ngram_range=3, threshold=15, min_count=5,quot_correction=False,spellcheck=False,segmentation=False,drop_short_docs_thres=3, percent=0.3, drop_na=False, save_words=[], drop_dups=False):
         """
         performs data preprocessing steps as defined by user
         
@@ -376,7 +376,7 @@ class Topic_Model_plus():
             sleep(0.5)
             pbar.close()
                 
-        self.__drop_duplicate_docs(self.list_of_attributes)
+        if drop_dups: self.__drop_duplicate_docs(self.list_of_attributes)
         self.__drop_short_docs(thres=drop_short_docs_thres) # need to drop short docs, else we'll get NaNs because of the next two lines; but we can set the thres so this works for the test case
         
         cols = self.data_df.columns.difference([self.doc_ids_label]+self.extra_cols)
