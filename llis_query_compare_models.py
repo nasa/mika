@@ -49,23 +49,28 @@ print('Query: ', query)
 start_time = time.time() # start timer
 
 # sbert model
-#sbert_model = SentenceTransformer('msmarco-roberta-base-v3') # this model is for asymmetric search and is tuned for cosine similarity (models tuned for cosine similarity will prefer retrieval of shorter documents - models trained for dot product will prefer retrieval of longer documents); this is a roberta model as opposed to pure bert; can be replaced with fine tuned model
-sbert_model = SentenceTransformer(os.path.join('results', 'fine_tuned_llis_model')) # fine tuned model
+sbert_model_original = SentenceTransformer('msmarco-roberta-base-v3') # this model is for asymmetric search and is tuned for cosine similarity (models tuned for cosine similarity will prefer retrieval of shorter documents - models trained for dot product will prefer retrieval of longer documents); this is a roberta model as opposed to pure bert
+sbert_model_finetune = SentenceTransformer(os.path.join('results', 'fine_tuned_llis_model')) # fine tuned model
 
 # get query embedding
-query_embedding = sbert_model.encode(query, convert_to_tensor=True)
+query_embedding_original = sbert_model_original.encode(query, convert_to_tensor=True)
+query_embedding_finetune = sbert_model_finetune.encode(query, convert_to_tensor=True)
 query_embedding_time = time.time()
 query_embedding_time_delta = query_embedding_time - start_time
 
-# load sentence embeddings - these are obtained in the file get_corpus_embeddings.py - the runtime for this is significant so we save them after obtaining
+# get corpus embeddings
 embeddings_as_numpy = np.load(os.path.join('data', 'llis_sentence_embeddings.npy'))
 corpus_embeddings_original = torch.from_numpy(embeddings_as_numpy)
+embeddings_as_numpy = np.load(os.path.join('data', 'llis_sentence_embeddings_finetune.npy'))
+corpus_embeddings_finetune = torch.from_numpy(embeddings_as_numpy)
 corpus_embeddings_time = time.time()
 corpus_embeddings_time_delta = corpus_embeddings_time - start_time - query_embedding_time_delta
 
 # semantic search
-hits = util.semantic_search(query_embedding, corpus_embeddings, top_k=5)
-hits = hits[0] # Get the hits for the first query
+hits_original = util.semantic_search(query_embedding_original, corpus_embeddings_original, top_k=5)
+hits_original = hits_original[0] # Get the hits for the first query
+hits_finetune = util.semantic_search(query_embedding_finetune, corpus_embeddings_finetune, top_k=5)
+hits_finetune = hits_finetune[0] # Get the hits for the first query
 search_time = time.time()
 search_time_delta = search_time - start_time - query_embedding_time_delta - corpus_embeddings_time_delta
 total_run_time = search_time - start_time # end timer
@@ -73,8 +78,18 @@ total_run_time = search_time - start_time # end timer
 # save outputs
 writer = csv.writer(open(os.path.join('results','llis_hls_query_results_0.csv'), "w"))
 writer.writerow(['Query: ',query])
+writer.writerow(['ORIGINAL SBERT MODEL'])
 writer.writerow(['--------------------------------------'])
-for hit in hits:
+for hit in hits_original:
+    writer.writerow(['Lesson ID: ', str(llis_numbers_corpus[hit['corpus_id']])])
+    writer.writerow([' Title: ', str(llis_title[hit['corpus_id']])])
+    writer.writerow([' LLIS-Designated Topics: ', str(llis_topics[hit['corpus_id']])])
+    writer.writerow([' Phase: ', str(llis_phase[hit['corpus_id']])])
+    writer.writerow(["Score: {:.4f}".format(hit['score'])])
+    writer.writerow([llis_corpus[hit['corpus_id']]])
+writer.writerow(['FINE-TUNED SBERT MODEL'])
+writer.writerow(['--------------------------------------'])
+for hit in hits_finetune:
     writer.writerow(['Lesson ID: ', str(llis_numbers_corpus[hit['corpus_id']])])
     writer.writerow([' Title: ', str(llis_title[hit['corpus_id']])])
     writer.writerow([' LLIS-Designated Topics: ', str(llis_topics[hit['corpus_id']])])
@@ -90,7 +105,7 @@ def print_runtime(run_time):
 
 print('Query embedding run time: ')
 print_runtime(query_embedding_time_delta)
-print('Corpus embedding run time: ')
+print('Corpus embedding load time: ')
 print_runtime(corpus_embeddings_time_delta)
 print('Semantic search run time: ')
 print_runtime(search_time_delta)
