@@ -381,7 +381,7 @@ class In_Time_Risk_Matrix():
         if condense_text: 
             condense_dict = {self.hazards[i]:"H"+str(i+1) for i in range(len(self.hazards))}
         
-        annotation_dfs = []
+        annotation_dfs = []; hazard_likelihoods = {hazard:[] for hazard in self.hazards}; hazard_severities = {hazard:[] for hazard in self.hazards}
         for i in tqdm(range(len(input_reports)), desc="Building Dynamic Risk Matrices..."):
             report = input_reports.iloc[i][:]
             
@@ -398,6 +398,8 @@ class In_Time_Risk_Matrix():
                               index=['Highly Likely', 'Likely', 'Possible','Improbable', 'Extremely Improbable'])
             annot_font = 16
             for hazard in self.hazards:
+                hazard_likelihoods[hazard].append(self.curr_likelihoods[hazard])
+                hazard_severities[hazard].append(self.curr_severities[hazard])
                 if annotation_df.at[self.curr_likelihoods[hazard],self.curr_severities[hazard]]!= "":
                     annotation_df.at[self.curr_likelihoods[hazard],self.curr_severities[hazard]] += ", "
                     hazards_per_row_df.at[self.curr_likelihoods[hazard],self.curr_severities[hazard]]+=1
@@ -434,7 +436,7 @@ class In_Time_Risk_Matrix():
                 ax.grid(which='minor', alpha=1)
                 plt.show()
         if not show: 
-            return annotation_dfs
+            return annotation_dfs, hazard_likelihoods, hazard_severities
         
     def build_static_risk_matrix(self,  severity_df, likelihood_df, condense_text=True, figsize=(9,5), rates=False, show=True):
         """
@@ -474,7 +476,10 @@ class In_Time_Risk_Matrix():
                          columns=['Minimal Impact', 'Minor Impact', 'Major Impact', 'Significant Critical Impact', 'Catastrophic Impact'],
                           index=['Highly Likely', 'Likely', 'Possible','Improbable', 'Extremely Improbable'])
         annot_font = 16
+        hazard_likelihoods = {hazard:"" for hazard in self.hazards}; hazard_severities={hazard:"" for hazard in self.hazards}
         for hazard in self.hazards:
+            hazard_likelihoods[hazard] = self.curr_likelihoods[hazard]
+            hazard_severities[hazard] = self.curr_severities[hazard]
             if annotation_df.at[self.curr_likelihoods[hazard],self.curr_severities[hazard]]!= "":
                 annotation_df.at[self.curr_likelihoods[hazard],self.curr_severities[hazard]] += ", "
                 hazards_per_row_df.at[self.curr_likelihoods[hazard],self.curr_severities[hazard]]+=1
@@ -488,8 +493,8 @@ class In_Time_Risk_Matrix():
                 hazard_annot = condense_dict[hazard]
             else: hazard_annot = hazard
             annotation_df.at[self.curr_likelihoods[hazard],self.curr_severities[hazard]] += (str(hazard_annot))
-        self.static_rm = annotation_df
-        if show == False: return annotation_df
+        self.static_rm = annotation_df; self.static_likelihoods = hazard_likelihoods; self.static_severities = hazard_severities
+        if show == False: return annotation_df, hazard_likelihoods, hazard_severities
         
         df = pd.DataFrame([[0, 5, 10, 10, 10], [0, 5, 5, 10, 10], [0, 0, 5, 5, 10],
                 [0, 0, 0, 5, 5], [0, 0, 0, 0, 5]],
@@ -675,14 +680,28 @@ class In_Time_Risk_Matrix():
                 print("Please input the required data.")
                 return
         else:
-            static_df = self.static_rm
+            static_df = self.static_rm; static_likelihoods = self.static_likelihoods; static_severities = self.static_severities
         # for each report, get dynamic
         if dynamic_kwargs == {}:
             print("Error: the arguments for the dynamic risk matrix are missing.")
             print("Please input the required data.")
             return
         else:
-            dynamic_dfs = self.build_risk_matrix(data, show=False, **dynamic_kwargs)
+            dynamic_dfs, dynamic_likelihoods, dynamic_severities = self.build_risk_matrix(data, show=False, **dynamic_kwargs)
         # calc % where static=dynamic
-        percent_same = len([df for df in dynamic_dfs if df.equals(static_df)])/len(dynamic_dfs)
-        return percent_same
+        percent_same = (len([df for df in dynamic_dfs if df.equals(static_df)])/len(dynamic_dfs))*100
+        # calc % of likelihoods/ severities where static=dynamic
+        comparison = {"Likelihood % same":[], "Likelihood average distance":[],
+                      "Severity % same":[], "Severity average distance":[],
+                      "Likelihood and Severity % same":[]}
+        dist_dict= {'Highly Likely':1, 'Likely':2, 'Possible':3,'Improbable':4, 'Extremely Improbable':5,
+                'Minimal Impact':1, 'Minor Impact':2, 'Major Impact':3, 'Significant Critical Impact':4, 'Catastrophic Impact':5}
+        for hazard in self.hazards:
+            comparison["Likelihood % same"].append((len([i for i in dynamic_likelihoods[hazard] if i==static_likelihoods[hazard]])/len(dynamic_likelihoods[hazard]))*100)
+            comparison["Likelihood average distance"].append(np.average([dist_dict[i]-dist_dict[static_likelihoods[hazard]] for i in dynamic_likelihoods[hazard]]))
+            comparison["Severity % same"].append((len([i for i in dynamic_severities[hazard] if i==static_severities[hazard]])/len(dynamic_severities[hazard]))*100)
+            comparison["Severity average distance"].append(np.average([dist_dict[i]-dist_dict[static_severities[hazard]] for i in dynamic_severities[hazard]]))
+            num_same = len([i for i in range(len(dynamic_severities[hazard])) if (dynamic_likelihoods[hazard][i]==static_likelihoods[hazard] and dynamic_severities[hazard][i]==static_severities[hazard])])
+            comparison["Likelihood and Severity % same"].append((num_same/len(dynamic_severities[hazard]))*100)
+        results_df = pd.DataFrame(comparison, index=self.hazards)
+        return percent_same, results_df
