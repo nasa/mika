@@ -61,4 +61,4 @@ for sbert in tqdm(sbert_models, "Iterating sBERT models..."):
 index = pd.MultiIndex.from_tuples(index, names=["Query", "Model Type", "sBERT model"])
 results_df = pd.DataFrame(results, index=index)
 results_df.to_csv(os.path.join('results','llis_hls_query_sBERT_comparisons.csv'))
-print('Total run time: ', time.time()-start_time/60," min")
+print('Total run time: ', (time.time()-start_time)/60," min")
