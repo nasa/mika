@@ -15,9 +15,8 @@ hazards = ['Traffic','Command_Transitions', 'Evacuations', 'Inaccurate_Mapping',
                    'Livestock', 'Law_Violations', 'Military_Base', 'Infrastructure',
                    'Extreme_Weather', 'Ecological', 'Hazardous_Terrain', 'Floods','Dry_Weather']
 rm = In_Time_Risk_Matrix(num_severity_models=1, num_likelihood_models=1, hazards=hazards)
-severity_x_cols = ['TOTAL_AERIAL', 'TOTAL_PERSONNEL', 'WF_FSR', 'DAYS_BURING', 'ACRES','PCT_CONTAINED_COMPLETED', 'Current_total_Injuries',
-       'Current_total_Structures_Damages',
-       'Current_total_Structures_Destroyed', 'Current_total_Fatalities','Traffic',
+severity_x_cols = ['TOTAL_AERIAL', 'TOTAL_PERSONNEL', 'WF_FSR', 'DAYS_BURING', 'ACRES','PCT_CONTAINED_COMPLETED',
+      'INJURIES','FATALITIES', 'STR_DESTROYED','STR_DAMAGED','Traffic',
        'Command_Transitions', 'Evacuations', 'Inaccurate_Mapping',
        'Aerial_Grounding', 'Resource_Issues', 'Injuries', 'Cultural_Resources',
        'Livestock', 'Law_Violations', 'Military_Base', 'Infrastructure',
@@ -50,7 +49,7 @@ rm.build_risk_matrix(input_reports, clean=False, vectorize=False, target='Raw_Co
 dynamic_kwargs = {"clean":False, "vectorize":False, "target":'Raw_Combined_Text', "model_type":"likelihood", 
                   "nlp_model_type":"USE", "nlp_model_number":0}
 #Static RM
-"""
+#"""
 document_id_col = "INCIDENT_ID"
 extra_cols = severity_x_cols + meta_inputs
 list_of_attributes = ["Combined_Text"]
@@ -70,9 +69,18 @@ rm.build_static_risk_matrix(severity_df, probs_df)
 
 #rates_df = rm.calc_static_likelihoods_rates(frequency_fires)
 #rm.build_static_risk_matrix(severity_df, rates_df, rates=True)
-"""
+#"""
 
 #Compare solution efficacy
-#dynamic_kwargs['clean'] = False #preprocessed_df is already cleaned 
-#percent_same = rm.compare_results(preprocessed_df, dynamic_kwargs=dynamic_kwargs, rate=False)
-#print("For %", 100*percent_same, " of situation reports the dyanmic risk matrix is the static risk matrix")
+#"""
+dynamic_kwargs['clean'] = False #preprocessed_df is already cleaned 
+percent_same, results_df = rm.compare_results(preprocessed_df, dynamic_kwargs=dynamic_kwargs, rate=False)
+print("For %", 100*percent_same, " of situation reports the dyanmic risk matrix is the static risk matrix")
+print(results_df)
+#with rates
+rates_df = rm.calc_static_likelihoods_rates(frequency_fires)
+rm.build_static_risk_matrix(severity_df, rates_df, rates=True)
+percent_same, results_df = rm.compare_results(preprocessed_df, dynamic_kwargs=dynamic_kwargs, rate=False)
+print("For %", 100*percent_same, " of situation reports the dyanmic risk matrix is the static risk matrix build using rates")
+print(results_df)
+#"""

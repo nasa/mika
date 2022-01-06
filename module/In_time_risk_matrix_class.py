@@ -201,10 +201,11 @@ class In_Time_Risk_Matrix():
             mdl = getattr(self, 'likelihood_model_'+str(i))
             if i == 0:
                 if self.NN:
-                    x = {input_key: np.array(report_df[getattr(self, 'likelihood_model_inputs_'+str(i))[input_key]].tolist()) for input_key in getattr(self, 'likelihood_model_inputs_'+str(i))}
+                    x = {input_key: report_df[getattr(self, 'likelihood_model_inputs_'+str(i))[input_key]] for input_key in getattr(self, 'likelihood_model_inputs_'+str(i))}
                     for key in x:
-                        if type(x[key][0]) is not np.str_:
-                            x[key] = np.array(x[key]).astype('float32').reshape(1,-1)
+                        #print(type(x[key]))
+                        if type(x[key].iloc[0][0]) is not str:
+                            x[key] = np.array(x[key]).astype('float32')
                     probs = mdl.predict(x)
                 elif self.bert:
                     probs = mdl.predict(report_df[getattr(self, 'likelihood_model_inputs_'+str(i))].values[0].reshape(1,-1))
@@ -217,49 +218,63 @@ class In_Time_Risk_Matrix():
                 probs_df = pd.DataFrame(probs, columns=self.hazards)
         return probs_df
     
-    def predict_severity(self, report_df):
+    def predict_severity(self, reports):
         """
-        Predicts the severity of each hazard, given that they occurs, far and individual report
+        predicts the severity for a set of reports
 
         Parameters
         ----------
-        report_df : pandas DataFrame (single row)
-            a single report (row) of a pandas dataframe
-
+        reports : pd.DataFrame
+            ICS-209-PLUS situation reports
         Returns
         -------
-        preds_df : pandas DataFrame
-            a dataframe where columns are hazards rows are the predicted severity for each measure (injuries, fatalities, etc)
+        preds_dfs : list of pd.DataFrame
+            list where each element is a pd.DataFrame corresponding to an incident report.
+            The data frame has columns as hazards and rows as different severity measures
 
         """
-        self.hazards = ['Traffic','Command_Transitions', 'Evacuations', 'Inaccurate_Mapping',
-                   'Aerial_Grounding', 'Resource_Issues', 'Injuries', 'Cultural_Resources',
-                   'Livestock', 'Law_Violations', 'Military_Base', 'Infrastructure',
-                   'Extreme_Weather', 'Ecological', 'Hazardous_Terrain', 'Floods','Dry_Weather']
-        severities = {hazard:[] for hazard in self.hazards}
-        for hazard in self.hazards: #for each hazard, we set the input value at the hazard=1
-            temp_input = report_df
-            temp_input.at[hazard] = 1
-            for other_hazard in self.hazards:
-                if other_hazard != hazard:
-                    temp_input.at[other_hazard] = 0 #and set the input value at all other hazards=0 -> thus we assume only the selected hazard is occuring
-            severities[hazard] = np.around(self.severity_model_0.predict(temp_input[self.severity_model_inputs_0].values.reshape(1,-1))[0])
-        preds_df = pd.DataFrame(severities, 
-                            index=['Diff_Injuries', 'Diff_Structures_Damages', 
-                                     'Diff_Structures_Destroyed','Diff_Fatalities'])
-        return preds_df
+        #transform df
+        indices = []
+        new_df = reports.copy()
+        dfs = []
+        for i in range(len(reports)):
+            report_df = pd.DataFrame(columns=new_df.columns)
+            for hazard in self.hazards: #for each hazard, we set the input value at the hazard=1
+                indices.append((i,hazard))
+                temp_input = new_df.loc[i][:].copy()
+                temp_input.at[hazard] = 1
+                for other_hazard in self.hazards:
+                    if other_hazard != hazard:
+                        temp_input.at[other_hazard] = 0 #and set the input value at all other hazards=0 -> thus we assume only the selected hazard is occuring
+                report_df = report_df.append(temp_input, ignore_index=True)
+            dfs.append(report_df)
+        new_reports = pd.concat(dfs, ignore_index=True)
+        new_reports.index = pd.MultiIndex.from_tuples(indices, names=["index", "hazard"])
+        preds = np.around(self.severity_model_0.predict(new_reports[self.severity_model_inputs_0]))
+        preds_df = pd.DataFrame(preds, index=pd.MultiIndex.from_tuples(indices, names=["index", "hazard"]))
+        preds_dfs = []
+        for i in range(len(reports)):
+            severities = {}
+            for hazard in self.hazards:
+                severities[hazard] = preds_df.loc[(i,hazard)][:]
+            preds_dfs.append(pd.DataFrame(severities, 
+                                index=['Diff_Injuries', 'Diff_Structures_Damages', 
+                                         'Diff_Structures_Destroyed','Diff_Fatalities']))
+        return preds_dfs
+                                
+
     
-    def get_likelihoods(self, report_df, likelihood_df=None):
+    def get_likelihoods(self, reports, likelihood_df=None):
         """
         Converts raw probabilities into likelihood categories for a risk matrix.
         Saves these likelihoods as a member variable for use in rm construction.
 
         Parameters
         ----------
-        report_df :  pandas DataFrame (single row)
-            a single report (row) of a pandas dataframe
+        reports : pd.DataFrame
+            ICS-209-PLUS situation reports
         likelihood_df :  pandas DataFrame, optional
-           a single row of a dataframe where columns are hazards and the row contains the probability of occurence. 
+           a dataframe where columns are hazards and the rows contains the probability of occurence. 
            The default is None.
 
         Returns
@@ -267,37 +282,40 @@ class In_Time_Risk_Matrix():
         None.
 
         """
-        self.curr_likelihoods = {hazard:0 for hazard in self.hazards}
-        if report_df is not None:
-            probs_df = self.predict_likelihoods(report_df)
+        self.curr_likelihoods = []
+        if reports is not None:
+            probs_df = self.predict_likelihoods(reports)
         elif likelihood_df is not None:
             probs_df = likelihood_df
         else:
             print("Error: must input a report or a dataframe of hazard likelihoods")
             return
-        for hazard in self.hazards:
-            p = probs_df.at[0, hazard]
-            if p>=0.5:
-                likelihood = 'Highly Likely'
-            elif p>=0.05 and p<0.5:
-                likelihood = 'Likely'
-            elif p>=0.005 and p<0.05:
-                likelihood = 'Possible'
-            elif p>=0.0005 and p<0.005:
-                likelihood = 'Improbable'
-            elif p<0.0005:
-                likelihood = 'Extremely Improbable'
-            self.curr_likelihoods[hazard] = likelihood
+        for i in range(len(probs_df)):
+            curr_likelihoods = {hazard:0 for hazard in self.hazards}
+            for hazard in self.hazards:
+                p = probs_df.at[i, hazard]
+                if p>=0.5:
+                    likelihood = 'Highly Likely'
+                elif p>=0.05 and p<0.5:
+                    likelihood = 'Likely'
+                elif p>=0.005 and p<0.05:
+                    likelihood = 'Possible'
+                elif p>=0.0005 and p<0.005:
+                    likelihood = 'Improbable'
+                elif p<0.0005:
+                    likelihood = 'Extremely Improbable'
+                curr_likelihoods[hazard] = likelihood
+            self.curr_likelihoods.append(curr_likelihoods)
         
-    def get_severities(self, report_df, severity_df=None):
+    def get_severities(self, reports, severity_df=None):
         """
         Converts raws severity predictions into severity categories for a risk matrix.
         Saves these severities as a member variable for use in rm construction.
 
         Parameters
         ----------
-        report_df :  pandas DataFrame (single row)
-            a single report (row) of a pandas dataframe
+        reports : pd.DataFrame
+            ICS-209-PLUS situation reports
         severity_df : pandas DataFrame, optional
             a dataframe where columns are hazards rows are the predicted severity for each measure (injuries, fatalities, etc)
             The default is None.
@@ -307,31 +325,34 @@ class In_Time_Risk_Matrix():
         None.
 
         """
-        self.curr_severities = {}
-        if report_df is not None:
-            preds_df = self.predict_severity(report_df)
+        self.curr_severities = []
+        if reports is not None:
+            preds_dfs = self.predict_severity(reports)
         elif severity_df is not None:
-            preds_df = severity_df
+            preds_dfs = [severity_df]
         else:
             print("Error: must input a report or a dataframe of hazard severities")
             return
-        for hazard in preds_df.columns: 
-             injuries = preds_df.at['Diff_Injuries',hazard]
-             str_dam = preds_df.at['Diff_Structures_Damages', hazard]
-             str_des = preds_df.at['Diff_Structures_Destroyed', hazard]
-             fatalities = preds_df.at['Diff_Fatalities', hazard]
-             if injuries == 0 and fatalities == 0 and str_des == 0 and str_dam ==0:
-                 impact = "Minimal Impact"
-             elif injuries <= 2 and fatalities == 0 and str_des == 0 and str_dam <= 10:
-                 impact = "Minor Impact"
-             elif injuries <= 2 and fatalities == 0 and str_des <= 10 and str_dam <= 10:
-                 impact = "Major Impact"
-             else:
-                if fatalities<2:
-                    impact = 'Significant Critical Impact'
-                else: #fatalities>2
-                    impact = 'Catastrophic Impact'
-             self.curr_severities[hazard] = impact
+        for preds_df in preds_dfs:
+            curr_severities = {}
+            for hazard in self.hazards: 
+                 injuries = preds_df.at['Diff_Injuries',hazard]
+                 str_dam = preds_df.at['Diff_Structures_Damages', hazard]
+                 str_des = preds_df.at['Diff_Structures_Destroyed', hazard]
+                 fatalities = preds_df.at['Diff_Fatalities', hazard]
+                 if injuries == 0 and fatalities == 0 and str_des == 0 and str_dam ==0:
+                     impact = "Minimal Impact"
+                 elif injuries <= 2 and fatalities == 0 and str_des == 0 and str_dam <= 10:
+                     impact = "Minor Impact"
+                 elif injuries <= 2 and fatalities == 0 and str_des <= 10 and str_dam <= 10:
+                     impact = "Major Impact"
+                 else:
+                    if fatalities<2:
+                        impact = 'Significant Critical Impact'
+                    else: #fatalities>2
+                        impact = 'Catastrophic Impact'
+                 curr_severities[hazard] = impact
+            self.curr_severities.append(curr_severities) 
         
     def build_risk_matrix(self, input_reports, clean=False, vectorize=False, condense_text=True, target=None, model_type=None, nlp_model_type=None, nlp_model_number=None,figsize=(9,5), show=True):
         """
@@ -380,16 +401,17 @@ class In_Time_Risk_Matrix():
             
         if condense_text: 
             condense_dict = {self.hazards[i]:"H"+str(i+1) for i in range(len(self.hazards))}
-        
+        self.get_likelihoods(input_reports)
+        self.get_severities(input_reports)
         annotation_dfs = []; hazard_likelihoods = {hazard:[] for hazard in self.hazards}; hazard_severities = {hazard:[] for hazard in self.hazards}
         for i in tqdm(range(len(input_reports)), desc="Building Dynamic Risk Matrices..."):
-            report = input_reports.iloc[i][:]
+            #report = input_reports.iloc[i][:]
             
             annotation_df = pd.DataFrame([["" for i in range(5)] for j in range(5)],
                              columns=['Minimal Impact', 'Minor Impact', 'Major Impact', 'Significant Critical Impact', 'Catastrophic Impact'],
                               index=['Highly Likely', 'Likely', 'Possible','Improbable', 'Extremely Improbable'])
-            self.get_likelihoods(report)
-            self.get_severities(report)
+            #self.get_likelihoods(report)
+            #self.get_severities(report)
             hazards_per_row_df = pd.DataFrame([[0 for i in range(5)] for j in range(5)],
                              columns=['Minimal Impact', 'Minor Impact', 'Major Impact', 'Significant Critical Impact', 'Catastrophic Impact'],
                               index=['Highly Likely', 'Likely', 'Possible','Improbable', 'Extremely Improbable'])
@@ -398,21 +420,21 @@ class In_Time_Risk_Matrix():
                               index=['Highly Likely', 'Likely', 'Possible','Improbable', 'Extremely Improbable'])
             annot_font = 16
             for hazard in self.hazards:
-                hazard_likelihoods[hazard].append(self.curr_likelihoods[hazard])
-                hazard_severities[hazard].append(self.curr_severities[hazard])
-                if annotation_df.at[self.curr_likelihoods[hazard],self.curr_severities[hazard]]!= "":
-                    annotation_df.at[self.curr_likelihoods[hazard],self.curr_severities[hazard]] += ", "
-                    hazards_per_row_df.at[self.curr_likelihoods[hazard],self.curr_severities[hazard]]+=1
-                    if hazards_per_row_df.at[self.curr_likelihoods[hazard],self.curr_severities[hazard]]>2:
-                        annotation_df.at[self.curr_likelihoods[hazard],self.curr_severities[hazard]]+="\n"
-                        rows.at[self.curr_likelihoods[hazard],self.curr_severities[hazard]] += 1
-                        if rows.at[self.curr_likelihoods[hazard],self.curr_severities[hazard]] > 2: annot_font=12
-                        if rows.at[self.curr_likelihoods[hazard],self.curr_severities[hazard]] > 3: annot_font=10
+                hazard_likelihoods[hazard].append(self.curr_likelihoods[i][hazard])
+                hazard_severities[hazard].append(self.curr_severities[i][hazard])
+                if annotation_df.at[self.curr_likelihoods[i][hazard],self.curr_severities[i][hazard]]!= "":
+                    annotation_df.at[self.curr_likelihoods[i][hazard],self.curr_severities[i][hazard]] += ", "
+                    hazards_per_row_df.at[self.curr_likelihoods[i][hazard],self.curr_severities[i][hazard]]+=1
+                    if hazards_per_row_df.at[self.curr_likelihoods[i][hazard],self.curr_severities[i][hazard]]>2:
+                        annotation_df.at[self.curr_likelihoods[i][hazard],self.curr_severities[i][hazard]]+="\n"
+                        rows.at[self.curr_likelihoods[i][hazard],self.curr_severities[i][hazard]] += 1
+                        if rows.at[self.curr_likelihoods[i][hazard],self.curr_severities[i][hazard]] > 2: annot_font=12
+                        if rows.at[self.curr_likelihoods[i][hazard],self.curr_severities[i][hazard]] > 3: annot_font=10
                         
-                        hazards_per_row_df.at[self.curr_likelihoods[hazard],self.curr_severities[hazard]]=0
+                        hazards_per_row_df.at[self.curr_likelihoods[i][hazard],self.curr_severities[i][hazard]]=0
                 if condense_text: hazard_annot = condense_dict[hazard]
                 else: hazard_annot = hazard
-                annotation_df.at[self.curr_likelihoods[hazard],self.curr_severities[hazard]] += (str(hazard_annot))
+                annotation_df.at[self.curr_likelihoods[i][hazard],self.curr_severities[i][hazard]] += (str(hazard_annot))
             annotation_dfs.append(annotation_df)
             if show:
                 df = pd.DataFrame([[0, 5, 10, 10, 10], [0, 5, 5, 10, 10], [0, 0, 5, 5, 10],
@@ -466,9 +488,12 @@ class In_Time_Risk_Matrix():
         annotation_df = pd.DataFrame([["" for i in range(5)] for j in range(5)],
                              columns=['Minimal Impact', 'Minor Impact', 'Major Impact', 'Significant Critical Impact', 'Catastrophic Impact'],
                               index=['Highly Likely', 'Likely', 'Possible','Improbable', 'Extremely Improbable'])
-        if rates == True: self.get_static_likelihoods_from_rates(likelihood_df)
-        else: self.get_likelihoods(report_df=None, likelihood_df=likelihood_df)
-        self.get_severities(report_df=None, severity_df=severity_df)
+        if rates == True: 
+            self.get_static_likelihoods_from_rates(likelihood_df)
+        else: 
+            self.get_likelihoods(reports=None, likelihood_df=likelihood_df)
+            self.curr_likelihoods=self.curr_likelihoods[0]
+        self.get_severities(reports=None, severity_df=severity_df); self.curr_severities=self.curr_severities[0]
         hazards_per_row_df = pd.DataFrame([[0 for i in range(5)] for j in range(5)],
                          columns=['Minimal Impact', 'Minor Impact', 'Major Impact', 'Significant Critical Impact', 'Catastrophic Impact'],
                           index=['Highly Likely', 'Likely', 'Possible','Improbable', 'Extremely Improbable'])
