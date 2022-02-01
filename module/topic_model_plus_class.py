@@ -23,6 +23,8 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import normalize
 from symspellpy import SymSpell, Verbosity
 import pkg_resources
+from bertopic import BERTopic
+from sentence_transformers import SentenceTransformer
 
 class Topic_Model_plus():
     """
@@ -489,7 +491,125 @@ class Topic_Model_plus():
         self.doc_ids = self.data_df[self.doc_ids_label].tolist()
         check_for_ngrams()
         #print("Preprocessed data extracted from: ", file_name)
+    
+    def bert_topic(self, sentence_transformer_model='all-MiniLM-L6-v2', umap=None, count_vectorizor=None, ngram_range=(1,3), BERTkwargs={}):
+        self.sentence_models = {}; self.embeddings = {}; self.BERT_models = {}
+        self.BERT_model_topics_per_doc = {}
+        for attr in self.list_of_attributes:
+            sentence_model = SentenceTransformer(sentence_transformer_model)
+            corpus = self.data_df[attr]
+            embeddings = sentence_model.encode(corpus, show_progress_bar=False)
+            topic_model = BERTopic(umap_model=umap, vectorizer_model=count_vectorizor, 
+                                   verbose=True, n_gram_range=ngram_range, **BERTkwargs)
+            topics, probs = topic_model.fit_transform(corpus, embeddings)
+            self.sentence_models[attr] = sentence_model
+            self.embeddings[attr] = embeddings
+            self.BERT_models[attr] = topic_model
+            self.BERT_model_topics_per_doc[attr] = topics
+    
+    def save_bert_topics(self, return_df=False, p_thres=0.001):
+        """
+        saves bert topics to file
+        """
+        #saving raw topics with coherence
+        self.__create_folder()
+        dfs = {}
+        for attr in self.list_of_attributes:
+            mdl = self.BERT_models[attr]
+            mdl_info = mdl.get_topic_info()
+            doc_text = self.data_df[attr].to_list()
+            topics_data = {"topic number": [],           
+                           "number of documents in topic": [],
+                           "topic words": [],
+                           "number of words": [],
+                           "best documents": [],
+                           #"coherence": [],
+                           "documents": []}
+            #topics_data["coherence"] = self.BERT_coherence[attr]["per topic"]
+            for k in mdl.topics:
+                topics_data["topic number"].append(k)
+                topics_data["number of words"].append(len(mdl.get_topic(k)))
+                topics_data["topic words"].append(", ".join([word[0] for word in mdl.get_topic(k) if word[1]>p_thres]))
+                topics_data["number of documents in topic"].append(mdl_info.loc[mdl_info['Topic']==k].reset_index(drop=True).at[0,'Count'])
+                if k!=-1: 
+                    best_docs = [self.doc_ids[doc_text.index(text)] for text in mdl.get_representative_docs(k)]
+                else:
+                    best_docs = "n/a"
+                topics_data["best documents"].append(best_docs)
+                docs = [self.doc_ids[i] for i in range(len(self.BERT_model_topics_per_doc[attr])) if self.BERT_model_topics_per_doc[attr][i] == k]
+                topics_data["documents"].append(docs)
+            df = pd.DataFrame(topics_data)
+            dfs[attr] = df
+            if return_df == False:
+                df.to_csv(os.path.join(self.folder_path,attr+"_BERT_topics.csv"))
+        if return_df == True:
+            return dfs
+    
+    def save_bert_taxonomy(self, return_df=False, p_thres=0.0001):
+        self.__create_folder()
+        taxonomy_data = {attr:[] for attr in self.list_of_attributes}
+        for attr in self.list_of_attributes:
+            mdl = self.BERT_models[attr]
+            for doc in self.BERT_model_topics_per_doc[attr]: 
+                topic_num = doc
+                words =  ", ".join([word[0] for word in mdl.get_topic(topic_num) if word[1]>p_thres])
+                taxonomy_data[attr].append(words)
+        taxonomy_df = pd.DataFrame(taxonomy_data)
+        taxonomy_df = taxonomy_df.drop_duplicates()
+        lesson_nums_per_row = []
+        num_lessons_per_row = []
+        for i in range(len(taxonomy_df)):
+            lesson_nums = []
+            tax_row  = "\n".join([taxonomy_df.iloc[i][key] for key in taxonomy_data])
+            for j in range(len(self.doc_ids)):
+                doc_row = "\n".join([taxonomy_data[key][j] for key in taxonomy_data])
+                if doc_row == tax_row:                      
+                    lesson_nums.append(self.doc_ids[j])
+            lesson_nums_per_row.append(lesson_nums)
+            num_lessons_per_row.append(len(lesson_nums))
+        taxonomy_df["document IDs for row"] = lesson_nums_per_row
+        taxonomy_df["number of documents for row"] = num_lessons_per_row
+        taxonomy_df = taxonomy_df.sort_values(by=[key for key in taxonomy_data])
+        taxonomy_df = taxonomy_df.reset_index(drop=True)
+        self.bert_taxonomy_df = taxonomy_df
+        if return_df == True:
+            return taxonomy_df
+        taxonomy_df.to_csv(os.path.join(self.folder_path,'bert_taxonomy.csv'))
+    
+    def save_bert_document_topic_distribution(self, return_df=False):
+        self.__create_folder()
+        doc_data = {attr: [] for attr in self.list_of_attributes}
+        doc_data['document number'] = self.doc_ids
+        for attr in self.list_of_attributes:
+            doc_data[attr] = self.BERT_model_topics_per_doc[attr]
+        doc_df = pd.DataFrame(doc_data)
+        if return_df == True:
+            return doc_df
+        doc_df.to_csv(os.path.join(self.folder_path,"bert_topic_dist_per_doc.csv"))
         
+    def save_bert_results(self):
+        """
+        saves the taxonomy, coherence, and document topic distribution in one excel file
+        """
+        
+        self.__create_folder()
+        data = {}
+        topics_dict = self.save_bert_topics(return_df=True)
+        data.update(topics_dict)
+        data["taxonomy"] = self.save_bert_taxonomy(return_df=True)
+        #data["coherence"] = self.save_bert_coherence(return_df=True)
+        data["document topic distribution"] = self.save_bert_document_topic_distribution(return_df=True)
+        with pd.ExcelWriter(os.path.join(self.folder_path,'BERTopic_results.xlsx')) as writer2:
+            for results in data:
+                data[results].to_excel(writer2, sheet_name = results, index = False)
+    
+    def save_bert_vis(self):
+        self.__create_folder()
+        for attr in self.list_of_attributes:
+            topic_model = self.BERT_models[attr]
+            fig = topic_model.visualize_topics()
+            fig.write_html(os.path.join(self.folder_path,'bertopics_ICS_viz.html'))
+    
     def coherence_scores(self, mdl, lda_or_hlda, measure='c_v'):
         """
         computes and returns coherence scores
@@ -756,7 +876,7 @@ class Topic_Model_plus():
         if return_df == True:
             return dfs
     
-    def save_lda_taxonomy(self, return_df=False, use_labels=False):
+    def save_lda_taxonomy(self, return_df=False, use_labels=False, num_words=10):
         """
         saves lda taxonomy to file or returns the dataframe to another function
         """
@@ -768,7 +888,7 @@ class Topic_Model_plus():
             for doc in mdl.docs: 
                 topic_num = int(doc.get_topics(top_n=1)[0][0])
                 if use_labels == False:
-                    num_words = min(mdl.get_count_by_topics()[topic_num], 100)
+                    num_words = min(mdl.get_count_by_topics()[topic_num], num_words)
                     words =  ", ".join([word[0] for word in mdl.get_topic_words(topic_num, top_n=num_words)])
                 else:
                     words = ", ".join(self.lda_labels[attr][topic_num])
@@ -1189,7 +1309,7 @@ class Topic_Model_plus():
         coherence_df.to_csv(os.path.join(self.folder_path,"hlda_coherence.csv"))
         #print("hLDA coherence scores saved to: ",self.folder_path+"/"+"hlda_coherence.csv")
     
-    def save_hlda_taxonomy(self, return_df=False, use_labels=False):
+    def save_hlda_taxonomy(self, return_df=False, use_labels=False, num_words=10):
         """
         saves hlda taxonomy to file
         """
@@ -1202,7 +1322,7 @@ class Topic_Model_plus():
                 topic_nums = doc.path
                 for level in range(1, self.levels):
                     if use_labels == False:
-                        words = ", ".join([word[0] for word in mdl.get_topic_words(topic_nums[level], top_n=500)])
+                        words = ", ".join([word[0] for word in mdl.get_topic_words(topic_nums[level], top_n=num_words)])
                     else:
                         words = ", ".join(self.hlda_labels[attr][topic_nums[level]])
                     taxonomy_data[attr+" Level "+str(level)].append(words)

@@ -5,29 +5,6 @@ Functions for ICS-209-PLUS
 @author: srandrad
 """
 
-
-"""Analyze fire trends: see notebook
-    - frequency (count incidents 1 per year)
-    - days burning (FOD contain doy-fod discovery doy)
-    -FSR??
-    - acres burned (final acres)
-    -average structures destroyed per year"""
-
-
-"""Analyze operational trends: see notebook
-    - number of assets (total areial sum)-average or total per year
-    - number of crews (total personnel sum) - average or total per year
-    - number of organizations involved -does not seem to be available
-    -cost?
-    -injury average per year?
-    -complex??
-    -num of situation reports?? -total or average per incident per year"""
-    
-"""Extract Hazards:
-    - preprocessing from lda3
-    - apply lda or hlda
-    - words from topics = hazards
-    """
 import sys
 import os
 sys.path.append(os.path.join(".."))
@@ -35,8 +12,6 @@ sys.path.append(os.path.join(".."))
 from module.topic_model_plus_class import Topic_Model_plus
 from module.stopwords.ICS_stop_words import stop_words
     
-from module.topic_model_plus_class import Topic_Model_plus
-
 import os
 
 ICS_stop_words = stop_words
@@ -54,17 +29,20 @@ list_of_attributes = ["REMARKS", "SIGNIF_EVENTS_SUMMARY", "MAJOR_PROBLEMS"]
 document_id_col = "INCIDENT_ID"
 
 file_name = os.path.join('data','209-PLUS','ics209-plus-wildfire','ics209-plus-wildfire','ics209-plus-wf_sitreps_1999to2014.csv')
-name = os.path.join('ICS')
+name = os.path.join('ICS_bertopic')
 
 ICS = Topic_Model_plus(document_id_col=document_id_col, extra_cols=extra_cols, csv_file=file_name, list_of_attributes=list_of_attributes, database_name=name, combine_cols=True, create_ids=True)
 ICS.prepare_data(dtype=str)
+raw_text = ICS.data_df[ICS.list_of_attributes]
 save_words = ['jurisdictions', 'team', 'command', 'organization', 'type', 'involved', 'transition', 'transfer', 'impact', 'concern', 'site', 'nation', 'political', 'social', 'adjacent', 'community', 'cultural', 'tribal', 'monument', 'archeaological', 'highway', 'traffic', 'road', 'travel', 'interstate', 'closure', 'remain', 'remains', 'close', 'block', 'continue', 'impact', 'access', 'limit', 'limited', 'terrain', 'rollout', 'snag', 'steep', 'debris', 'access', 'terrian', 'concern', 'hazardous', 'pose', 'heavy', 'rugged', 'difficult', 'steep', 'narrow', 'violation', 'notification', 'respond', 'law', 'patrol', 'cattle', 'buffalo', 'grow', 'allotment', 'ranch', 'sheep', 'livestock', 'grazing', 'pasture', 'threaten', 'concern', 'risk', 'threat', 'evacuation', 'evacuate', ' threaten', 'threat', 'resident', ' residence', 'level', 'notice', 'community', 'structure', 'subdivision', 'mandatory', 'order', 'effect', 'remain', 'continue', 'issued', 'issue', 'injury', 'hospital', 'injured', 'accident', 'treatment', 'laceration', 'firefighter', 'treated', 'minor', 'report', 'transport', 'heat', 'shoulder', 'ankle', 'medical', 'released', 'military', 'unexploded', 'national', 'training', 'present', 'ordinance', 'guard', 'infrastructure', 'utility', 'powerline', 'water', 'electric', 'pipeline', 'powerlines', 'watershed', 'pole', 'power', 'gas', 'concern', 'near', 'hazard', 'critical', 'threaten', 'threat', 'off', 'weather', 'behavior', 'wind', 'thunderstorm', 'storm', 'gusty', 'lightning', 'flag', 'unpredictable', 'extreme', 'erratic', 'strong', 'red', 'warning', 'species', 'specie', 'habitat', 'animal', 'plant', 'conservation', 'threaten', 'endanger', 'threat', 'sensitive', 'threatened', 'endangered', 'risk', 'loss', 'impacts', 'unstaffed', 'resources', 'support', 'crew', 'aircraft', 'helicopter', 'engines', 'staffing', 'staff', 'lack', 'need', 'shortage', 'minimal', 'share', 'necessary', 'limited', 'limit', 'fatigue', 'flood', 'flashflood', 'flash', 'risk', 'potential', 'mapping', 'map', 'reflect', 'accurate', 'adjustment', 'change', 'reflect', 'aircraft', 'heli', 'helicopter', 'aerial', 'tanker', 'copter', 'grounded', 'ground', 'suspended', 'suspend', 'smoke', 'impact', 'hazard', 'windy', 'humidity', 'moisture', 'hot', 'drought', 'low', 'dry', 'prolonged']
+#use filtered reports
 file = os.path.join('data','summary_reports_cleaned.csv')
 filtered_df = pd.read_csv(file)
 filtered_ids = filtered_df['INCIDENT_ID'].unique()
 ICS.data_df = ICS.data_df.loc[ICS.data_df['INCIDENT_ID'].isin(filtered_ids)].reset_index(drop=True)
-ICS.preprocess_data(domain_stopwords=ICS_stop_words, ngrams=False, min_count=1, save_words=save_words)
-ICS.save_preprocessed_data()
+ICS.doc_ids = ICS.data_df['Unique IDs'].tolist()
+#ICS.preprocess_data(domain_stopwords=ICS_stop_words, ngrams=False, min_count=1, save_words=save_words)
+#ICS.save_preprocessed_data()
 
 #use filtered reports
 """
@@ -76,6 +54,14 @@ save_words = ['jurisdictions', 'team', 'command', 'organization', 'type', 'invol
 ICS.preprocess_data(domain_stopwords = ICS_stop_words, percent=0.5, ngrams=False, min_count=1, save_words=save_words)
 ICS.save_preprocessed_data()
 """
+
+#BERTopic
+#"""
+ICS.data_df[ICS.list_of_attributes] = raw_text #uses raw text
+ICS.bert_topic()
+ICS.save_bert_results()
+ICS.save_bert_vis()
+#"""
 
 """#Extract preprocessed data
 list_of_attributes = ["Combined Text"]
