@@ -60,6 +60,8 @@ ICS.save_preprocessed_data()
 ICS.data_df[ICS.list_of_attributes] = raw_text #uses raw text
 ICS.bert_topic()
 ICS.save_bert_results()
+#get coherence
+#coh = ICS.get_bert_coherence(coh_method='c_v')
 ICS.save_bert_vis()
 #"""
 

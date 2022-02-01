@@ -25,6 +25,8 @@ from symspellpy import SymSpell, Verbosity
 import pkg_resources
 from bertopic import BERTopic
 from sentence_transformers import SentenceTransformer
+import gensim.corpora as corpora
+from gensim.models.coherencemodel import CoherenceModel
 
 class Topic_Model_plus():
     """
@@ -492,6 +494,65 @@ class Topic_Model_plus():
         check_for_ngrams()
         #print("Preprocessed data extracted from: ", file_name)
     
+    def get_bert_coherence(self, coh_method='u_mass'):
+        self.BERT_coherence = {}
+        for attr in self.list_of_attributes:
+            docs = self.data_df[attr].tolist()
+            topics = self.BERT_model_topics_per_doc[attr]
+            topic_model = self.BERT_models[attr]
+            self.BERT_coherence[attr] = self.calc_bert_coherence(docs, topics, topic_model, method=coh_method)
+            
+    def calc_bert_coherence(self, docs, topics, topic_model, method = 'u_mass'):
+        # Preprocess Documents
+        documents = pd.DataFrame({"Document": docs,
+                                  "ID": range(len(docs)),
+                                  "Topic": topics})
+        documents_per_topic = documents.groupby(['Topic'], as_index=False).agg({'Document': ' '.join})
+        cleaned_docs = topic_model._preprocess_text(documents_per_topic.Document.values)
+
+        # Extract vectorizer and analyzer from BERTopic
+        vectorizer = topic_model.vectorizer_model
+        analyzer = vectorizer.build_analyzer()
+
+        # Extract features for Topic Coherence evaluation
+        words = vectorizer.get_feature_names()
+        tokens = [analyzer(doc) for doc in cleaned_docs]
+        dictionary = corpora.Dictionary(tokens)
+        corpus = [dictionary.doc2bow(token) for token in tokens]
+        topic_words = [[words for words, _ in topic_model.get_topic(topic)]
+                       for topic in range(len(set(topics))-1)]
+
+        # Evaluate
+        coherence_model = CoherenceModel(topics=topic_words,
+                                         texts=tokens,
+                                         corpus=corpus,
+                                         dictionary=dictionary,
+                                         coherence=method)
+        coherence_per_topic = coherence_model.get_coherence_per_topic()
+        return coherence_per_topic
+    
+    def save_bert_coherence(self, return_df=False, coh_method='u_mass'):
+        self.get_bert_coherence(coh_method)
+        self.__create_folder()
+        max_topics = max([len(self.BERT_models[attr].topics) for attr in self.BERT_models])
+        coherence_score = {"topic numbers": ["average score"]+['std dev']+[i for i in range(0,max_topics)]}
+        for attr in self.list_of_attributes:
+            coherence_score[attr] = []
+            c_scores = self.BERT_coherence[attr]
+            average_coherence = np.average(c_scores)
+            coherence_score[attr].append(average_coherence)
+            std_coherence = np.std(c_scores)
+            coherence_score[attr].append(std_coherence)
+            coherence_per_topic = c_scores
+            for i in range(0, (max_topics-len(coherence_per_topic))):
+                coherence_per_topic.append("n/a")
+            coherence_score[attr] += coherence_per_topic
+        coherence_df = pd.DataFrame(coherence_score)
+        if return_df == True:
+            return coherence_df
+        coherence_df.to_csv(os.path.join(self.folder_path,"BERT_coherence.csv"))
+        
+        
     def bert_topic(self, sentence_transformer_model='all-MiniLM-L6-v2', umap=None, count_vectorizor=None, ngram_range=(1,3), BERTkwargs={}):
         self.sentence_models = {}; self.embeddings = {}; self.BERT_models = {}
         self.BERT_model_topics_per_doc = {}
@@ -507,7 +568,7 @@ class Topic_Model_plus():
             self.BERT_models[attr] = topic_model
             self.BERT_model_topics_per_doc[attr] = topics
     
-    def save_bert_topics(self, return_df=False, p_thres=0.001):
+    def save_bert_topics(self, return_df=False, p_thres=0.001, coherence=False, coh_method='u_mass'):
         """
         saves bert topics to file
         """
@@ -525,7 +586,12 @@ class Topic_Model_plus():
                            "best documents": [],
                            #"coherence": [],
                            "documents": []}
-            #topics_data["coherence"] = self.BERT_coherence[attr]["per topic"]
+            if coherence == True: 
+                try:
+                    topics_data["coherence"] = self.BERT_coherence[attr]
+                except:
+                    self.get_bert_coherence(coh_method)
+                    topics_data["coherence"] = self.BERT_coherence[attr]
             for k in mdl.topics:
                 topics_data["topic number"].append(k)
                 topics_data["number of words"].append(len(mdl.get_topic(k)))
@@ -587,17 +653,17 @@ class Topic_Model_plus():
             return doc_df
         doc_df.to_csv(os.path.join(self.folder_path,"bert_topic_dist_per_doc.csv"))
         
-    def save_bert_results(self):
+    def save_bert_results(self, coherence=False, coh_method='u_mass'):
         """
         saves the taxonomy, coherence, and document topic distribution in one excel file
         """
         
         self.__create_folder()
         data = {}
-        topics_dict = self.save_bert_topics(return_df=True)
+        topics_dict = self.save_bert_topics(return_df=True, coherence=coherence, coh_method=coh_method)
         data.update(topics_dict)
         data["taxonomy"] = self.save_bert_taxonomy(return_df=True)
-        #data["coherence"] = self.save_bert_coherence(return_df=True)
+        if coherence == True: data["coherence"] = self.save_bert_coherence(return_df=True, coh_method=coh_method)
         data["document topic distribution"] = self.save_bert_document_topic_distribution(return_df=True)
         with pd.ExcelWriter(os.path.join(self.folder_path,'BERTopic_results.xlsx')) as writer2:
             for results in data:
