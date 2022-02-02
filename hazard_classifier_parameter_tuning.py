@@ -106,7 +106,7 @@ y_train_inputs = [ytrain[targets], ytrain[targets], ytrain[targets]]
 X_test_inputs = [test[meta_predictors], Xtest_vec, test[predictors]]
 y_test_inputs = [ytest[targets], ytest[targets], ytest[targets]]
 #models
-models = {'knn':KNeighborsClassifier, "svm":SVC, 
+models = {#'knn':KNeighborsClassifier, "svm":SVC, 
           "decision tree":DecisionTreeClassifier, "random forest":RandomForestClassifier, 
         "logisitc regression":LogisticRegression, "mlp":MLPClassifier, 
         'ridge':RidgeClassifier,'xgboost':XGBClassifier, 'adaboost':AdaBoostClassifier}
