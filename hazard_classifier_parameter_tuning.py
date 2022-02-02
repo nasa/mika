@@ -66,10 +66,6 @@ val.columns = val.columns.astype(str)
 test = pd.concat([test_data, Xtest_vec], axis=1)
 test.columns = test.columns.astype(str)
 
-ytrain['powerlabel'] = ytrain.apply(lambda x : sum([(2**i)*x[targets[i]] for i in range(len(targets))]),axis=1)
-yval['powerlabel'] = yval.apply(lambda x : sum([(2**i)*x[targets[i]] for i in range(len(targets))]),axis=1)
-ytest['powerlabel'] = ytest.apply(lambda x : sum([(2**i)*x[targets[i]] for i in range(len(targets))]),axis=1)
-
 #hyper parameter optimization
 def hyper_parameter_optimization(params, Xtrain, ytrain, Xtest, ytest, multilabel_func=None, classifier=None):
     best_params = {}
@@ -83,7 +79,7 @@ def hyper_parameter_optimization(params, Xtrain, ytrain, Xtest, ytest, multilabe
             test_params = {param:val}
             test_params.update(best_params)
             if multilabel_func is not None:
-                clf = multilabel_func(classifier(**test_params), n_jobs=-1)
+                clf = multilabel_func(classifier(**test_params))#, n_jobs=-1)
             else:
                 clf = classifier(**test_params)
             clf.fit(Xtrain, ytrain)
@@ -155,6 +151,7 @@ ovr_params_df.to_excel(file, sheet_name="One Vs Rest (BR)")
 ovr_params_df.to_csv(os.path.join('results','hazard_classification_model_BR_params.csv'))
 
 #Classifier Chain
+"""
 cc_mdls = {model_name:[] for model_name in models}; best_cc_params = {model_name:[] for model_name in models}
 cc_model_params = ovr_model_params.copy()
 
@@ -174,8 +171,14 @@ with pd.ExcelWriter(file, engine='openpyxl', mode='a') as writer:
     cc_params_df.to_excel(writer, sheet_name="Classifier Chains (CC)")
 
 cc_params_df.to_csv(os.path.join('results','hazard_classification_model_CC_params.csv'))
-
+"""
 #Label Powerset method
+"""
+
+ytrain['powerlabel'] = ytrain.apply(lambda x : sum([(2**i)*x[targets[i]] for i in range(len(targets))]),axis=1)
+yval['powerlabel'] = yval.apply(lambda x : sum([(2**i)*x[targets[i]] for i in range(len(targets))]),axis=1)
+ytest['powerlabel'] = ytest.apply(lambda x : sum([(2**i)*x[targets[i]] for i in range(len(targets))]),axis=1)
+
 lp_mdls = {model_name:[] for model_name in models}; best_lp_params = {model_name:[] for model_name in models}
 lp_model_params = ovr_model_params.copy()
 
@@ -194,3 +197,4 @@ lp_params_df = pd.DataFrame(best_lp_params, index=input_types)
 with pd.ExcelWriter(file, engine='openpyxl', mode='a') as writer:  
     lp_params_df.to_excel(writer, sheet_name="Label Powerset (LP)")
 lp_params_df.to_csv(os.path.join('results','hazard_classification_model_LP_params.csv'))
+"""
