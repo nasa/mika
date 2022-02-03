@@ -107,7 +107,8 @@ X_test_inputs = [test[meta_predictors], Xtest_vec, test[predictors]]
 y_test_inputs = [ytest[targets], ytest[targets], ytest[targets]]
 #models
 models = {#'knn':KNeighborsClassifier, "svm":SVC, 
-          "decision tree":DecisionTreeClassifier, "random forest":RandomForestClassifier, 
+          #"decision tree":DecisionTreeClassifier, 
+          #"random forest":RandomForestClassifier, 
         "logisitc regression":LogisticRegression, "mlp":MLPClassifier, 
         'ridge':RidgeClassifier,'xgboost':XGBClassifier, 'adaboost':AdaBoostClassifier}
 #OneVsRest
@@ -135,8 +136,10 @@ ovr_model_params = {'knn':{'n_neighbors': [10, 50]+[i for i in range(55,1055,100
                              'n_estimators':[i for i in range(50, 550, 50)],
                              'learning_rate':[1*((10)**(i)) for i in range(-4,2,1)]}}
 for model_name in tqdm(models):
-    for i in range(len(input_types)):
-        
+    if model_name == "random forest": start=1
+    else: start = 0
+    for i in range(start, len(input_types)):
+    
         if model_name == 'adaboost':
             ovr_model_params['adaboost']['base_estimator'] = [None, one_v_rest_mdls['decision tree'][i]]
     
