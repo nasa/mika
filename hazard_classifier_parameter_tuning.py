@@ -113,6 +113,7 @@ models = {#'knn':KNeighborsClassifier, "svm":SVC,
         'ridge':RidgeClassifier,'xgboost':XGBClassifier, 'adaboost':AdaBoostClassifier}
 #OneVsRest
 one_v_rest_mdls = {model_name:[] for model_name in models}; best_ovr_params = {model_name:[] for model_name in models}
+one_v_rest_mdls['decision tree'] = [{'criterion':'gini', 'max_features':'auto', 'class_weight':'balanced', 'splitter':'best'}, {'criterion':'entropy', 'max_features':'auto', 'class_weight':'balanced', 'splitter':'best'}, {'criterion':'entropy', 'max_features':'sqrt', 'class_weight':'balanced', 'splitter':'best'}]
 ovr_model_params = {'knn':{'n_neighbors': [10, 50]+[i for i in range(55,1055,100)],
                        'weights':['uniform', 'distance'],'p':[1,2]}, 
                 "svm":{'C': [1*(10**i) for i in range(-3,2,1)],'class_weight':[None, "balanced"],
@@ -135,6 +136,7 @@ ovr_model_params = {'knn':{'n_neighbors': [10, 50]+[i for i in range(55,1055,100
                 'adaboost': {'base_estimator':[None, one_v_rest_mdls['decision tree']],
                              'n_estimators':[i for i in range(50, 550, 50)],
                              'learning_rate':[1*((10)**(i)) for i in range(-4,2,1)]}}
+
 for model_name in tqdm(models):
     if model_name == "random forest": start=1
     else: start = 0
