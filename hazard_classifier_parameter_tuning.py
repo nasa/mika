@@ -144,6 +144,7 @@ for model_name in tqdm(models):
                                                              multilabel_func=OneVsRestClassifier, classifier=models[model_name])
         one_v_rest_mdls[model_name].append(best_mdl)
         best_ovr_params[model_name].append(best_params)
+        print(best_params)
 
 ovr_params_df = pd.DataFrame(best_ovr_params, index=input_types)
 file = os.path.join('results','hazard_classification_model_params.xlsx')
