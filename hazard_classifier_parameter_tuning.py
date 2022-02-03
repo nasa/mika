@@ -124,7 +124,7 @@ ovr_model_params = {'knn':{'n_neighbors': [10, 50]+[i for i in range(55,1055,100
                                  'class_weight':[None, "balanced"], 'n_estimators':[i for i in range(50, 550, 50)]}, 
                 "logisitc regression":{'max_iter':[10000],'multi_class':['ovr'],
                                        'solver':['newton-cg', 'lbfgs', 'sag', 'saga'],
-                                       'C': [i for i in range(1,11,1)],
+                                       'C': [10**i for i in range(-3,0)]+[i for i in range(1,11,1)],
                                        'class_weight':[None, "balanced"]}, 
                 "mlp":{'max_iter':[10000],'alpha': [1*((10)**(i)) for i in range(-4,3,1)],
                        'learning_rate':['constant', 'invscaling', 'adaptive'],
