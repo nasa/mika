@@ -109,7 +109,7 @@ y_test_inputs = [ytest[targets], ytest[targets], ytest[targets]]
 models = {#'knn':KNeighborsClassifier, "svm":SVC, 
           #"decision tree":DecisionTreeClassifier, 
           #"random forest":RandomForestClassifier, 
-        "logisitc regression":LogisticRegression, "mlp":MLPClassifier, 
+        #"logisitc regression":LogisticRegression, "mlp":MLPClassifier, 
         'ridge':RidgeClassifier,'xgboost':XGBClassifier, 'adaboost':AdaBoostClassifier}
 #OneVsRest
 one_v_rest_mdls = {model_name:[] for model_name in models}; best_ovr_params = {model_name:[] for model_name in models}
