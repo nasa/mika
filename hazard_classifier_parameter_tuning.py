@@ -55,6 +55,7 @@ ytest = test_data[targets]
 
 #embed = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
 vec_cols = [col for col in train_data.columns if col not in targets+meta_predictors+['INCIDENT_ID']]
+#print(vec_cols)
 Xtrain_vec = train_data[vec_cols]#embed(Xtrain)
 Xval_vec = val_data[vec_cols]#embed(Xval)
 Xtest_vec = test_data[vec_cols]#embed(Xtest)
@@ -74,6 +75,9 @@ test.columns = test.columns.astype(str)
 def hyper_parameter_optimization(params, Xtrain, ytrain, Xtest, ytest, multilabel_func=None, classifier=None):
     best_params = {}
     for param in tqdm(params):
+        if len(params[param]) == 1:
+            best_params[param] = params[param][0]
+            continue
         test_hamming_loss = []; train_hamming_loss = []
         test_acc = []; train_acc = []
         test_f1 = []; train_f1 = []
@@ -114,7 +118,8 @@ models = {#'knn':KNeighborsClassifier, "svm":SVC,
           #"decision tree":DecisionTreeClassifier, 
           #"random forest":RandomForestClassifier, 
         #"logisitc regression":LogisticRegression, "mlp":MLPClassifier, 
-        'ridge':RidgeClassifier,'xgboost':XGBClassifier, 'adaboost':AdaBoostClassifier}
+        #'ridge':RidgeClassifier,
+        'xgboost':XGBClassifier, 'adaboost':AdaBoostClassifier}
 #OneVsRest
 one_v_rest_mdls = {model_name:[] for model_name in models}; best_ovr_params = {model_name:[] for model_name in models}
 one_v_rest_mdls['decision tree'] = [{'criterion':'gini', 'max_features':'auto', 'class_weight':'balanced', 'splitter':'best'}, {'criterion':'entropy', 'max_features':'auto', 'class_weight':'balanced', 'splitter':'best'}, {'criterion':'entropy', 'max_features':'sqrt', 'class_weight':'balanced', 'splitter':'best'}]
@@ -135,7 +140,7 @@ ovr_model_params = {'knn':{'n_neighbors': [10, 50]+[i for i in range(55,1055,100
                        'hidden_layer_sizes':[(50,), (50,50), (50,50,50), (100,), (100,100), (100,100,100)]}, 
                 'ridge':{'alpha': [1*((10)**(i)) for i in range(-4,3,1)],
                          'class_weight':[None, "balanced"]},
-                'xgboost':{'max_depth':[None]+[i for i in range(3,25)],
+                'xgboost':{'eval_metric':['logloss'], 'use_label_encoder':[False], 'max_depth':[None]+[i for i in range(3,25)],
                            'booster': ['gbtree', 'gblinear', 'dart'], 'n_estimators': [i for i in range(100, 500, 25)]}, 
                 'adaboost': {'base_estimator':[None, one_v_rest_mdls['decision tree']],
                              'n_estimators':[i for i in range(50, 550, 50)],
@@ -143,6 +148,7 @@ ovr_model_params = {'knn':{'n_neighbors': [10, 50]+[i for i in range(55,1055,100
 
 for model_name in tqdm(models):
     if model_name == "random forest": start=1
+    elif model_name == 'xgboost': start=1
     else: start = 0
     for i in range(start, len(input_types)):
     
