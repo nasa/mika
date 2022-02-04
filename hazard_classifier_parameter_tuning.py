@@ -22,13 +22,13 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, hamming_loss
 from sklearn.preprocessing import MinMaxScaler
-import tensorflow_hub as hub
+#import tensorflow_hub as hub
 
 
 #import data
-test_data = pd.read_csv(os.path.join('data','ICS_predictive_sitreps_full_test.csv')).drop(["Unnamed: 0"], axis=1)
-train_data = pd.read_csv(os.path.join('data','ICS_predictive_sitreps_full_train.csv')).drop(["Unnamed: 0"], axis=1)
-val_data = pd.read_csv(os.path.join('data','ICS_predictive_sitreps_full_val.csv')).drop(["Unnamed: 0"], axis=1)
+test_data = pd.read_csv(os.path.join('data',"ICS_test_sitreps_preprocessed.csv")).drop(["Unnamed: 0"], axis=1)
+train_data = pd.read_csv(os.path.join('data',"ICS_train_sitreps_preprocessed.csv")).drop(["Unnamed: 0"], axis=1)
+val_data = pd.read_csv(os.path.join('data',"ICS_val_sitreps_preprocessed.csv")).drop(["Unnamed: 0"], axis=1)
 
 meta_predictors = ["TOTAL_PERSONNEL", "TOTAL_AERIAL", "PCT_CONTAINED_COMPLETED",
               "ACRES",  "WF_FSR", "INJURIES", "FATALITIES", "EST_IM_COST_TO_DATE", "STR_DAMAGED",
@@ -50,14 +50,15 @@ Xval = val_data['Raw_Combined_Text']; yval = val_data[targets]
 Xtest = test_data['Raw_Combined_Text']; ytest = test_data[targets]
 
 
-embed = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
-Xtrain_vec = embed(Xtrain)
-Xval_vec = embed(Xval)
-Xtest_vec = embed(Xtest)
-scaler = MinMaxScaler()
-Xtrain_vec = pd.DataFrame(scaler.fit_transform(Xtrain_vec))
-Xval_vec = pd.DataFrame(scaler.fit_transform(Xval_vec))
-Xtest_vec = pd.DataFrame(scaler.fit_transform(Xtest_vec))
+#embed = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
+vec_cols = [col for col in train_data.columns if col not in targets+meta_predictors+['INCIDENT_ID']]
+Xtrain_vec = train_data[vec_cols]#embed(Xtrain)
+Xval_vec = val_data[vec_cols]#embed(Xval)
+Xtest_vec = test_data[vec_cols]#embed(Xtest)
+#scaler = MinMaxScaler()
+#Xtrain_vec = pd.DataFrame(scaler.fit_transform(Xtrain_vec))
+#Xval_vec = pd.DataFrame(scaler.fit_transform(Xval_vec))
+#Xtest_vec = pd.DataFrame(scaler.fit_transform(Xtest_vec))
 predictors = meta_predictors + [str(c) for c in Xtrain_vec.columns]
 train = pd.concat([train_data, Xtrain_vec], axis=1)
 train.columns = train.columns.astype(str)
