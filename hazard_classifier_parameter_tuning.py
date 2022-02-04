@@ -45,9 +45,12 @@ targets = ["Traffic","Command_Transitions","Evacuations", "Inaccurate_Mapping", 
            "Infrastructure", "Extreme_Weather", "Ecological", "Hazardous_Terrain", "Floods", "Dry_Weather"]
 
 #prepare data
-Xtrain = train_data['Raw_Combined_Text']; ytrain = train_data[targets]
-Xval = val_data['Raw_Combined_Text']; yval = val_data[targets]
-Xtest = test_data['Raw_Combined_Text']; ytest = test_data[targets]
+#Xtrain = train_data['Raw_Combined_Text']; 
+ytrain = train_data[targets]
+#Xval = val_data['Raw_Combined_Text']; 
+yval = val_data[targets]
+#Xtest = test_data['Raw_Combined_Text']; 
+ytest = test_data[targets]
 
 
 #embed = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
