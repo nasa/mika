@@ -26,9 +26,9 @@ from sklearn.preprocessing import MinMaxScaler
 
 
 #import data
-test_data = pd.read_csv(os.path.join('data',"ICS_test_sitreps_preprocessed.csv")).drop(["Unnamed: 0"], axis=1)
-train_data = pd.read_csv(os.path.join('data',"ICS_train_sitreps_preprocessed.csv")).drop(["Unnamed: 0"], axis=1)
-val_data = pd.read_csv(os.path.join('data',"ICS_val_sitreps_preprocessed.csv")).drop(["Unnamed: 0"], axis=1)
+test_data = pd.read_csv(os.path.join('data','ICS_data',"ICS_test_sitreps_preprocessed.csv")).drop(["Unnamed: 0"], axis=1)
+train_data = pd.read_csv(os.path.join('data','ICS_data',"ICS_train_sitreps_preprocessed.csv")).drop(["Unnamed: 0"], axis=1)
+val_data = pd.read_csv(os.path.join('data','ICS_data',"ICS_val_sitreps_preprocessed.csv")).drop(["Unnamed: 0"], axis=1)
 
 meta_predictors = ["TOTAL_PERSONNEL", "TOTAL_AERIAL", "PCT_CONTAINED_COMPLETED",
               "ACRES",  "WF_FSR", "INJURIES", "FATALITIES", "EST_IM_COST_TO_DATE", "STR_DAMAGED",

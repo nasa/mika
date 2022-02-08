@@ -22,7 +22,7 @@ incident_summary_df = incident_summary_df.drop("Unnamed: 0", axis=1)
 incident_summary_df = incident_summary_df.loc[incident_summary_df["START_YEAR"]>=2006].reset_index(drop=True)
 print(len(incident_summary_df))
 
-preprocessed_file = os.path.join('data',"ICS_sitreps.csv")
+preprocessed_file = os.path.join('data','ICS_data',"ICS_sitreps.csv")
 sitrep_df = pd.read_csv(preprocessed_file)
 sitrep_df = sitrep_df.loc[sitrep_df["START_YEAR"]>2005].reset_index(drop=True)
 print(len(sitrep_df))
@@ -120,8 +120,8 @@ total_ids = [id_ for id_ in sitrep_ids if id_ not in fire_ids_to_drop]
 incident_summary_df = incident_summary_df.loc[incident_summary_df['INCIDENT_ID'].isin(total_ids)].reset_index(drop=True)
 sitrep_df = sitrep_df.loc[sitrep_df['INCIDENT_ID'].isin(total_ids)].reset_index(drop=True)
 
-sitrep_df.to_csv(os.path.join('data',"ICS_sitreps_clean.csv"))
-incident_summary_df.to_csv(os.path.join('data','summary_reports_cleaned2.csv'))
+sitrep_df.to_csv(os.path.join('data','ICS_data',"ICS_sitreps_clean.csv"))
+incident_summary_df.to_csv(os.path.join('data','ICS_data','summary_reports_cleaned2.csv'))
 
 print(len(incident_summary_df),len(sitrep_df))
 print(len([id_ for id_ in sitrep_df["INCIDENT_ID"].unique() if id_ in incident_summary_df["INCIDENT_ID"].unique()]))
