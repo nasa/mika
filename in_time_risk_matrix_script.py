@@ -26,7 +26,7 @@ severity_x_cols = ['TOTAL_AERIAL', 'TOTAL_PERSONNEL', 'WF_FSR', 'DAYS_BURING', '
        'Incident_region_NWCC', 'Incident_region_RMCC', 'Incident_region_SACC',
        'Incident_region_SWCC']
 
-severity_model = os.path.join(os.path.dirname(os.getcwd()),'smart_nlp','models','severity_model_test.sav')
+severity_model = os.path.join(os.path.dirname(os.getcwd()),'smart_nlp','models','severity_model_xGB.sav')
 rm.load_model(model_location=[severity_model], model_type="severity", model_inputs=[severity_x_cols])
 text_input = ['Raw_Combined_Text']
 meta_inputs = ["TOTAL_PERSONNEL", "TOTAL_AERIAL", "PCT_CONTAINED_COMPLETED",
@@ -38,18 +38,20 @@ meta_inputs = ["TOTAL_PERSONNEL", "TOTAL_AERIAL", "PCT_CONTAINED_COMPLETED",
               'Incident_region_SWCC', 'INC_MGMT_ORG_ABBREV_1', 'INC_MGMT_ORG_ABBREV_2','INC_MGMT_ORG_ABBREV_3', 
               'INC_MGMT_ORG_ABBREV_4','INC_MGMT_ORG_ABBREV_5', 'INC_MGMT_ORG_ABBREV_B','INC_MGMT_ORG_ABBREV_C', 
               'INC_MGMT_ORG_ABBREV_D','INC_MGMT_ORG_ABBREV_E', 'INC_MGMT_ORG_ABBREV_F']
-input_reports = pd.read_csv(os.path.join(os.path.dirname(os.getcwd()),'smart_nlp','data','ICS_predictive_sitreps_full_val.csv')).drop(["Unnamed: 0"], axis=1)
+input_reports = pd.read_csv(os.path.join(os.path.dirname(os.getcwd()),'smart_nlp','data','ICS_val_sitreps_preprocessed.csv')).drop(["Unnamed: 0"], axis=1)
 input_reports = input_reports.loc[input_reports['INCIDENT_ID']=='2012_CA-NEU-15060_ROBBERS'].reset_index(drop=True)
+#print(input_reports)
+#input_reports = input_reports.drop([i for i in range(len(input_reports)) if i not in [0,9]]).reset_index(drop=True) #only the 1st and 10th reports
+#CB model
+model_location = os.path.join(os.path.dirname(os.getcwd()),'smart_nlp','models','hazard_model_CB.sav')
+model_inputs = [col for col in input_reports.columns if col not in hazards+['INCIDENT_ID', 'Unique_IDs']]
+rm.load_model(model_location=[model_location], model_type="likelihood", model_inputs=[model_inputs],NN=False)
+rm.build_risk_matrix(input_reports, figsize=(10,5), clean=False, vectorize=False, model_type="likelihood", nlp_model_number=0, save=True, id_col='Unique_IDs')
+dynamic_kwargs = {"clean":False, "vectorize":False, "model_type":"likelihood", 
+                   "nlp_model_number":0}
 
-#USE model
-model_location = os.path.join(os.path.dirname(os.getcwd()),'smart_nlp','models','USE_hazard_classification_model')
-model_inputs = {'USE_input':['Raw_Combined_Text'], 'meta_input':meta_inputs}
-rm.load_model(model_location=[model_location], model_type="likelihood", model_inputs=[model_inputs],NN=True)
-rm.build_risk_matrix(input_reports, clean=False, vectorize=False, target='Raw_Combined_Text', model_type="likelihood", nlp_model_type="USE", nlp_model_number=0)
-dynamic_kwargs = {"clean":False, "vectorize":False, "target":'Raw_Combined_Text', "model_type":"likelihood", 
-                  "nlp_model_type":"USE", "nlp_model_number":0}
 #Static RM
-#"""
+"""
 document_id_col = "INCIDENT_ID"
 extra_cols = severity_x_cols + meta_inputs
 list_of_attributes = ["Combined_Text"]
@@ -65,22 +67,28 @@ severity_total, severity_table = calc_severity(fires, summary_reports, rm_outlie
 
 probs_df = rm.calc_static_likelihoods(frequency_fires, total_fires=len(summary_reports))
 severity_df = rm.calc_static_severity(severity_table)
-rm.build_static_risk_matrix(severity_df, probs_df)
+#rm.build_static_risk_matrix(severity_df, probs_df, figsize=(10,5))
 
-#rates_df = rm.calc_static_likelihoods_rates(frequency_fires)
-#rm.build_static_risk_matrix(severity_df, rates_df, rates=True)
-#"""
+rates_df = rm.calc_static_likelihoods_rates(frequency_fires)
+rm.build_static_risk_matrix(severity_df, rates_df, rates=True, save=True,  figsize=(10,5))
+"""
 
 #Compare solution efficacy
-#"""
+"""
+val =  pd.read_csv(os.path.join(os.path.dirname(os.getcwd()),'smart_nlp','data','ICS_val_sitreps_preprocessed.csv')).drop(["Unnamed: 0"], axis=1)
+train =  pd.read_csv(os.path.join(os.path.dirname(os.getcwd()),'smart_nlp','data','ICS_test_sitreps_preprocessed.csv')).drop(["Unnamed: 0"], axis=1)
+test =  pd.read_csv(os.path.join(os.path.dirname(os.getcwd()),'smart_nlp','data','ICS_train_sitreps_preprocessed.csv')).drop(["Unnamed: 0"], axis=1)
+preprocessed_df = pd.concat([val, train, test]).reset_index(drop=True)
 dynamic_kwargs['clean'] = False #preprocessed_df is already cleaned 
 percent_same, results_df = rm.compare_results(preprocessed_df, dynamic_kwargs=dynamic_kwargs, rate=False)
 print("For %", 100*percent_same, " of situation reports the dyanmic risk matrix is the static risk matrix")
 print(results_df)
+results_df.to_csv("dynamic_static_comparison.csv")
 #with rates
 rates_df = rm.calc_static_likelihoods_rates(frequency_fires)
-rm.build_static_risk_matrix(severity_df, rates_df, rates=True)
+rm.build_static_risk_matrix(severity_df, rates_df, rates=True,figsize=(10,5))
 percent_same, results_df = rm.compare_results(preprocessed_df, dynamic_kwargs=dynamic_kwargs, rate=False)
 print("For %", 100*percent_same, " of situation reports the dyanmic risk matrix is the static risk matrix build using rates")
 print(results_df)
-#"""
+results_df.to_csv("dynamic_static_rates_comparison.csv")
+"""

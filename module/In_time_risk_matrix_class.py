@@ -14,6 +14,10 @@ from tqdm import tqdm
 from tensorflow.keras import preprocessing as kprocessing
 from tensorflow.keras import models
 from sklearn.metrics import hamming_loss
+import tensorflow_addons as tfa
+Hamming_loss=tfa.metrics.HammingLoss(mode='multilabel', threshold=0.6)
+import os
+
 #TODO: remove old sbert and word2vec functionality
 class In_Time_Risk_Matrix():
     def __init__(self, num_severity_models=1, num_likelihood_models=1, hazards=[]):
@@ -35,7 +39,8 @@ class In_Time_Risk_Matrix():
             likelihood or severity. The default is None.
         model_inputs : list of lists/dict, optional
             list of lists.dict of model predictors. The default is [].
-            
+        NN : boolean, optional
+            True if using a neural network, false if not
         Returns
         -------
         None.
@@ -53,7 +58,8 @@ class In_Time_Risk_Matrix():
                         setattr(self, str(model_type)+'_model_'+str(i), pickle.load(open(model_location[i], 'rb')))
                         setattr(self, str(model_type)+'_model_inputs_'+str(i), model_inputs[i])
                     else:
-                        setattr(self, str(model_type)+'_model_'+str(i), models.load_model(model_location[i], custom_objects={'Hamming_loss':hamming_loss}))
+                        setattr(self, str(model_type)+'_model_'+str(i), models.load_model(model_location[i], custom_objects={'Hamming_loss':Hamming_loss}, compile=False))
+                        
                         setattr(self, str(model_type)+'_model_inputs_'+str(i), model_inputs[i])
     
     def load_nlp_model(self, model_location=[], model_type=None, model_number=[], model_input=[]):
@@ -72,7 +78,8 @@ class In_Time_Risk_Matrix():
         model_number : List, optional
             the model number for tfidf, model type (bigram/trigram/tokenizer) for word2vec.
             The default is [].
-
+        model_input: List, optional
+            The model inputs for the nlp model (preprocessed or raw usually)
         Returns
         -------
         None.
@@ -199,6 +206,7 @@ class In_Time_Risk_Matrix():
         """
         for i in range(self.likelihood_model_count):
             mdl = getattr(self, 'likelihood_model_'+str(i))
+            if self.NN: mdl.compile()
             if i == 0:
                 if self.NN:
                     x = {input_key: report_df[getattr(self, 'likelihood_model_inputs_'+str(i))[input_key]] for input_key in getattr(self, 'likelihood_model_inputs_'+str(i))}
@@ -207,10 +215,11 @@ class In_Time_Risk_Matrix():
                         if type(x[key].iloc[0][0]) is not str:
                             x[key] = np.array(x[key]).astype('float32')
                     probs = mdl.predict(x)
+                    print(probs)
                 elif self.bert:
                     probs = mdl.predict(report_df[getattr(self, 'likelihood_model_inputs_'+str(i))].values[0].reshape(1,-1))
                 else: 
-                    probs = mdl.predict_proba(report_df[getattr(self, 'likelihood_model_inputs_'+str(i))].values.reshape(1,-1))
+                    probs = mdl.predict_proba(report_df[getattr(self, 'likelihood_model_inputs_'+str(i))].values)
                 probs_df = pd.DataFrame(probs, columns=self.hazards)
             if i>0:
                 input_df = pd.concat([report_df[getattr(self, 'likelihood_model_inputs_'+str(i))], probs_df])
@@ -241,22 +250,25 @@ class In_Time_Risk_Matrix():
             report_df = pd.DataFrame(columns=new_df.columns)
             for hazard in self.hazards: #for each hazard, we set the input value at the hazard=1
                 indices.append((i,hazard))
-                temp_input = new_df.loc[i][:].copy()
+                temp_input = new_df.loc[i][:]#.copy()
                 temp_input.at[hazard] = 1
+               
                 for other_hazard in self.hazards:
                     if other_hazard != hazard:
                         temp_input.at[other_hazard] = 0 #and set the input value at all other hazards=0 -> thus we assume only the selected hazard is occuring
+                
                 report_df = report_df.append(temp_input, ignore_index=True)
             dfs.append(report_df)
+            
         new_reports = pd.concat(dfs, ignore_index=True)
         new_reports.index = pd.MultiIndex.from_tuples(indices, names=["index", "hazard"])
-        preds = np.around(self.severity_model_0.predict(new_reports[self.severity_model_inputs_0]))
+        preds = np.around(self.severity_model_0.predict(new_reports[self.severity_model_inputs_0].astype(float)))
         preds_df = pd.DataFrame(preds, index=pd.MultiIndex.from_tuples(indices, names=["index", "hazard"]))
         preds_dfs = []
         for i in range(len(reports)):
             severities = {}
             for hazard in self.hazards:
-                severities[hazard] = preds_df.loc[(i,hazard)][:]
+                severities[hazard] = preds_df.loc[(i,hazard)][:].values
             preds_dfs.append(pd.DataFrame(severities, 
                                 index=['Diff_Injuries', 'Diff_Structures_Damages', 
                                          'Diff_Structures_Destroyed','Diff_Fatalities']))
@@ -290,19 +302,20 @@ class In_Time_Risk_Matrix():
         else:
             print("Error: must input a report or a dataframe of hazard likelihoods")
             return
+        print(probs_df)
         for i in range(len(probs_df)):
             curr_likelihoods = {hazard:0 for hazard in self.hazards}
             for hazard in self.hazards:
                 p = probs_df.at[i, hazard]
-                if p>=0.5:
+                if p>=0.8:
                     likelihood = 'Highly Likely'
-                elif p>=0.05 and p<0.5:
+                elif p>=0.3 and p<0.8:
                     likelihood = 'Likely'
-                elif p>=0.005 and p<0.05:
+                elif p>=0.05 and p<0.3:
                     likelihood = 'Possible'
-                elif p>=0.0005 and p<0.005:
+                elif p>=0.005 and p<0.05:
                     likelihood = 'Improbable'
-                elif p<0.0005:
+                elif p<0.005:
                     likelihood = 'Extremely Improbable'
                 curr_likelihoods[hazard] = likelihood
             self.curr_likelihoods.append(curr_likelihoods)
@@ -335,6 +348,7 @@ class In_Time_Risk_Matrix():
             return
         for preds_df in preds_dfs:
             curr_severities = {}
+            print(preds_df)
             for hazard in self.hazards: 
                  injuries = preds_df.at['Diff_Injuries',hazard]
                  str_dam = preds_df.at['Diff_Structures_Damages', hazard]
@@ -354,7 +368,7 @@ class In_Time_Risk_Matrix():
                  curr_severities[hazard] = impact
             self.curr_severities.append(curr_severities) 
         
-    def build_risk_matrix(self, input_reports, clean=False, vectorize=False, condense_text=True, target=None, model_type=None, nlp_model_type=None, nlp_model_number=None,figsize=(9,5), show=True):
+    def build_risk_matrix(self, input_reports, clean=False, vectorize=False, condense_text=True, target=None, model_type=None, nlp_model_type=None, nlp_model_number=None,figsize=(9,5), show=True, save=False, id_col=None):
         """
         Builds a dynamic risk matrix for each report in the input_reports.
 
@@ -381,7 +395,10 @@ class In_Time_Risk_Matrix():
             figsize for rm display. The default is (9,5).
         show : Boolean, optional
             dictates whether or not figure is shown. The default is True.
-
+        save: Boolean, optional
+            dictates whether or not the figure is saved as a pdf. The default is False.
+        id_col: String, optional
+            name of the column where unique identifiers are stored. used for created file name for saved images.
         Returns
         -------
         annotation_dfs : list
@@ -430,7 +447,7 @@ class In_Time_Risk_Matrix():
                         rows.at[self.curr_likelihoods[i][hazard],self.curr_severities[i][hazard]] += 1
                         if rows.at[self.curr_likelihoods[i][hazard],self.curr_severities[i][hazard]] > 2: annot_font=12
                         if rows.at[self.curr_likelihoods[i][hazard],self.curr_severities[i][hazard]] > 3: annot_font=10
-                        
+                        if rows.at[self.curr_likelihoods[i][hazard],self.curr_severities[i][hazard]] > 4: annot_font=8
                         hazards_per_row_df.at[self.curr_likelihoods[i][hazard],self.curr_severities[i][hazard]]=0
                 if condense_text: hazard_annot = condense_dict[hazard]
                 else: hazard_annot = hazard
@@ -456,11 +473,12 @@ class In_Time_Risk_Matrix():
                 ax.set_yticks(minor_ticks, minor=True)
                 ax.tick_params(which='minor',length=0, grid_color='black', grid_alpha=1)
                 ax.grid(which='minor', alpha=1)
+                if save: plt.savefig(os.path.join(os.path.dirname(os.getcwd()),'smart_nlp','results','risk_matrices', str(input_reports.at[i,id_col])+".pdf"), bbox_inches="tight")
                 plt.show()
         if not show: 
             return annotation_dfs, hazard_likelihoods, hazard_severities
         
-    def build_static_risk_matrix(self,  severity_df, likelihood_df, condense_text=True, figsize=(9,5), rates=False, show=True):
+    def build_static_risk_matrix(self,  severity_df, likelihood_df, condense_text=True, figsize=(9,5), rates=False, show=True, save=False):
         """
         Builds a static risk matrix from known hazard likelihoods and severities
 
@@ -479,7 +497,8 @@ class In_Time_Risk_Matrix():
             dictates whether the likelihood is based on rates or probabilities. The default is False.
         show : Boolean, optional
             dictates whether or not figure is shown. The default is True.
-
+        save: Boolean, optional
+            dictates whether or not the figure is saved as a pdf. The default is False.
         Returns
         -------
         None.
@@ -540,6 +559,10 @@ class In_Time_Risk_Matrix():
         ax.set_yticks(minor_ticks, minor=True)
         ax.tick_params(which='minor',length=0, grid_color='black', grid_alpha=1)
         ax.grid(which='minor', alpha=1)
+        if save: 
+            file_path = os.path.join(os.path.dirname(os.getcwd()),'smart_nlp','results','risk_matrices', "static_rm")
+            if rates: file_path += "_rates"
+            plt.savefig(file_path+".pdf", bbox_inches="tight")
         plt.show()
         
     def calc_static_likelihoods(self, frequency_fires, total_fires):
