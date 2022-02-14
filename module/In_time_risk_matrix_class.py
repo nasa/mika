@@ -211,11 +211,9 @@ class In_Time_Risk_Matrix():
                 if self.NN:
                     x = {input_key: report_df[getattr(self, 'likelihood_model_inputs_'+str(i))[input_key]] for input_key in getattr(self, 'likelihood_model_inputs_'+str(i))}
                     for key in x:
-                        #print(type(x[key]))
                         if type(x[key].iloc[0][0]) is not str:
                             x[key] = np.array(x[key]).astype('float32')
                     probs = mdl.predict(x)
-                    print(probs)
                 elif self.bert:
                     probs = mdl.predict(report_df[getattr(self, 'likelihood_model_inputs_'+str(i))].values[0].reshape(1,-1))
                 else: 
@@ -302,7 +300,6 @@ class In_Time_Risk_Matrix():
         else:
             print("Error: must input a report or a dataframe of hazard likelihoods")
             return
-        print(probs_df)
         for i in range(len(probs_df)):
             curr_likelihoods = {hazard:0 for hazard in self.hazards}
             for hazard in self.hazards:
@@ -348,7 +345,6 @@ class In_Time_Risk_Matrix():
             return
         for preds_df in preds_dfs:
             curr_severities = {}
-            print(preds_df)
             for hazard in self.hazards: 
                  injuries = preds_df.at['Diff_Injuries',hazard]
                  str_dam = preds_df.at['Diff_Structures_Damages', hazard]

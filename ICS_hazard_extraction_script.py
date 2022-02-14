@@ -63,6 +63,9 @@ ICS.save_bert_results()
 #get coherence
 #coh = ICS.get_bert_coherence(coh_method='c_v')
 ICS.save_bert_vis()
+ICS.reduce_bert_topics(num=50)
+ICS.save_bert_results()
+ICS.save_bert_vis()
 #"""
 
 """#Extract preprocessed data

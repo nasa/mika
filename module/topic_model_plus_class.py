@@ -555,7 +555,7 @@ class Topic_Model_plus():
         
     def bert_topic(self, sentence_transformer_model='all-MiniLM-L6-v2', umap=None, count_vectorizor=None, ngram_range=(1,3), BERTkwargs={}):
         self.sentence_models = {}; self.embeddings = {}; self.BERT_models = {}
-        self.BERT_model_topics_per_doc = {}
+        self.BERT_model_topics_per_doc = {}; self.BERT_model_probs={}
         for attr in self.list_of_attributes:
             sentence_model = SentenceTransformer(sentence_transformer_model)
             corpus = self.data_df[attr]
@@ -567,7 +567,20 @@ class Topic_Model_plus():
             self.embeddings[attr] = embeddings
             self.BERT_models[attr] = topic_model
             self.BERT_model_topics_per_doc[attr] = topics
+            self.BERT_model_probs[attr] = probs
+            self.reduced = False
     
+    def reduce_bert_topics(self, num=30):
+        self.reduced = True
+        for attr in self.list_of_attributes:
+            corpus = self.data_df[attr]
+            topic_model = self.BERT_models[attr]
+            topics, probs = topic_model.reduce_topics(corpus, self.BERT_model_topics_per_doc[attr], 
+                                                      self.BERT_model_probs[attr] , nr_topics=num)
+            self.BERT_models[attr] = topic_model
+            self.BERT_model_topics_per_doc[attr] = topics
+            self.BERT_model_probs[attr] = probs
+            
     def save_bert_topics(self, return_df=False, p_thres=0.001, coherence=False, coh_method='u_mass'):
         """
         saves bert topics to file
@@ -607,7 +620,11 @@ class Topic_Model_plus():
             df = pd.DataFrame(topics_data)
             dfs[attr] = df
             if return_df == False:
-                df.to_csv(os.path.join(self.folder_path,attr+"_BERT_topics.csv"))
+                if self.reduced:
+                    file = os.path.join(self.folder_path,attr+"_reduced_BERT_topics.csv")
+                else: 
+                    file = os.path.join(self.folder_path,attr+"_BERT_topics.csv")
+                df.to_csv(file)
         if return_df == True:
             return dfs
     
@@ -640,7 +657,11 @@ class Topic_Model_plus():
         self.bert_taxonomy_df = taxonomy_df
         if return_df == True:
             return taxonomy_df
-        taxonomy_df.to_csv(os.path.join(self.folder_path,'bert_taxonomy.csv'))
+        if self.reduced:
+            file = os.path.join(self.folder_path,attr+"_reduced_bert_taxonomy.csv")
+        else: 
+            file = os.path.join(self.folder_path,'bert_taxonomy.csv')
+        taxonomy_df.to_csv(file)
     
     def save_bert_document_topic_distribution(self, return_df=False):
         self.__create_folder()
@@ -651,7 +672,11 @@ class Topic_Model_plus():
         doc_df = pd.DataFrame(doc_data)
         if return_df == True:
             return doc_df
-        doc_df.to_csv(os.path.join(self.folder_path,"bert_topic_dist_per_doc.csv"))
+        if self.reduced:
+            file = os.path.join(self.folder_path,attr+"_reduced_bert_topic_dist_per_doc.csv")
+        else: 
+            file = os.path.join(self.folder_path,"bert_topic_dist_per_doc.csv")
+        doc_df.to_csv(file)
         
     def save_bert_results(self, coherence=False, coh_method='u_mass'):
         """
@@ -665,16 +690,26 @@ class Topic_Model_plus():
         data["taxonomy"] = self.save_bert_taxonomy(return_df=True)
         if coherence == True: data["coherence"] = self.save_bert_coherence(return_df=True, coh_method=coh_method)
         data["document topic distribution"] = self.save_bert_document_topic_distribution(return_df=True)
-        with pd.ExcelWriter(os.path.join(self.folder_path,'BERTopic_results.xlsx')) as writer2:
+        if self.reduced:
+            file = os.path.join(self.folder_path,"Reduced_BERTopic_results.xlsx")
+        else: 
+            file = os.path.join(self.folder_path,'BERTopic_results.xlsx')
+        with pd.ExcelWriter(file) as writer2:
             for results in data:
                 data[results].to_excel(writer2, sheet_name = results, index = False)
     
     def save_bert_vis(self):
         self.__create_folder()
+        if self.reduced:
+            file = os.path.join(self.folder_path, 'Reduced')
+        else: 
+            file = os.path.join(self.folder_path,"")
         for attr in self.list_of_attributes:
             topic_model = self.BERT_models[attr]
             fig = topic_model.visualize_topics()
-            fig.write_html(os.path.join(self.folder_path,'bertopics_ICS_viz.html'))
+            fig.write_html(file+'bertopics_viz.html')
+            hfig = topic_model.visualize_hierarchy()
+            hfig.write_html(file+'bertopics_hierarchy_viz.html')
     
     def coherence_scores(self, mdl, lda_or_hlda, measure='c_v'):
         """
