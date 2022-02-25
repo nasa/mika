@@ -426,8 +426,8 @@ def identify_docs_per_hazard(hazard_file, preprocessed_df, results_file, text_fi
     frequency = {name:{str(time_p):0 for time_p in time_period} for name in hazards}
     docs_per_hazard = {hazard:{str(time_p):[] for time_p in time_period} for hazard in hazards}
     for i in range(len(hazards)):
-         num_df = hazard_info['topic-focused'].loc[hazard_info['topic-focused']['Hazard name'] == hazards[i]]
-         nums = num_df['Topic Number'].to_list() #identifies all topics related to this hazard
+         num_df = hazard_info['topic-focused'].loc[hazard_info['topic-focused']['Hazard name'] == hazards[i]].reset_index(drop=True)
+         nums = [int(i) for nums in num_df['Topic Number'] for i in str(nums).split(", ")]#num_df['Topic Number'].to_list() #identifies all topics related to this hazard
          ids_df = results[text_field].loc[nums]
          ids_ = ids_df['documents'].to_list()
          ids_ = ids_[0].strip("[]").split(", ")
