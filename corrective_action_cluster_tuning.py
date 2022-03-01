@@ -64,7 +64,7 @@ embedder = SentenceTransformer('all-mpnet-base-v2')
 def silhouette_score(estimator, X):
     labels = estimator.fit_predict(X)
     try:
-        score = silhouette_score(X, labels, metric='euclidean')
+        score = silhouette_score(X, labels)
         # score = sklearn.metrics.calinski_harabasz_score(X, labels)
     except ValueError:
         score = -1
