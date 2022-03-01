@@ -61,7 +61,7 @@ best_models = {}
 best_params = {}
 embedder = SentenceTransformer('all-mpnet-base-v2')
 
-def silhouette_score(estimator, X):
+def silhouette_score_cust(estimator, X):
     labels = estimator.fit_predict(X)
     try:
         score = silhouette_score(X, labels)
@@ -73,7 +73,7 @@ def silhouette_score(estimator, X):
 for cluster in tqdm(cluster_dict):
     x = embedder.encode(data['Corrective Action'].tolist())
     cluster_model = cluster_dict[cluster]
-    GS = GridSearchCV(estimator=cluster_model(), param_grid=cluster_params[cluster],scoring=silhouette_score)
+    GS = GridSearchCV(estimator=cluster_model(), param_grid=cluster_params[cluster],scoring=silhouette_score_cust)
     GS.fit(x)
     best_models[cluster] = GS.best_estimator_
     best_params[cluster] = GS.best_params_
