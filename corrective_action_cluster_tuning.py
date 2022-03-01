@@ -61,6 +61,15 @@ best_models = {}
 best_params = {}
 embedder = SentenceTransformer('all-mpnet-base-v2')
 
+def silhouette_score(estimator, X):
+    labels = estimator.fit_predict(X)
+    try:
+        score = silhouette_score(X, labels, metric='euclidean')
+        # score = sklearn.metrics.calinski_harabasz_score(X, labels)
+    except ValueError:
+        score = -1
+    return score
+
 for cluster in tqdm(cluster_dict):
     x = embedder.encode(data['Corrective Action'].tolist())
     cluster_model = cluster_dict[cluster]
