@@ -76,4 +76,5 @@ print(best_models)
 file = os.path.join('models', 'SAFECOM_Corrective_Action_cluster_models.xlsx')
 with pd.ExcelWriter(file) as writer2:
     for results in best_params:
-        best_params[results].to_excel(writer2, sheet_name = results, index = False)
+        params_dict_formatted = { x:[y] for x,y in best_params[results].iteritems() }
+        params_dict_formatted.to_excel(writer2, sheet_name = results, index = False)
