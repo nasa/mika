@@ -44,7 +44,7 @@ mean_shift_param_grid = {'bandwidth':[0, 1e-1, 1e-2, 1e-3, 1e-4,1,5,10],
                         'cluster_all':[True, False]}
 affintiy_param_grid = {'damping': [0.5,0.6,0.7,0.8,9,0.99],
                        'random_state':[1],
-                      'affinity':['euclidean', 'precomputed']}
+                      'affinity':['euclidean']}#, 'precomputed']}
 DBSCAN_param_grid = {'eps':[1e-2, 1e-3, 0.1, 0.2, 0.3, 0.4, 0.5,0.6,0.7,0.8,0.9,1,2,3],
                     'min_samples':[1,2,3,4,5,6,7,8],
                     'algorithm': ['auto', 'ball_tree', 'kd_tree', 'brute'],
@@ -54,7 +54,7 @@ aglommorative_param_grid = {'n_clusters':[None]+[i for i in range(4, 25)],
                            'distance_threshold':[1e-2, 1e-3, 0.1, 0.2, 0.3, 0.4, 0.5,0.6,0.7,0.8,0.9,1,2,3]}
 
 cluster_dict = {#'kmeans':KMeans, 'spectral':SpectralClustering, 
-                'mean_shift': MeanShift,
+                #'mean_shift': MeanShift,
                'affinity': AffinityPropagation, 'DBSCAN': DBSCAN, 'aglommorative': AgglomerativeClustering}
 cluster_params = {'kmeans':kmeans_param_grid, 'spectral':spectral_param_grid, 'mean_shift': mean_shift_param_grid,
                'affinity': affintiy_param_grid, 'DBSCAN':DBSCAN_param_grid, 'aglommorative': aglommorative_param_grid}
