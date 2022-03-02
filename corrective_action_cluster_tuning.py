@@ -28,15 +28,15 @@ kmeans_param_grid = {'n_clusters':[i for i in range(4, 25)],
                     'tol':[1e-2, 1e-3, 1e-4, 1e-5, 1e-6],
                     'random_state':[1],
                     'algorithm':['full', 'elkan']}
-spectral_param_grid = {'n_clusters':[i for i in range(4, 25)],
+spectral_param_grid = {'n_clusters':[i for i in range(3, 10)],
                        'eigen_solver':['arpack', 'lobpcg', 'amg'],
-                       'n_init':[i for i in range(5, 30, 5)],
+                       'n_init':[i for i in range(5, 30, 10)],
                        'gamma': [1e-4,1e-3,1e-2,1e-1,1,1e1],
-                       'affinity':['rbf', 'nearest_neighbors', 'precomputed', 'precomputed_nearest_neighbors'],
-                       'n_neighbors': [i for i in range(5, 40, 5)],
-                       'eigen_tol': [0, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6],
+                       'affinity':['rbf', 'nearest_neighbors'],#, 'precomputed', 'precomputed_nearest_neighbors'],
+                       'n_neighbors': [i for i in range(5, 40, 10)],
+                       'eigen_tol': [0, 1e-1, 1e-2, 1e-3, 1e-4],
                        'assign_labels':['kmeans', 'discretize'],
-                       'degree': [2,3,4,5],
+                       'degree': [2,3],
                        'random_state':[1],
                        'coef0':[1,2,3,-1,-2,0]}
 mean_shift_param_grid = {'bandwidth':[0, 1e-1, 1e-2, 1e-3, 1e-4,1,5,10],
@@ -53,9 +53,10 @@ aglommorative_param_grid = {'n_clusters':[None]+[i for i in range(4, 25)],
                            'linkage':['ward', 'complete', 'average', 'single'],
                            'distance_threshold':[1e-2, 1e-3, 0.1, 0.2, 0.3, 0.4, 0.5,0.6,0.7,0.8,0.9,1,2,3]}
 
-cluster_dict = {#'kmeans':KMeans, 'spectral':SpectralClustering, 
+cluster_dict = {#'kmeans':KMeans, 
+                'spectral':SpectralClustering} 
                 #'mean_shift': MeanShift,
-               'affinity': AffinityPropagation, 'DBSCAN': DBSCAN, 'aglommorative': AgglomerativeClustering}
+               #'affinity': AffinityPropagation, 'DBSCAN': DBSCAN, 'aglommorative': AgglomerativeClustering}
 cluster_params = {'kmeans':kmeans_param_grid, 'spectral':spectral_param_grid, 'mean_shift': mean_shift_param_grid,
                'affinity': affintiy_param_grid, 'DBSCAN':DBSCAN_param_grid, 'aglommorative': aglommorative_param_grid}
 best_models = {}
@@ -82,9 +83,3 @@ for cluster in tqdm(cluster_dict):
 
 print(best_params)
 print(best_models)
-
-file = os.path.join('models', 'SAFECOM_Corrective_Action_cluster_models.xlsx')
-with pd.ExcelWriter(file) as writer2:
-    for results in best_params:
-        params_dict_formatted = { x:[y] for x,y in best_params[results].iteritems() }
-        params_dict_formatted.to_excel(writer2, sheet_name = results, index = False)
