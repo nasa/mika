@@ -53,10 +53,8 @@ aglommorative_param_grid = {'n_clusters':[None]+[i for i in range(4, 25)],
                            'linkage':['ward', 'complete', 'average', 'single'],
                            'distance_threshold':[1e-2, 1e-3, 0.1, 0.2, 0.3, 0.4, 0.5,0.6,0.7,0.8,0.9,1,2,3]}
 
-cluster_dict = {#'kmeans':KMeans, 
-                'spectral':SpectralClustering} 
-                #'mean_shift': MeanShift,
-               #'affinity': AffinityPropagation, 'DBSCAN': DBSCAN, 'aglommorative': AgglomerativeClustering}
+cluster_dict = {'kmeans':KMeans, 'spectral':SpectralClustering,'mean_shift': MeanShift,
+               'affinity': AffinityPropagation, 'DBSCAN': DBSCAN, 'aglommorative': AgglomerativeClustering}
 cluster_params = {'kmeans':kmeans_param_grid, 'spectral':spectral_param_grid, 'mean_shift': mean_shift_param_grid,
                'affinity': affintiy_param_grid, 'DBSCAN':DBSCAN_param_grid, 'aglommorative': aglommorative_param_grid}
 best_models = {}
@@ -73,7 +71,7 @@ def silhouette_score_cust(estimator, X):
     return score
 
 for cluster in tqdm(cluster_dict):
-    x = embedder.encode(data['Corrective Action'].tolist())
+    x = embedder.encode(data['Corrective Action'].tolist())#change to 'Narrative' for narrative section tuning
     cluster_model = cluster_dict[cluster]
     GS = GridSearchCV(estimator=cluster_model(), param_grid=cluster_params[cluster],scoring=silhouette_score_cust)
     GS.fit(x)
