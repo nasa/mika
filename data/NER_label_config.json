@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "text": "CAU",
+    "prefixKey": null,
+    "suffixKey": "0",
+    "backgroundColor": "#F4363F",
+    "textColor": "#ffffff"
+  },
+  {
+    "id": 2,
+    "text": "MOD",
+    "prefixKey": null,
+    "suffixKey": "1",
+    "backgroundColor": "#FFEB3B",
+    "textColor": "#ffffff"
+  },
+  {
+    "id": 3,
+    "text": "EFF",
+    "prefixKey": null,
+    "suffixKey": "2",
+    "backgroundColor": "#4CAF50",
+    "textColor": "#ffffff"
+  },
+  {
+    "id": 4,
+    "text": "CON",
+    "prefixKey": null,
+    "suffixKey": "3",
+    "backgroundColor": "#2196F3",
+    "textColor": "#ffffff"
+  },
+  {
+    "id": 5,
+    "text": "REC",
+    "prefixKey": null,
+    "suffixKey": "4",
+    "backgroundColor": "#9C27B0",
+    "textColor": "#ffffff"
+  }
+]
