@@ -428,7 +428,12 @@ class Topic_Model_plus():
             today_str = datetime.date.today().strftime("%b-%d-%Y")
             if itr != "":
                 itr = "-"+str(itr)
-            filename = os.path.join('results',self.database_name+'_topics_'+today_str+str(itr))
+            if os.getcwd().split("//")[-1] == 'smart_nlp':
+                filename = os.path.join('results',self.database_name+'_topics_'+today_str+str(itr))
+            if os.path.dirname(os.getcwd()).split("\\")[-1] == 'smart_nlp':
+                filename = os.path.join(os.path.dirname(os.getcwd()),'results',self.database_name+'_topics_'+today_str+str(itr))
+            else:
+                filename = os.path.join('results',self.database_name+'_topics_'+today_str+str(itr))
             self.folder_path = filename#path+"/"+filename
             os.makedirs(self.folder_path, exist_ok = True)
             #print("folder created")
@@ -696,7 +701,11 @@ class Topic_Model_plus():
             file = os.path.join(self.folder_path,'BERTopic_results.xlsx')
         with pd.ExcelWriter(file) as writer2:
             for results in data:
-                data[results].to_excel(writer2, sheet_name = results, index = False)
+                if len(results) >31:
+                    result_label = results[:31]
+                else:
+                    result_label = results
+                data[results].to_excel(writer2, sheet_name = result_label, index = False)
     
     def save_bert_vis(self):
         self.__create_folder()
