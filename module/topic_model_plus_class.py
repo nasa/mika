@@ -674,7 +674,7 @@ class Topic_Model_plus():
         doc_data['document number'] = self.doc_ids
         for attr in self.list_of_attributes:
             doc_data[attr] = self.BERT_model_topics_per_doc[attr]
-        doc_df = pd.DataFrame(doc_data)
+        doc_df = pd.DataFrame({key:pd.Series(value) for key, value in doc_data.items()})
         if return_df == True:
             return doc_df
         if self.reduced:
