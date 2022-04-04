@@ -558,14 +558,14 @@ class Topic_Model_plus():
         coherence_df.to_csv(os.path.join(self.folder_path,"BERT_coherence.csv"))
         
         
-    def bert_topic(self, sentence_transformer_model='all-MiniLM-L6-v2', umap=None, count_vectorizor=None, ngram_range=(1,3), BERTkwargs={}):
+    def bert_topic(self, sentence_transformer_model='all-MiniLM-L6-v2', umap=None, hdbscan=None, count_vectorizor=None, ngram_range=(1,3), BERTkwargs={}):
         self.sentence_models = {}; self.embeddings = {}; self.BERT_models = {}
         self.BERT_model_topics_per_doc = {}; self.BERT_model_probs={}
         for attr in self.list_of_attributes:
             sentence_model = SentenceTransformer(sentence_transformer_model)
             corpus = self.data_df[attr]
             embeddings = sentence_model.encode(corpus, show_progress_bar=False)
-            topic_model = BERTopic(umap_model=umap, vectorizer_model=count_vectorizor, 
+            topic_model = BERTopic(umap_model=umap, vectorizer_model=count_vectorizor, hdbscan_model=hdbscan,
                                    verbose=True, n_gram_range=ngram_range, **BERTkwargs)
             topics, probs = topic_model.fit_transform(corpus, embeddings)
             self.sentence_models[attr] = sentence_model
@@ -720,6 +720,34 @@ class Topic_Model_plus():
             hfig = topic_model.visualize_hierarchy()
             hfig.write_html(file+'bertopics_hierarchy_viz.html')
     
+    def hdp(self, training_iterations=1000, iteration_step=10, to_lda=True, kwargs={}, topic_threshold=0.0):
+        start = time()
+        self.hdp_models = {}
+        self.hdp_coherence = {}
+        for attr in self.list_of_attributes:
+            texts = self.data_df[attr].tolist()
+            if self.ngrams == "tp":
+                corpus = self.__create_corpus_of_ngrams(texts)
+                hdp = tp.HDPModel(tw = tp.TermWeight.IDF, corpus=corpus, **kwargs)
+            else:
+                hdp = tp.HDPModel(tw = tp.TermWeight.IDF, **kwargs)
+                for text in texts:
+                    hdp.add_doc(text)
+            sleep(0.5)
+            for i in tqdm(range(0, training_iterations, iteration_step), attr+" HDP…"):
+                hdp.train(iteration_step)
+            self.hdp_models[attr] = hdp
+            #self.hdp_coherence[attr] = self.coherence_scores(hdp, "lda")
+        if to_lda:
+            self.lda_models = {}
+            self.lda_coherence = {}
+            self.lda_num_topics = {}
+            for attr in self.list_of_attributes:
+                self.lda_models[attr], new_topic_ids = self.hdp_models[attr].convert_to_lda(topic_threshold=topic_threshold)
+                self.lda_num_topics[attr] = self.lda_models[attr].k
+                self.lda_coherence[attr] = self.coherence_scores(self.lda_models[attr], "lda")
+        print("HDP: ", (time()-start)/60, " minutes")
+        
     def coherence_scores(self, mdl, lda_or_hlda, measure='c_v'):
         """
         computes and returns coherence scores
