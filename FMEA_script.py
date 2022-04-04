@@ -52,7 +52,7 @@ if __name__ == '__main__':
     fmea.calc_severity(calc_severity)
     fmea.calc_frequency()
     fmea.calc_risk()
-    fmea.grouped_df.to_csv("grouped_df_test_w_risk.csv")
+    #fmea.grouped_df.to_csv("grouped_df_test_w_risk.csv")
     #df.to_csv("test_docs_with_ents.csv")
     #print(labels[0])
     #print(fmea.input_data)#['tokens'][0])

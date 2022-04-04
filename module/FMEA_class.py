@@ -19,6 +19,8 @@ from sklearn.cluster import DBSCAN, AgglomerativeClustering
 from cairosvg import svg2pdf
 import pdfkit
 from pathlib import Path
+import aspose.words as aw
+
 #spacy.require_gpu()
 
 #device = 'cuda' if cuda.is_available() else 'cpu'
@@ -296,20 +298,24 @@ class FMEA():
         else:
             colors_dict = {}
         options = {"colors": colors_dict}
-        svg = spacy.displacy.render(ent_input, options=options, style="ent", manual=True, jupyter=False, page=True)
+        html = spacy.displacy.render(ent_input, options=options, style="ent", manual=True, jupyter=False, page=True)
         if save == True:
             if output_path == "":
                 output_path = os.path.join(os.getcwd(),"results", str(doc_id)+"_display")
-                pdf_path = Path(output_path+".pdf")
-            #output_path = Path(output_path+".svg")
-            #output_path.open("w", encoding="utf-8").write(svg)
+                pdf_path = output_path+".pdf"
+            output = Path(output_path+".html")
+            output.open("w", encoding="utf-8").write(html)
+            #doc = aw.Document(output_path+'.html')
+            #for page in range(0, doc.page_count):
+            #    extractedPage = doc.extract_pages(page, 1)
+            #    extractedPage.save(output_path+".svg")
             #path_wkhtmltopdf = r"C:\Users\srandrad\Anaconda3\Lib\site-packages\wkhtmltox-0.12.6-1.msvc2015-win32.exe"
             #config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
             #pdfkit.from_string(svg, output_path+".pdf", configuration=config)
-            #svg2pdf(url=output_path, write_to=pdf_path)
+            #svg2pdf(url=output_path+".svg", write_to=pdf_path,output_width=4, output_height=2)
         elif save == False:
             spacy.displacy.serve(ent_input, options=options, style="ent", manual=True)
-        return svg
+        return html
 
 #if __name__ == '__main__':
 #    freeze_support()
