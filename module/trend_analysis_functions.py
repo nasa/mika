@@ -416,19 +416,27 @@ def calc_severity(fires, summary_reports, rm_outliers=True):
                                     )
     return severity_total, severity_table
 
-def identify_docs_per_hazard(hazard_file, preprocessed_df, results_file, text_field, time_field, id_field):
+def identify_docs_per_hazard(hazard_file, preprocessed_df, results_file, text_field, time_field, id_field, results_text_field=None):
     hazard_info = pd.read_excel(hazard_file, sheet_name=['topic-focused'])
     hazards = list(set(hazard_info['topic-focused']['Hazard name'].tolist()))
     hazards = [hazard for hazard in hazards if isinstance(hazard,str)]
     time_period = preprocessed_df[time_field].unique()
     categories = hazard_info['topic-focused']['Hazard Category'].tolist()
-    results = pd.read_excel(results_file, sheet_name=[text_field])
+    if '.csv' in results_file:
+        results = pd.read_csv(results_file)
+        results = {results_text_field: results}
+    elif '.xlsx' in results_file:
+        results = pd.read_excel(results_file, sheet_name=[text_field])
+    if results_text_field == None:
+        results_text_field = text_field
     frequency = {name:{str(time_p):0 for time_p in time_period} for name in hazards}
     docs_per_hazard = {hazard:{str(time_p):[] for time_p in time_period} for hazard in hazards}
     for i in range(len(hazards)):
          num_df = hazard_info['topic-focused'].loc[hazard_info['topic-focused']['Hazard name'] == hazards[i]].reset_index(drop=True)
          nums = [int(i) for nums in num_df['Topic Number'] for i in str(nums).split(", ")]#num_df['Topic Number'].to_list() #identifies all topics related to this hazard
-         ids_df = results[text_field].loc[nums]
+         #print(nums)
+         #print(results)
+         ids_df = results[results_text_field].loc[nums]
          ids_ = ids_df['documents'].to_list()
          ids_ = ids_[0].strip("[]").split(", ")
          ids_= [w.replace("'","") for w in ids_]
@@ -443,7 +451,6 @@ def identify_docs_per_hazard(hazard_file, preprocessed_df, results_file, text_fi
                 hazard_name = hazards[i]
                 hazard_words = num_df['Relevant hazard words'].to_list()
                 hazard_words = [word for words in hazard_words for word in words.split(", ")]
-                #print(hazard_words, len(hazard_words), hazard_words[0])
                 negation_words = num_df['Negation words'].to_list()
                 negation_words = [word for word in negation_words if isinstance(word, str)]
                 #need to check if a word in text is in hazard words
