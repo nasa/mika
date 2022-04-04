@@ -25,12 +25,7 @@ import copy
 import matplotlib.cm as cm 
 from torch import cuda
 
-MAX_LEN = 128
-TRAIN_BATCH_SIZE = 4
-VALID_BATCH_SIZE = 2
-EPOCHS = 1
-LEARNING_RATE = 1e-05
-MAX_GRAD_NORM = 10
+#device = 'cuda' if cuda.is_available() else 'cpu'
 
 def read_doccano_annots(file, encoding=False):
     if encoding == False: f = open(file, "r") #safecom 
@@ -149,25 +144,38 @@ def identify_bad_annotations(text_df):
         [bad_tokens.append(text_df_issues.iloc[ind]['docs'][i]) for i in inds]
     return bad_tokens
 
-def split_docs_to_sentances(text_df, id_col = 'Tracking #'): 
+def split_docs_to_sentances(text_df, id_col = 'Tracking #', tags=True): 
     #split each document into one row per sentance
     sentence_tags_total = []
     sentences_in_list = []
     ids = []
     for i in range(len(text_df)):
         doc = text_df.iloc[i]['docs']
-        total_sentence_tags = text_df.iloc[i]['tags']
+        
         sentences = [sent for sent in doc.sents] #split into sentences
-        sentence_tags = [[tag for tag in  total_sentence_tags[sent.start:sent.end]] for sent in doc.sents]
-        for tags in sentence_tags:
-            sentence_tags_total.append(tags)
+        if tags == True:
+            total_sentence_tags = text_df.iloc[i]['tags']
+            sentence_tags = [[tag for tag in  total_sentence_tags[sent.start:sent.end]] for sent in doc.sents]
+            for tags in sentence_tags:
+                sentence_tags_total.append(tags)
         for sent in sentences:
             sentences_in_list.append(sent)
             ids.append(text_df.iloc[i][id_col])
-    sentence_df = pd.DataFrame({id_col:ids,
-                                "sentence": sentences_in_list,
-                                "tags": sentence_tags_total})
+    results_dict = {id_col:ids,"sentence": sentences_in_list}
+    if tags == True:
+        results_dict.update({"tags": sentence_tags_total})
+    sentence_df = pd.DataFrame(results_dict)#{id_col:ids,
+                                #"sentence": sentences_in_list,
+                                #"tags": sentence_tags_total})
     return sentence_df
+"""
+def split_unformatted_doc_to_sentences(text_df, id_col='Tracking #', text_col='Narrative'):
+    sentences_in_list = []
+    ids = []
+    for i in range(len(text_df)):
+        doc = text_df.iloc[i]['docs']
+        total_sentence_tags = text_df.iloc[i]['tags']
+        sentences = [sent for sent in doc.sents] #split into sentences"""
 
 def check_doc_to_sentence_split(sentence_df):
     for i in range(len(sentence_df)):
@@ -198,15 +206,20 @@ def align_labels_with_tokens(labels, word_ids):
             new_labels.append(label)
     return new_labels
 
-def tokenize_and_align_labels(sentence_df, tokenizer):
+def tokenize_and_align_labels(sentence_df, tokenizer, align_labels=True):
     tokenized_inputs = tokenizer(sentence_df["tokens"], is_split_into_words=True)#, padding=True, truncation=True)
-    all_labels = sentence_df["ner_tags"]
-    new_labels = []
-    for i, labels in enumerate(all_labels):
-        word_ids = tokenized_inputs.word_ids(i)
-        new_labels.append(align_labels_with_tokens(labels, word_ids))
+    if align_labels==True:
+        all_labels = sentence_df["ner_tags"]
+        new_labels = []
+        for i, labels in enumerate(all_labels):
+            word_ids = tokenized_inputs.word_ids(i)
+            new_labels.append(align_labels_with_tokens(labels, word_ids))
+    
+        tokenized_inputs["labels"] = new_labels
+    return tokenized_inputs
 
-    tokenized_inputs["labels"] = new_labels
+def tokenize(sentence_df, tokenizer):
+    tokenized_inputs = tokenizer(sentence_df["tokens"], is_split_into_words=True)
     return tokenized_inputs
 
 def compute_metrics(eval_preds, id2label): #couldn't move to utils bc of label_list
@@ -235,7 +248,6 @@ def compute_classification_report(labels, preds, pred_labels, label_list):
     return classification_report(true_labels, true_predictions)
 
 def get_cleaned_label(label):
-    #print(label)
     if "-" in label:
         return label.split("-")[1]
     else:
