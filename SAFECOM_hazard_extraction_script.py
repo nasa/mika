@@ -37,6 +37,7 @@ num_topics ={'Narrative': 96}
 safecom.prepare_data()
 fire_missions = [mission for mission in list(safecom.data_df['Mission Type']) if type(mission) is str and 'fire' in mission.lower()]
 safecom.data_df = safecom.data_df.loc[safecom.data_df['Mission Type'].isin(fire_missions)].reset_index(drop=True)
+safecom.doc_ids = safecom.data_df[document_id_col].tolist()
 raw_text = safecom.data_df[safecom.list_of_attributes] 
 raw_attrs = ['Raw_'+attr for attr in safecom.list_of_attributes]
 safecom.data_df[raw_attrs] = raw_text
