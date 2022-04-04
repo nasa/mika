@@ -2,6 +2,8 @@
 """
 Created on Tue Mar 22 13:28:23 2022
 
+requires CUDA GPU set up
+
 @author: srandrad
 """
 
@@ -42,7 +44,7 @@ text_df = clean_doccano_annots(text_df)
 #convert text to spacy doc 
 text_data = text_df['data'].tolist()
 docs = [nlp(doc) for doc in text_data]
-print(text_df.columns)
+#print(text_df.columns)
 text_df['docs'] = docs#[nlp(doc) for doc in text_data]
 
 #convert offset labels to biluo tags
@@ -128,6 +130,7 @@ args = TrainingArguments(
     per_device_eval_batch_size = 4,
     logging_steps=50,
     eval_steps = 50,
+    #dataloader_pin_memory=False
     #label_names = label_list
 )
 
