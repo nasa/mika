@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+import os
 
 import scipy.stats as stats
 from sklearn import linear_model
@@ -416,7 +417,7 @@ def calc_severity(fires, summary_reports, rm_outliers=True):
                                     )
     return severity_total, severity_table
 
-def identify_docs_per_hazard(hazard_file, preprocessed_df, results_file, text_field, time_field, id_field, results_text_field=None):
+def identify_docs_per_hazard(hazard_file, preprocessed_df, results_file, text_field, time_field, id_field, results_text_field=None, doc_topic_dist_field=None, topic_thresh=0.0, ids_to_drop=[]):
     hazard_info = pd.read_excel(hazard_file, sheet_name=['topic-focused'])
     hazards = list(set(hazard_info['topic-focused']['Hazard name'].tolist()))
     hazards = [hazard for hazard in hazards if isinstance(hazard,str)]
@@ -425,8 +426,10 @@ def identify_docs_per_hazard(hazard_file, preprocessed_df, results_file, text_fi
     if '.csv' in results_file:
         results = pd.read_csv(results_file)
         results = {results_text_field: results}
+        doc_topic_distribution = None
     elif '.xlsx' in results_file:
         results = pd.read_excel(results_file, sheet_name=[text_field])
+        doc_topic_distribution = pd.read_excel(results_file, sheet_name=[doc_topic_dist_field])[doc_topic_dist_field]
     if results_text_field == None:
         results_text_field = text_field
     frequency = {name:{str(time_p):0 for time_p in time_period} for name in hazards}
@@ -440,15 +443,31 @@ def identify_docs_per_hazard(hazard_file, preprocessed_df, results_file, text_fi
          ids_ = ids_df['documents'].to_list()
          ids_ = ids_[0].strip("[]").split(", ")
          ids_= [w.replace("'","") for w in ids_]
+         ids_ = [id_ for id_ in ids_ if id_ not in ids_to_drop]
+         # ids_ = ids_ only if topic nums > thres
+         if doc_topic_distribution is not None:
+             new_ids = []
+             for id_ in ids_:
+                 #check that topic prob> thres for at least one num
+                 id_df = doc_topic_distribution.loc[doc_topic_distribution['document number']==id_].reset_index(drop=True)
+                 probs = [float(id_df.iloc[0][text_field].strip("[]").split(" ")[num].strip("\n")) for num in nums]
+                 max_prob = max(probs)
+                 if max_prob > topic_thresh:
+                     new_ids.append(id_)
+             ids_ = new_ids
          #print(ids_)
          temp_df = preprocessed_df.loc[preprocessed_df[id_field].astype(str).isin(ids_)].reset_index(drop=True)
          fire_ids = temp_df[id_field].unique()
          for id_ in fire_ids:
             temp_fire_df = temp_df.loc[temp_df[id_field]==id_].reset_index(drop=True)
             for j in range(len(temp_fire_df)):
+                #fuel
+                fuel_ids = pd.read_csv(r"C:\Users\srandrad\smart_nlp\notebooks\fuel_unidentified.csv")['Tracking #'].tolist()
                 text = temp_fire_df.iloc[j][text_field]
                 #check for hazard -- looks at the hazard relevant words from the topic
                 hazard_name = hazards[i]
+                #if id_ in fuel_ids and hazard_name in ['Fuel System Malfunction', 'Fuel Leak']:
+                #    print(id_, hazard_name, text)
                 hazard_words = num_df['Relevant hazard words'].to_list()
                 hazard_words = [word for words in hazard_words for word in words.split(", ")]
                 negation_words = num_df['Negation words'].to_list()
@@ -458,12 +477,16 @@ def identify_docs_per_hazard(hazard_file, preprocessed_df, results_file, text_fi
                 for word in hazard_words:
                     if word in text:
                         hazard_found = True
+                        #if id_ in fuel_ids and hazard_name in ['Fuel System Malfunction', 'Fuel Leak']:
+                        #    print(id_, text, hazard_found, word)
                 
                 if negation_words!=[]:
                     for words in negation_words:
                         for word in words.split(", "):#removes texts that have negation words
                             if word in text:
                                 hazard_found = False 
+                                #if id_ in fuel_ids and hazard_name in ['Fuel System Malfunction', 'Fuel Leak']:
+                                #    print(id_, text, hazard_found, word)
                 
                 if hazard_found == True:
                     year = temp_fire_df.iloc[j][time_field]
@@ -916,5 +939,108 @@ def hazard_accuracy(ids, num, results_path):
 
     with pd.ExcelWriter(results_path+"/hazard_extraction_accuracy.xlsx") as writer:
             for results in data:
-                data[results].to_excel(writer, sheet_name = results, index = False)
+                if len(results)>31:
+                    sheet_name = results[:30]
+                else: 
+                    sheet_name = results
+                data[results].to_excel(writer, sheet_name = sheet_name, index = False)
     return sampled_hazard_ids, total_ids
+
+def get_likelihoods(rates):
+    curr_likelihoods = {hazard:0 for hazard in rates}
+    for hazard in rates:
+        r = rates[hazard]
+        if r>=100:
+            likelihood = 'Frequent'
+        elif r>=10 and r<100:
+            likelihood = 'Probable'
+        elif r>=1 and r<10:
+            likelihood = 'Remote'
+        elif r>=0.1 and r<1:
+            likelihood = 'Extremely Remote'
+        elif r<0.1:
+            likelihood = 'Extremely Improbable'
+        curr_likelihoods[hazard] = likelihood
+    return curr_likelihoods
+
+def get_severities(severities):
+    curr_severities = {hazard:0 for hazard in severities}
+    for hazard in severities:
+        s = severities[hazard]
+        if s<=0.1: #negligible impact
+            severity = 'Minimal Impact'
+        elif s>0.1 and s <= 0.5:
+            severity = 'Minor Impact'
+        elif s>0.5 and s<=1:
+            severity = 'Major Impact'
+        elif s>1 and s<=2:
+            severity = 'Hazardous Impact'
+        elif s>2:
+            severity = 'Catastrophic Impact'
+        curr_severities[hazard] = severity
+    return curr_severities
+
+def plot_risk_matrix(rates, severities, figsize=(9,5), save=False):
+    hazards = [h for h in rates]
+    curr_likelihoods = get_likelihoods(rates)
+    curr_severities = get_severities(severities)
+    annotation_df = pd.DataFrame([["" for i in range(5)] for j in range(5)],
+                         columns=['Minimal Impact', 'Minor Impact', 'Major Impact', 'Hazardous Impact', 'Catastrophic Impact'],
+                          index=['Frequent', 'Probable', 'Remote','Extremely Remote', 'Extremely Improbable'])
+    hazards_per_row_df = pd.DataFrame([[0 for i in range(5)] for j in range(5)],
+                     columns=['Minimal Impact', 'Minor Impact', 'Major Impact', 'Hazardous Impact', 'Catastrophic Impact'],
+                      index=['Frequent', 'Probable', 'Remote','Extremely Remote', 'Extremely Improbable'])
+    rows = pd.DataFrame([[0 for i in range(5)] for j in range(5)],
+                     columns=['Minimal Impact', 'Minor Impact', 'Major Impact', 'Hazardous Impact', 'Catastrophic Impact'],
+                      index=['Frequent', 'Probable', 'Remote','Extremely Remote', 'Extremely Improbable'])
+    annot_font = 12
+    hazard_likelihoods = {hazard:"" for hazard in hazards}; hazard_severities={hazard:"" for hazard in hazards}
+    for hazard in hazards:
+        hazard_likelihoods[hazard] = curr_likelihoods[hazard]
+        hazard_severities[hazard] = curr_severities[hazard]
+        #if annotation_df.at[curr_likelihoods[hazard], curr_severities[hazard]]!= "":
+            #annotation_df.at[curr_likelihoods[hazard], curr_severities[hazard]] += ", \n"
+            #hazards_per_row_df.at[curr_likelihoods[hazard], curr_severities[hazard]]+=1
+            #if hazards_per_row_df.at[curr_likelihoods[hazard], curr_severities[hazard]]>2:
+            #    annotation_df.at[curr_likelihoods[hazard], curr_severities[hazard]]+="\n"
+            #    rows.at[curr_likelihoods[hazard], curr_severities[hazard]] += 1
+            #    if rows.at[curr_likelihoods[hazard], curr_severities[hazard]] > 3: annot_font=12
+            #    hazards_per_row_df.at[curr_likelihoods[hazard], curr_severities[hazard]]=0
+        #if len(hazard.split(" "))>2:
+        #    hazard_split = hazard.split(" ")
+        #    hazard_annot = " ".join(hazard_split[0:2])
+        #    hazard_annot = "\n ".join([hazard_annot]+[" ".join(hazard_split[2:])])
+        #else: hazard_annot = hazard
+        new_annot = annotation_df.at[curr_likelihoods[hazard], curr_severities[hazard]]
+        if new_annot != "": new_annot += ", "
+        hazard_annot = hazard.split(" ")
+        #if line>20 then new line
+        #line = old line + hazard section
+        if len(new_annot.split("\n")[-1]) + len(hazard_annot[0]) < 20:
+            new_annot += hazard_annot[0]
+        if len(hazard_annot)>1:
+            new_annot += "\n"+" ".join(hazard_annot[1:])
+        annotation_df.at[curr_likelihoods[hazard], curr_severities[hazard]] = new_annot #+= (str(hazard_annot))
+    
+    df = pd.DataFrame([[0, 5, 10, 10, 10], [0, 5, 5, 10, 10], [0, 0, 5, 5, 10],
+            [0, 0, 0, 5, 5], [0, 0, 0, 0, 5]],
+          columns=['Minimal Impact', 'Minor Impact', 'Major Impact', 'Hazardous Impact', 'Catastrophic Impact'],
+           index=['Frequent', 'Probable', 'Remote','Extremely Remote', 'Extremely Improbable'])
+    fig,ax = plt.subplots(figsize=figsize)
+    #annot df has hazards in the cell they belong to #annot=annotation_df
+    sn.heatmap(df, annot=annotation_df, fmt='s',annot_kws={'fontsize':annot_font},cbar=False,cmap='RdYlGn_r')
+    plt.title("Risk Matrix", fontsize=12)
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=40, ha="right")
+    ax.set_yticklabels(ax.get_yticklabels(), rotation=0)#, ha="right")
+    plt.tick_params(labelsize=12)
+    plt.ylabel("Likelihood", fontsize=12)
+    plt.xlabel("Severity", fontsize=12)
+    minor_ticks = np.arange(1, 6, 1)
+    ax.set_xticks(minor_ticks, minor=True)
+    ax.set_yticks(minor_ticks, minor=True)
+    ax.tick_params(which='minor',length=0, grid_color='black', grid_alpha=1)
+    ax.grid(which='minor', alpha=1)
+    if save: 
+        file_path = os.path.join(os.path.dirname(os.getcwd()),'results','risk_matrices', "SAFECOM_static_rm")
+        plt.savefig(file_path+".pdf", bbox_inches="tight")
+    plt.show()

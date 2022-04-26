@@ -9,21 +9,15 @@ Utility functions for custom NER
 import pandas as pd
 import os
 import json
-from spacy.training import offsets_to_biluo_tags
-import spacy
 import numpy as np
-from transformers import AutoTokenizer, AutoModelForTokenClassification, DataCollatorForTokenClassification
-from transformers import TrainingArguments, Trainer
-from seqeval.metrics import classification_report
-from sklearn.metrics import confusion_matrix
-from torch import cuda
-from datasets import load_metric, Dataset, DatasetDict
+# seqeval.metrics import classification_report
+from sklearn.metrics import confusion_matrix, classification_report, precision_recall_fscore_support, accuracy_score
+from datasets import load_metric
 import seaborn as sn
 import matplotlib.pyplot as plt
-from matplotlib.colors import LogNorm
 import copy
 import matplotlib.cm as cm 
-from torch import cuda
+
 
 #device = 'cuda' if cuda.is_available() else 'cpu'
 
@@ -43,32 +37,6 @@ def clean_doccano_annots(df):
         df.at[i, 'label'] = new_labels
         df.at[i, 'data'] = new_text
     return df
-"""
-def clean_interannotator_annots(df):
-    for i in range(len(df)):
-        text = df.iloc[i]['data']#.replace("  ", " ")
-        label = df.iloc[i]['label']
-        new_labels, new_text = clean_doccano_text_tags(text, label)
-        df.at[i, 'label'] = new_labels
-        df.at[i, 'data'] = new_text
-    return df
-
-def clean_doccano_text_tags(text, labels):
-    new_labels = []
-    chars_removed = 0
-    remove_char = False
-    labels.sort()
-    for label in labels:
-        new_label = label
-        new_text = text
-        if remove_char == True:
-            new_label = [new_label[0]-chars_removed, new_label[1]-chars_removed, new_label[2]]
-        #update text for removed spaces
-        #case 1: extra spaces added
-        #case 2: character needs to be removed -> note 
-        text = new_text
-        new_labels.append(new_label)
-    return """
 
 def clean_annots_from_str(df):
     cleaned_labels = []
@@ -85,6 +53,7 @@ def clean_annots_from_str(df):
     return df
 
 def clean_text_tags(text, labels): #input single text, list of labels [beg, end, tag]
+#there is a bug in this it is added unnecessary spaces...
     new_labels = []
     spaces_added = 0
     add_spaces = False
@@ -151,13 +120,12 @@ def split_docs_to_sentances(text_df, id_col = 'Tracking #', tags=True):
     ids = []
     for i in range(len(text_df)):
         doc = text_df.iloc[i]['docs']
-        
         sentences = [sent for sent in doc.sents] #split into sentences
         if tags == True:
             total_sentence_tags = text_df.iloc[i]['tags']
             sentence_tags = [[tag for tag in  total_sentence_tags[sent.start:sent.end]] for sent in doc.sents]
-            for tags in sentence_tags:
-                sentence_tags_total.append(tags)
+            for tags_ in sentence_tags:
+                sentence_tags_total.append(tags_)
         for sent in sentences:
             sentences_in_list.append(sent)
             ids.append(text_df.iloc[i][id_col])
@@ -230,13 +198,17 @@ def compute_metrics(eval_preds, id2label): #couldn't move to utils bc of label_l
     true_predictions = [
         [id2label[p] for (p, l) in zip(prediction, label) if l != -100]
         for prediction, label in zip(predictions, labels)]
-    metric = load_metric("seqeval")
-    all_metrics = metric.compute(predictions=true_predictions, references=true_labels, zero_division=0)
-    
-    return {"precision": all_metrics["overall_precision"],
-            "recall": all_metrics["overall_recall"],
-            "f1": all_metrics["overall_f1"],
-            "accuracy": all_metrics["overall_accuracy"]}
+    true_labels = [get_cleaned_label(l) for list_ in true_labels for l in list_]
+    true_predictions = [get_cleaned_label(l) for list_ in true_predictions for l in list_]
+    #metric = load_metric("seqeval")
+    #all_metrics = metric.compute(predictions=true_predictions, references=true_labels, zero_division=0)
+    labels=[lab for lab in set(true_predictions) if lab!='O']
+    precision, recall, fscore, support = precision_recall_fscore_support(true_labels, true_predictions, average='weighted',  labels=labels)
+    accuracy = accuracy_score(true_labels, true_predictions)
+    return {"precision": precision, #all_metrics["overall_precision"],
+            "recall": recall, #all_metrics["overall_recall"],
+            "f1": fscore, #all_metrics["overall_f1"],
+            "accuracy": accuracy} #all_metrics["overall_accuracy"]}
 
 
 def compute_classification_report(labels, preds, pred_labels, label_list):
@@ -245,7 +217,10 @@ def compute_classification_report(labels, preds, pred_labels, label_list):
     labels = pred_labels
     true_predictions = [[label_list[p] for (p, l) in zip(prediction, label) if l != -100]
                         for prediction, label in zip(predictions, labels)]
-    return classification_report(true_labels, true_predictions)
+    true_labels = [get_cleaned_label(l) for list_ in true_labels for l in list_]
+    true_predictions = [get_cleaned_label(l) for list_ in true_predictions for l in list_]
+    labels=[lab for lab in set(true_predictions) if lab!='O']
+    return classification_report(true_labels, true_predictions, labels=labels)
 
 def get_cleaned_label(label):
     if "-" in label:
@@ -274,6 +249,7 @@ def build_confusion_matrix(labels, preds, pred_labels, label_list):
 
 
 def read_trainer_logs(filepath, final_train_metrics, final_eval_metrics):
+    print(filepath)
     df = pd.read_json(filepath)
     eval_dicts = []
     training_dicts = []

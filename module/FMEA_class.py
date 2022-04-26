@@ -10,16 +10,18 @@ import os
 import pandas as pd
 import numpy as np
 from transformers import Trainer, pipeline, TrainingArguments, AutoTokenizer, DataCollatorForTokenClassification, BertForTokenClassification
-from module.NER_utils import build_confusion_matrix, compute_classification_report, split_docs_to_sentances, tokenize, tokenize_and_align_labels
+from module.NER_utils import build_confusion_matrix, compute_classification_report, split_docs_to_sentances, tokenize, tokenize_and_align_labels, read_doccano_annots, clean_doccano_annots
 from datasets import load_from_disk, Dataset
 from torch import cuda, tensor
 import torch
 import spacy
+from spacy.training import offsets_to_biluo_tags
 from sklearn.cluster import DBSCAN, AgglomerativeClustering
 from cairosvg import svg2pdf
 import pdfkit
 from pathlib import Path
 import aspose.words as aw
+import random
 
 #spacy.require_gpu()
 
@@ -38,19 +40,36 @@ class FMEA():
             self.input_data = load_from_disk(filepath)
             self.true_labels = self.input_data[label_col]
         elif formatted == False:
-            test_data = pd.read_csv(filepath, index_col=0)
-            test_data = test_data.dropna(subset=[text_col])
-            #sentences
-            self.nlp = spacy.load("en_core_web_trf")
-            self.nlp.add_pipe("sentencizer")
-            test_docs = test_data[text_col].tolist()
-            docs = [self.nlp(doc) for doc in test_docs]
-            test_data['docs'] = docs
-            self.raw_df = test_data
-            sentence_df = split_docs_to_sentances(test_data, id_col='Tracking #',tags=False)
-            self.data_df = sentence_df 
-            self.data_df['sentence'] = [sent.text for sent in sentence_df["sentence"].tolist()]
-            self.input_data = self.data_df['sentence'].tolist()
+            if '.csv' in filepath:
+                test_data = pd.read_csv(filepath, index_col=0)
+                test_data = test_data.dropna(subset=[text_col])
+                #sentences
+                self.nlp = spacy.load("en_core_web_trf")
+                self.nlp.add_pipe("sentencizer")
+                test_docs = test_data[text_col].tolist()
+                docs = [self.nlp(doc) for doc in test_docs]
+                test_data['docs'] = docs
+                self.raw_df = test_data
+                sentence_df = split_docs_to_sentances(test_data, id_col='Tracking #',tags=False)
+                self.data_df = sentence_df 
+                self.data_df['sentence'] = [sent.text for sent in sentence_df["sentence"].tolist()]
+                self.input_data = self.data_df['sentence'].tolist()
+            elif '.jsonl' in filepath:
+                test_data = read_doccano_annots(filepath)
+                test_data = clean_doccano_annots(test_data)
+                #break into sentences and tags
+                self.nlp = spacy.load("en_core_web_trf")
+                self.nlp.add_pipe("sentencizer")
+                test_docs = test_data[text_col].tolist()
+                docs = [self.nlp(doc) for doc in test_docs]
+                test_data['docs'] = docs
+                self.raw_df = test_data
+                test_data['tags'] = [offsets_to_biluo_tags(test_data.at[i,'docs'], test_data.at[i,'label']) for i in range(len(test_data))]
+                sentence_df = split_docs_to_sentances(test_data, id_col='Tracking #', tags=True)
+                self.data_df = sentence_df 
+                self.data_df['sentence'] = [sent.text for sent in sentence_df["sentence"].tolist()]
+                self.input_data = self.data_df['sentence'].tolist()
+                self.true_labels = self.data_df['tags']
             
     def predict(self):
         self.preds = self.token_classifier(self.input_data)
@@ -90,8 +109,6 @@ class FMEA():
                     new_ents = id_df.iloc[j]['predicted entities']
                 doc_ents.append(new_ents)
         self.data_df['document entities'] = doc_ents
-            
-            
     
     def get_entities_per_doc(self):
         #may need to clean entities... if so then use the entity label with the most chars, update
@@ -214,6 +231,87 @@ class FMEA():
                                                                self.id_col: lambda x: '; '.join(x)})
         #get most representatice doc somehow?
         return self.grouped_df
+    
+    def group_docs_manual(self, filename='', grouping_col='Mode', additional_cols=['Mission Type']):
+        if '.xlsx' in filename: 
+            manual_groups = pd.read_excel(filename)
+        elif '.csv' in filename:
+            manual_groups = pd.read_csv(filename)
+        if additional_cols != []:
+            for col in additional_cols:
+                self.data_df[col] = self.raw_df[col].tolist()
+        cluster = []
+        new_data_df = self.data_df.copy()
+        rows_added = 0
+        for i in range(len(self.data_df)):
+            id_ = self.data_df.iloc[i]['Tracking #']
+            group = manual_groups.loc[manual_groups['Tracking #']==id_].reset_index(drop=True)
+            if len(group) == 1:
+                cluster.append(group.at[0,grouping_col])
+            elif len(group) == 0:
+                cluster.append('misc')
+            elif len(group) == 2:
+                cluster.append(group.at[0,grouping_col])
+                cluster.append(group.at[1,grouping_col])
+                new_data_df = pd.concat([new_data_df.iloc[:i+rows_added][:],self.data_df.iloc[i:i+1][:], new_data_df.iloc[i+rows_added:][:]]).reset_index(drop=True)
+                rows_added += 1
+        self.data_df = new_data_df
+        #self.data_df.index = self.data_df[self.id_col]
+        self.data_df['cluster'] = cluster
+        agg_dict = {'CAU': lambda x: '; '.join([i for i in x if i!=""]),
+                    'MOD': lambda x: '; '.join([i for i in x if i!=""]),
+                    'EFF': lambda x: '; '.join([i for i in x if i!=""]),
+                    'CON': lambda x: '; '.join([i for i in x if i!=""]),
+                    'REC': lambda x: '; '.join([i for i in x if i!=""]),
+                    self.id_col: lambda x: '; '.join(x)}
+        ad_col_dict = {col: lambda x: '; '.join(set([i.replace("Fire, ","") for i in x])) for col in additional_cols}
+        agg_dict.update(ad_col_dict)
+        self.grouped_df = self.data_df.groupby('cluster').agg(agg_dict)
+        sampled_ids = []
+        for i in range(len(self.grouped_df)):
+            ids = self.grouped_df.iloc[i][self.id_col].split("; ")
+            sampled = random.sample(ids, min(len(ids),3))
+            sampled = "; ".join(sampled)
+            sampled_ids.append(sampled)
+        self.grouped_df['Sampled '+self.id_col] = sampled_ids
+        return self.grouped_df
+    
+    def post_process_fmea(self, rows_to_drop=[], id_name='SAFECOM', phase_name='Mission Type'):
+        #clean data in NER columns: remove duplicate words, form tokens from token pieces
+        for i in self.grouped_df.index:
+            for ent in ['CAU', 'MOD', 'EFF', 'CON', 'REC']:
+                text = self.grouped_df.loc[i, ent]
+                docs = text.split("; ")
+                new_docs = []
+                for doc_text in docs:
+                    doc_text = doc_text.split(", ")
+                    new_text = []
+                    for word in doc_text:
+                        if "##" in word:
+                            #check prev word
+                            if doc_text.index(word) != 0 and len(new_text)>0:
+                                new_word = new_text[-1] + word.strip("##") #combines with previous word
+                                del new_text[-1] #deletes previous word
+                                new_text.append(new_word) # updates with combined word
+                            else:
+                                # do not append word
+                                continue
+                        else:
+                            new_text.append(word)
+                    new_docs.append(", ".join(new_text))
+                new_docs = ", ".join(new_docs)
+                seen = set()
+                new_docs = ', '.join(seen.add(i) or i for i in new_docs.split(", ") if i not in seen)
+                self.grouped_df.at[i, ent] = new_docs
+        #format columns
+        col_to_label = {'CAU': "Cause", 'MOD': "Failure Mode", 'EFF': "Effect",
+                        "CON": "Control Process", "REC": "Recommendations",
+                        "Total Frequency": 'Frequency', 'severity':"Severity",
+                        "Sampled "+self.id_col: id_name, phase_name: 'Phase'}
+        fmea_cols = [phase_name,'CAU', 'MOD', 'EFF', 'CON', 'REC', 'Total Frequency', 'severity', "Sampled "+self.id_col]
+        self.fmea_df = self.grouped_df[fmea_cols]
+        self.fmea_df.columns = [col_to_label[col] for col in self.fmea_df.columns]
+        return self.fmea_df
     
     def calc_frequency(self):
         self.grouped_df[self.id_col]
