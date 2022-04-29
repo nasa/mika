@@ -29,7 +29,7 @@ print(device)
 nlp = spacy.load("en_core_web_trf")
 nlp.add_pipe("sentencizer")
 
-file = os.path.join('data','UAS_fire_SAFECOM_annotated_SA.jsonl')
+file = os.path.join('data','srandrad_safecom_v2.jsonl')
 LLIS_folder = os.path.join('data','annotated_LLIS')
 #read in doccano annotations
 df = read_doccano_annots(file)
@@ -37,8 +37,10 @@ text_df = df[['data', 'label', 'Tracking #']] #"Lesson ID"]]
 llis_files = [f for f in os.listdir(LLIS_folder)]
 llis_dfs = []
 for llis_file in llis_files:
-    llis_file = os.path.join('data','annotated_LLIS', llis_file)
-    llis_dfs.append(read_doccano_annots(llis_file))
+    if "HW" in llis_file: encoding=True
+    else: encoding = False
+    llis_file = os.path.join(LLIS_folder, llis_file)
+    llis_dfs.append(read_doccano_annots(llis_file, encoding=encoding))
 llis_df = pd.concat(llis_dfs).reset_index(drop=True)
 llis_df = llis_df[['data', 'label', 'Lesson ID']]
 #clean doccano annotations
@@ -77,14 +79,18 @@ llis_df_issues = llis_df.iloc[inds_with_issues][:].reset_index(drop=True)
 if len(llis_df_issues)>0: print("error: there are documents with invalid tags")
 
 #set up labels
-total_tags= pd.DataFrame({'tags':[t for tag in text_df['tags'] for t in tag]})
+total_tags= pd.DataFrame({'tags':[t for tag in llis_df['tags'] for t in tag]})
+tags_simple = pd.DataFrame({'tags':[t.split("-")[1] if "-" in t else t for tag in llis_df['tags'] for t in tag]})
 labels_to_ids = {k: v for v, k in enumerate(total_tags['tags'].unique())}
 ids_to_labels = {v: k for v, k in enumerate(total_tags['tags'].unique())}
 
 #look at frequencies
-#print("Number of tags: {}".format(len(total_tags['tags'].unique())))
-#frequencies = total_tags['tags'].value_counts()
-#print(frequencies)
+print("Number of tags: {}".format(len(total_tags['tags'].unique())))
+frequencies = total_tags['tags'].value_counts()
+print(frequencies)
+print("Number of tags: {}".format(len(tags_simple['tags'].unique())))
+frequencies = tags_simple['tags'].value_counts()
+print(frequencies)
 
 #prepare dataset and dataloader
 #convert df from docs to sentences
@@ -111,7 +117,7 @@ llis_sentence_df['tokens'] = [[tok.orth_ for tok in llis_sentence_df.iloc[i]['se
 model_checkpoint = os.path.join("models","Pre-trained-BERT","checkpoint-318766")
 tokenizer = AutoTokenizer.from_pretrained(model_checkpoint)
 
-train_size = 0.9
+train_size = 0.8
 
 #train, test both llis
 train_dataset = llis_sentence_df.sample(frac=train_size,random_state=200)
@@ -159,11 +165,11 @@ model =BertForTokenClassification.from_pretrained( #AutoModelForTokenClassificat
 #training setup
 data_collator = DataCollatorForTokenClassification(tokenizer=tokenizer)
 args = TrainingArguments(
-    "models/FMEA-ner-LLIS-weighted_loss",
+    "models/FMEA-ner-model-3ep",
     evaluation_strategy="steps",
     save_strategy="epoch",
     learning_rate=2e-5,
-    num_train_epochs=4,
+    num_train_epochs=3,
     weight_decay=0.01,
     push_to_hub=False,
     per_device_train_batch_size = 4,
@@ -235,13 +241,11 @@ preds, label_ids, pred_metric = trainer.predict(safecom_data)
 labels = safecom_data['labels']
 y_pred = np.argmax(preds, axis=1)
 print(compute_classification_report(labels, preds, label_ids, ids_to_labels))
-build_confusion_matrix(labels, preds, label_ids, ids_to_labels)
+build_confusion_matrix(labels, preds, label_ids, ids_to_labels, save=True, savepath="results/safecom_")
 #"""
 #"""
-num_train = len(train_dataset); num_epochs = args.num_train_epochs; num_batch = args.per_device_train_batch_size
-num_steps = round(((num_train+1) / num_batch) * num_epochs)
-
-filename = os.path.join(os.getcwd(),"models", "FMEA-ner-LLIS-weighted_loss", "checkpoint-"+str(num_steps), "trainer_state.json")
-plot_eval_results(filename)
+num_steps = trainer.state.max_steps
+filename = os.path.join(os.getcwd(),"models", "FMEA-ner-model-3ep", "checkpoint-"+str(num_steps), "trainer_state.json")
+plot_eval_results(filename, save=True, savepath='results/')
 trainer.save_model()
 #"""

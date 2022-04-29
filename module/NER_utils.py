@@ -17,7 +17,9 @@ import seaborn as sn
 import matplotlib.pyplot as plt
 import copy
 import matplotlib.cm as cm 
-
+import matplotlib
+matplotlib.style.use("seaborn")
+plt.rcParams["font.family"] = "Times New Roman"
 
 #device = 'cuda' if cuda.is_available() else 'cpu'
 
@@ -228,7 +230,8 @@ def get_cleaned_label(label):
     else:
         return label
     
-def build_confusion_matrix(labels, preds, pred_labels, label_list):
+def build_confusion_matrix(labels, preds, pred_labels, label_list, save=False, savepath=""):
+    FONT=14
     true_labels = [get_cleaned_label(label_list[l]) for label in labels for l in label if l != -100 ]
     predictions = np.argmax(preds, axis=-1)
     labels = pred_labels
@@ -241,15 +244,16 @@ def build_confusion_matrix(labels, preds, pred_labels, label_list):
     my_cmap = copy.copy(cm.get_cmap('viridis')) # copy the default cmap
     conf_mat = confusion_matrix(true_labels, true_predictions, labels=entities, normalize='true')
     conf_mat = pd.DataFrame(conf_mat, index=labels, columns=labels)
-    sn.heatmap(conf_mat, annot=True, annot_kws={"size": 10}, cmap=my_cmap) #norm=LogNorm(), cmap=my_cmap, fmt='d') # font size
-    plt.ylabel('True label')
-    plt.xlabel('Predicted label')
+    sn.heatmap(conf_mat, annot=True, annot_kws={"size": FONT}, cmap=my_cmap) #norm=LogNorm(), cmap=my_cmap, fmt='d') # font size
+    plt.ylabel('True label', fontsize=FONT)
+    plt.xlabel('Predicted label', fontsize=FONT)
+    if save==True:
+        plt.savefig(savepath+"confusion_matrix.pdf", bbox_inches="tight")
     plt.show()
     return cm, true_predictions, true_labels
 
 
 def read_trainer_logs(filepath, final_train_metrics, final_eval_metrics):
-    print(filepath)
     df = pd.read_json(filepath)
     eval_dicts = []
     training_dicts = []
@@ -285,7 +289,7 @@ def plot_loss(eval_df, training_df, save, savepath):
     plt.legend(fontsize=FONT)
     plt.tick_params(axis='both', which='major', labelsize=FONT)
     if save:
-        plt.savefig(savepath+".pdf")
+        plt.savefig(savepath+"training_val_loss.pdf", bbox_inches="tight")
     plt.show()
     return
 
@@ -303,7 +307,7 @@ def plot_eval_metrics(eval_df, save, savepath):
     plt.legend(fontsize=FONT)
     plt.tick_params(axis='both', which='major', labelsize=FONT)
     if save:
-        plt.savefig(savepath+".pdf")
+        plt.savefig(savepath+"val_metrics.pdf", bbox_inches="tight")
     plt.show()
     return
 

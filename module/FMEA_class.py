@@ -17,17 +17,17 @@ import torch
 import spacy
 from spacy.training import offsets_to_biluo_tags
 from sklearn.cluster import DBSCAN, AgglomerativeClustering
-from cairosvg import svg2pdf
-import pdfkit
 from pathlib import Path
-import aspose.words as aw
 import random
+from nltk.corpus import words
 
 #spacy.require_gpu()
 
 #device = 'cuda' if cuda.is_available() else 'cpu'
 
 class FMEA():
+    __english_vocab = set([w.lower() for w in words.words()])
+    
     def __init__(self):
         return
     
@@ -232,7 +232,7 @@ class FMEA():
         #get most representatice doc somehow?
         return self.grouped_df
     
-    def group_docs_manual(self, filename='', grouping_col='Mode', additional_cols=['Mission Type']):
+    def group_docs_manual(self, filename='', grouping_col='Mode', additional_cols=['Mission Type'], sample=1):
         if '.xlsx' in filename: 
             manual_groups = pd.read_excel(filename)
         elif '.csv' in filename:
@@ -270,13 +270,13 @@ class FMEA():
         sampled_ids = []
         for i in range(len(self.grouped_df)):
             ids = self.grouped_df.iloc[i][self.id_col].split("; ")
-            sampled = random.sample(ids, min(len(ids),3))
+            sampled = random.sample(ids, min(len(ids),sample))
             sampled = "; ".join(sampled)
             sampled_ids.append(sampled)
         self.grouped_df['Sampled '+self.id_col] = sampled_ids
         return self.grouped_df
     
-    def post_process_fmea(self, rows_to_drop=[], id_name='SAFECOM', phase_name='Mission Type'):
+    def post_process_fmea(self, rows_to_drop=[], id_name='SAFECOM', phase_name='Mission Type', max_words=20):
         #clean data in NER columns: remove duplicate words, form tokens from token pieces
         for i in self.grouped_df.index:
             for ent in ['CAU', 'MOD', 'EFF', 'CON', 'REC']:
@@ -292,7 +292,10 @@ class FMEA():
                             if doc_text.index(word) != 0 and len(new_text)>0:
                                 new_word = new_text[-1] + word.strip("##") #combines with previous word
                                 del new_text[-1] #deletes previous word
-                                new_text.append(new_word) # updates with combined word
+                                if new_word in self.__english_vocab:
+                                    new_text.append(new_word) # updates with combined word if its a real word
+                                elif word.strip("##") == 'ua':
+                                    new_text.append('uas')
                             else:
                                 # do not append word
                                 continue
@@ -306,11 +309,16 @@ class FMEA():
         #format columns
         col_to_label = {'CAU': "Cause", 'MOD': "Failure Mode", 'EFF': "Effect",
                         "CON": "Control Process", "REC": "Recommendations",
-                        "Total Frequency": 'Frequency', 'severity':"Severity",
-                        "Sampled "+self.id_col: id_name, phase_name: 'Phase'}
-        fmea_cols = [phase_name,'CAU', 'MOD', 'EFF', 'CON', 'REC', 'Total Frequency', 'severity', "Sampled "+self.id_col]
+                        "frequency": 'Frequency', 'severity':"Severity",
+                        "Sampled "+self.id_col: id_name, phase_name: 'Phase',
+                        "risk": "Risk"}
+        fmea_cols = [phase_name,'CAU', 'MOD', 'EFF', 'CON', 'REC', 'frequency', 'severity', "risk", "Sampled "+self.id_col]
         self.fmea_df = self.grouped_df[fmea_cols]
         self.fmea_df.columns = [col_to_label[col] for col in self.fmea_df.columns]
+        if max_words is not None:
+            for col in ['Cause', 'Failure Mode', 'Effect', 'Control Process', "Recommendations"]:
+                for i in self.fmea_df.index:
+                    self.fmea_df.at[i, col] = " ".join(self.fmea_df.at[i,col].split(" ")[:max_words])
         return self.fmea_df
     
     def calc_frequency(self):
