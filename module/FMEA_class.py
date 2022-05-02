@@ -36,6 +36,7 @@ class FMEA():
         
     def load_data(self, filepath, formatted=False, text_col="Narrative", id_col="Tracking #", label_col="labels"):
         self.id_col = id_col
+        self.text_col = text_col
         if formatted == True:
             self.input_data = load_from_disk(filepath)
             self.true_labels = self.input_data[label_col]
@@ -110,11 +111,11 @@ class FMEA():
                 doc_ents.append(new_ents)
         self.data_df['document entities'] = doc_ents
     
-    def get_entities_per_doc(self):
-        #may need to clean entities... if so then use the entity label with the most chars, update
-        #start and end for each of the conflicting entities
-        #connect entity preds back to each sentence
-        self.data_df['predicted entities'] = self.preds
+    def get_entities_per_doc(self, pred=True):
+        if pred==True:
+            self.data_df['predicted entities'] = self.preds
+        else: 
+            self.data_df['predicted entities'] = self.data_df['tags']
         self.update_entities_per_sentence()
         self.data_df = self.data_df.groupby(self.id_col).agg({'document entities': 'sum', 'sentence': lambda x: ' '.join(x)})
         #go through predicted entities
@@ -386,15 +387,30 @@ class FMEA():
         #save table
         return
     
-    def display_doc(self, doc_id, save=True, output_path="", colors_path=None):
+    def display_doc(self, doc_id, save=True, output_path="", colors_path=None, pred=True):
         #see https://spacy.io/usage/visualizers
-        doc = self.data_df.loc[self.data_df[self.id_col]==str(doc_id)].reset_index(drop=True)
-        text = doc.iloc[0]['sentence']
-        ents = doc.iloc[0]['document entities']
-        cleaned_ents = []
-        for ent in ents:
-            ent['label'] = ent.pop('entity_group')
-            cleaned_ents.append(ent)
+        #doc = self.data_df.loc[self.data_df[self.id_col]==str(doc_id)].reset_index(drop=True)
+        if pred == False:
+            text_col = self.text_col
+            ent_col = 'label'
+            doc = self.raw_df.loc[self.raw_df[self.id_col]==str(doc_id)].reset_index(drop=True)
+        else: 
+            text_col = 'sentence'
+            ent_col = 'document entities'
+            doc = self.data_df.loc[self.data_df[self.id_col]==str(doc_id)].reset_index(drop=True)
+        text = doc.iloc[0][text_col]
+        ents = doc.iloc[0][ent_col]
+        if pred == True:
+            cleaned_ents = []
+            for ent in ents:
+                ent['label'] = ent.pop('entity_group')
+                cleaned_ents.append(ent)
+        elif pred == False:
+            cleaned_ents = []
+            for ent in ents:
+                ent_dict = {"start":ent[0], "end":ent[1], "label":ent[2]}
+                cleaned_ents.append(ent_dict)
+            
         ent_input = {"text": text,
                      "ents": cleaned_ents,
                      "title": doc_id}

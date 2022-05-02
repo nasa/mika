@@ -29,7 +29,12 @@ def safecom_severity(hazardous_mat, injury, damage):
     return severity
 
 if __name__ == '__main__':
-    #model_checkpoint = os.path.join(os.getcwd(),"models", "FMEA-ner", "checkpoint-4490")
+    """
+    fmea = FMEA()
+    file = "data/annotated_LLIS_IAA/srandrad_safecom_v2.jsonl"
+    input_data = fmea.load_data(file, formatted=False, text_col='data')
+    fmea.display_doc(doc_id="21-0098", save=True, output_path="results/21-0098_display_annotated", colors_path=os.path.join(os.getcwd(),'data','NER_label_config.json'), pred=False)
+    """
     model_checkpoint = os.path.join(os.getcwd(),"models", "FMEA-ner-model", "checkpoint-1424")
     #device = 'cuda' if cuda.is_available() else 'cpu'
     #cuda.empty_cache()
@@ -48,7 +53,6 @@ if __name__ == '__main__':
     
     print("loaded data")
     preds = fmea.predict()
-    #print(preds)
     df = fmea.get_entities_per_doc()
     fmea.display_doc(doc_id="21-0098", save=True, output_path="", colors_path=os.path.join(os.getcwd(),'data','NER_label_config.json'))
     #fmea.group_docs_with_meta()
@@ -61,10 +65,6 @@ if __name__ == '__main__':
     fmea.post_process_fmea(max_words=10)
     #"""
     fmea.fmea_df.to_csv("results/safecom_fmea_.csv")
-    #df.to_csv("test_docs_with_ents.csv")
-    #print(labels[0])
-    #print(fmea.input_data)#['tokens'][0])
-    #print(raw_pred[0], label_ids[0])
     
     #metrics = fmea.evaluate_preds()
     #print(metrics["Confusion Matrix"])
