@@ -350,11 +350,11 @@ class In_Time_Risk_Matrix():
                  str_dam = preds_df.at['Diff_Structures_Damages', hazard]
                  str_des = preds_df.at['Diff_Structures_Destroyed', hazard]
                  fatalities = preds_df.at['Diff_Fatalities', hazard]
-                 if injuries == 0 and fatalities == 0 and str_des == 0 and str_dam ==0:
+                 if injuries == 0 and fatalities == 0 and str_des <= 5 and str_dam <= 5:
                      impact = "Minimal Impact"
-                 elif injuries <= 2 and fatalities == 0 and str_des == 0 and str_dam <= 10:
-                     impact = "Minor Impact"
                  elif injuries <= 2 and fatalities == 0 and str_des <= 10 and str_dam <= 10:
+                     impact = "Minor Impact"
+                 elif injuries <= 2 and fatalities == 0 and (str_des > 10 or str_dam > 10):
                      impact = "Major Impact"
                  else:
                     if fatalities<2:
@@ -656,10 +656,10 @@ class In_Time_Risk_Matrix():
         #severity table -> index
         for hazard in self.hazards:
             temp_df = severity_table.loc[severity_table["Hazard"]==hazard.replace("_", " ")].reset_index(drop=True)
-            severities[hazard].append(temp_df.at[0,"Average Injuries"])
+            severities[hazard].append(round(temp_df.at[0,"Average Injuries"]))
             severities[hazard].append(temp_df.at[0,"Average Structures Damaged"])
             severities[hazard].append(temp_df.at[0,"Average Structures Destroyed"])
-            severities[hazard].append(temp_df.at[0,"Average Fatalities"])
+            severities[hazard].append(round(temp_df.at[0,"Average Fatalities"]))
         severity_df = pd.DataFrame(severities, 
                                 index=['Diff_Injuries', 'Diff_Structures_Damages', 
                                          'Diff_Structures_Destroyed','Diff_Fatalities'])
