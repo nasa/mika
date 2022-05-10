@@ -1,0 +1,18 @@
+,Hazard,Likelihood,Severity,Risk
+0,Aerial Grounding,Probable,Critical Impact,High
+1,Command Transitions,Frequent,Critical Impact,High
+2,Cultural Resources,Probable,Critical Impact,High
+3,Dry Weather,Probable,Major Impact,Medium
+4,Ecological,Probable,Critical Impact,High
+5,Evacuations,Frequent,Critical Impact,High
+6,Extreme Weather,Frequent,Minor Impact,Medium
+7,Floods,Remote,Critical Impact,Medium
+8,Hazardous Terrain,Frequent,Minor Impact,Medium
+9,Inaccurate Mapping,Probable,Minor Impact,Medium
+10,Infrastructure,Probable,Critical Impact,High
+11,Injuries,Probable,Critical Impact,High
+12,Law Violations,Probable,Minor Impact,Medium
+13,Livestock,Probable,Critical Impact,High
+14,Military Base,Remote,Minor Impact,Low
+15,Resource Issues,Probable,Critical Impact,High
+16,Traffic,Frequent,Minor Impact,Medium

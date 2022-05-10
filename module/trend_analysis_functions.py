@@ -383,8 +383,8 @@ def calc_metrics(hazard_file, preprocessed_df, rm_outliers=True, distance=3, tar
                     time_of_occurence_pct_contained[hazard][year] = remove_outliers(time_of_occurence_pct_contained[hazard][year])
      return time_of_occurence_days, time_of_occurence_pct_contained, frequency, fires, frequency_fires, categories, hazards, years, unique_ids
 
-def calc_severity(fires, summary_reports, rm_outliers=True):
-    #TODO: Generalize this!
+def calc_severity(fires, summary_reports, rm_all_outliers=False, rm_severity_outliers=True):
+    #TODO: Generalize this
     severity_total = {}; injuries_total = {}; fatalities_total = {}; str_dam_total = {}; str_des_total = {}
     for hazard in fires:
         severity_total[hazard] = {}; injuries_total[hazard] = {}; fatalities_total[hazard] = {}
@@ -400,19 +400,19 @@ def calc_severity(fires, summary_reports, rm_outliers=True):
                 injuries_total[hazard][year].append(int(id_df.iloc[0]["INJURIES_TOTAL"])); fatalities_total[hazard][year].append(int(id_df.iloc[0]["FATALITIES"]))
                 str_dam_total[hazard][year].append(int(id_df.iloc[0]["STR_DAMAGED_TOTAL"])); str_des_total[hazard][year].append(int(id_df.iloc[0]["STR_DESTROYED_TOTAL"]))
     severity_table = pd.DataFrame({"Hazard": [hazard for hazard in severity_total],
-                                    "Average Severity": [round(np.average(remove_outliers([val for year in severity_total[hazard] for val in severity_total[hazard][year]],rm_outliers=rm_outliers)),3) for hazard in severity_total],
-                                    "std dev Severity": [round(np.std(remove_outliers([val for year in severity_total[hazard] for val in severity_total[hazard][year]],rm_outliers=rm_outliers)),3) for hazard in severity_total],
-                                    "Average Injuries": [round(np.average(remove_outliers([val for year in injuries_total[hazard] for val in injuries_total[hazard][year]],rm_outliers=rm_outliers)),3) for hazard in injuries_total],
-                                    "std dev Injuries": [round(np.std(remove_outliers([val for year in injuries_total[hazard] for val in injuries_total[hazard][year]],rm_outliers=rm_outliers)),3) for hazard in injuries_total],
-                                    "Average Fatalities": [round(np.average(remove_outliers([val for year in fatalities_total[hazard] for val in fatalities_total[hazard][year]],rm_outliers=rm_outliers)),3) for hazard in fatalities_total],
-                                    "std dev Fatalities": [round(np.std(remove_outliers([val for year in fatalities_total[hazard] for val in fatalities_total[hazard][year]],rm_outliers=rm_outliers)),3) for hazard in fatalities_total],
-                                    "Average Structures Damaged": [round(np.average(remove_outliers([val for year in str_dam_total[hazard] for val in str_dam_total[hazard][year]],rm_outliers=rm_outliers)),3) for hazard in str_dam_total],
-                                    "std dev Structures Damaged": [round(np.std(remove_outliers([val for year in str_dam_total[hazard] for val in str_dam_total[hazard][year]],rm_outliers=rm_outliers)),3) for hazard in str_dam_total],
-                                    "Average Structures Destroyed": [round(np.average(remove_outliers([val for year in str_des_total[hazard] for val in str_des_total[hazard][year]],rm_outliers=rm_outliers)),3) for hazard in str_des_total],
-                                    "std dev Structures Destroyed": [round(np.std(remove_outliers([val for year in str_des_total[hazard] for val in str_des_total[hazard][year]],rm_outliers=rm_outliers)),3) for hazard in str_des_total],
+                                    "Average Severity": [round(np.average(remove_outliers([val for year in severity_total[hazard] for val in severity_total[hazard][year]],rm_outliers=rm_severity_outliers)),3) for hazard in severity_total],
+                                    "std dev Severity": [round(np.std(remove_outliers([val for year in severity_total[hazard] for val in severity_total[hazard][year]],rm_outliers=rm_severity_outliers)),3) for hazard in severity_total],
+                                    "Average Injuries": [round(np.average(remove_outliers([val for year in injuries_total[hazard] for val in injuries_total[hazard][year]],rm_outliers=rm_all_outliers)),3) for hazard in injuries_total],
+                                    "std dev Injuries": [round(np.std(remove_outliers([val for year in injuries_total[hazard] for val in injuries_total[hazard][year]],rm_outliers=rm_all_outliers)),3) for hazard in injuries_total],
+                                    "Average Fatalities": [round(np.average(remove_outliers([val for year in fatalities_total[hazard] for val in fatalities_total[hazard][year]],rm_outliers=rm_all_outliers)),3) for hazard in fatalities_total],
+                                    "std dev Fatalities": [round(np.std(remove_outliers([val for year in fatalities_total[hazard] for val in fatalities_total[hazard][year]],rm_outliers=rm_all_outliers)),3) for hazard in fatalities_total],
+                                    "Average Structures Damaged": [round(np.average(remove_outliers([val for year in str_dam_total[hazard] for val in str_dam_total[hazard][year]],rm_outliers=rm_all_outliers)),3) for hazard in str_dam_total],
+                                    "std dev Structures Damaged": [round(np.std(remove_outliers([val for year in str_dam_total[hazard] for val in str_dam_total[hazard][year]],rm_outliers=rm_all_outliers)),3) for hazard in str_dam_total],
+                                    "Average Structures Destroyed": [round(np.average(remove_outliers([val for year in str_des_total[hazard] for val in str_des_total[hazard][year]],rm_outliers=rm_all_outliers)),3) for hazard in str_des_total],
+                                    "std dev Structures Destroyed": [round(np.std(remove_outliers([val for year in str_des_total[hazard] for val in str_des_total[hazard][year]],rm_outliers=rm_all_outliers)),3) for hazard in str_des_total],
                                     "n total": [len([val for year in severity_total[hazard] for val in severity_total[hazard][year]]) for hazard in severity_total],
-                                    "n after outliers": [len(remove_outliers([val for year in severity_total[hazard] for val in severity_total[hazard][year]],rm_outliers=rm_outliers)) for hazard in severity_total],
-                                    "formatted": [str(round(np.average(remove_outliers([val for year in severity_total[hazard] for val in severity_total[hazard][year]],rm_outliers=rm_outliers)),3))+"+-"+str(round(np.std(remove_outliers([val for year in severity_total[hazard] for val in severity_total[hazard][year]],rm_outliers=rm_outliers)),3)) for hazard in severity_total]
+                                    "n after outliers": [len(remove_outliers([val for year in severity_total[hazard] for val in severity_total[hazard][year]],rm_outliers=rm_all_outliers)) for hazard in severity_total],
+                                    "formatted": [str(round(np.average(remove_outliers([val for year in severity_total[hazard] for val in severity_total[hazard][year]],rm_outliers=rm_severity_outliers)),3))+"+-"+str(round(np.std(remove_outliers([val for year in severity_total[hazard] for val in severity_total[hazard][year]],rm_outliers=rm_severity_outliers)),3)) for hazard in severity_total]
                                     }
                                     )
     return severity_total, severity_table
@@ -462,7 +462,7 @@ def identify_docs_per_hazard(hazard_file, preprocessed_df, results_file, text_fi
             temp_fire_df = temp_df.loc[temp_df[id_field]==id_].reset_index(drop=True)
             for j in range(len(temp_fire_df)):
                 #fuel
-                fuel_ids = pd.read_csv(r"C:\Users\srandrad\smart_nlp\notebooks\fuel_unidentified.csv")['Tracking #'].tolist()
+                #fuel_ids = pd.read_csv(r"C:\Users\srandrad\smart_nlp\notebooks\fuel_unidentified.csv")['Tracking #'].tolist()
                 text = temp_fire_df.iloc[j][text_field]
                 #check for hazard -- looks at the hazard relevant words from the topic
                 hazard_name = hazards[i]
