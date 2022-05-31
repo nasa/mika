@@ -1,0 +1,30 @@
+,Category,Subcategory,Hazards,Frequency,Rate,Manual Category
+0,Human Factors,Risk Assessment,Water Contamination,10,0.435,Human Factors
+1,Human Factors,Decision Making;Leadership;Risk Assessment;Performance;Situational Awareness,Inaccurate Weather Data,16,0.696,Human Factors
+2,Contributing Factors,Equipment,Insufficient PPE,134,5.826,Equipment
+3,Human Factors,Decision Making;Leadership;Risk Assessment;Fatigue,Fatigue,71,3.087,Human Factors
+4,Human Factors,Fatigue,Heat Exhaustion,13,0.565,Medical
+5,Other Factors,Some poor schmuck could read this and think that this is what we do.,Insect Stings,7,0.304,Environment
+6,Contributing Factors,Equipment,Fuel Leak,65,2.826,Equipment
+7,Human Factors,Decision Making;Leadership;Risk Assessment;Performance;Situational Awareness,Inadequate Training or Certification,278,12.087,Human Factors
+8,Contributing Factors,Communications,Bandwidth,24,1.043,Communications
+9,Contributing Factors,Communications,Cargo operations overhead,39,1.696,Communications
+10,Contributing Factors,Communications,Red Flag Warning,34,1.478,Communications
+11,Contributing Factors,Equipment,Vehicle Collision or Accident,181,7.87,
+12,Contributing Factors,Environmental,Poison Oak,12,0.522,Environment
+13,Human Factors,Performance,Food Supply Issues,33,1.435,Human Factors
+14,Human Factors,Decision Making;Leadership;Risk Assessment,Drug use,28,1.217,Human Factors
+15,Human Factors,Situational Awareness,Burn,54,2.348,Medical
+16,Contributing Factors,Communications;Equipment;Other,Heart Attack,5,0.217,Human Factors
+17,Contributing Factors,Equipment,Reckless Driving,104,4.522,Equipment
+18,Human Factors,Decision Making;Leadership;Risk Assessment;Fatigue;Performance;Situational Awareness,Insufficient Breaks,46,2.0,Human Factors
+19,Contributing Factors,Communications,Technical Infrastructure Outage,144,6.261,Communications
+20,Contributing Factors,Environmental;Human Factors,Dehydration,15,0.652,Medical
+21,Human Factors,Situational Awareness,Falling Objects,112,4.87,Environment
+22,Contributing Factors,Other,Illness,58,2.522,Human Factors
+23,Contributing Factors,Communications,Communication Disruption,986,42.87,Communications
+24,Contributing Factors,Communications;Human Factors,Unsanitary Bathrooms,24,1.043,Human Factors
+25,Contributing Factors,Equipment,Entrapment,15,0.652,Environment
+26,Contributing Factors,Communications,Air to Ground Communication,223,9.696,Communications
+27,Contributing Factors,Equipment,Vehicle Damage,203,8.826,Equipment
+28,Contributing Factors,Equipment,Vehicle Breakdown,147,6.391,Equipment

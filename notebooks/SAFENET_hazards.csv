@@ -1,0 +1,31 @@
+,Hazard,Likelihood,Severity,Risk
+0,Air to Ground Communication,Remote,Minor Impact,Low
+1,Bandwidth,Remote,Minor Impact,Low
+2,Burn,Remote,Hazardous Impact,Medium
+3,Cargo operations overhead,Remote,Hazardous Impact,Medium
+4,Communication Disruption,Probable,Minor Impact,Medium
+5,Dehydration,Probable,Hazardous Impact,High
+6,Drug use,Remote,Minor Impact,Low
+7,Entrapment,Remote,Catastrophic Impact,High
+8,Falling Objects,Remote,Hazardous Impact,Medium
+9,Fatigue,Remote,Minor Impact,Low
+10,Food Supply Issues,Remote,Minor Impact,Low
+11,Fuel Leak,Remote,Minor Impact,Low
+12,Heart Attack,Remote,Hazardous Impact,Medium
+13,Heat Exhaustion,Remote,Hazardous Impact,Medium
+14,Illness,Remote,Minor Impact,Low
+15,Inaccurate Weather Data,Remote,Minor Impact,Low
+16,Inadequate Training or Certification,Probable,Hazardous Impact,High
+17,Insect Stings,Probable,Minor Impact,Medium
+18,Insufficient Breaks,Remote,Minor Impact,Low
+19,Insufficient PPE,Remote,Minor Impact,Low
+20,Poison Oak,Remote,Minor Impact,Low
+21,Reckless Driving,Remote,Minor Impact,Low
+22,Red Flag Warning,Remote,Minimal Impact,Low
+23,Technical Infrastructure Outage,Remote,Minor Impact,Low
+24,Unsanitary Bathrooms,Remote,Minor Impact,Low
+25,Vehicle Breakdown,Remote,Hazardous Impact,Medium
+26,Vehicle Collision or Accident,Remote,Hazardous Impact,Medium
+27,Vehicle Damage,Remote,Minor Impact,Low
+28,Water Contamination,Remote,Minor Impact,Low
+29,misc,Probable,Minimal Impact,Low
