@@ -437,11 +437,9 @@ def identify_docs_per_hazard(hazard_file, preprocessed_df, results_file, text_fi
     for i in range(len(hazards)):
          num_df = hazard_info['topic-focused'].loc[hazard_info['topic-focused']['Hazard name'] == hazards[i]].reset_index(drop=True)
          nums = [int(i) for nums in num_df['Topic Number'] for i in str(nums).split(", ")]#num_df['Topic Number'].to_list() #identifies all topics related to this hazard
-         #print(nums)
-         #print(results)
          ids_df = results[results_text_field].loc[nums]
          ids_ = ids_df['documents'].to_list()
-         ids_ = ids_[0].strip("[]").split(", ")
+         ids_ = [id_ for k in range(len(ids_)) for id_ in ids_[k].strip("[]").split(", ")]
          ids_= [w.replace("'","") for w in ids_]
          ids_ = [id_ for id_ in ids_ if id_ not in ids_to_drop]
          # ids_ = ids_ only if topic nums > thres
@@ -449,10 +447,12 @@ def identify_docs_per_hazard(hazard_file, preprocessed_df, results_file, text_fi
              new_ids = []
              for id_ in ids_:
                  #check that topic prob> thres for at least one num
-                 id_df = doc_topic_distribution.loc[doc_topic_distribution['document number']==id_].reset_index(drop=True)
-                 probs = [float(id_df.iloc[0][text_field].strip("[]").split(" ")[num].strip("\n")) for num in nums]
+                 #print(id_, type(id_))
+                 #print(doc_topic_distribution.iloc[0]['document number'], type(doc_topic_distribution.iloc[0]['document number']))
+                 id_df = doc_topic_distribution.loc[doc_topic_distribution['document number'].astype(str)==id_].reset_index(drop=True)
+                 probs = [(id_df.iloc[0][text_field].strip("[]").split(" ")[num].strip("\n")) for num in nums]
                  max_prob = max(probs)
-                 if max_prob > topic_thresh:
+                 if float(max_prob) > topic_thresh:
                      new_ids.append(id_)
              ids_ = new_ids
          #print(ids_)

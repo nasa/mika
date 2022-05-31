@@ -20,10 +20,10 @@ from sklearn.cluster import DBSCAN, AgglomerativeClustering
 from pathlib import Path
 import random
 from nltk.corpus import words
-
+spacy.prefer_gpu()
 #spacy.require_gpu()
 
-#device = 'cuda' if cuda.is_available() else 'cpu'
+device = 'cuda' if cuda.is_available() else 'cpu'
 
 class FMEA():
     __english_vocab = set([w.lower() for w in words.words()])
@@ -42,7 +42,7 @@ class FMEA():
             self.true_labels = self.input_data[label_col]
         elif formatted == False:
             if '.csv' in filepath:
-                test_data = pd.read_csv(filepath, index_col=0)
+                test_data = pd.read_csv(filepath)#, index_col=0)
                 test_data = test_data.dropna(subset=[text_col])
                 #sentences
                 self.nlp = spacy.load("en_core_web_trf")
@@ -51,7 +51,7 @@ class FMEA():
                 docs = [self.nlp(doc) for doc in test_docs]
                 test_data['docs'] = docs
                 self.raw_df = test_data
-                sentence_df = split_docs_to_sentances(test_data, id_col='Tracking #',tags=False)
+                sentence_df = split_docs_to_sentances(test_data, id_col=id_col,tags=False)
                 self.data_df = sentence_df 
                 self.data_df['sentence'] = [sent.text for sent in sentence_df["sentence"].tolist()]
                 self.input_data = self.data_df['sentence'].tolist()
@@ -66,7 +66,7 @@ class FMEA():
                 test_data['docs'] = docs
                 self.raw_df = test_data
                 test_data['tags'] = [offsets_to_biluo_tags(test_data.at[i,'docs'], test_data.at[i,'label']) for i in range(len(test_data))]
-                sentence_df = split_docs_to_sentances(test_data, id_col='Tracking #', tags=True)
+                sentence_df = split_docs_to_sentances(test_data, id_col=id_col, tags=True)
                 self.data_df = sentence_df 
                 self.data_df['sentence'] = [sent.text for sent in sentence_df["sentence"].tolist()]
                 self.input_data = self.data_df['sentence'].tolist()
@@ -245,29 +245,30 @@ class FMEA():
         new_data_df = self.data_df.copy()
         rows_added = 0
         for i in range(len(self.data_df)):
-            id_ = self.data_df.iloc[i]['Tracking #']
-            group = manual_groups.loc[manual_groups['Tracking #']==id_].reset_index(drop=True)
-            if len(group) == 1:
+            id_ = self.data_df.iloc[i][self.id_col]
+            group = manual_groups.loc[manual_groups[self.id_col]==id_].reset_index(drop=True)
+            if len(group) == 1: #reports with one hazard
                 cluster.append(group.at[0,grouping_col])
-            elif len(group) == 0:
+            elif len(group) == 0: #reports with no hazards
                 cluster.append('misc')
-            elif len(group) == 2:
-                cluster.append(group.at[0,grouping_col])
-                cluster.append(group.at[1,grouping_col])
-                new_data_df = pd.concat([new_data_df.iloc[:i+rows_added][:],self.data_df.iloc[i:i+1][:], new_data_df.iloc[i+rows_added:][:]]).reset_index(drop=True)
-                rows_added += 1
-        self.data_df = new_data_df
-        #self.data_df.index = self.data_df[self.id_col]
-        self.data_df['cluster'] = cluster
-        agg_dict = {'CAU': lambda x: '; '.join([i for i in x if i!=""]),
-                    'MOD': lambda x: '; '.join([i for i in x if i!=""]),
-                    'EFF': lambda x: '; '.join([i for i in x if i!=""]),
-                    'CON': lambda x: '; '.join([i for i in x if i!=""]),
-                    'REC': lambda x: '; '.join([i for i in x if i!=""]),
-                    self.id_col: lambda x: '; '.join(x)}
+            elif len(group) >= 2: #reports with 2 or more hazards #something is wrong here!!
+                for j in range(len(group)):
+                    cluster.append(group.at[j,grouping_col])
+                    if j>0:
+                        new_data_df = pd.concat([new_data_df.iloc[:i+rows_added][:],self.data_df.iloc[i:i+1][:], new_data_df.iloc[i+rows_added:][:]]).reset_index(drop=True)
+                        rows_added += 1
+        self.data_df_all_rows = new_data_df
+        self.data_df_all_rows['cluster'] = cluster #need to add extra rows to data df for documents in multiple clusters
+        agg_dict = {'CAU': lambda x: '; '.join([i for i in x if i!="" and type(i)==str]),
+                    'MOD': lambda x: '; '.join([i for i in x if i!="" and type(i)==str]),
+                    'EFF': lambda x: '; '.join([i for i in x if i!="" and type(i)==str]),
+                    'CON': lambda x: '; '.join([i for i in x if i!="" and type(i)==str]),
+                    'REC': lambda x: '; '.join([i for i in x if i!="" and type(i)==str]),
+                    self.id_col: lambda x: '; '.join([str(i) for i in x])}#str(x))} #this may not work for all data sets
         ad_col_dict = {col: lambda x: '; '.join(set([i.replace("Fire, ","") for i in x])) for col in additional_cols}
         agg_dict.update(ad_col_dict)
-        self.grouped_df = self.data_df.groupby('cluster').agg(agg_dict)
+        self.grouped_df = self.data_df_all_rows.groupby('cluster').agg(agg_dict)
+
         sampled_ids = []
         for i in range(len(self.grouped_df)):
             ids = self.grouped_df.iloc[i][self.id_col].split("; ")
@@ -311,9 +312,12 @@ class FMEA():
         col_to_label = {'CAU': "Cause", 'MOD': "Failure Mode", 'EFF': "Effect",
                         "CON": "Control Process", "REC": "Recommendations",
                         "frequency": 'Frequency', 'severity':"Severity",
-                        "Sampled "+self.id_col: id_name, phase_name: 'Phase',
-                        "risk": "Risk"}
-        fmea_cols = [phase_name,'CAU', 'MOD', 'EFF', 'CON', 'REC', 'frequency', 'severity', "risk", "Sampled "+self.id_col]
+                        "Sampled "+self.id_col: id_name,"risk": "Risk"}
+        fmea_cols = ['CAU', 'MOD', 'EFF', 'CON', 'REC', 'frequency', 'severity', "risk", "Sampled "+self.id_col]
+        if phase_name != '':
+            col_to_label.update({phase_name: 'Phase'})
+            fmea_cols = [phase_name] + fmea_cols 
+            
         self.fmea_df = self.grouped_df[fmea_cols]
         self.fmea_df.columns = [col_to_label[col] for col in self.fmea_df.columns]
         if max_words is not None:
@@ -322,18 +326,24 @@ class FMEA():
                     self.fmea_df.at[i, col] = " ".join(self.fmea_df.at[i,col].split(" ")[:max_words])
         return self.fmea_df
     
-    def calc_frequency(self):
+    def get_year_per_doc(self, year_col='', config='/'):
+        if config == '/':
+            self.raw_df['Year'] = [self.raw_df.at[i,year_col].split('/')[-1].split(" ")[0] for i in range(len(self.raw_df))]
+        elif config == 'id':
+            self.raw_df['Year'] = [num.split("-")[0] for num in self.raw_df[self.id_col]]
+            
+    def calc_frequency(self, year_col=''): #something is wrong with the frequency
         self.grouped_df[self.id_col]
         #total frequency
         frequency = [len(ids.split("; ")) for ids in self.grouped_df[self.id_col]]
         self.grouped_df['Total Frequency'] = frequency
         #frequency per each year
-        years = list(set([num.split("-")[0] for num in self.data_df[self.id_col]]))
+        years = list(set([y for y in self.raw_df[year_col]]))
         years.sort()
         years_frequency = {year:[] for year in years}
         for i in range(len(self.grouped_df)):
             ids = self.grouped_df.iloc[i][self.id_col].split("; ")
-            year_ids = [num.split("-")[0] for num in ids]
+            year_ids = self.raw_df.loc[self.raw_df[self.id_col].isin(ids)][year_col].tolist()#[num.split("-")[0] for num in ids]
             for year in years_frequency:
                 years_frequency[year].append(year_ids.count(year))
         for year in years_frequency:
@@ -344,7 +354,6 @@ class FMEA():
         for i in range(len(self.grouped_df)):
             rate = self.grouped_df.iloc[i]['rate']
             max_year_freq = max([self.grouped_df.iloc[i][str(year)+" Frequency"] for year in years])
-            #print(i, max_year_freq, rate)
             if rate > 100 or max_year_freq > 100:
                 freq = 5 # occurs 100 times a year
             elif rate > 10 or max_year_freq >10:
@@ -359,17 +368,26 @@ class FMEA():
         self.grouped_df['frequency'] = FAA_freqs
         return self.grouped_df
     
-    def calc_severity(self, severity_func):
+    def calc_severity(self, severity_func, from_file=False, file_name='', file_kwargs={}):
         #severity func calculates the severity for each report in the raw df
-        self.raw_df = severity_func(self.raw_df)
-        #need to get average severity for row in grouped df
-        severity_per_row = []
-        for i in range(len(self.grouped_df)):
-            ids = self.grouped_df.iloc[i][self.id_col].split("; ")
-            temp_df = self.raw_df.loc[self.raw_df[self.id_col ].isin(ids)]
-            severities = temp_df['severity'].tolist()
-            severity_per_row.append(np.average(severities))
-        self.grouped_df['severity'] = severity_per_row
+        if from_file == False:
+            self.raw_df = severity_func(self.raw_df)
+            #need to get average severity for row in grouped df
+            severity_per_row = []
+            for i in range(len(self.grouped_df)):
+                ids = self.grouped_df.iloc[i][self.id_col].split("; ")
+                temp_df = self.raw_df.loc[self.raw_df[self.id_col ].isin(ids)]
+                severities = temp_df['severity'].tolist()
+                severity_per_row.append(np.average(severities))
+            self.grouped_df['severity'] = severity_per_row
+        else:
+            if '.xlsx' in file_name:
+                file_df = pd.read_excel(file_name, **file_kwargs)[file_kwargs['sheet_name'][0]] 
+            elif '.csv' in file_name:
+                file_df = pd.read_csv(file_name, **file_kwargs)
+            #make sure it is in same order as grouped df
+            file_df = severity_func(file_df, self.grouped_df)
+            self.grouped_df['severity'] = file_df['severity'].tolist() 
         return
     
     def calc_risk(self):
