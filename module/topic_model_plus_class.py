@@ -27,6 +27,7 @@ from bertopic import BERTopic
 from sentence_transformers import SentenceTransformer
 import gensim.corpora as corpora
 from gensim.models.coherencemodel import CoherenceModel
+from octis.evaluation_metrics.diversity_metrics import TopicDiversity
 
 class Topic_Model_plus():
     """
@@ -169,6 +170,8 @@ class Topic_Model_plus():
             text = ""
             for attr in self.list_of_attributes:
                 if not(str(self.data_df.iloc[i][attr]).strip("()").lower().startswith("see") or str(self.data_df.iloc[i][attr]).strip("()").lower().startswith("same") or str(self.data_df.iloc[i][attr])=="" or isinstance(self.data_df.iloc[i][attr],float) or str(self.data_df.iloc[i][attr]).lower().startswith("none")):
+                    if text != "":
+                        text += ". " 
                     text += str(self.data_df.iloc[i][attr])
             if text == "":
                 rows_to_drop.append(i)
@@ -499,15 +502,23 @@ class Topic_Model_plus():
         check_for_ngrams()
         #print("Preprocessed data extracted from: ", file_name)
     
-    def get_bert_coherence(self, coh_method='u_mass'):
+    def get_bert_coherence(self, coh_method='u_mass', from_probs=False):
         self.BERT_coherence = {}
         for attr in self.list_of_attributes:
-            docs = self.data_df[attr].tolist()
-            topics = self.BERT_model_topics_per_doc[attr]
+            if from_probs == False: #each document only has one topic
+                docs = self.data_df[attr].tolist()
+                topics = self.BERT_model_topics_per_doc[attr]
+            elif from_probs == True: #documents can have multiple topics
+                docs = []; topics = []
+                text = self.data_df[attr].tolist()
+                for doc in range(len(self.BERT_model_all_topics_per_doc[attr])):
+                    for k in self.BERT_model_all_topics_per_doc[attr][doc]:
+                        topics.append(k)
+                        docs.append(text[doc])
             topic_model = self.BERT_models[attr]
             self.BERT_coherence[attr] = self.calc_bert_coherence(docs, topics, topic_model, method=coh_method)
             
-    def calc_bert_coherence(self, docs, topics, topic_model, method = 'u_mass'):
+    def calc_bert_coherence(self, docs, topics, topic_model, method = 'u_mass', num_words=10):
         # Preprocess Documents
         documents = pd.DataFrame({"Document": docs,
                                   "ID": range(len(docs)),
@@ -524,9 +535,9 @@ class Topic_Model_plus():
         tokens = [analyzer(doc) for doc in cleaned_docs]
         dictionary = corpora.Dictionary(tokens)
         corpus = [dictionary.doc2bow(token) for token in tokens]
-        topic_words = [[words for words, _ in topic_model.get_topic(topic)]
+        topic_words = [[words for words, _ in topic_model.get_topic(topic)[:num_words]]
                        for topic in range(len(set(topics))-1)]
-
+       
         # Evaluate
         coherence_model = CoherenceModel(topics=topic_words,
                                          texts=tokens,
@@ -536,10 +547,18 @@ class Topic_Model_plus():
         coherence_per_topic = coherence_model.get_coherence_per_topic()
         return coherence_per_topic
     
-    def save_bert_coherence(self, return_df=False, coh_method='u_mass'):
-        self.get_bert_coherence(coh_method)
+    def save_bert_model(self, embedding_model=True):
         self.__create_folder()
-        max_topics = max([len(self.BERT_models[attr].topics) for attr in self.BERT_models])
+        for attr in self.list_of_attributes:
+            path = "_BERT_model_object.bin"
+            if self.reduced: path = "_Reduced" + path
+            self.BERT_models[attr].save(os.path.join(self.folder_path,attr+path),save_embedding_model=embedding_model)
+        self.save_preprocessed_data()
+        
+    def save_bert_coherence(self, return_df=False, coh_method='u_mass', from_probs=False):
+        self.get_bert_coherence(coh_method, from_probs)
+        self.__create_folder()
+        max_topics = max([len(self.BERT_models[attr].topics)-1 for attr in self.BERT_models])
         coherence_score = {"topic numbers": ["average score"]+['std dev']+[i for i in range(0,max_topics)]}
         for attr in self.list_of_attributes:
             coherence_score[attr] = []
@@ -555,27 +574,68 @@ class Topic_Model_plus():
         coherence_df = pd.DataFrame(coherence_score)
         if return_df == True:
             return coherence_df
-        coherence_df.to_csv(os.path.join(self.folder_path,"BERT_coherence.csv"))
-        
-        
-    def bert_topic(self, sentence_transformer_model='all-MiniLM-L6-v2', umap=None, hdbscan=None, count_vectorizor=None, ngram_range=(1,3), BERTkwargs={}):
-        self.sentence_models = {}; self.embeddings = {}; self.BERT_models = {}
-        self.BERT_model_topics_per_doc = {}; self.BERT_model_probs={}
+        path = "BERT_coherence_"
+        if self.reduced: path = "Reduced_" + path
+        coherence_df.to_csv(os.path.join(self.folder_path,path+coh_method+".csv"))
+    
+    def get_bert_topic_diversity(self, topk=10):
+        topic_diversity = TopicDiversity(topk=topk)
+        self.diversity = {attr: [] for attr in self.list_of_attributes}
         for attr in self.list_of_attributes:
-            sentence_model = SentenceTransformer(sentence_transformer_model)
-            corpus = self.data_df[attr]
-            embeddings = sentence_model.encode(corpus, show_progress_bar=False)
-            topic_model = BERTopic(umap_model=umap, vectorizer_model=count_vectorizor, hdbscan_model=hdbscan,
-                                   verbose=True, n_gram_range=ngram_range, **BERTkwargs)
-            topics, probs = topic_model.fit_transform(corpus, embeddings)
-            self.sentence_models[attr] = sentence_model
-            self.embeddings[attr] = embeddings
+            output = {'topics': [[words for words,_ in topic] 
+                                 for topic in self.BERT_models[attr].topics.values()]}
+            score = topic_diversity.score(output)
+            self.diversity[attr].append(score)
+    
+    def save_bert_topic_diversity(self, topk=10, return_df=False):
+        self.get_bert_topic_diversity(topk=10)
+        diversity_df = pd.DataFrame(self.diversity)
+        if return_df == True:
+            return diversity_df
+        path = "BERT_diversity_"
+        if self.reduced: path = "Reduced_" + path
+        diversity_df.to_csv(os.path.join(self.folder_path,path+".csv"))
+        
+    def bert_topic(self, sentence_transformer_model=None, umap=None, hdbscan=None, count_vectorizor=None, ngram_range=(1,3), BERTkwargs={}, from_probs=True, thresh=0.01):
+        self.sentence_models = {}; self.embeddings = {}; self.BERT_models = {}
+        self.BERT_model_topics_per_doc = {}; self.BERT_model_probs={}; self.BERT_model_all_topics_per_doc={}
+        for attr in self.list_of_attributes:
+            if sentence_transformer_model:
+                sentence_model = SentenceTransformer(sentence_transformer_model)
+                corpus = self.data_df[attr]
+                embeddings = sentence_model.encode(corpus, show_progress_bar=False)
+                topic_model = BERTopic(umap_model=umap, vectorizer_model=count_vectorizor, hdbscan_model=hdbscan,
+                                       verbose=True, n_gram_range=ngram_range, embedding_model=sentence_model,
+                                       **BERTkwargs)
+                topics, probs = topic_model.fit_transform(corpus, embeddings)
+                self.sentence_models[attr] = sentence_model
+                self.embeddings[attr] = embeddings
+            else:
+                corpus = self.data_df[attr]
+                topic_model = BERTopic(umap_model=umap, vectorizer_model=count_vectorizor, hdbscan_model=hdbscan,
+                                       verbose=True, n_gram_range=ngram_range, **BERTkwargs)
+                topics, probs = topic_model.fit_transform(corpus)
             self.BERT_models[attr] = topic_model
             self.BERT_model_topics_per_doc[attr] = topics
             self.BERT_model_probs[attr] = probs
+            if from_probs == True:
+                best_topics_per_doc = [np.argmax(prob_list) if max(prob_list)>thresh else -1 for prob_list in probs]
+                self.BERT_model_topics_per_doc[attr] = best_topics_per_doc
+                self.BERT_model_all_topics_per_doc[attr] = [[] for i in range(len(probs))]
+                for i in range(len(probs)):
+                    topic_probs = probs[i]#.strip("[]").split(" ")
+                    if len(topic_probs) > len(topics):
+                        topic_probs = [t for t in topic_probs if len(t)>0]
+                    topic_indices = [ind for ind in range(len(topic_probs)) if float(topic_probs[ind])>thresh]
+                    if len(topic_indices)==0:
+                        topic_indices = [-1]
+                        self.BERT_model_all_topics_per_doc[attr][i] = [-1]
+                    else:
+                        self.BERT_model_all_topics_per_doc[attr][i] = topic_indices
+
             self.reduced = False
     
-    def reduce_bert_topics(self, num=30):
+    def reduce_bert_topics(self, num=30, from_probs=True, thresh=0.01):
         self.reduced = True
         for attr in self.list_of_attributes:
             corpus = self.data_df[attr]
@@ -584,9 +644,24 @@ class Topic_Model_plus():
                                                       self.BERT_model_probs[attr] , nr_topics=num)
             self.BERT_models[attr] = topic_model
             self.BERT_model_topics_per_doc[attr] = topics
+            if from_probs == True:
+                best_topics_per_doc = [np.argmax(prob_list) if max(prob_list)>thresh else -1 for prob_list in probs]
+                self.BERT_model_topics_per_doc[attr] = best_topics_per_doc
+                self.BERT_model_all_topics_per_doc[attr] = [[] for i in range(len(probs))]
+                for i in range(len(probs)):
+                    topic_probs = probs[i]#.strip("[]").split(" ")
+                    if len(topic_probs) > len(topics):
+                        topic_probs = [t for t in topic_probs if len(t)>0]
+                    topic_indices = [ind for ind in range(len(topic_probs)) if float(topic_probs[ind])>thresh]
+                    if len(topic_indices)==0:
+                        topic_indices = [-1]
+                        self.BERT_model_all_topics_per_doc[attr][i] = [-1]
+                    else:
+                        self.BERT_model_all_topics_per_doc[attr][i] = topic_indices
+                        
             self.BERT_model_probs[attr] = probs
             
-    def save_bert_topics(self, return_df=False, p_thres=0.001, coherence=False, coh_method='u_mass'):
+    def save_bert_topics(self, return_df=False, p_thres=0.001, coherence=False, coh_method='u_mass', from_probs=False):
         """
         saves bert topics to file
         """
@@ -608,7 +683,7 @@ class Topic_Model_plus():
                 try:
                     topics_data["coherence"] = self.BERT_coherence[attr]
                 except:
-                    self.get_bert_coherence(coh_method)
+                    self.get_bert_coherence(coh_method, from_probs=from_probs)
                     topics_data["coherence"] = self.BERT_coherence[attr]
             for k in mdl.topics:
                 topics_data["topic number"].append(k)
@@ -633,6 +708,35 @@ class Topic_Model_plus():
         if return_df == True:
             return dfs
     
+    def save_bert_topics_from_probs(self, thresh=0.01, return_df=False, coherence=False, coh_method='u_mass', from_probs=True):
+        topic_dfs = self.save_bert_topics(return_df=True, coherence=coherence, coh_method=coh_method, from_probs=True)
+        topic_prob_dfs = self.get_bert_topics_from_probs(topic_dfs, thresh, coherence)
+        if return_df == False:
+            for attr in self.list_of_attributes:
+                if self.reduced:
+                    file = os.path.join(self.folder_path,attr+"_reduced_BERT_topics_modified.csv")
+                else: 
+                    file = os.path.join(self.folder_path,attr+"_BERT_topics_modified.csv")
+                topic_prob_dfs[attr].to_csv(file)
+        if return_df == True:
+            return topic_prob_dfs
+        
+    def get_bert_topics_from_probs(self, topic_df, thresh=0.01, coherence=False):
+        cols = ['topic number', 'topic words', 'number of words', 'best documents']
+        if coherence == True: cols += ['coherence']
+        new_topic_dfs = {attr:topic_df[attr][cols] for attr in self.list_of_attributes}
+        for attr in self.list_of_attributes:
+            documents_per_topic = {k:[] for k in new_topic_dfs[attr]['topic number']}
+            for i in range(len(self.BERT_model_all_topics_per_doc[attr])): 
+                doc_id = self.doc_ids[i]
+                topics = self.BERT_model_all_topics_per_doc[attr][i]
+                for k in topics:
+                    documents_per_topic[k].append(doc_id)
+            num_docs = [len(docs) for docs in documents_per_topic.values()]
+            new_topic_dfs[attr]['documents'] = [docs for docs in documents_per_topic.values()]
+            new_topic_dfs[attr]['number of documents in topic'] = num_docs
+        return new_topic_dfs
+        
     def save_bert_taxonomy(self, return_df=False, p_thres=0.0001):
         self.__create_folder()
         taxonomy_data = {attr:[] for attr in self.list_of_attributes}
@@ -646,6 +750,7 @@ class Topic_Model_plus():
         taxonomy_df = taxonomy_df.drop_duplicates()
         lesson_nums_per_row = []
         num_lessons_per_row = []
+            
         for i in range(len(taxonomy_df)):
             lesson_nums = []
             tax_row  = "\n".join([taxonomy_df.iloc[i][key] for key in taxonomy_data])
@@ -673,8 +778,8 @@ class Topic_Model_plus():
         doc_data = {attr: [] for attr in self.list_of_attributes}
         doc_data['document number'] = self.doc_ids
         for attr in self.list_of_attributes:
-            doc_data[attr] = self.BERT_model_topics_per_doc[attr]
-        doc_df = pd.DataFrame({key:pd.Series(value) for key, value in doc_data.items()})
+            doc_data[attr] = [l for l in self.BERT_model_probs[attr]]
+        doc_df = pd.DataFrame(doc_data)#{key:pd.Series(value) for key, value in doc_data.items()})
         if return_df == True:
             return doc_df
         if self.reduced:
@@ -683,18 +788,22 @@ class Topic_Model_plus():
             file = os.path.join(self.folder_path,"bert_topic_dist_per_doc.csv")
         doc_df.to_csv(file)
         
-    def save_bert_results(self, coherence=False, coh_method='u_mass'):
+    def save_bert_results(self, coherence=False, coh_method='u_mass', from_probs=True, thresh=0.01, topk=10):
         """
         saves the taxonomy, coherence, and document topic distribution in one excel file
         """
         
         self.__create_folder()
         data = {}
-        topics_dict = self.save_bert_topics(return_df=True, coherence=coherence, coh_method=coh_method)
+        if from_probs == False:
+            topics_dict = self.save_bert_topics(return_df=True, coherence=coherence, coh_method=coh_method)
+        elif from_probs == True:
+            topics_dict = self.save_bert_topics_from_probs(thresh=thresh, return_df=True, coherence=coherence, coh_method=coh_method)
         data.update(topics_dict)
         data["taxonomy"] = self.save_bert_taxonomy(return_df=True)
-        if coherence == True: data["coherence"] = self.save_bert_coherence(return_df=True, coh_method=coh_method)
+        if coherence == True: data["coherence"] = self.save_bert_coherence(return_df=True, coh_method=coh_method, from_probs=from_probs)
         data["document topic distribution"] = self.save_bert_document_topic_distribution(return_df=True)
+        data["topic diversity"] = self.save_bert_topic_diversity(topk=topk, return_df=True)
         if self.reduced:
             file = os.path.join(self.folder_path,"Reduced_BERTopic_results.xlsx")
         else: 
