@@ -1,0 +1,4 @@
+,Centralized Decision Making,Complexity,Coupling,Insufficient Analysis of Final Configuration,Insufficient Monitoring,Integration into an Existing System,Lack of Isolation or Protection from Environment,Scale of Effect,Time Dependency
+0,,subsystems,sensitivity,,,new,,,
+1,,interfacing,,,,,,,
+2,,interfacing subsystems,,,,,,,
