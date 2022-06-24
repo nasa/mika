@@ -1,24 +1,24 @@
 ,Hazard,Likelihood,Severity,Risk
 0,Airspace Control Hazards,Remote,Minimal Impact,Low
-1,Avionics Malfunction,Probable,Minor Impact,Medium
+1,Avionics Malfunction,Probable,Minimal Impact,Low
 2,Bucket Drop Failure,Probable,Minor Impact,Medium
 3,Cargo Letdown Failure,Probable,Minor Impact,Medium
 4,Control Surface Damage,Probable,Major Impact,Medium
 5,Door Failure,Probable,Major Impact,Medium
-6,Engine Malfunction,Probable,Minimal Impact,Low
-7,Fuel System Malfunction,Remote,Minimal Impact,Low
+6,Engine Malfunction,Probable,Minor Impact,Medium
+7,Fuel System Malfunction,Probable,Minor Impact,Medium
 8,Helitorch Operations Failure,Remote,Minor Impact,Low
 9,Hydraulic Fluid Leak,Remote,Minor Impact,Low
-10,In-flight Collision,Extremely Remote,Major Impact,Low
+10,In-flight Collision,Remote,Major Impact,Medium
 11,Inadequate PPE,Remote,Minimal Impact,Low
-12,Intrusion,Remote,Minimal Impact,Low
+12,Intrusion,Probable,Minimal Impact,Low
 13,Jumper Operations Hazards,Remote,Catastrophic Impact,High
-14,Landing Gear Malfunction,Remote,Minor Impact,Low
+14,Landing Gear Malfunction,Probable,Minor Impact,Medium
 15,Load Limits Exceeded,Remote,Minimal Impact,Low
-16,Medivac,Remote,Critical Impact,Medium
-17,Oil Malfunction,Remote,Minimal Impact,Low
-18,On-board Caution Light Illuminates,Remote,Minimal Impact,Low
+16,Medivac,Remote,Hazardous Impact,Medium
+17,Oil Malfunction,Probable,Minor Impact,Medium
+18,On-board Caution Light Illuminates,Probable,Minimal Impact,Low
 19,Personnel Duty Hours Exceeded,Remote,Minimal Impact,Low
-20,Radio Malfunction,Extremely Remote,Minor Impact,Low
+20,Radio Malfunction,Probable,Minimal Impact,Low
 21,Severe Weather,Remote,Major Impact,Medium
-22,Tanker Loading Failure,Remote,Minor Impact,Low
+22,Tanker Loading Failure,Probable,Minor Impact,Medium
