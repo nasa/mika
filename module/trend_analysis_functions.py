@@ -9,7 +9,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import os
-
+from nltk.corpus import words
+from nltk.stem.porter import PorterStemmer
 import scipy.stats as stats
 from sklearn import linear_model
 from sklearn.metrics import mean_squared_error, accuracy_score, r2_score
@@ -216,7 +217,7 @@ def remove_outliers(data, threshold=1.5, rm_outliers=True):
     #print(len(data), len(new_data))
     return new_data
 
-def check_anamolies(time_of_occurence_days, time_of_occurence_pct_contained, frequency, fires, categories, hazards):
+def check_anamolies(time_of_occurence_days, time_of_occurence_pct_contained, frequency, fires, hazards):
     anomolous_hazards = {'OTTO days':{},
                         'OTTO pct': {},
                         'frequency days': {},
@@ -370,7 +371,7 @@ def calc_metrics(hazard_file, preprocessed_df, rm_outliers=True, distance=3, tar
          for year in frequency_fires[name]:
              frequency_fires[name][year] = len(set(fires[name][year]))
      
-     anomolous_hazards, anoms = check_anamolies(time_of_occurence_days, time_of_occurence_pct_contained, frequency, fires, categories, hazards)
+     anomolous_hazards, anoms = check_anamolies(time_of_occurence_days, time_of_occurence_pct_contained, frequency, fires, hazards)
      if anoms == True:
          print("Error in calculation:")
          print(anomolous_hazards)
@@ -421,81 +422,183 @@ def identify_docs_per_hazard(hazard_file, preprocessed_df, results_file, text_fi
     hazard_info = pd.read_excel(hazard_file, sheet_name=['topic-focused'])
     hazards = list(set(hazard_info['topic-focused']['Hazard name'].tolist()))
     hazards = [hazard for hazard in hazards if isinstance(hazard,str)]
+    docs = preprocessed_df[id_field].tolist()
+    hazard_words_per_doc = {hazard:['none' for doc in docs] for hazard in hazards}
     time_period = preprocessed_df[time_field].unique()
     categories = hazard_info['topic-focused']['Hazard Category'].tolist()
+    punctuation = ['.', ',', "'", '"', '?', '!']
+    stemmer = PorterStemmer()
+    english_words = [w.lower() for w in words.words()]
     if '.csv' in results_file:
         results = pd.read_csv(results_file)
         results = {results_text_field: results}
         doc_topic_distribution = None
     elif '.xlsx' in results_file:
         results = pd.read_excel(results_file, sheet_name=[text_field])
-        doc_topic_distribution = pd.read_excel(results_file, sheet_name=[doc_topic_dist_field])[doc_topic_dist_field]
+        if doc_topic_dist_field:
+            doc_topic_distribution = pd.read_excel(results_file, sheet_name=[doc_topic_dist_field])[doc_topic_dist_field]
+        else:
+            doc_topic_distribution = None
     if results_text_field == None:
         results_text_field = text_field
     frequency = {name:{str(time_p):0 for time_p in time_period} for name in hazards}
     docs_per_hazard = {hazard:{str(time_p):[] for time_p in time_period} for hazard in hazards}
-    for i in range(len(hazards)):
+    if results[results_text_field].at[0,'topic number'] == -1:
+        begin_nums = 1
+    else:
+        begin_nums = 0
+    for i in tqdm(range(len(hazards))):
          num_df = hazard_info['topic-focused'].loc[hazard_info['topic-focused']['Hazard name'] == hazards[i]].reset_index(drop=True)
-         nums = [int(i) for nums in num_df['Topic Number'] for i in str(nums).split(", ")]#num_df['Topic Number'].to_list() #identifies all topics related to this hazard
+         nums = [int(i)+begin_nums for nums in num_df['Topic Number'] for i in str(nums).split(", ")]#num_df['Topic Number'].to_list() #identifies all topics related to this hazard
+         nums = [int(i) for nums in num_df['Topic Number'] for i in str(nums).split(", ")]
          ids_df = results[results_text_field].loc[nums]
          ids_ = ids_df['documents'].to_list()
          ids_ = [id_ for k in range(len(ids_)) for id_ in ids_[k].strip("[]").split(", ")]
          ids_= [w.replace("'","") for w in ids_]
-         ids_ = [id_ for id_ in ids_ if id_ not in ids_to_drop]
+         ids_ = set([id_ for id_ in ids_ if id_ not in ids_to_drop])
          # ids_ = ids_ only if topic nums > thres
          if doc_topic_distribution is not None:
              new_ids = []
              for id_ in ids_:
                  #check that topic prob> thres for at least one num
-                 #print(id_, type(id_))
-                 #print(doc_topic_distribution.iloc[0]['document number'], type(doc_topic_distribution.iloc[0]['document number']))
-                 id_df = doc_topic_distribution.loc[doc_topic_distribution['document number'].astype(str)==id_].reset_index(drop=True)
-                 probs = [(id_df.iloc[0][text_field].strip("[]").split(" ")[num].strip("\n")) for num in nums]
+                 id_df = doc_topic_distribution.loc[doc_topic_distribution['document number']==id_].reset_index(drop=True)
+                 probs = [float(id_df.iloc[0][text_field].strip("[]").split(" ")[num].strip("\n")) for num in nums]
                  max_prob = max(probs)
-                 if float(max_prob) > topic_thresh:
+                 if max_prob > topic_thresh:
                      new_ids.append(id_)
              ids_ = new_ids
-         #print(ids_)
+
          temp_df = preprocessed_df.loc[preprocessed_df[id_field].astype(str).isin(ids_)].reset_index(drop=True)
          fire_ids = temp_df[id_field].unique()
          for id_ in fire_ids:
             temp_fire_df = temp_df.loc[temp_df[id_field]==id_].reset_index(drop=True)
             for j in range(len(temp_fire_df)):
-                #fuel
-                #fuel_ids = pd.read_csv(r"C:\Users\srandrad\smart_nlp\notebooks\fuel_unidentified.csv")['Tracking #'].tolist()
                 text = temp_fire_df.iloc[j][text_field]
+                text = " ".join(text)
+                text = text.replace(".", " ")
                 #check for hazard -- looks at the hazard relevant words from the topic
                 hazard_name = hazards[i]
-                #if id_ in fuel_ids and hazard_name in ['Fuel System Malfunction', 'Fuel Leak']:
-                #    print(id_, hazard_name, text)
                 hazard_words = num_df['Relevant hazard words'].to_list()
-                hazard_words = [word for words in hazard_words for word in words.split(", ")]
+                hazard_words = list(set([word for words in hazard_words for word in words.split(", ")]))
                 negation_words = num_df['Negation words'].to_list()
                 negation_words = [word for word in negation_words if isinstance(word, str)]
                 #need to check if a word in text is in hazard words
                 hazard_found = False
-                for word in hazard_words:
-                    if word in text:
+                for h_word in hazard_words:
+                    #end_ind = 0
+                    if h_word in text:
                         hazard_found = True
-                        #if id_ in fuel_ids and hazard_name in ['Fuel System Malfunction', 'Fuel Leak']:
-                        #    print(id_, text, hazard_found, word)
+                        break
+                        """
+                        if len(h_word.split(" ")) == 1:
+                            word_ind = text[end_ind:].find(h_word)
+                            start_ind = max([s_ind for s_ind in [0, text[:word_ind].rfind(" ")]+[text[:word_ind].rfind(p) for p in punctuation] if s_ind!=-1])
+                            next_punctuation = [s_ind for s_ind in [text[start_ind:].find(" ")+start_ind]+[text[start_ind:].find(p)+start_ind for p in punctuation] if s_ind > start_ind]
+                            print(word_ind, start_ind, next_punctuation)
+                            if next_punctuation == []:
+                                next_punctuation = -1
+                            else:
+                                next_punctuation = min(next_punctuation)
+                                #print(word_ind, next_punctuation)
+                                print(word_ind, start_ind, next_punctuation)
+                            
+                            end_ind = max(next_punctuation, word_ind)
+                            full_word = text[start_ind:end_ind].strip(" .,'")
+                            print(full_word, h_word)
+                            #full_word = text[text[:word_ind].rfind(" "):text[word_ind:].find(" ")] #what about words ending in punctuation????? beginning after punctuation?
+                            if len(full_word) > len(h_word):
+                                #check to see if different words - stem both
+                                if stemmer.stem(full_word) == stemmer.stem(h_word):
+                                    hazard_found = True
+                                elif full_word not in english_words: #likely two conjoined words, split them
+                                    word_split_ind = full_word.find(h_word)
+                                    word_split = [full_word[:word_split_ind], full_word[word_split_ind:]]
+                                    if word_split[0] in english_words and word_split[1] in english_words:
+                                        hazard_found = True
+                            elif len(full_word) == len(h_word):
+                                hazard_found = True
+                        else:
+                            hazard_found = True"""
                 
                 if negation_words!=[]:
-                    for words in negation_words:
-                        for word in words.split(", "):#removes texts that have negation words
+                    for neg_words in negation_words:
+                        for word in neg_words.split(", "):#removes texts that have negation words
                             if word in text:
-                                hazard_found = False 
-                                #if id_ in fuel_ids and hazard_name in ['Fuel System Malfunction', 'Fuel Leak']:
-                                #    print(id_, text, hazard_found, word)
-                
+                                hazard_found = False
+
                 if hazard_found == True:
                     year = temp_fire_df.iloc[j][time_field]
                     docs_per_hazard[hazard_name][str(year)].append(id_)
                     frequency[hazard_name][str(year)] += 1
-    return frequency, docs_per_hazard
+                    hazard_words_per_doc[hazard_name][docs.index(id_)] = h_word
+
+    return frequency, docs_per_hazard, hazard_words_per_doc
+
+def correct_dates(preprocessed_df, temp_hazard_df, i, id_col):
+    fire_df = preprocessed_df.loc[preprocessed_df[id_col]==temp_hazard_df.iloc[i][id_col]]
+    start_date = fire_df["DISCOVERY_DOY"].unique() #should only have one start date
+    if len(start_date) != 1: 
+        start_date = min(start_date)
+    else: 
+        start_date = start_date[0]
+    if start_date == 365:
+            start_date = 0
+    
+    time_of_hazard = int(temp_hazard_df.iloc[i]["REPORT_DOY"])
+    #correct dates
+    if time_of_hazard<start_date: 
+        #print(time_of_hazard, start_date)
+        if time_of_hazard<30 and start_date<330: #report day is days since start, not doy 
+            time_of_hazard+=start_date
+        elif time_of_hazard<30 and start_date>=330:
+            start_date = start_date-365 #fire spans two years
+        else: #start and report day were incorrectly switched
+            temp_start = start_date
+            start_date = time_of_hazard
+            time_of_hazard = temp_start
+    return start_date, time_of_hazard
+
+def calc_ICS_metrics(docs_per_hazard, preprocessed_df, id_col, unique_ids_col, rm_outliers=True):
+    time_of_occurence_days = {name:{year:[] for year in docs_per_hazard[name]} for name in docs_per_hazard}
+    time_of_occurence_pct_contained = {name:{year:[] for year in docs_per_hazard[name]} for name in docs_per_hazard}
+    frequency = {name:{year:0 for year in docs_per_hazard[name]} for name in docs_per_hazard}
+    fires = {name:{year:[] for year in docs_per_hazard[name]} for name in docs_per_hazard}
+    unique_ids = {name:{year:[] for year in docs_per_hazard[name]} for name in docs_per_hazard}
+    frequency_fires ={name:{year:0 for year in docs_per_hazard[name]} for name in docs_per_hazard}
+    for hazard in tqdm(docs_per_hazard):
+        for year in docs_per_hazard[hazard]:
+            ids = docs_per_hazard[hazard][year]
+            temp_hazard_df = preprocessed_df.loc[preprocessed_df[unique_ids_col].isin(ids)].reset_index(drop=True)
+            for j in range(len(temp_hazard_df)):
+                start_date, time_of_hazard = correct_dates(preprocessed_df, temp_hazard_df, j, id_col)
+                time_of_occurence_days[hazard][year].append(time_of_hazard-int(start_date))
+                #time_of_occurence_pct_contained[hazard][year].append(temp_hazard_df.iloc[j]["PCT_CONTAINED_COMPLETED"])
+                if temp_hazard_df.iloc[j]["PCT_CONTAINED_COMPLETED"] <= 100: time_of_occurence_pct_contained[hazard][year].append(temp_hazard_df.iloc[j]["PCT_CONTAINED_COMPLETED"])
+                fires[hazard][year].append(temp_hazard_df.iloc[j][id_col])
+                unique_ids[hazard][year].append(temp_hazard_df.iloc[j][unique_ids_col])
+                frequency[hazard][year] += 1
+    for name in frequency_fires:
+        for year in frequency_fires[name]:
+            frequency_fires[name][year] = len(set(fires[name][year]))
+    
+    hazards = [h for h in docs_per_hazard]
+    years = list(set([y for h in docs_per_hazard for y in docs_per_hazard[h]]))
+    anomolous_hazards, anoms = check_anamolies(time_of_occurence_days, time_of_occurence_pct_contained, frequency, fires, hazards)
+    if anoms == True:
+        print("Error in calculation:")
+        print(anomolous_hazards)
+        
+    if rm_outliers == True:
+        for year in years:
+            for hazard in hazards:
+                if len(time_of_occurence_pct_contained[hazard][year])>9 and hazard != 'Law Violations':
+                   time_of_occurence_days[hazard][year] = remove_outliers(time_of_occurence_days[hazard][year])
+                   time_of_occurence_pct_contained[hazard][year] = remove_outliers(time_of_occurence_pct_contained[hazard][year])
+    
+    return time_of_occurence_days, time_of_occurence_pct_contained, frequency, fires, frequency_fires
      
 
-def topic_based_calc_metrics(hazard_file, years, preprocessed_df, results_file, rm_outliers=True):
+def topic_based_calc_metrics(hazard_file, preprocessed_df, results_file, rm_outliers=True, unique_ids_col="Unique IDs"):
     ###TODO: change from metric calc to just identifying docs, then metric calc separate
      """
      Uses the topic-focused spread sheet, goes through each hazard relevant topic,
@@ -520,16 +623,17 @@ def topic_based_calc_metrics(hazard_file, years, preprocessed_df, results_file, 
      hazards = [hazard for hazard in hazards if isinstance(hazard,str)]
      categories = hazard_info['topic-focused']['Hazard Category'].tolist()
      results = pd.read_excel(results_file, sheet_name=['Combined Text'])
-     
-     time_of_occurence_days = {name:{str(year):[] for year in years} for name in hazards}
-     time_of_occurence_pct_contained = {name:{str(year):[] for year in years} for name in hazards}
-     frequency = {name:{str(year):0 for year in years} for name in hazards}
-     fires = {name:{str(year):[] for year in years} for name in hazards}
      years = preprocessed_df["START_YEAR"].unique()
      years.sort()
+     time_of_occurence_days = {name:{year:[] for year in years} for name in hazards}
+     time_of_occurence_pct_contained = {name:{year:[] for year in years} for name in hazards}
+     frequency = {name:{year:0 for year in years} for name in hazards}
+     fires = {name:{year:[] for year in years} for name in hazards}
+     unique_ids = {name:{year:[] for year in years} for name in hazards}
+     frequency_fires ={name:{year:0 for year in years} for name in hazards}
      for i in range(len(hazards)):
          num_df = hazard_info['topic-focused'].loc[hazard_info['topic-focused']['Hazard name'] == hazards[i]]
-         nums = num_df['Topic Number'].to_list()
+         nums = nums = [int(i) for nums in num_df['Topic Number'] for i in str(nums).split(", ")]
          ids_df = results['Combined Text'].loc[nums]
          ids_ = ids_df['documents'].to_list()
          ids_ = ids_[0].strip("[]").split(", ")
@@ -565,8 +669,8 @@ def topic_based_calc_metrics(hazard_file, years, preprocessed_df, results_file, 
                         hazard_found = True
                 
                 if negation_words!=[]:
-                    for words in negation_words:
-                        for word in words.split(", "):#removes texts that have negation words
+                    for neg_words in negation_words:
+                        for word in neg_words.split(", "):#removes texts that have negation words
                             if word in text:
                                 hazard_found = False 
                 
@@ -585,12 +689,16 @@ def topic_based_calc_metrics(hazard_file, years, preprocessed_df, results_file, 
                             start_date = time_of_hazard
                             time_of_hazard = temp_start
                     year = temp_fire_df.iloc[j]["START_YEAR"]
-                    time_of_occurence_days[hazard_name][str(float(year))].append(time_of_hazard-int(start_date))
-                    time_of_occurence_pct_contained[hazard_name][str(float(year))].append(temp_fire_df.iloc[j]["PCT_CONTAINED_COMPLETED"])
-                    fires[hazard_name][str(float(year))].append(id_)
-                    frequency[hazard_name][str(float(year))] += 1
-     
-     anomolous_hazards, anoms = check_anamolies(time_of_occurence_days, time_of_occurence_pct_contained, frequency, fires, categories, hazards)
+                    time_of_occurence_days[hazard_name][year].append(time_of_hazard-int(start_date))
+                    time_of_occurence_pct_contained[hazard_name][year].append(temp_fire_df.iloc[j]["PCT_CONTAINED_COMPLETED"])
+                    fires[hazard_name][year].append(id_)
+                    unique_ids[hazard_name][year].append(temp_fire_df.iloc[j][unique_ids_col])
+                    frequency[hazard_name][year] += 1
+     for name in frequency_fires:
+         for year in frequency_fires[name]:
+             frequency_fires[name][year] = len(set(fires[name][year]))
+             
+     anomolous_hazards, anoms = check_anamolies(time_of_occurence_days, time_of_occurence_pct_contained, frequency, fires, hazards)
      if anoms == True:
          print("Error in calculation:")
          print(anomolous_hazards)
@@ -598,9 +706,9 @@ def topic_based_calc_metrics(hazard_file, years, preprocessed_df, results_file, 
      if rm_outliers == True:
          for year in years:
              for hazard in hazards:
-                 time_of_occurence_days[hazard][str(float(year))] = remove_outliers(time_of_occurence_days[hazard][str(year)])
-                 time_of_occurence_pct_contained[hazard][str(float(year))] = remove_outliers(time_of_occurence_pct_contained[hazard][str(year)])
-     return time_of_occurence_days, time_of_occurence_pct_contained, frequency, fires, categories, hazards, years
+                 time_of_occurence_days[hazard][year] = remove_outliers(time_of_occurence_days[hazard][year])
+                 time_of_occurence_pct_contained[hazard][year] = remove_outliers(time_of_occurence_pct_contained[hazard][year])
+     return time_of_occurence_days, time_of_occurence_pct_contained, frequency, fires, frequency_fires, categories, hazards, years, unique_ids
 
 
 
@@ -671,7 +779,7 @@ def create_primary_results_table(time_of_occurence_days, time_of_occurence_pct_c
     data_df["Total Fire Frequency"] = sums_per_hazard
     return data_df
 
-def create_metrics_time_series(time_of_occurence_days, time_of_occurence_pct_contained, frequency, frequency_fires, years, categories, combined=True):
+def create_metrics_time_series(time_of_occurence_days, time_of_occurence_pct_contained, frequency, frequency_fires, years, categories, combined=True, scale=False):
     """
     creates the time series graphs for OTTO, frequency, and rate for each hazard
     arguments are outputs from calc_metrics
@@ -706,7 +814,7 @@ def create_metrics_time_series(time_of_occurence_days, time_of_occurence_pct_con
     line_styles = ['--', ':','-']
     line_style_dict = {list(set(categories))[i]:line_styles[i] for i in range(len(list(set(categories))))}
     category_counter = {list(set(categories))[i]:0 for i in range(len(list(set(categories))))}
-    marker_styles = ['.', 'v', '^', 's', 'D', 'X', '+']
+    marker_styles = ['.', 'v', '^', 's', 'D', 'X', '+','*', '<', '>', ]
     years_plot = years#[year.strip('0').strip('.') for year in years]
     #plot OTTO
     if combined == True:
@@ -763,36 +871,53 @@ def create_metrics_time_series(time_of_occurence_days, time_of_occurence_pct_con
     #plot frequency
     category_counter = {list(set(categories))[i]:0 for i in range(len(list(set(categories))))}
     frequencies = {hazard: [frequency[hazard][year] for year in frequency[hazard]] for hazard in frequency}
-    hazard_freqs_scaled = {hazard: minmax_scale(frequencies[hazard]) for hazard in frequencies}
     frequencies_fire = {hazard: [frequency_fires[hazard][year] for year in frequency_fires[hazard]] for hazard in frequency_fires}
+    hazard_freqs_scaled = {hazard: minmax_scale(frequencies[hazard]) for hazard in frequencies}
     fire_freqs_scaled = {hazard: minmax_scale(frequencies_fire[hazard]) for hazard in frequencies_fire}
+    
     if combined == True:
         plt.figure()
-        plt.ylabel("Total Scaled", fontsize=16)
         plt.xlabel("Year", fontsize=16)
         #plt.title("Change in Hazard Frequency from 2006-2014")
         i = 0
-        for hazard in hazard_freqs_scaled:
-            category = categories[i]
-            plt.plot(years_plot, hazard_freqs_scaled[hazard], color=colors[i], label=hazard, marker=marker_styles[category_counter[category]], linestyle=line_style_dict[category])
-            category_counter[category] += 1
-            i += 1
+        if scale == True:
+            plt.ylabel("Total Scaled", fontsize=16)
+            for hazard in hazard_freqs_scaled:
+                category = categories[i]
+                plt.plot(years_plot, hazard_freqs_scaled[hazard], color=colors[i], label=hazard, marker=marker_styles[category_counter[category]], linestyle=line_style_dict[category])
+                category_counter[category] += 1
+                i += 1
+        else:
+            plt.ylabel("Total", fontsize=16)
+            for hazard in frequencies:
+                category = categories[i]
+                plt.plot(years_plot, frequencies[hazard], color=colors[i], label=hazard,marker=marker_styles[category_counter[category]], linestyle=line_style_dict[category])
+                category_counter[category] += 1
+                i += 1
             
         plt.legend(bbox_to_anchor=(1, 1.1), loc='upper left', fontsize=14)
         plt.tick_params(labelsize=16)
         plt.show()
         
         plt.figure()
-        plt.ylabel("Total Scaled", fontsize=16)
         plt.xlabel("Year", fontsize=16)
         #plt.title("Change in Hazard Frequency from 2006-2014")
         i = 0
         category_counter = {list(set(categories))[i]:0 for i in range(len(list(set(categories))))}
-        for hazard in hazard_freqs_scaled:
-            category = categories[i]
-            plt.plot(years_plot, fire_freqs_scaled[hazard], color=colors[i], label=hazard,marker=marker_styles[category_counter[category]], linestyle=line_style_dict[category])
-            category_counter[category] += 1
-            i += 1
+        if scale == True:
+            plt.ylabel("Total Scaled", fontsize=16)
+            for hazard in hazard_freqs_scaled:
+                category = categories[i]
+                plt.plot(years_plot, fire_freqs_scaled[hazard], color=colors[i], label=hazard,marker=marker_styles[category_counter[category]], linestyle=line_style_dict[category])
+                category_counter[category] += 1
+                i += 1
+        else:
+            plt.ylabel("Total", fontsize=16)
+            for hazard in frequencies_fire:
+                category = categories[i]
+                plt.plot(years_plot, frequencies_fire[hazard], color=colors[i], label=hazard,marker=marker_styles[category_counter[category]], linestyle=line_style_dict[category])
+                category_counter[category] += 1
+                i += 1
             
         plt.legend(bbox_to_anchor=(1, 1.1), loc='upper left', fontsize=14)
         plt.tick_params(labelsize=16)
@@ -898,37 +1023,25 @@ def reshape_correlation_matrix(corrMatrix, p_values, predictors, hazards):
     plt.show()
     
 
-def hazard_accuracy(ids, num, results_path):
-    """
-    Parameters
-    ----------
-    ids : TYPE
-        DESCRIPTION.
-    num : TYPE
-        DESCRIPTION.
-    results_path : TYPE
-        DESCRIPTION.
-
-    Returns
-    -------
-    sampled_hazard_ids : TYPE
-        DESCRIPTION.
-    total_ids : TYPE
-        DESCRIPTION.
-
-    """
+def hazard_accuracy(ids, num, results_path, hazard_words_per_doc, preprocessed_df, text_col, id_col, seed=0):
+    hazards = [hazard for hazard in ids]
     sampled_hazard_ids = {hazard:[] for hazard in ids}
     num_total_ids = {hazard:0 for hazard in ids}
+    docs = preprocessed_df[id_col].tolist()
+    document_text = preprocessed_df[text_col].tolist()
     data = {}
     for hazard in ids:
         total_ids = [id_ for year in ids[hazard] for id_ in ids[hazard][year]]
         sampled_ids = random.sample(total_ids, min(num, len(total_ids)))
         sampled_hazard_ids[hazard] = sampled_ids
         num_total_ids[hazard] = len(total_ids)
+        
+        hazard_words = [hazard_words_per_doc[hazard][docs.index(id_)] for id_ in sampled_ids]
+        doc_text = [document_text[docs.index(id_)] for id_ in sampled_ids]
         data[hazard] = pd.DataFrame({"ID": sampled_ids,
-                                     "Contains Hazard": [0 for id_ in sampled_ids]})
-        #print(hazard, "sampled IDS: ", sampled_ids)
-        #print(hazard, "total number of ids: ", len(total_ids))
+                                     "Contains Hazard": [0 for id_ in sampled_ids],
+                                     "Hazard Word": hazard_words,
+                                     "Document Text": doc_text})
     data["Summary"] = pd.DataFrame({"Hazards": [hazard for hazard in ids],
                        "# Total IDs": [num_total_ids[hazard] for hazard in num_total_ids],
                        "# Sampled IDs": [len(sampled_hazard_ids[hazard]) for hazard in sampled_hazard_ids],
@@ -936,14 +1049,25 @@ def hazard_accuracy(ids, num, results_path):
                        "# Correct Sampled IDs": [0 for hazard in ids],
                        "Accuracy": [0 for hazard in ids]
                        })
-
-    with pd.ExcelWriter(results_path+"/hazard_extraction_accuracy.xlsx") as writer:
+    #correct sampled IDs is in col E -> set this equal to the sum of Hazard sheet, B1:num for each hazard
+    # SUM() =SUM(B2:B16)
+    #'Aerial Grounding'!B12
+    # accuracy = correct sampled/ total sampled = E/C Accuracy worksheet.write_formula('F','=QUOTIENT(E:E,C:C)')
+    with pd.ExcelWriter(results_path+"/hazard_extraction_accuracy.xlsx", engine='xlsxwriter') as writer:
             for results in data:
                 if len(results)>31:
                     sheet_name = results[:30]
                 else: 
                     sheet_name = results
                 data[results].to_excel(writer, sheet_name = sheet_name, index = False)
+                if results == "Summary":
+                    worksheet = writer.sheets['Summary']
+                    for i in range(len(hazards)):
+                        worksheet.write_formula('E'+str(i+2), '{='+"'"+hazards[i]+"'"+'!B'+str(num+2)+'}')
+                        worksheet.write_formula('F'+str(i+2),'{=QUOTIENT(E'+str(i+2)+',C'+str(i+2)+')}')
+                else:
+                    worksheet = writer.sheets[sheet_name]
+                    worksheet.write('B'+str(num+2),'{=SUM(B2:B'+str(num+1)+')}')
     return sampled_hazard_ids, total_ids
 
 def get_likelihoods(rates):
@@ -987,39 +1111,32 @@ def plot_risk_matrix(rates, severities, figsize=(9,5), save=False):
     annotation_df = pd.DataFrame([["" for i in range(5)] for j in range(5)],
                          columns=['Minimal Impact', 'Minor Impact', 'Major Impact', 'Hazardous Impact', 'Catastrophic Impact'],
                           index=['Frequent', 'Probable', 'Remote','Extremely Remote', 'Extremely Improbable'])
-    hazards_per_row_df = pd.DataFrame([[0 for i in range(5)] for j in range(5)],
-                     columns=['Minimal Impact', 'Minor Impact', 'Major Impact', 'Hazardous Impact', 'Catastrophic Impact'],
-                      index=['Frequent', 'Probable', 'Remote','Extremely Remote', 'Extremely Improbable'])
-    rows = pd.DataFrame([[0 for i in range(5)] for j in range(5)],
-                     columns=['Minimal Impact', 'Minor Impact', 'Major Impact', 'Hazardous Impact', 'Catastrophic Impact'],
-                      index=['Frequent', 'Probable', 'Remote','Extremely Remote', 'Extremely Improbable'])
+    #hazards_per_row_df = pd.DataFrame([[0 for i in range(5)] for j in range(5)],
+    #                 columns=['Minimal Impact', 'Minor Impact', 'Major Impact', 'Hazardous Impact', 'Catastrophic Impact'],
+    #                  index=['Frequent', 'Probable', 'Remote','Extremely Remote', 'Extremely Improbable'])
+    #rows = pd.DataFrame([[0 for i in range(5)] for j in range(5)],
+    #                 columns=['Minimal Impact', 'Minor Impact', 'Major Impact', 'Hazardous Impact', 'Catastrophic Impact'],
+    #                  index=['Frequent', 'Probable', 'Remote','Extremely Remote', 'Extremely Improbable'])
     annot_font = 12
     hazard_likelihoods = {hazard:"" for hazard in hazards}; hazard_severities={hazard:"" for hazard in hazards}
     for hazard in hazards:
         hazard_likelihoods[hazard] = curr_likelihoods[hazard]
         hazard_severities[hazard] = curr_severities[hazard]
-        #if annotation_df.at[curr_likelihoods[hazard], curr_severities[hazard]]!= "":
-            #annotation_df.at[curr_likelihoods[hazard], curr_severities[hazard]] += ", \n"
-            #hazards_per_row_df.at[curr_likelihoods[hazard], curr_severities[hazard]]+=1
-            #if hazards_per_row_df.at[curr_likelihoods[hazard], curr_severities[hazard]]>2:
-            #    annotation_df.at[curr_likelihoods[hazard], curr_severities[hazard]]+="\n"
-            #    rows.at[curr_likelihoods[hazard], curr_severities[hazard]] += 1
-            #    if rows.at[curr_likelihoods[hazard], curr_severities[hazard]] > 3: annot_font=12
-            #    hazards_per_row_df.at[curr_likelihoods[hazard], curr_severities[hazard]]=0
-        #if len(hazard.split(" "))>2:
-        #    hazard_split = hazard.split(" ")
-        #    hazard_annot = " ".join(hazard_split[0:2])
-        #    hazard_annot = "\n ".join([hazard_annot]+[" ".join(hazard_split[2:])])
-        #else: hazard_annot = hazard
         new_annot = annotation_df.at[curr_likelihoods[hazard], curr_severities[hazard]]
         if new_annot != "": new_annot += ", "
         hazard_annot = hazard.split(" ")
         #if line>20 then new line
-        #line = old line + hazard section
         if len(new_annot.split("\n")[-1]) + len(hazard_annot[0]) < 20:
             new_annot += hazard_annot[0]
+            annot_ind = 1
+        elif len(hazard_annot[1]) + len(hazard_annot[0]) < 20:
+            new_annot += "\n" + hazard_annot[0] + " " + hazard_annot[1]
+            annot_ind = 2
+        else:
+            new_annot += "\n" + hazard_annot[0]
+            annot_ind = 1
         if len(hazard_annot)>1:
-            new_annot += "\n"+" ".join(hazard_annot[1:])
+            new_annot += "\n"+" ".join(hazard_annot[annot_ind:])
         annotation_df.at[curr_likelihoods[hazard], curr_severities[hazard]] = new_annot #+= (str(hazard_annot))
     
     df = pd.DataFrame([[0, 5, 10, 10, 10], [0, 5, 5, 10, 10], [0, 0, 5, 5, 10],
