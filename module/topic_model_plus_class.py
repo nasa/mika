@@ -502,6 +502,27 @@ class Topic_Model_plus():
         check_for_ngrams()
         #print("Preprocessed data extracted from: ", file_name)
     
+    def split_doc_to_sentences(self):
+        dfs = []
+        for i in range(len(self.data_df)):
+            sentences_for_doc = {attr:[] for attr in self.list_of_attributes}
+            for attr in self.list_of_attributes:
+                text = self.data_df.at[i, attr]
+                sentences_for_doc[attr] = text.split(".")
+            num_rows = max([len(sentences_for_doc[attr]) for attr in self.list_of_attributes])
+            for attr in self.list_of_attributes:
+                while len(sentences_for_doc[attr])<num_rows:
+                    sentences_for_doc[attr].append("")
+            doc_df = pd.concat([self.data_df.loc[i:i][:] for j in range(num_rows)]).reset_index(drop=True)
+            for attr in self.list_of_attributes:
+                doc_df[attr+' Sentences'] = sentences_for_doc[attr]
+            dfs.append(doc_df)
+        self.dfs = dfs
+        self.data_df = pd.concat(dfs).reset_index(drop=True)#, ignore_index=True)
+        self.list_of_attributes = [attr+' Sentences' for attr in self.list_of_attributes]
+        #print(self.data_df)
+        self.doc_ids = self.data_df[self.doc_ids_label].tolist()
+        
     def get_bert_coherence(self, coh_method='u_mass', from_probs=False):
         self.BERT_coherence = {}
         for attr in self.list_of_attributes:

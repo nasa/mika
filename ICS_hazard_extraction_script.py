@@ -43,7 +43,9 @@ if __name__ == '__main__':
     ICS.data_df = ICS.data_df.loc[ICS.data_df['INCIDENT_ID'].isin(filtered_ids)].reset_index(drop=True)
     ICS.doc_ids = ICS.data_df['Unique IDs'].tolist()
     raw_text = ICS.data_df[ICS.list_of_attributes]
+    # break up df into sentences 
     #ICS.preprocess_data(domain_stopwords=ICS_stop_words, ngrams=False, min_count=1, save_words=save_words)
+    ICS.split_doc_to_sentences()
     ICS.save_preprocessed_data()
     
     #use filtered reports
@@ -61,24 +63,23 @@ if __name__ == '__main__':
     #"""
     from nltk.corpus import stopwords
     total_stopwords = stopwords.words('english')+ICS_stop_words
-    ICS.data_df[ICS.list_of_attributes] = raw_text #uses raw text
+    #ICS.data_df[ICS.list_of_attributes] = raw_text #uses raw text
     vectorizer_model = CountVectorizer(ngram_range=(1, 3), stop_words=total_stopwords) #removes stopwords
     seed_topic_list = [['highway', 'traffic', 'road', 'travel', 'interstate', 'closure', 'remain', 'remains', 'close', 'block', 'impact', 'access', 'limit', 'limited'], 
-                       ['jurisdiction', 'team', 'command', 'organization', 'type', 'involve', 'transition', 'transfer'], 
-                       ['evacuation', 'evacuate', 'threaten', 'threat', 'resident', 'residence', 'level', 'notice', 'community', 'structure', 'subdivision', 'mandatory', 'order', 'effect', 'remain', 'continue', 'issue'], 
+                       ['transition', 'transfer'], 
+                       ['evacuation', 'evacuate',], 
                        ['mapping', 'map', 'reflect', 'accurate', 'adjustment', 'change', 'reflect', 'inaccurate'], 
-                       ['aerial', 'suspend', 'suspendsion', 'prohibit', 'delay', 'hamper', 'unable', 'cancel', 'inability', 'loss', 'curtail', 'challenge', 'smoke', 'windy', 'wind', 'mechanical', 'problem'], 
+                       ['aerial','inversion', 'suspend', 'suspendsion', 'prohibit', 'delay', 'hamper', 'unable', 'cancel', 'inability', 'loss', 'curtail', 'challenge', 'smoke'], 
                        ['unstaffed', 'resource', 'lack', 'need', 'shortage', 'minimal', 'share', 'necessary', 'limited', 'limit', 'fatigue'], 
                        ['injury', 'hospital', 'injured', 'accident', 'treatment', 'laceration', 'firefighter', 'treat', 'minor', 'report', 'transport', 'heat', 'shoulder', 'ankle', 'medical', 'release'], 
                        ['cultural', 'tribal', 'monument', 'archaeological', 'heritage', 'site', 'nation', 'political', 'social', 'adjacent', 'community'], 
                        ['cattle', 'buffalo', 'allotment', 'ranch', 'sheep', 'livestock', 'grazing', 'pasture', 'threaten', 'concern', 'risk', 'threat', 'private', 'area', 'evacuate', 'evacuation', 'order'], 
-                       ['violation', 'notification', 'respond', 'law'], 
+                       ['violation', 'arson', 'notification', 'respond', 'law'], 
                        ['military', 'unexploded', 'training', 'present', 'ordinance', 'proximity', 'activity', 'active', 'base', 'area'], 
-                       ['infrastructure', 'utility', 'powerline', 'water', 'electric', 'pipeline', 'powerlines', 'watershed', 'pole', 'power', 'gas', 'concern', 'near', 'hazard', 'critical', 'threaten', 'threat', 'off'], 
+                       ['infrastructure', 'utility', 'powerline', 'water', 'electric', 'pipeline', 'powerlines', 'watershed', 'pole', 'power', 'gas'], 
                        ['weather', 'behavior', 'wind', 'thunderstorm', 'storm', 'gusty', 'lightning', 'flag', 'unpredictable', 'extreme', 'erratic', 'strong', 'red', 'warning', 'warn'], 
                        ['species', 'habitat', 'animal', 'plant', 'conservation', 'threaten', 'endanger', 'threat', 'sensitive', 'risk', 'loss', 'impact'], 
                        ['terrain', 'rollout', 'snag', 'steep', 'debris', 'access', 'concern', 'hazardous', 'pose', 'heavy', 'rugged', 'difficult', 'steep', 'narrow'], 
-                       ['flood', 'flashflood', 'flash', 'risk', 'potential', 'chance'], 
                        ['humidity', 'moisture', 'hot', 'drought', 'low', 'dry', 'prolong']]
     
     """#load bertopic model
@@ -93,7 +94,7 @@ if __name__ == '__main__':
     """
     
     BERTkwargs={"calculate_probabilities":True, 'seed_topic_list':seed_topic_list,
-                "top_n_words": 20, 'min_topic_size':75}
+                "top_n_words": 20, 'min_topic_size':150}
     ICS.bert_topic(count_vectorizor=vectorizer_model, BERTkwargs=BERTkwargs, from_probs=True)
     ICS.save_bert_results(from_probs=True) #warning: saving in excel can result in missing data when char limit is reached
     ICS.save_bert_topics_from_probs()
@@ -102,7 +103,7 @@ if __name__ == '__main__':
     ICS.save_bert_coherence(coh_method='c_npmi')
     ICS.save_bert_vis()
     ICS.save_bert_model()
-    #"""
+    """
     ICS.reduce_bert_topics(num=100, from_probs=True)
     ICS.save_bert_results(from_probs=True)  #warning: saving in excel can result in missing data when char limit is reached
     ICS.save_bert_vis()
@@ -110,7 +111,7 @@ if __name__ == '__main__':
     ICS.save_bert_coherence(coh_method='c_npmi')
     ICS.save_bert_model()
     ICS.save_bert_topics_from_probs()
-    #"""
+    """
     #"""
     
     """#Extract preprocessed data
