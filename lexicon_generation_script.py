@@ -16,6 +16,7 @@ from module.NER_utils import read_doccano_annots
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer 
 from sklearn import feature_selection
+from sklearn.utils.extmath import safe_sparse_dot
 import sys
 import os
 import numpy as np
@@ -38,15 +39,25 @@ def vectorize_text(X):
 
 def get_significant_words(vectorizer, X_vec, y, p_value_limit=0.99):
     X_names = vectorizer.get_feature_names_out()
+    y_array = y.to_numpy()
     p_value_limit = 0.99 #Change this to vary p-value, try 0.95 and 0.9
     dtf_features = pd.DataFrame()
     for cat in y.columns:
         chi2, p = feature_selection.chi2(X_vec, y[[cat]])
+        y_array = y[[cat]].to_numpy()
+        observed = safe_sparse_dot(y_array.T, X_vec)
+        feature_count = X_vec.sum(axis=0).reshape(1, -1)
+        class_prob = y_array.mean(axis=0).reshape(1, -1)
+        expected = np.dot(class_prob.T, feature_count)
+        expected = [expected[0,i] for i in range(expected.shape[1])]
         dtf_features = dtf_features.append(pd.DataFrame(
-                       {"feature":X_names, "score":1-p, "y":cat}))
+                       {"feature":X_names, "score":1-p, "y":cat,
+                        "expected": expected, 
+                        "observed": observed[0]}))
         dtf_features = dtf_features.sort_values(["y","score"], 
                         ascending=[True,False])
-        dtf_features = dtf_features[dtf_features["score"]>p_value_limit]
+        # must have a signficant p-value and observed>expected 
+        dtf_features = dtf_features[(dtf_features["score"]>p_value_limit) & (dtf_features["observed"]>dtf_features["expected"])]
     X_names = dtf_features["feature"].unique().tolist() #unnecessary?
     return dtf_features
 
