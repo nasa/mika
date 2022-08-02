@@ -74,9 +74,9 @@ def print_results(y, dtf_features):
 def save_lexicons(y, dtf_features, p_value_limit, total_or_annotated):
     #save lexicons
     #reformat: each column is a list of words for the category
-    data_dict = {cat:[] for cat in y if y != 'None'}
+    data_dict = {cat:[] for cat in y if cat != 'None'}
     for cat in y:
-        if y != 'None':
+        if cat != 'None':
             cat_words = dtf_features[dtf_features["y"]==cat]
             data_dict[cat] = cat_words["feature"].tolist()
     # make lists of equal length
