@@ -139,8 +139,8 @@ cuda.empty_cache()
 nlp = spacy.load("en_core_web_trf")
 nlp.add_pipe("sentencizer")
 
-llis_H_files = ['data/Hannah_LLIS_DE_IAA.jsonl','data/h_annot_LL.jsonl', 'data/Hannah_LLIS_R_IAA.jsonl']
-llis_S_files = ['data/annotated_LLIS/DE.jsonl','data/annotated_LLIS/srandrad_LL.jsonl', 'data/annotated_LLIS/REC.jsonl']
+llis_H_files = ['data/doccano/annotations/hswalsh_LLIS_DE_IAA.jsonl','data/doccano/annotations/hswalsh_LLIS_LL_IAA.jsonl', 'data/doccano/annotations/hswalsh_LLIS_R_IAA.jsonl']
+llis_S_files = ['data/doccano/annotations/srandrade_DE.jsonl','data/doccano/annotations/srandrade_LL_IAA.jsonl', 'data/doccano/annotations/srandrade_REC.jsonl']
 h = []
 s = []
 for i in range(3):
@@ -154,7 +154,7 @@ for i in range(3):
 S_annot_df = pd.concat(s).reset_index(drop=True)
 H_annot_df = pd.concat(h).reset_index(drop=True)
 
-H_safecom, S_safecom = prepare_annot_dfs(file1=os.path.join('data','hswalsh_safecom_round2.jsonl'), file2=os.path.join('data','srandrad_safecom_v2.jsonl'))
+H_safecom, S_safecom = prepare_annot_dfs(file1=os.path.join('data','doccano','annotations','hswalsh_safecom_round2.jsonl'), file2=os.path.join('data','doccano','annotations','srandrad_safecom_v2.jsonl'))
 
 metric = load_metric("seqeval")
 true_predictions = S_annot_df['tags']

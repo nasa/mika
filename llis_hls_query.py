@@ -5,12 +5,13 @@
 import os
 import pandas as pd
 from sentence_transformers import SentenceTransformer, util
+import numpy as np
 import torch
 import time
 import csv
 
 # load data
-llis_filename = os.path.join('data','lessons_learned_2021-12-10.xlsx')
+llis_filename = os.path.join('data','LLIS','lessons_learned_2021-12-10.xlsx')
 llis_df = pd.read_excel(llis_filename)
 requirements_filename = os.path.join('data','functional_performance_requirements_docs.csv')
 requirements_df = pd.read_csv(requirements_filename)
@@ -58,7 +59,7 @@ query_embedding_time = time.time()
 query_embedding_time_delta = query_embedding_time - start_time
 
 # load sentence embeddings - these are obtained in the file get_corpus_embeddings.py - the runtime for this is significant so we save them after obtaining
-embeddings_as_numpy = np.load(os.path.join('data', 'llis_sentence_embeddings.npy'))
+embeddings_as_numpy = np.load(os.path.join('data', 'LLIS','llis_sentence_embeddings.npy'))
 corpus_embeddings_original = torch.from_numpy(embeddings_as_numpy)
 corpus_embeddings_time = time.time()
 corpus_embeddings_time_delta = corpus_embeddings_time - start_time - query_embedding_time_delta

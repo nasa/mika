@@ -15,7 +15,7 @@ import time
 model = SentenceTransformer(os.path.join('results', 'fine_tuned_llis_model')) # fine tuned model
 
 # load LLIS data for fine-tuning
-llis_filename = os.path.join('data','lessons_learned_2021-12-10.xlsx')
+llis_filename = os.path.join('data','LLIS','lessons_learned_2021-12-10.xlsx')
 llis_df = pd.read_excel(llis_filename)
 
 # remove nans and combine sections to create documents
@@ -58,4 +58,4 @@ print_runtime(total_run_time)
 
 # save - recommend giving a different name for finetuned embeddings
 embeddings_as_numpy = sentence_corpus_embeddings.numpy()
-np.save(os.path.join('data', 'llis_sentence_embeddings_finetune.npy'), embeddings_as_numpy)
+np.save(os.path.join('data', 'LLIS', 'llis_sentence_embeddings_finetune.npy'), embeddings_as_numpy)

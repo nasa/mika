@@ -18,7 +18,7 @@ model = SentenceTransformer('msmarco-roberta-base-v3') # this is the model we ar
 start_time = time.time() # start timer
 
 header_list = ['sent1', 'sent2', 'label']
-llis_samples_df = pd.read_csv(os.path.join('data', 'llis_bert_training_set.csv'), names = header_list)
+llis_samples_df = pd.read_csv(os.path.join('data', 'LLIS','llis_bert_training_set.csv'), names = header_list)
 llis_samples_sent1 = llis_samples_df['sent1'].tolist()
 llis_samples_sent2 = llis_samples_df['sent2'].tolist()
 llis_samples_label = llis_samples_df['label'].tolist() # this training data is not suitable for a query system... we need a query and result, not two sentences
@@ -45,7 +45,7 @@ evaluator = evaluation.EmbeddingSimilarityEvaluator(llis_validate_sent1, llis_va
 # fine tune model
 num_epochs = 2 # takes approx. 1 day per epoch on my macbook
 warmup_steps = 0
-model_save_path = os.path.join('results', 'fine_tuned_llis_model')
+model_save_path = os.path.join('models', 'fine_tuned_llis_model')
 model.fit(train_objectives=[(train_dataloader, train_loss)], epochs=num_epochs, evaluation_steps=100, evaluator=evaluator, warmup_steps=warmup_steps, output_path=model_save_path)
 
 fine_tune_time = time.time()

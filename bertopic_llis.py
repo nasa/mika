@@ -14,7 +14,7 @@ import time
 
 # load data - no preprocessing required for bertopic!
 # import LLIS docs
-llis_filename = os.path.join('data','lessons_learned_2021-12-10.xlsx')
+llis_filename = os.path.join('data','LLIS','lessons_learned_2021-12-10.xlsx')
 llis_df = pd.read_excel(llis_filename)
 
 # treat paragraphs in llis as separate documents - paragraphs are more "requirement-sized"

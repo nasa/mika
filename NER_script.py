@@ -29,12 +29,13 @@ print(device)
 nlp = spacy.load("en_core_web_trf")
 nlp.add_pipe("sentencizer")
 
-file = os.path.join('data','srandrad_safecom_v2.jsonl')
-LLIS_folder = os.path.join('data','annotated_LLIS')
+file = os.path.join('data','doccano','annotations','srandrad_safecom_v2.jsonl')
+LLIS_folder = os.path.join('data','doccano','annotations')
 #read in doccano annotations
 df = read_doccano_annots(file)
 text_df = df[['data', 'label', 'Tracking #']] #"Lesson ID"]]
-llis_files = [f for f in os.listdir(LLIS_folder)]
+llis_files = ['srandrade_DE.jsonl', 'srandrade_REC.jsonl', 'srandrade_LL.jsonl',
+              'LLIS_DE_150_160_HW.jsonl', 'LLIS_REC_150_160_HW.jsonl', 'LLIS_LL_150_160_HW.jsonl']
 llis_dfs = []
 for llis_file in llis_files:
     if "HW" in llis_file: encoding=True
@@ -241,11 +242,11 @@ preds, label_ids, pred_metric = trainer.predict(safecom_data)
 labels = safecom_data['labels']
 y_pred = np.argmax(preds, axis=1)
 print(compute_classification_report(labels, preds, label_ids, ids_to_labels))
-build_confusion_matrix(labels, preds, label_ids, ids_to_labels, save=True, savepath="results/safecom_")
+build_confusion_matrix(labels, preds, label_ids, ids_to_labels, save=True, savepath="examples/FMEA/DASC_2022/safecom_")
 #"""
 #"""
 num_steps = trainer.state.max_steps
 filename = os.path.join(os.getcwd(),"models", "FMEA-ner-model-3ep", "checkpoint-"+str(num_steps), "trainer_state.json")
-plot_eval_results(filename, save=True, savepath='results/')
+plot_eval_results(filename, save=True, savepath='examples/FMEA/DASC_2022/')
 trainer.save_model()
 #"""

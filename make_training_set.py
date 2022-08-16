@@ -10,7 +10,7 @@ import csv
 model = SentenceTransformer('msmarco-roberta-base-v3') # this is the model we are starting with and would like to fine tune further; possibly check input sequence length as well
 
 # load LLIS data for fine-tuning
-llis_filename = os.path.join('data','lessons_learned_2021-12-10.xlsx')
+llis_filename = os.path.join('data','LLIS','lessons_learned_2021-12-10.xlsx')
 llis_df = pd.read_excel(llis_filename)
 
 # remove nans and combine sections to create documents
@@ -36,7 +36,7 @@ for doc in llis_corpus:
         sentence_corpus.append(sentence)
 
 # load sentence embeddings - these are obtained in the file get_corpus_embeddings.py - the runtime for this is significant so we save them after obtaining
-embeddings_as_numpy = np.load(os.path.join('data', 'llis_sentence_embeddings.npy'))
+embeddings_as_numpy = np.load(os.path.join('data', 'LLIS', 'llis_sentence_embeddings.npy'))
 sentence_corpus_embeddings = torch.from_numpy(embeddings_as_numpy)
 
 start_time = time.time() # start timer
@@ -59,7 +59,7 @@ for sentence in sentence_corpus:
 find_high_matching_pairs_time = time.time()
 total_run_time = find_high_matching_pairs_time - start_time
 
-writer = csv.writer(open(os.path.join('data','llis_bert_training_set.csv'), "w"))
+writer = csv.writer(open(os.path.join('data','LLIS','llis_bert_training_set.csv'), "w"))
 for pair in high_matching_pairs:
     writer.writerow(pair)
 

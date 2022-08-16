@@ -13,7 +13,7 @@ from tqdm import tqdm
 import numpy as np
 
 # load data
-llis_filename = os.path.join('data','lessons_learned_2021-12-10.xlsx')
+llis_filename = os.path.join('data','LLIS','lessons_learned_2021-12-10.xlsx')
 llis_df = pd.read_excel(llis_filename)
 requirements_filename = os.path.join('data','functional_performance_requirements_docs.csv')
 requirements_df = pd.read_csv(requirements_filename)

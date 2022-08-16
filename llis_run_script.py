@@ -16,7 +16,7 @@ database_name = 'LLIS' # optional, used at beginning of folder for identificatio
 num_topics ={'Lesson(s) Learned':75, 'Driving Event':75, 'Recommendation(s)':75} # for lda only
 
 # data file input
-filename = os.path.join('data','useable_LL_combined.csv')
+filename = os.path.join('data','LLIS','useable_LL_combined.csv')
 
 # creating object
 tm = Topic_Model_plus(list_of_attributes=list_of_attributes, document_id_col=document_id_col, csv_file=filename, database_name=database_name)
@@ -31,7 +31,7 @@ tm = Topic_Model_plus(list_of_attributes=list_of_attributes, document_id_col=doc
 #tm.preprocess_data(percent=.3, domain_stopwords=stopwords, ngrams=False, quot_correction=True, min_count=3) # min_count should be equivalent to min_cf in tm.lda
 #tm.save_preprocessed_data()
 
-filepath = os.path.join('results','LLIS_topics_Dec-03-2021')
+filepath = os.path.join('examples','Taxonomy', 'JCISE','LLIS_topics_Dec-03-2021')
 tm.extract_preprocessed_data(os.path.join(filepath,'preprocessed_data.csv'))
 
 # perform lda: can pass in any parameter used in tp model

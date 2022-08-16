@@ -39,7 +39,7 @@ def prepare_data(file, combine_cols, id_col, extra_cols=[]):
 lexicon_file = os.path.join('results', 'Risk_Factor_Lexicons.csv')
 lexicons = pd.read_csv(lexicon_file, index_col=0) 
 #read in llis using topic model plus
-llis_file = os.path.join('data', 'useable_LL_combined.csv')
+llis_file = os.path.join('data', 'LLIS', 'useable_LL_combined.csv')
 combine_cols = ['Abstract', 'Lesson(s) Learned', 'Recommendation(s)', 'Driving Event']
 llis_df = prepare_data(llis_file, combine_cols, 'Lesson ID')
 #combining columns, loading data

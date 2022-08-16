@@ -20,8 +20,8 @@ cuda.empty_cache()
 print(device)
 
 #load training data: LLIS, all of SAFECOM
-safecom = pd.read_csv('data/SAFECOM_data.csv')
-llis = pd.read_excel('data/lessons_learned_2021-12-10.xlsx')
+safecom = pd.read_csv('data/SAFECOM/SAFECOM_data.csv')
+llis = pd.read_excel('data/LLIS/lessons_learned_2021-12-10.xlsx')
 print(len(llis), len(safecom))
 safecom_text = safecom[['Narrative', 'Corrective Action']]
 llis_text = llis[['Recommendation(s)', 'Lesson(s) Learned', 'Driving Event']]
