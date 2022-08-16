@@ -1,0 +1,24 @@
+Category,Subcategory,Hazards,Frequency,Rate,Severity,Precision
+Airspace,Conflict,Airspace Control Hazards,123,4.556,0.106,0.8
+Airspace,Intrusion,Intrusion,533,19.741,0.004,1.0
+Hazard,Communications,Radio Malfunction,1030,38.148,0.061,0.933
+Hazard,Communications,Jumper Operations Hazards,59,2.185,3.441,0.8
+Hazard,Mission Equipment,Helitorch Operations Failure,246,9.111,0.228,0.8
+Hazard,Other,Cargo Letdown Failure,660,24.444,0.211,0.8
+Hazard,Other,Door Failure,592,21.926,0.73,0.867
+Hazard,Pilot Action,Bucket Drop Failure,1672,61.926,0.395,0.733
+Hazard,Pilot Action,In-flight Collision,129,4.778,0.76,0.8
+Hazard,Policy Deviation,Inadequate PPE,59,2.185,0.051,0.8
+Hazard,Policy Deviation,Personnel Duty Hours Exceeded,90,3.333,0.022,0.8
+Hazard,Policy Deviation,Load Limits Exceeded,52,1.926,0.058,0.867
+Hazard,Policy Deviation,Medivac,59,2.185,2.102,1.0
+Hazard,Weather,Severe Weather,401,14.852,0.541,0.8
+Maintenance,Caution Light,On-board Caution Light Illuminates,371,13.741,0.032,1.0
+Maintenance,Chip Light,Engine Malfunction,1990,73.704,0.105,0.933
+Maintenance,Electrical,Avionics Malfunction,592,21.926,0.093,0.933
+Maintenance,Engine,Tanker Loading Failure,819,30.333,0.149,0.733
+Maintenance,Engine,Oil Malfunction,702,26.0,0.107,1.0
+Maintenance,Fuel,Fuel System Malfunction,2078,76.963,0.15,0.733
+Maintenance,Hydraulic,Hydraulic Fluid Leak,332,12.296,0.127,0.933
+Maintenance,Landing Gear,Landing Gear Malfunction,357,13.222,0.361,0.933
+Maintenance,Rotor (Main),Control Surface Damage,528,19.556,0.544,0.8
