@@ -1,0 +1,30 @@
+,Category,Subcategory,Hazards,Frequency,Rate,Manual Category
+0,Contributing Factors,Equipment,Fuel Leak,95,4.13,Equipment
+1,Human Factors,Decision Making;Leadership;Risk Assessment;Situational Awareness,Food Supply Issues,65,2.826,Human Factors
+2,Human Factors,Situational Awareness,Burn,63,2.739,Medical
+3,Contributing Factors,Environmental;Human Factors,Dehydration,15,0.652,Medical
+4,Human Factors,Fatigue,Heat Exhaustion,17,0.739,Medical
+5,Human Factors,Decision Making;Leadership;Risk Assessment;Performance;Situational Awareness,Insufficient PPE,143,6.217,Equipment
+6,Human Factors,Decision Making;Leadership;Risk Assessment;Performance;Situational Awareness,Inaccurate Weather Data,16,0.696,Human Factors
+7,Contributing Factors,Environmental,Poison Oak,13,0.565,Environment
+8,Contributing Factors,Communications,Insect Stings,20,0.87,Environment
+9,Human Factors,Decision Making;Leadership;Risk Assessment,Illness,72,3.13,Human Factors
+10,Contributing Factors,Communications;Human Factors,Unsanitary Bathrooms,24,1.043,Human Factors
+11,Contributing Factors,Communications,Communication Disruption,1036,45.043,Communications
+12,Contributing Factors,Communications,Bandwidth,24,1.043,Communications
+13,Contributing Factors,Communications;Equipment;Other,Heart Attack,5,0.217,Human Factors
+14,Human Factors,Risk Assessment,Water Contamination,10,0.435,Human Factors
+15,Contributing Factors,Communications,Technical Infrastructure Outage,145,6.304,Communications
+16,Contributing Factors,Communications,Air to Ground Communication,259,11.261,Communications
+17,Human Factors,Decision Making;Leadership;Risk Assessment;Performance;Situational Awareness,Inadequate Training or Certification,280,12.174,Human Factors
+18,Contributing Factors,Equipment,Vehicle Collision or Accident,193,8.391,
+19,Contributing Factors,Equipment,Vehicle Damage,235,10.217,Equipment
+20,Human Factors,Decision Making;Leadership;Risk Assessment;Fatigue;Performance;Situational Awareness,Insufficient Breaks,89,3.87,Human Factors
+21,Contributing Factors,Equipment,Vehicle Breakdown,151,6.565,Equipment
+22,Contributing Factors,Communications,Cargo operations overhead,39,1.696,Communications
+23,Contributing Factors,Communications,Red Flag Warning,34,1.478,Communications
+24,Human Factors,Decision Making;Leadership;Risk Assessment;Fatigue;Performance;Situational Awareness,Drug use,34,1.478,Human Factors
+25,Human Factors,Decision Making;Leadership;Risk Assessment;Fatigue,Fatigue,71,3.087,Human Factors
+26,Contributing Factors,Equipment,Reckless Driving,111,4.826,Equipment
+27,Human Factors,Situational Awareness,Falling Objects,128,5.565,Environment
+28,Contributing Factors,Equipment,Entrapment,34,1.478,Environment
