@@ -154,14 +154,14 @@ class Topic_Model_plus():
         self.lda_models = {}
         self.create_ids = create_ids
         
-    def __load_data(self, csv=True, sheet_name=None, **kwargs):
+    def __load_data(self, csv=True, sheet_name=None, **kwargs): #moved to data class
         if csv: self.data_df = pd.read_csv(open(self.data_csv,encoding='utf8',errors='ignore'), **kwargs)
         else: self.data_df = pd.read_excel(self.data_csv, sheet_name=sheet_name, **kwargs)
         if self.doc_ids_label == "index":
             self.data_df['index'] = self.data_df.index
         self.doc_ids = self.data_df[self.doc_ids_label].tolist()
      
-    def __combine_columns(self):
+    def __combine_columns(self): #moved to data class - note the filtering step with see/same/etc has been added to a utils file
         columns_to_drop = [cols for cols in  self.data_df.columns if cols not in [self.doc_ids_label]+self.extra_cols]
         rows_to_drop = []
         combined_text = []
@@ -182,7 +182,7 @@ class Topic_Model_plus():
         self.data_df = self.data_df.drop(columns_to_drop, axis=1)
         self.data_df = self.data_df.drop(rows_to_drop).reset_index(drop=True)
     
-    def __remove_incomplete_rows(self):
+    def __remove_incomplete_rows(self): #moved to data class
         columns_to_drop = [cols for cols in  self.data_df.columns if cols not in self.list_of_attributes+[self.doc_ids_label]+self.extra_cols]
         rows_to_drop = []
         sleep(0.5)
@@ -196,7 +196,7 @@ class Topic_Model_plus():
         self.data_df = self.data_df.reset_index(drop=True)
         self.doc_ids = self.data_df[self.doc_ids_label].tolist()
     
-    def __create_unique_ids(self):
+    def __create_unique_ids(self): #moved to data class
         unique_ids = []
         prev_id = None
         j = 0
@@ -212,7 +212,7 @@ class Topic_Model_plus():
         self.doc_ids_label = "Unique IDs"
         self.doc_ids = self.data_df["Unique IDs"].tolist()
          
-    def prepare_data(self, **kwargs):
+    def prepare_data(self, **kwargs): #moved to data class
         """
         loads and prepares data by removing and combining rows/cols as defined by user
         """
@@ -227,16 +227,16 @@ class Topic_Model_plus():
             self.__create_unique_ids()
         print("data preparation: ", (time()-start_time)/60,"minutes \n")
         
-    def __tokenize_texts(self,texts):
+    def __tokenize_texts(self,texts): #moved to data class
         texts = [simple_tokenize(text) for text in texts if not isinstance(text,float)]
         texts = [[word for word in text if len(word)>self.min_word_len and len(word)<self.max_word_len] for text in texts if not isinstance(text,float)]
         return texts
         
-    def __lowercase_texts(self,texts):
+    def __lowercase_texts(self,texts): #moved to data class
         texts = [[word.lower() for word in text] for text in texts]
         return texts
         
-    def __lemmatize_texts(self,texts): #why is this so slow?
+    def __lemmatize_texts(self,texts): #why is this so slow? #moved to data class
         def get_wordnet_pos(word):
             tag = pos_tag([word])[0][1][0].upper()
             tag_dict = {"J": wordnet.ADJ,"N": wordnet.NOUN,"V": wordnet.VERB,"R": wordnet.ADV}
@@ -246,14 +246,14 @@ class Topic_Model_plus():
         texts = [[lemmatizer.lemmatize(w,get_wordnet_pos(w)) for w in text if get_wordnet_pos(w)!="unnecessary word"] for text in texts if not isinstance(text,float)]
         return texts
         
-    def __remove_stopwords(self,texts,domain_stopwords):
+    def __remove_stopwords(self,texts,domain_stopwords): #moved to data class
         all_stopwords = stopwords.words('english')+domain_stopwords
         all_stopwords = [word.lower() for word in all_stopwords]
         texts = [[w for w in text if not w in all_stopwords] for text in texts if not isinstance(text,float)]
         texts = [[w for w in text if len(w)>=3] for text in texts if not isinstance(text,float)]
         return texts
     
-    def __quot_normalize(self,texts):
+    def __quot_normalize(self,texts): #moved to data class
         def quot_replace(word):
             if word not in self.__english_vocab:
                 w_tmp = word.replace('quot','')
@@ -263,7 +263,7 @@ class Topic_Model_plus():
         texts = [[quot_replace(word) for word in text] for text in texts if not isinstance(text,float)]
         return texts
     
-    def __spellchecker(self,texts):
+    def __spellchecker(self,texts): #moved to data class
         def spelling_replace(word):
             if word not in self.__english_vocab and not word.isupper() and not sum(1 for c in word if c.isupper()) > 1:
                 suggestions = sym_spell.lookup(word,Verbosity.CLOSEST,           max_edit_distance=2,include_unknown=True,transfer_casing=True)
@@ -277,7 +277,7 @@ class Topic_Model_plus():
         texts = [[spelling_replace(word) for word in text] for text in texts if not isinstance(text,float)]
         return texts
     
-    def __segment_text(self,texts):
+    def __segment_text(self,texts): #moved to data class
         def segment_replace(text):
             for word in text:
                 if word not in self.__english_vocab and not word.isupper():
@@ -294,8 +294,8 @@ class Topic_Model_plus():
         texts = [segment_replace(text) for text in texts if not isinstance(text,float)]
         return texts
         
-    def __trigram_texts(self, texts, ngram_range, threshold, min_count):
-        #NEEDS WORK
+    def __trigram_texts(self, texts, ngram_range, threshold, min_count): #moved to data class
+        #NEEDS WORK - could probably replace with a BERT tokenizer
         # changes word order!
         ngrams = []
         ngram_models = {}
@@ -329,7 +329,7 @@ class Topic_Model_plus():
                 
         return ngrams
     
-    def preprocess_data(self, domain_stopwords=[], ngrams=True, ngram_range=3, threshold=15, min_count=5,quot_correction=False,spellcheck=False,segmentation=False,drop_short_docs_thres=3, percent=0.3, drop_na=False, save_words=[], drop_dups=False):
+    def preprocess_data(self, domain_stopwords=[], ngrams=True, ngram_range=3, threshold=15, min_count=5,quot_correction=False,spellcheck=False,segmentation=False,drop_short_docs_thres=3, percent=0.3, drop_na=False, save_words=[], drop_dups=False): #moved to data class
         """
         performs data preprocessing steps as defined by user
         
@@ -396,7 +396,7 @@ class Topic_Model_plus():
         print("Processing time: ", (time()-start)/60, " minutes")
         sleep(0.5)
                 
-    def __remove_words_in_pct_of_docs(self, data_df, list_of_attributes, pct_=0.3, save_words=[]):
+    def __remove_words_in_pct_of_docs(self, data_df, list_of_attributes, pct_=0.3, save_words=[]): #moved to data class
             num_docs = len(data_df)
             pct = np.round(pct_*num_docs)
             indicies_to_drop = []
@@ -425,7 +425,7 @@ class Topic_Model_plus():
             #self.doc_ids = self.data_df[self.doc_ids_label].tolist()
             return self.data_df
         
-    def __create_folder(self, itr=""): #itr is an optional argument to pass in a number for multiple runs on same day
+    """def __create_folder(self, itr=""): #itr is an optional argument to pass in a number for multiple runs on same day
         if self.folder_path == "":
             #path = os.getcwd()
             today_str = datetime.date.today().strftime("%b-%d-%Y")
@@ -441,12 +441,17 @@ class Topic_Model_plus():
             os.makedirs(self.folder_path, exist_ok = True)
             #print("folder created")
         else:
-            return
+            return"""
         
-    def __drop_duplicate_docs(self, cols):
+    def __create_folder(self): #new version, just saves it within the folder
+        if self.folder_path == "":
+            self.folder_path = 'topic_model_results'
+            os.makedirs(self.folder_path, exist_ok = True)
+        
+    def __drop_duplicate_docs(self, cols): #moved to data class
         self.data_df = self.data_df.loc[self.data_df.astype(str).drop_duplicates(subset=cols, keep='last').index].reset_index(drop=True)
         
-    def __drop_short_docs(self, thres=3):
+    def __drop_short_docs(self, thres=3): #moved to data class
         indx_to_drop = []
         for i in range(len(self.data_df)):
             for attr in self.list_of_attributes:
@@ -454,7 +459,7 @@ class Topic_Model_plus():
                     indx_to_drop.append(i)
         self.data_df = self.data_df.drop(indx_to_drop).reset_index(drop=True)
     
-    def save_preprocessed_data(self):
+    def save_preprocessed_data(self): #moved to data class
         """
         saves preprocessed data to a file
         """
@@ -467,7 +472,7 @@ class Topic_Model_plus():
         #print("Preprocessed data saves to: ", self.folder_path+name)
         
     
-    def extract_preprocessed_data(self, file_name, drop_short_docs=True, drop_short_docs_thres=3, drop_duplicates=True):
+    def extract_preprocessed_data(self, file_name, drop_short_docs=True, drop_short_docs_thres=3, drop_duplicates=True, id_in_dups=True): #moved to data class
         """
         uses previously saved preprocessed data
         
@@ -495,6 +500,7 @@ class Topic_Model_plus():
         cols = self.list_of_attributes
         self.data_df[cols] = self.data_df[cols].applymap(lambda y: remove_quote_marks(y))
         if drop_duplicates == True:
+            if id_in_dups: cols += [self.doc_ids_label]
             self.__drop_duplicate_docs(cols)
         if drop_short_docs == True:
             self.__drop_short_docs(thres=drop_short_docs_thres)
@@ -502,7 +508,7 @@ class Topic_Model_plus():
         check_for_ngrams()
         #print("Preprocessed data extracted from: ", file_name)
     
-    def split_doc_to_sentences(self):
+    def split_doc_to_sentences(self):#moved to doc class
         dfs = []
         for i in range(len(self.data_df)):
             sentences_for_doc = {attr:[] for attr in self.list_of_attributes}
@@ -1545,7 +1551,6 @@ class Topic_Model_plus():
                         probs.append(prob)
                     i += 1
                 topics_data["best document"].append(docs_in_topic[probs.index(max(probs))])
-                #print(k, docs_in_topic)
                 topics_data["documents"].append(docs_in_topic)
             df = pd.DataFrame(topics_data)
             dfs[attr] = df

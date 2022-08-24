@@ -8,6 +8,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+from matplotlib.colors import LinearSegmentedColormap
+import matplotlib.colors as mcolors
 import os
 from nltk.corpus import words
 from nltk.stem.porter import PorterStemmer
@@ -57,7 +59,6 @@ def corr_sig(df=None):
 def regression_feature_importance(predictors, hazards, correlation_mat_total):
     data = correlation_mat_total
     predictors = predictors
-    hazards = ["total "+ h for h in hazards]
     full_model_score = []
     full_model_MSE = []
     xi_score = {predictor+" score":[] for predictor in predictors}
@@ -100,7 +101,7 @@ def regression_feature_importance(predictors, hazards, correlation_mat_total):
     colors = cm.tab20(np.linspace(0, 1, num_bars))
     plt.figure(figsize=(len(hazards),4))
     for hazard in importance_data:
-        plt.bar(X_axis+(width*i), importance_data[hazard], width, label=hazard.replace("total ",""), color=colors[i-1])
+        plt.bar(X_axis+(width*i), importance_data[hazard], width, label=hazard, color=colors[i-1])
         i+=1
     plt.xticks(X_axis+(width*np.ceil(num_bars/2)), [pred.replace("total ","") for pred in predictors], rotation=70)
     plt.tick_params(labelsize=14)
@@ -111,7 +112,8 @@ def regression_feature_importance(predictors, hazards, correlation_mat_total):
     
     return results_df
 
-def multiple_reg_feature_importance(predictors, hazards, correlation_mat_total):
+def multiple_reg_feature_importance(predictors, hazards, correlation_mat_total, save=False, results_path="", 
+                                    r2_fontsize=10, r2_figsize=(3.5,4), predictor_import_fontsize=10, predictor_import_figsize=(7,4)):
     """
     builds multiple regression model for hazrd frequency given the predictors.
     also performs predictor importance to identify which predictors are most relevant to the hazards frequency
@@ -184,25 +186,43 @@ def multiple_reg_feature_importance(predictors, hazards, correlation_mat_total):
     delta_data.update(xi_score_delta)
     delta_data.update(xi_MSE_delta)
     delta_df = pd.DataFrame(delta_data)
-    
+    #graph r2 for full model
+    num_bars = len(hazards)
+    width = 1/(num_bars+2)
+    i=1
+    colors = cm.tab20(np.linspace(0, 1, num_bars))
+    plt.figure(figsize=r2_figsize)
+    for hazard in importance_data:
+        plt.bar((width*i), full_model_score[hazards.index(hazard)], width, label=hazard.replace("total ",""), color=colors[i-1])
+        i+=1
+    plt.xticks([width*i for i in range(1,num_bars+1)],hazards, rotation=90)#(width*np.ceil(num_bars/2)), ["Full Model"], rotation=70)
+    plt.tick_params(labelsize=r2_fontsize)
+    plt.xlabel("Hazards", fontsize=r2_fontsize)
+    plt.ylabel("R2", fontsize=r2_fontsize)
+    if save:
+        plt.savefig(results_path+'multiple_regression_R2.pdf', bbox_inches="tight") 
+    plt.show()
     #graph feature importance
     X_axis = np.arange(len(predictors))
     num_bars = len(hazards)
     width = 1/(num_bars+2)
     i=1
     colors = cm.tab20(np.linspace(0, 1, num_bars))
-    plt.figure(figsize=(len(hazards),4))
+    plt.figure(figsize=predictor_import_figsize)#(len(hazards),4))
     for hazard in importance_data:
         plt.bar(X_axis+(width*i), importance_data[hazard], width, label=hazard.replace("total ",""), color=colors[i-1])
         i+=1
     plt.xticks(X_axis+(width*np.ceil(num_bars/2)), [pred.replace("total ","") for pred in predictors], rotation=70)
-    plt.tick_params(labelsize=14)
-    plt.xlabel("Predictors", fontsize=14)
-    plt.ylabel("Importance", fontsize=14)
-    plt.legend(bbox_to_anchor=(1, 1.1), loc='upper left', fontsize=14)
+    plt.tick_params(labelsize=predictor_import_fontsize)
+    plt.xlabel("Predictors", fontsize=predictor_import_fontsize)
+    plt.ylabel("Coefficient", fontsize=predictor_import_fontsize)
+    plt.legend(bbox_to_anchor=(1, 1.1), loc='upper left', fontsize=predictor_import_fontsize-2)
+    if save:
+        plt.savefig(results_path+'multiple_regression.pdf', bbox_inches="tight") 
     plt.show()
     
-    return results_df, delta_df
+    coefficient_df = pd.DataFrame(importance_data, index= [pred.replace("total ","") for pred in predictors])
+    return results_df, delta_df, coefficient_df
 
 def remove_outliers(data, threshold=1.5, rm_outliers=True):
     if data == [] or rm_outliers == False:
@@ -220,8 +240,6 @@ def check_for_hazard_words(h_word, text):
     return hazard_found
 
 def check_for_negation_words(negation_words, text, h_word):
-    #negation_words = [word for neg_words in negation_words for word in neg_words.split(", ")]
-    #for neg_words in negation_words: #this doesnt seem right
     hazard_found = True
     for word in negation_words:#.split(", "):#removes texts that have negation words
         if word in text:
@@ -326,7 +344,6 @@ def get_negation_words(hazard_df):
     return negation_words
 
 def record_hazard_doc_info(hazard_name, year, docs_per_hazard, id_, frequency, hazard_words_per_doc, docs, h_word):
-    #year = temp_fire_df.iloc[j][time_field]
     docs_per_hazard[hazard_name][str(year)].append(id_)
     frequency[hazard_name][str(year)] += 1
     hazard_words_per_doc[hazard_name][docs.index(id_)] = h_word
@@ -372,112 +389,6 @@ def check_if_word_contained_in_other_word():
             hazard_found = True
     else:
         hazard_found = True"""
-def old_identify_docs_per_hazard(hazard_file, preprocessed_df, results_file, text_field, time_field, id_field, results_text_field=None, doc_topic_dist_field=None, topic_thresh=0.0, ids_to_drop=[]):
-    hazard_info = pd.read_excel(hazard_file, sheet_name=['topic-focused'])
-    hazards = list(set(hazard_info['topic-focused']['Hazard name'].tolist()))
-    hazards = [hazard for hazard in hazards if isinstance(hazard,str)]
-    docs = preprocessed_df[id_field].tolist()
-    hazard_words_per_doc = {hazard:['none' for doc in docs] for hazard in hazards}
-    time_period = preprocessed_df[time_field].unique()
-    #categories = hazard_info['topic-focused']['Hazard Category'].tolist()
-    ##punctuation = ['.', ',', "'", '"', '?', '!']
-    ##stemmer = PorterStemmer()
-    ##english_words = [w.lower() for w in words.words()]
-    print("read hazard file")
-    if '.csv' in results_file:
-        results = pd.read_csv(results_file)
-        results = {results_text_field: results}
-        doc_topic_distribution = None
-    elif '.xlsx' in results_file:
-        results = pd.read_excel(results_file, sheet_name=[text_field])
-        if doc_topic_dist_field:
-            doc_topic_distribution = pd.read_excel(results_file, sheet_name=[doc_topic_dist_field])[doc_topic_dist_field]
-        else:
-            doc_topic_distribution = None
-    if results_text_field == None:
-        results_text_field = text_field
-    print("read results file")
-    frequency = {name:{str(time_p):0 for time_p in time_period} for name in hazards}
-    docs_per_hazard = {hazard:{str(time_p):[] for time_p in time_period} for hazard in hazards}
-    if results[results_text_field].at[0,'topic number'] == -1:
-        begin_nums = 1
-    else:
-        begin_nums = 0
-    
-    topics_per_doc, hazard_topics_per_doc = get_topics_per_doc(docs, results, results_text_field, hazards)
-    #print("initiated topics per document")
-    for i in tqdm(range(len(hazards))):
-        hazard_name = hazards[i]
-        hazard_df = hazard_info['topic-focused'].loc[hazard_info['topic-focused']['Hazard name'] == hazards[i]].reset_index(drop=True)
-
-        nums = [int(i)+begin_nums for nums in hazard_df['Topic Number'] for i in str(nums).split(", ")]#identifies all topics related to this hazard
-        ids_df = results[results_text_field].loc[nums]
-        ids_ = "; ".join(ids_df['documents'].to_list())
-        ids_ = [id_ for id_ in docs if id_ in ids_]   
-        #get hazard_topics
-        for doc in ids_:
-            hazard_topics_per_doc[doc][hazards[i]] = [num-begin_nums for num in nums if num-begin_nums in topics_per_doc[doc]]
-        # ids_ = ids_ only if topic nums > thres
-        if doc_topic_distribution is not None:
-            new_ids = []
-            for id_ in ids_:
-                #check that topic prob> thres for at least one num
-                id_df = doc_topic_distribution.loc[doc_topic_distribution['document number']==id_].reset_index(drop=True)
-                probs = [float(id_df.iloc[0][text_field].strip("[]").split(" ")[num].strip("\n")) for num in nums]
-                max_prob = max(probs)
-                if max_prob > topic_thresh:
-                    new_ids.append(id_)
-                    ids_ = new_ids
-        temp_df = preprocessed_df.loc[preprocessed_df[id_field].astype(str).isin(ids_)].reset_index(drop=True)
-        ids = temp_df[id_field].unique()
-        #check for hazard -- looks at the hazard relevant words from the topic
-        #hazard_name = hazards[i]
-        hazard_words = hazard_df['Relevant hazard words'].to_list()
-        hazard_words = list(set([word for words in hazard_words for word in words.split(", ")]))
-        negation_words = hazard_df['Negation words'].to_list()
-        negation_words = [word for word in negation_words if isinstance(word, str)]
-        for id_ in ids:
-            temp_fire_df = temp_df.loc[temp_df[id_field]==id_].reset_index(drop=True)#just need text?
-            for j in range(len(temp_fire_df)):
-                text = temp_fire_df.iloc[j][text_field]
-                text = " ".join(text)
-                text = text.replace(".", " ")#???
-                
-                #need to check if a word in text is in hazard words
-                hazard_found = False
-                for h_word in hazard_words:
-                    #end_ind = 0
-                    if h_word in text:
-                        hazard_found = True
-                        #break
-                    
-                    if negation_words!=[] and hazard_found == True:
-                        #negation_words = [word for neg_words in negation_words for word in neg_words.split(", ")]
-                        for neg_words in negation_words: #this doesnt seem right
-                            for word in neg_words.split(", "):#removes texts that have negation words
-                                if word in text:
-                                    #must be within 3 of hazard word, no punctuation
-                                    hazard_word_inds = [h_i for h_i in range(len(text)) if text.startswith(h_word, h_i)]
-                                    negation_word_inds = [n_i for n_i in range(len(text)) if text.startswith(word, n_i)]
-                                    if len(hazard_word_inds) > len(negation_word_inds):
-                                        continue
-                                    else:
-                                        for neg_ind in negation_word_inds:
-                                            paired_h_ind = hazard_word_inds[np.argmin([abs(neg_ind-h_i) for h_i in hazard_word_inds])]
-                                            sub_text = text[min(neg_ind, paired_h_ind):max(neg_ind, paired_h_ind)]
-                                            if sub_text.count(" ") <= 3 and sub_text.count(".") == 0 and sub_text.count("  ") == 0:
-                                                hazard_found = False
-                                                break
-                    if hazard_found == True:
-                        break
-
-                if hazard_found == True:
-                    year = temp_fire_df.iloc[j][time_field]
-                    docs_per_hazard[hazard_name][str(year)].append(id_)
-                    frequency[hazard_name][str(year)] += 1
-                    hazard_words_per_doc[hazard_name][docs.index(id_)] = h_word
-
-    return frequency, docs_per_hazard, hazard_words_per_doc, topics_per_doc, hazard_topics_per_doc
 
 def identify_docs_per_hazard(hazard_file, preprocessed_df, results_file, text_field, time_field, id_field, results_text_field=None, doc_topic_dist_field=None, topic_thresh=0.0): #NOTE: removed ids_to_drop
     #read in hazard_info
@@ -511,7 +422,10 @@ def identify_docs_per_hazard(hazard_file, preprocessed_df, results_file, text_fi
 
     return frequency, docs_per_hazard, hazard_words_per_doc, topics_per_doc, hazard_topics_per_doc
 
-def plot_metric_time_series(metric_data, metric_name, line_styles=[], markers=[], title="", time_name="Year", scaled=False, xtick_freq=5, show_std=True, save=False, dataset_name="", yscale=None, legend=True):
+def plot_metric_time_series(metric_data, metric_name, line_styles=[], markers=[], title="", 
+                            time_name="Year", scaled=False, xtick_freq=5, show_std=True, 
+                            save=False, dataset_name="", yscale=None, legend=True, figsize=(6,4),
+                            fontsize=16):
     time_vals = list(set([year for hazard in metric_data for year in metric_data[hazard]]))
     time_vals.sort()
     #scaled -> scaled the averages, how to scale stddev?
@@ -519,10 +433,10 @@ def plot_metric_time_series(metric_data, metric_name, line_styles=[], markers=[]
     averages = {hazard: [np.average(metric_data[hazard][year]) for year in time_vals] for hazard in metric_data}
     stddevs = {hazard: [np.std(metric_data[hazard][year]) for year in time_vals] for hazard in metric_data}
     colors = cm.tab20(np.linspace(0, 1, len(averages)))
-    plt.figure()
-    plt.title(title, fontsize=16)
-    plt.xlabel(time_name, fontsize=16)
-    plt.ylabel(metric_name, fontsize=16)
+    plt.figure(figsize=figsize)
+    plt.title(title, fontsize=fontsize)
+    plt.xlabel(time_name, fontsize=fontsize)
+    plt.ylabel(metric_name, fontsize=fontsize)
     if yscale == 'log':
         plt.yscale('symlog')
     i=0
@@ -531,25 +445,29 @@ def plot_metric_time_series(metric_data, metric_name, line_styles=[], markers=[]
         nans = np.where(np.isnan(averages[hazard]))[0]
         hazard_avs = averages[hazard]
         hazard_stddev = stddevs[hazard]
+        num_removed = 0
         for ind in nans:
-            temp_time_vals.pop(ind)
-            hazard_avs.pop(ind)
-            hazard_stddev.pop(ind)
+            temp_time_vals.pop(ind-num_removed)
+            hazard_avs.pop(ind-num_removed)
+            hazard_stddev.pop(ind-num_removed)
+            num_removed+=1
+        temp_time_vals = [int(t) for t in temp_time_vals]
         if show_std == True:
             plt.errorbar(temp_time_vals, hazard_avs, yerr=hazard_stddev, color=colors[i], marker=markers[i], linestyle=line_styles[i], label=hazard, capsize=5, markeredgewidth=1)
         else:
             plt.plot(temp_time_vals, hazard_avs, color=colors[i], marker=markers[i], linestyle=line_styles[i], label=hazard)
         i += 1
     if legend: 
-        plt.legend(bbox_to_anchor=(1, 1.1), loc='upper left', fontsize=14)
+        plt.legend(bbox_to_anchor=(1, 1.1), loc='upper left', fontsize=fontsize-2)
     plt.xticks(np.arange(0, int(len(time_vals))+1, xtick_freq),rotation=45)
     plt.margins(x=0.05)
-    plt.tick_params(labelsize=16)
+    plt.tick_params(labelsize=fontsize)
     if save: 
         plt.savefig(dataset_name+'_hazard_'+metric_name+'.pdf', bbox_inches="tight") 
     plt.show()
-
-def plot_metric_averages(metric_data, metric_name, show_std=True, title="", save=False, legend=True, dataset_name=""):
+    
+def plot_metric_averages(metric_data, metric_name, show_std=True, title="", save=False, legend=True, dataset_name="",
+                         figsize=(6,4), fontsize=16):
     import textwrap
     avg = {hazard: np.average([m for year in metric_data[hazard] for m in metric_data[hazard][year]]) for hazard in metric_data}
     stddev = {hazard: np.std([m for year in metric_data[hazard] for m in metric_data[hazard][year]]) for hazard in metric_data}
@@ -558,15 +476,15 @@ def plot_metric_averages(metric_data, metric_name, show_std=True, title="", save
     colors = cm.tab20(np.linspace(0, 1, len(metric_data)))
     labels = [key for key in metric_data.keys()]
     ax.bar(x_pos, avg.values(), yerr=stddev.values(), align='center', ecolor='black', capsize=10, color=colors)
-    plt.xlabel("Hazard", fontsize=16)
-    plt.ylabel(metric_name, fontsize=16)
-    plt.title(title, fontsize=16)
+    plt.xlabel("Hazard", fontsize=fontsize)
+    plt.ylabel(metric_name, fontsize=fontsize)
+    plt.title(title, fontsize=fontsize)
     ax.yaxis.grid(True)
-    plt.tick_params(labelsize=14)
+    plt.tick_params(labelsize=fontsize)
     if legend == True:
         ax.set_xticklabels([])
         handles = [plt.Rectangle((0,0),1,1, color=color) for color in colors]
-        plt.legend(handles, labels, bbox_to_anchor=(1, 1.1), loc='upper left', fontsize=14)
+        plt.legend(handles, labels, bbox_to_anchor=(1, 1.1), loc='upper left', fontsize=fontsize)
     elif legend == False:
         labels = list(metric_data.keys())
         mean_length = np.mean([len(i) for i in labels])
@@ -576,7 +494,10 @@ def plot_metric_averages(metric_data, metric_name, show_std=True, title="", save
     if save: plt.savefig(dataset_name+'_hazard_bar_'+metric_name+'.pdf', bbox_inches="tight") 
     plt.show()
     
-def plot_frequency_time_series(metric_data, metric_name='Frequency', line_styles=[], markers=[], title="", time_name="Year", xtick_freq=5, scale=True, save=False, dataset_name="", legend=True):
+def plot_frequency_time_series(metric_data, metric_name='Frequency', line_styles=[], 
+                               markers=[], title="", time_name="Year", xtick_freq=5, 
+                               scale=True, save=False, dataset_name="", legend=True,
+                               figsize=(6,4), fontsize=16):
     time_vals = list(set([year for hazard in metric_data for year in metric_data[hazard]]))
     time_vals.sort()
     frequencies = {hazard: [metric_data[hazard][year] for year in time_vals] for hazard in metric_data}
@@ -587,23 +508,23 @@ def plot_frequency_time_series(metric_data, metric_name='Frequency', line_styles
         hazard_freqs_scaled = frequencies
         y_label = metric_name
     colors = cm.tab20(np.linspace(0, 1, len(frequencies)))
-    plt.figure()
-    plt.ylabel(y_label, fontsize=16)
-    plt.xlabel(time_name, fontsize=16)
-    plt.title(title, fontsize=16)
+    plt.figure(figsize=figsize)
+    plt.ylabel(y_label, fontsize=fontsize)
+    plt.xlabel(time_name, fontsize=fontsize)
+    plt.title(title, fontsize=fontsize)
     i = 0
     for hazard in hazard_freqs_scaled:
         plt.plot(time_vals, hazard_freqs_scaled[hazard], color=colors[i], label=hazard, marker=markers[i], linestyle=line_styles[i])
         i += 1
     if legend: 
-        plt.legend(bbox_to_anchor=(1, 1.1), loc='upper left', fontsize=14)
+        plt.legend(bbox_to_anchor=(1, 1.1), loc='upper left', fontsize=fontsize-2)
     plt.xticks(np.arange(0, int(len(time_vals))+1, xtick_freq),rotation=45)
     plt.margins(x=0.05)
-    plt.tick_params(labelsize=16)
+    plt.tick_params(labelsize=fontsize)
     if save: plt.savefig(dataset_name+'_hazard_'+metric_name+'.pdf', bbox_inches="tight") 
     plt.show()
 
-def create_correlation_matrix(predictors_scaled, frequencies_scaled, graph=True, mask_vals=False, figsize=(4,4)):
+def create_correlation_matrix(predictors_scaled, frequencies_scaled, graph=True, mask_vals=False, figsize=(6,4), fontsize=12, save=False, results_path="", title=False):
     """
     creates the correlation matrix between all predictors and all hazard frequencies
     all arguments are outputs from create_metrics_time_series
@@ -623,19 +544,37 @@ def create_correlation_matrix(predictors_scaled, frequencies_scaled, graph=True,
     p_values = corr_sig(correlation_mat_total)                     # get p-Value
     mask = np.invert(np.tril(p_values<0.05)) 
     if graph == True:
-        fig,ax = plt.subplots(figsize=figsize)
         if mask_vals:
-            sn.heatmap(corrMatrix, annot=True, mask=mask)
-            plt.title("Correlational Matrix for Trends in \n Fires, Operations, Intensity, and Hazard Frequency per year")
+            fig, (cax, ax) = plt.subplots(nrows=2, figsize=figsize,  gridspec_kw={"height_ratios":[0.025, 1]})
+            # Draw heatmap
+            sn.heatmap(corrMatrix, annot=True, mask=mask, annot_kws={'fontsize':fontsize},# cbar_kws={"orientation": "horizontal"}, 
+                       vmin=-1, vmax=1, center= 0, cbar=False)
+            ax.set_xticklabels(ax.get_xticklabels(), rotation=90, ha="right")
+            plt.tick_params(labelsize=fontsize)
+            # colorbar
+            cbar = fig.colorbar(ax.get_children()[0], cax=cax, orientation="horizontal")
+            cbar.ax.tick_params(labelsize=fontsize) 
+            if title: plt.title("Correlational Matrix for Trends in \n Fires, Operations, Intensity, and Hazard Frequency per year")
+            if save: plt.savefig(results_path+'.pdf', bbox_inches="tight")
             plt.show()
         else:
-            sn.heatmap(corrMatrix, annot=True)
-            plt.title("Correlational Matrix for Trends in \n Fires, Operations, Intensity, and Hazard Frequency per year")
+            fig, (cax, ax) = plt.subplots(nrows=2, figsize=figsize,  gridspec_kw={"height_ratios":[0.025, 1]})
+            # Draw heatmap
+            sn.heatmap(corrMatrix, annot=True, annot_kws={'fontsize':fontsize},# cbar_kws={"orientation": "horizontal"}, 
+                       vmin=-1, vmax=1, center= 0, cbar=False)
+            ax.set_xticklabels(ax.get_xticklabels(), rotation=90, ha="right")
+            plt.tick_params(labelsize=fontsize)
+            # colorbar
+            cbar = fig.colorbar(ax.get_children()[0], cax=cax, orientation="horizontal")
+            cbar.ax.tick_params(labelsize=fontsize) 
+            if title: plt.title("Correlational Matrix for Trends in \n Fires, Operations, Intensity, and Hazard Frequency per year")
+            if save: plt.savefig(results_path+'.pdf', bbox_inches="tight")
             plt.show()
+
 
     return corrMatrix, correlation_mat_total, p_values
 
-def reshape_correlation_matrix(corrMatrix, p_values, predictors, hazards):
+def reshape_correlation_matrix(corrMatrix, p_values, predictors, hazards, figsize=(8,8.025), fontsize=16):
     """
     reshapes the correlation matrix between all predictors and all hazard frequencies
     columns are predictors and rows are hazards
@@ -678,19 +617,19 @@ def reshape_correlation_matrix(corrMatrix, p_values, predictors, hazards):
     new_corr_df = pd.DataFrame(new_corr_data, index=hazards)
     annotation_df = pd.DataFrame(annotation_data, index=hazards)
    
-    fig, (cax, ax) = plt.subplots(nrows=2, figsize=(8,8.025),  gridspec_kw={"height_ratios":[0.025, 1]})
+    fig, (cax, ax) = plt.subplots(nrows=2, figsize=figsize,  gridspec_kw={"height_ratios":[0.025, 1]})
 
     # Draw heatmap
-    sn.heatmap(new_corr_df, annot=annotation_df,  fmt="s", annot_kws={'fontsize':16},# cbar_kws={"orientation": "horizontal"}, 
+    sn.heatmap(new_corr_df, annot=annotation_df,  fmt="s", annot_kws={'fontsize':fontsize},# cbar_kws={"orientation": "horizontal"}, 
                vmin=-1, vmax=1, center= 0, cbar=False)
     ax.set_xticklabels(ax.get_xticklabels(), rotation=40, ha="right")
-    plt.tick_params(labelsize=16)
-    plt.xlabel("Predictor", fontsize=16)
-    plt.ylabel("Hazard", fontsize=16)
+    plt.tick_params(labelsize=fontsize)
+    plt.xlabel("Predictor", fontsize=fontsize)
+    plt.ylabel("Hazard", fontsize=fontsize)
 
     # colorbar
     cbar = fig.colorbar(ax.get_children()[0], cax=cax, orientation="horizontal")
-    cbar.ax.tick_params(labelsize=16) 
+    cbar.ax.tick_params(labelsize=fontsize) 
     plt.show()
 
 def hazard_accuracy(ids, num, results_path, hazard_words_per_doc, preprocessed_df, text_col, id_col, seed=0):
@@ -743,7 +682,7 @@ def hazard_accuracy(ids, num, results_path, hazard_words_per_doc, preprocessed_d
                     worksheet.write('B'+str(num+2),'{=SUM(B2:B'+str(num+1)+')}')
     return sampled_hazard_ids, total_ids
 
-def get_likelihoods(rates):
+def get_likelihood_FAA(rates):
     curr_likelihoods = {hazard:0 for hazard in rates}
     for hazard in rates:
         r = rates[hazard]
@@ -760,37 +699,31 @@ def get_likelihoods(rates):
         curr_likelihoods[hazard] = likelihood
     return curr_likelihoods
 
-def get_severities(severities): #SAFECOM
-    curr_severities = {hazard:0 for hazard in severities}
-    for hazard in severities:
-        s = severities[hazard]
-        if s<=0.1: #negligible impact
-            severity = 'Minimal Impact'
-        elif s>0.1 and s <= 0.5:
-            severity = 'Minor Impact'
-        elif s>0.5 and s<=1:
-            severity = 'Major Impact'
-        elif s>1 and s<=2:
-            severity = 'Hazardous Impact'
-        elif s>2:
-            severity = 'Catastrophic Impact'
-        curr_severities[hazard] = severity
-    return curr_severities
+def get_likelihood_USFS(rates):
+    curr_likelihoods = {hazard:0 for hazard in rates}
+    for hazard in rates:
+        r = rates[hazard]
+        if r>=100:
+            likelihood = 'Frequent'
+        elif r>=10 and r<100:
+            likelihood = 'Probable'
+        elif r>=1 and r<10:
+            likelihood = 'Occasional'
+        elif r>=0.1 and r<1:
+            likelihood = 'Remote'
+        elif r<0.1:
+            likelihood = 'Improbable'
+        curr_likelihoods[hazard] = likelihood
+    return curr_likelihoods
 
-def plot_risk_matrix(rates, severities, figsize=(9,5), save=False):
-    hazards = [h for h in rates]
-    curr_likelihoods = get_likelihoods(rates)
-    curr_severities = get_severities(severities)
-    annotation_df = pd.DataFrame([["" for i in range(5)] for j in range(5)],
-                         columns=['Minimal Impact', 'Minor Impact', 'Major Impact', 'Hazardous Impact', 'Catastrophic Impact'],
-                          index=['Frequent', 'Probable', 'Remote','Extremely Remote', 'Extremely Improbable'])
-    #hazards_per_row_df = pd.DataFrame([[0 for i in range(5)] for j in range(5)],
-    #                 columns=['Minimal Impact', 'Minor Impact', 'Major Impact', 'Hazardous Impact', 'Catastrophic Impact'],
-    #                  index=['Frequent', 'Probable', 'Remote','Extremely Remote', 'Extremely Improbable'])
-    #rows = pd.DataFrame([[0 for i in range(5)] for j in range(5)],
-    #                 columns=['Minimal Impact', 'Minor Impact', 'Major Impact', 'Hazardous Impact', 'Catastrophic Impact'],
-    #                  index=['Frequent', 'Probable', 'Remote','Extremely Remote', 'Extremely Improbable'])
-    annot_font = 12
+def plot_USFS_risk_matrix(likelihoods, severities, figsize=(9,5), save=False, results_path="", fontsize=12, max_chars=20, title=False):
+    hazards = [h for h in likelihoods]
+    curr_likelihoods = likelihoods
+    curr_severities = severities
+    annotation_df = pd.DataFrame([["" for i in range(4)] for j in range(5)],
+                         columns=['Negligible', 'Marginal', 'Critical', 'Catastrophic'],
+                          index=['Frequent', 'Probable', 'Occasional', 'Remote','Improbable'])
+    annot_font = fontsize
     hazard_likelihoods = {hazard:"" for hazard in hazards}; hazard_severities={hazard:"" for hazard in hazards}
     for hazard in hazards:
         hazard_likelihoods[hazard] = curr_likelihoods[hazard]
@@ -799,16 +732,77 @@ def plot_risk_matrix(rates, severities, figsize=(9,5), save=False):
         if new_annot != "": new_annot += ", "
         hazard_annot = hazard.split(" ")
         #if line>20 then new line
-        if len(new_annot.split("\n")[-1]) + len(hazard_annot[0]) < 20:
+        if len(hazard_annot)>1 and len(new_annot.split("\n")[-1]) + len(hazard_annot[0]) +len(hazard_annot[1]) < max_chars:
+            new_annot += hazard_annot[0] + " "+ hazard_annot[1] 
+            annot_ind = 2
+        elif len(new_annot.split("\n")[-1]) + len(hazard_annot[0]) < max_chars:
             new_annot += hazard_annot[0]
             annot_ind = 1
-        elif len(hazard_annot[1]) + len(hazard_annot[0]) < 20:
+        elif len(hazard_annot)>1 and len(hazard_annot[1]) + len(hazard_annot[0]) < max_chars:
             new_annot += "\n" + hazard_annot[0] + " " + hazard_annot[1]
             annot_ind = 2
         else:
             new_annot += "\n" + hazard_annot[0]
             annot_ind = 1
-        if len(hazard_annot)>1:
+        if len(hazard_annot)>1 and annot_ind<len(hazard_annot):
+            new_annot += "\n"+" ".join(hazard_annot[annot_ind:])
+        annotation_df.at[curr_likelihoods[hazard], curr_severities[hazard]] = new_annot #+= (str(hazard_annot))
+    
+    df = pd.DataFrame([[2, 3, 4, 4], [2, 3, 4, 4], [1, 2, 3, 4], [1, 2, 2, 3], [1, 2, 2, 2]],
+                      columns=['Negligible', 'Marginal', 'Critical', 'Catastrophic'],
+                      index=['Frequent', 'Probable', 'Occasional', 'Remote','Improbable'])
+    fig,ax = plt.subplots(figsize=figsize)
+    myColors = (mcolors.to_rgb(mcolors.cnames['green']),
+                mcolors.to_rgb(mcolors.cnames['dodgerblue']),
+                mcolors.to_rgb(mcolors.cnames['yellow']),
+                mcolors.to_rgb(mcolors.TABLEAU_COLORS['tab:red']))
+    cmap = LinearSegmentedColormap.from_list('Custom', myColors, len(myColors))
+    #annot df has hazards in the cell they belong to #annot=annotation_df
+    sn.heatmap(df, annot=annotation_df, fmt='s',annot_kws={'fontsize':annot_font},cbar=False,cmap=cmap)
+    if title: plt.title("Risk Matrix", fontsize=fontsize)
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=40, ha="right")
+    ax.set_yticklabels(ax.get_yticklabels(), rotation=0)#, ha="right")
+    plt.tick_params(labelsize=fontsize)
+    plt.ylabel("Likelihood", fontsize=fontsize)
+    plt.xlabel("Severity", fontsize=fontsize)
+    minor_ticks = np.arange(1, 5, 1)
+    ax.set_xticks(minor_ticks, minor=True)
+    ax.set_yticks(minor_ticks, minor=True)
+    ax.tick_params(which='minor',length=0, grid_color='black', grid_alpha=1)
+    ax.grid(which='minor', alpha=1)
+    if save: 
+        plt.savefig(results_path+".pdf", bbox_inches="tight")
+    plt.show()
+
+def plot_risk_matrix(likelihoods, severities, figsize=(9,5), save=False, results_path="", fontsize=12, max_chars=20):
+    hazards = [h for h in likelihoods]
+    curr_likelihoods = likelihoods
+    curr_severities = severities
+    annotation_df = pd.DataFrame([["" for i in range(5)] for j in range(5)],
+                         columns=['Minimal Impact', 'Minor Impact', 'Major Impact', 'Hazardous Impact', 'Catastrophic Impact'],
+                          index=['Frequent', 'Probable', 'Remote','Extremely Remote', 'Extremely Improbable'])
+    annot_font = fontsize
+    hazard_likelihoods = {hazard:"" for hazard in hazards}; hazard_severities={hazard:"" for hazard in hazards}
+    for hazard in hazards:
+        hazard_likelihoods[hazard] = curr_likelihoods[hazard]
+        hazard_severities[hazard] = curr_severities[hazard]
+        new_annot = annotation_df.at[curr_likelihoods[hazard], curr_severities[hazard]]
+        if new_annot != "": new_annot += ", "
+        hazard_annot = hazard.split(" ")
+        #if line>20 then new line
+        if len(hazard_annot)>1 and len(new_annot.split("\n")[-1]) + len(hazard_annot[0]) +len(hazard_annot[1]) < max_chars:
+            new_annot += hazard_annot[0] + " "+ hazard_annot[1] 
+            annot_ind = 2
+        elif len(new_annot.split("\n")[-1]) + len(hazard_annot[0]) < max_chars:
+            new_annot += hazard_annot[0]
+            annot_ind = 1
+        elif len(hazard_annot)>1 and len(hazard_annot[1]) + len(hazard_annot[0]) < max_chars:
+            new_annot += "\n" + hazard_annot[0] + " " + hazard_annot[1]
+            annot_ind = 2
+        else:
+            new_annot += "\n" + hazard_annot[0]
+            annot_ind = 1
+        if len(hazard_annot)>1 and annot_ind<len(hazard_annot):
             new_annot += "\n"+" ".join(hazard_annot[annot_ind:])
         annotation_df.at[curr_likelihoods[hazard], curr_severities[hazard]] = new_annot #+= (str(hazard_annot))
     
@@ -819,20 +813,19 @@ def plot_risk_matrix(rates, severities, figsize=(9,5), save=False):
     fig,ax = plt.subplots(figsize=figsize)
     #annot df has hazards in the cell they belong to #annot=annotation_df
     sn.heatmap(df, annot=annotation_df, fmt='s',annot_kws={'fontsize':annot_font},cbar=False,cmap='RdYlGn_r')
-    plt.title("Risk Matrix", fontsize=12)
+    plt.title("Risk Matrix", fontsize=fontsize)
     ax.set_xticklabels(ax.get_xticklabels(), rotation=40, ha="right")
     ax.set_yticklabels(ax.get_yticklabels(), rotation=0)#, ha="right")
-    plt.tick_params(labelsize=12)
-    plt.ylabel("Likelihood", fontsize=12)
-    plt.xlabel("Severity", fontsize=12)
+    plt.tick_params(labelsize=fontsize)
+    plt.ylabel("Likelihood", fontsize=fontsize)
+    plt.xlabel("Severity", fontsize=fontsize)
     minor_ticks = np.arange(1, 6, 1)
     ax.set_xticks(minor_ticks, minor=True)
     ax.set_yticks(minor_ticks, minor=True)
     ax.tick_params(which='minor',length=0, grid_color='black', grid_alpha=1)
     ax.grid(which='minor', alpha=1)
     if save: 
-        file_path = os.path.join(os.path.dirname(os.getcwd()),'results','risk_matrices', "SAFECOM_static_rm")
-        plt.savefig(file_path+".pdf", bbox_inches="tight")
+        plt.savefig(results_path+".pdf", bbox_inches="tight")
     plt.show()
 
 def sample_for_recall(preprocessed_df, id_col, text_col, hazards, save_path, num_sample=100):

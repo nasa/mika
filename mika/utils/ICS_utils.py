@@ -178,7 +178,7 @@ def calc_metrics(hazard_file, preprocessed_df, rm_outliers=True, distance=3, tar
                     time_of_occurence_pct_contained[hazard][year] = remove_outliers(time_of_occurence_pct_contained[hazard][year])
      return time_of_occurence_days, time_of_occurence_pct_contained, frequency, fires, frequency_fires, categories, hazards, years, unique_ids
 
-def calc_severity(fires, summary_reports, rm_all_outliers=False, rm_severity_outliers=True):
+def calc_severity(fires, summary_reports, rm_all_outliers=False, rm_severity_outliers=True, round_to=1):
     severity_total = {}; injuries_total = {}; fatalities_total = {}; str_dam_total = {}; str_des_total = {}
     for hazard in fires:
         severity_total[hazard] = {}; injuries_total[hazard] = {}; fatalities_total[hazard] = {}
@@ -194,19 +194,19 @@ def calc_severity(fires, summary_reports, rm_all_outliers=False, rm_severity_out
                 injuries_total[hazard][year].append(int(id_df.iloc[0]["INJURIES_TOTAL"])); fatalities_total[hazard][year].append(int(id_df.iloc[0]["FATALITIES"]))
                 str_dam_total[hazard][year].append(int(id_df.iloc[0]["STR_DAMAGED_TOTAL"])); str_des_total[hazard][year].append(int(id_df.iloc[0]["STR_DESTROYED_TOTAL"]))
     severity_table = pd.DataFrame({"Hazard": [hazard for hazard in severity_total],
-                                    "Average Severity": [round(np.average(remove_outliers([val for year in severity_total[hazard] for val in severity_total[hazard][year]],rm_outliers=rm_severity_outliers)),3) for hazard in severity_total],
-                                    "std dev Severity": [round(np.std(remove_outliers([val for year in severity_total[hazard] for val in severity_total[hazard][year]],rm_outliers=rm_severity_outliers)),3) for hazard in severity_total],
-                                    "Average Injuries": [round(np.average(remove_outliers([val for year in injuries_total[hazard] for val in injuries_total[hazard][year]],rm_outliers=rm_all_outliers)),3) for hazard in injuries_total],
-                                    "std dev Injuries": [round(np.std(remove_outliers([val for year in injuries_total[hazard] for val in injuries_total[hazard][year]],rm_outliers=rm_all_outliers)),3) for hazard in injuries_total],
-                                    "Average Fatalities": [round(np.average(remove_outliers([val for year in fatalities_total[hazard] for val in fatalities_total[hazard][year]],rm_outliers=rm_all_outliers)),3) for hazard in fatalities_total],
-                                    "std dev Fatalities": [round(np.std(remove_outliers([val for year in fatalities_total[hazard] for val in fatalities_total[hazard][year]],rm_outliers=rm_all_outliers)),3) for hazard in fatalities_total],
-                                    "Average Structures Damaged": [round(np.average(remove_outliers([val for year in str_dam_total[hazard] for val in str_dam_total[hazard][year]],rm_outliers=rm_all_outliers)),3) for hazard in str_dam_total],
-                                    "std dev Structures Damaged": [round(np.std(remove_outliers([val for year in str_dam_total[hazard] for val in str_dam_total[hazard][year]],rm_outliers=rm_all_outliers)),3) for hazard in str_dam_total],
-                                    "Average Structures Destroyed": [round(np.average(remove_outliers([val for year in str_des_total[hazard] for val in str_des_total[hazard][year]],rm_outliers=rm_all_outliers)),3) for hazard in str_des_total],
-                                    "std dev Structures Destroyed": [round(np.std(remove_outliers([val for year in str_des_total[hazard] for val in str_des_total[hazard][year]],rm_outliers=rm_all_outliers)),3) for hazard in str_des_total],
+                                    "Average Severity": [round(np.average(remove_outliers([val for year in severity_total[hazard] for val in severity_total[hazard][year]],rm_outliers=rm_severity_outliers)),round_to) for hazard in severity_total],
+                                    "std dev Severity": [round(np.std(remove_outliers([val for year in severity_total[hazard] for val in severity_total[hazard][year]],rm_outliers=rm_severity_outliers)),round_to) for hazard in severity_total],
+                                    "Average Injuries": [round(np.average(remove_outliers([val for year in injuries_total[hazard] for val in injuries_total[hazard][year]],rm_outliers=rm_all_outliers)),round_to) for hazard in injuries_total],
+                                    "std dev Injuries": [round(np.std(remove_outliers([val for year in injuries_total[hazard] for val in injuries_total[hazard][year]],rm_outliers=rm_all_outliers)),round_to) for hazard in injuries_total],
+                                    "Average Fatalities": [round(np.average(remove_outliers([val for year in fatalities_total[hazard] for val in fatalities_total[hazard][year]],rm_outliers=rm_all_outliers)),round_to) for hazard in fatalities_total],
+                                    "std dev Fatalities": [round(np.std(remove_outliers([val for year in fatalities_total[hazard] for val in fatalities_total[hazard][year]],rm_outliers=rm_all_outliers)),round_to) for hazard in fatalities_total],
+                                    "Average Structures Damaged": [round(np.average(remove_outliers([val for year in str_dam_total[hazard] for val in str_dam_total[hazard][year]],rm_outliers=rm_all_outliers)),round_to) for hazard in str_dam_total],
+                                    "std dev Structures Damaged": [round(np.std(remove_outliers([val for year in str_dam_total[hazard] for val in str_dam_total[hazard][year]],rm_outliers=rm_all_outliers)),round_to) for hazard in str_dam_total],
+                                    "Average Structures Destroyed": [round(np.average(remove_outliers([val for year in str_des_total[hazard] for val in str_des_total[hazard][year]],rm_outliers=rm_all_outliers)),round_to) for hazard in str_des_total],
+                                    "std dev Structures Destroyed": [round(np.std(remove_outliers([val for year in str_des_total[hazard] for val in str_des_total[hazard][year]],rm_outliers=rm_all_outliers)),round_to) for hazard in str_des_total],
                                     "n total": [len([val for year in severity_total[hazard] for val in severity_total[hazard][year]]) for hazard in severity_total],
                                     "n after outliers": [len(remove_outliers([val for year in severity_total[hazard] for val in severity_total[hazard][year]],rm_outliers=rm_all_outliers)) for hazard in severity_total],
-                                    "formatted": [str(round(np.average(remove_outliers([val for year in severity_total[hazard] for val in severity_total[hazard][year]],rm_outliers=rm_severity_outliers)),3))+"+-"+str(round(np.std(remove_outliers([val for year in severity_total[hazard] for val in severity_total[hazard][year]],rm_outliers=rm_severity_outliers)),3)) for hazard in severity_total]
+                                    "formatted": [str(round(np.average(remove_outliers([val for year in severity_total[hazard] for val in severity_total[hazard][year]],rm_outliers=rm_severity_outliers)),round_to))+"+-"+str(round(np.std(remove_outliers([val for year in severity_total[hazard] for val in severity_total[hazard][year]],rm_outliers=rm_severity_outliers)),round_to)) for hazard in severity_total]
                                     }
                                     )
     return severity_total, severity_table
@@ -274,7 +274,7 @@ def calc_ICS_metrics(docs_per_hazard, preprocessed_df, id_col, unique_ids_col, r
     
     return time_of_occurence_days, time_of_occurence_pct_contained, frequency, fires, frequency_fires
 
-def create_primary_results_table(time_of_occurence_days, time_of_occurence_pct_contained, frequency, fire_freq, preprocessed_df, categories, hazards, years, interval=False):
+def create_primary_results_table(time_of_occurence_days, time_of_occurence_pct_contained, frequency, fire_freq, preprocessed_df, categories, hazards, years, interval=False, round_to=1):
     """
     creates the primary results table consisting of average OTTO, frequency, and rate for each hazard
     all arguments are outputs from calc_metrics
@@ -313,7 +313,7 @@ def create_primary_results_table(time_of_occurence_days, time_of_occurence_pct_c
                 days_total_data[hazard].append(val)
     days_av = {hazard: np.average(days_total_data[hazard]) for hazard in hazards}
     days_std = {hazard: np.std(days_total_data[hazard]) for hazard in hazards}
-    data_df["OTTO days"] = [str(round(days_av[hazard],3))+"+-"+str(round(days_std[hazard],3)) for hazard in hazards]
+    data_df["OTTO days"] = [str(round(days_av[hazard],round_to))+"+-"+str(round(days_std[hazard],round_to)) for hazard in hazards]
     if interval == True:
         data_df["OTTO days interval"] = [stats.t.interval(alpha=0.95, df=len(days_total_data[hazard])-1, loc=np.mean(days_total_data[hazard]), scale=stats.sem(days_total_data[hazard])) for hazard in hazards]
     #OTTO percent average += std dev; interval
@@ -325,20 +325,20 @@ def create_primary_results_table(time_of_occurence_days, time_of_occurence_pct_c
                 pct_total_data[hazard].append(val)
     pct_av = {hazard: np.average(pct_total_data[hazard]) for hazard in hazards}
     pct_std = {hazard: np.std(pct_total_data[hazard]) for hazard in hazards}
-    data_df["OTTO %"] = [str(round(pct_av[hazard],3))+"+-"+str(round(pct_std[hazard],3)) for hazard in hazards]
+    data_df["OTTO %"] = [str(round(pct_av[hazard],round_to))+"+-"+str(round(pct_std[hazard],round_to)) for hazard in hazards]
     if interval == True:
         data_df["OTTO % interval"] = [stats.t.interval(alpha=0.95, df=len(pct_total_data[hazard])-1, loc=np.mean(pct_total_data[hazard]), scale=stats.sem(pct_total_data[hazard])) for hazard in hazards]
     #rate per year
     sums_per_hazard = [np.sum([fire_freq[hazard][year] for year in fire_freq[hazard]]) for hazard in hazards]
-    data_df["Average Occurrences per year"] = [round(val/len(years),3) for val in sums_per_hazard]
+    data_df["Average Occurrences per year"] = [round(val/len(years),round_to) for val in sums_per_hazard]
     #rate interval
-    data_df["Rate"] = [str(round(np.average([fire_freq[hazard][year] for year in fire_freq[hazard]]),3))+"+-"+ str(round(np.std([fire_freq[hazard][year] for year in fire_freq[hazard]]),3)) for hazard in hazards]
+    data_df["Rate"] = [str(round(np.average([fire_freq[hazard][year] for year in fire_freq[hazard]]),round_to))+"+-"+ str(round(np.std([fire_freq[hazard][year] for year in fire_freq[hazard]]),round_to)) for hazard in hazards]
     if interval == True:
         data_df["Rate Interval (stats)"] = [stats.t.interval(alpha=0.95, df=len([fire_freq[hazard][year] for year in fire_freq[hazard]])-1, loc=np.mean([fire_freq[hazard][year] for year in fire_freq[hazard]]), scale=stats.sem([fire_freq[hazard][year] for year in fire_freq[hazard]])) for hazard in hazards]
-        data_df["Rate Interval (percentile)"] = [str(round(np.average([fire_freq[hazard][year] for year in fire_freq[hazard]]),3))+" ("+str(round(np.percentile([fire_freq[hazard][year] for year in fire_freq[hazard]], 2.5),3))+","+str(round(np.percentile([fire_freq[hazard][year] for year in fire_freq[hazard]], 97.5),3))+")" for hazard in hazards]
+        data_df["Rate Interval (percentile)"] = [str(round(np.average([fire_freq[hazard][year] for year in fire_freq[hazard]]),round_to))+" ("+str(round(np.percentile([fire_freq[hazard][year] for year in fire_freq[hazard]], 2.5),round_to))+","+str(round(np.percentile([fire_freq[hazard][year] for year in fire_freq[hazard]], 97.5),round_to))+")" for hazard in hazards]
     #fires per rate
     total_fires = len(preprocessed_df["INCIDENT_ID"].unique())
-    data_df["Average fires per occurrence"] = [round(total_fires/val,3) for val in sums_per_hazard]
+    data_df["Average fires per occurrence"] = [round(total_fires/val,round_to) for val in sums_per_hazard]
 
     #total frequency
     data_df["Total Frequency"] = [np.sum([frequency[hazard][year] for year in frequency[hazard]]) for hazard in hazards]
@@ -346,7 +346,7 @@ def create_primary_results_table(time_of_occurence_days, time_of_occurence_pct_c
     data_df["Total Fire Frequency"] = sums_per_hazard
     return data_df
 
-def graph_ICS_time_series(time_of_occurence_days, time_of_occurence_pct_contained, frequency, frequency_fires, hazards, categories):
+def graph_ICS_time_series(time_of_occurence_days, time_of_occurence_pct_contained, frequency, frequency_fires, hazards, categories, std_dev=True, save=True, results_path="", fontsize=16, figsize=(6,4), titles=True):
     line_styles = []
     line_style_options = ['--', ':','-']
     line_style_dict = {list(set(categories))[i]:line_style_options[i] for i in range(len(list(set(categories))))}
@@ -360,12 +360,99 @@ def graph_ICS_time_series(time_of_occurence_days, time_of_occurence_pct_containe
         markers.append(marker)
         line_styles.append(line_style_dict[category])
     #plot days
-    plot_metric_time_series(metric_data=time_of_occurence_days, metric_name='Days', line_styles=line_styles, markers=markers, title="Operational Time to Occurrence", time_name="Year", scaled=False, xtick_freq=1, show_std=True, save=False, dataset_name="", yscale=None)
+    if titles == True:
+        otto_days_title = "Operational Time to Occurrence"
+        otto_pct_title = "Operational Time to Occurrence"
+        frequency_title = "Hazard Frequency"
+        total_frequency_title = "Total Hazard Frequency"
+    else:
+        otto_days_title = ""
+        otto_pct_title = ""
+        frequency_title = ""
+        total_frequency_title = ""
+    plot_metric_time_series(metric_data=time_of_occurence_days, metric_name='Days', line_styles=line_styles, markers=markers, title=otto_days_title, time_name="Year", scaled=False, xtick_freq=1, show_std=std_dev, save=save, dataset_name=results_path+"/ICS_OTTO_days", yscale=None, fontsize=fontsize, figsize=figsize)
     #plot pct contained
-    plot_metric_time_series(metric_data=time_of_occurence_pct_contained, metric_name='% Containment', line_styles=line_styles, markers=markers, title="Operational Time to Occurrence", time_name="Year", scaled=False, xtick_freq=1, show_std=True, save=False, dataset_name="", yscale=None)
+    plot_metric_time_series(metric_data=time_of_occurence_pct_contained, metric_name='% Containment', line_styles=line_styles, markers=markers, title=otto_pct_title, time_name="Year", scaled=False, xtick_freq=1, show_std=std_dev, save=save, dataset_name=results_path+"/ICS_OTTO_pct", yscale=None, fontsize=fontsize, figsize=figsize)
     #plot total frequency
-    plot_frequency_time_series(frequency, metric_name='Frequency', line_styles=line_styles, markers=markers, title="Total Hazard Frequency", time_name="Year", xtick_freq=1, scale=False, save=False, dataset_name="")
+    plot_frequency_time_series(frequency, metric_name='Frequency', line_styles=line_styles, markers=markers, title=total_frequency_title, time_name="Year", xtick_freq=1, scale=False, save=save, dataset_name=results_path+"/ICS_total_frequency", fontsize=fontsize, figsize=figsize)
     #plot fire frequency
-    plot_frequency_time_series(frequency_fires, metric_name='Frequency', line_styles=line_styles, markers=markers, title="Hazard Frequency", time_name="Year", xtick_freq=1, scale=False, save=False, dataset_name="")
+    plot_frequency_time_series(frequency_fires, metric_name='Frequency', line_styles=line_styles, markers=markers, title=frequency_title, time_name="Year", xtick_freq=1, scale=False, save=save, dataset_name=results_path+"/ICS_fire_frequency", fontsize=fontsize, figsize=figsize)
     #plot severity
     
+def get_likelihoods_ICS(rates):
+    curr_likelihoods = {hazard:0 for hazard in rates}
+    for hazard in rates:
+        r = rates[hazard]
+        if r>=1000:
+            likelihood = 'Frequent'
+        elif r>=100 and r<1000:
+            likelihood = 'Probable'
+        elif r>=10 and r<100:
+            likelihood = 'Occasional'
+        elif r>=1 and r<10:
+            likelihood = 'Remote'
+        elif r<1:
+            likelihood = 'Improbable'
+        curr_likelihoods[hazard] = likelihood
+    return curr_likelihoods
+
+def get_ICS_severity_category_USFS(severity_table, hazards):
+    severities = {hazard:[] for hazard in hazards}
+    #severity table -> index
+    for hazard in hazards:
+        #temp_df = severity_table.loc[severity_table["Hazard"]==hazard.replace("_", " ")].reset_index(drop=True)
+        severities[hazard].append(round(severity_table.at[hazard,"Average Injuries"]) - severity_table.at[hazard, "Total Avg Injuries"])
+        severities[hazard].append(severity_table.at[hazard,"Average Structures Damaged"] - severity_table.at[hazard,"Total Avg Str Dam"])
+        severities[hazard].append(severity_table.at[hazard,"Average Structures Destroyed"] - severity_table.at[hazard,"Total Avg Str Des"])
+        severities[hazard].append(round(severity_table.at[hazard,"Average Fatalities"]) - severity_table.at[hazard, "Total Avg Fatalities"])
+    severity_df = pd.DataFrame(severities, 
+                            index=['Diff_Injuries', 'Diff_Structures_Damages', 
+                                     'Diff_Structures_Destroyed','Diff_Fatalities'])
+    curr_severities = {}
+    for hazard in hazards: 
+        injuries = severity_df.at['Diff_Injuries',hazard]
+        str_dam = severity_df.at['Diff_Structures_Damages', hazard]
+        str_des = severity_df.at['Diff_Structures_Destroyed', hazard]
+        fatalities = severity_df.at['Diff_Fatalities', hazard]
+        if injuries == 0 and fatalities == 0 and str_des == 0 and str_dam ==0:
+             impact = "Negligible"
+        elif injuries <= 2 and fatalities == 0 and str_des <= 10 and str_dam <= 10:
+             impact = "Marginal"
+        elif fatalities == 0 and (injuries > 2 or str_des > 10 or str_dam > 10):
+             impact = "Critical"
+        else:
+            impact = 'Catastrophic'
+        curr_severities[hazard] = impact
+    return curr_severities
+
+def get_ICS_severity_category(severity_table, hazards):
+    severities = {hazard:[] for hazard in hazards}
+    #severity table -> index
+    for hazard in hazards:
+        #temp_df = severity_table.loc[severity_table["Hazard"]==hazard.replace("_", " ")].reset_index(drop=True)
+        severities[hazard].append(round(severity_table.at[hazard,"Average Injuries"]) - severity_table.at[hazard, "Total Avg Injuries"])
+        severities[hazard].append(severity_table.at[hazard,"Average Structures Damaged"] - severity_table.at[hazard,"Total Avg Str Dam"])
+        severities[hazard].append(severity_table.at[hazard,"Average Structures Destroyed"] - severity_table.at[hazard,"Total Avg Str Des"])
+        severities[hazard].append(round(severity_table.at[hazard,"Average Fatalities"]) - severity_table.at[hazard, "Total Avg Fatalities"])
+    severity_df = pd.DataFrame(severities, 
+                            index=['Diff_Injuries', 'Diff_Structures_Damages', 
+                                     'Diff_Structures_Destroyed','Diff_Fatalities'])
+    curr_severities = {}
+    for hazard in hazards: 
+        injuries = severity_df.at['Diff_Injuries',hazard]
+        str_dam = severity_df.at['Diff_Structures_Damages', hazard]
+        str_des = severity_df.at['Diff_Structures_Destroyed', hazard]
+        fatalities = severity_df.at['Diff_Fatalities', hazard]
+        if injuries == 0 and fatalities == 0 and str_des == 0 and str_dam ==0:
+             impact = "Minimal Impact"
+        elif injuries <= 2 and fatalities == 0 and str_des <= 10 and str_dam <= 10:
+             impact = "Minor Impact"
+        elif injuries <= 2 and fatalities == 0 and (str_des > 10 or str_dam > 10):
+             impact = "Major Impact"
+        else:
+            if fatalities<2:
+                impact = 'Hazardous Impact'
+            else: #fatalities>2
+                impact = 'Catastrophic Impact'
+        curr_severities[hazard] = impact
+    return curr_severities
