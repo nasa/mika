@@ -9,7 +9,10 @@ import os
 from hdbscan import HDBSCAN
 from sklearn.feature_extraction.text import CountVectorizer
 import tomotopy as tp
-from module.topic_model_plus_class import Topic_Model_plus
+import sys
+import os
+sys.path.append(os.path.join("..", "..", ".."))
+from mika.kd import Topic_Model_plus
 
 
 list_of_attributes = ['Narrative']#'narr_public']#, 'corrective_public', 'notes']
@@ -47,7 +50,7 @@ safecom.data_df[raw_attrs] = raw_text
 #safecom.save_preprocessed_data()
 #"""
 #"""#Extract preprocessed data
-file = os.path.join(os.getcwd(),'results','safecom_topics_Feb-17-2022','preprocessed_data.csv')
+file = os.path.join('topic_model_results','preprocessed_data.csv')
 safecom = Topic_Model_plus(document_id_col=document_id_col, extra_cols=extra_cols, list_of_attributes=list_of_attributes, database_name=name, combine_cols=False)
 safecom.extract_preprocessed_data(file)
 #"""

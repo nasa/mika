@@ -29,8 +29,9 @@ sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/../..")
 if sys.platform == "win32":
     smart_nlp_path = os.getcwd()
     smart_nlp_path = "\\".join([smart_nlp_path.split("\\")[i] for i in range(0,4)])
+    smart_nlp_path = ""
 
-lex_path = smart_nlp_path + "\\LLIS_Lesson_Selection\\Lexicons\\"
+lex_path = smart_nlp_path + "Lexicons\\"
 
 def drop_topics(df):
     to_remove = ['Acquisition / procurement strategy and planning','Business processes','Center distribution of programs and management activities',

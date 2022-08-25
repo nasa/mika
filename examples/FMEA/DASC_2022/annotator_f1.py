@@ -5,7 +5,7 @@ Created on Mon Mar 28 13:16:13 2022
 @author: srandrad
 """
 
-from module.NER_utils import read_doccano_annots, clean_doccano_annots, split_docs_to_sentances, check_doc_to_sentence_split, tokenize_and_align_labels, compute_metrics, compute_classification_report, build_confusion_matrix, plot_eval_results
+from mika.kd.NER import read_doccano_annots, clean_doccano_annots, split_docs_to_sentances, check_doc_to_sentence_split, tokenize_and_align_labels, compute_metrics, compute_classification_report, build_confusion_matrix, plot_eval_results
 
 import os
 import pandas as pd
@@ -144,8 +144,8 @@ llis_S_files = ['data/doccano/annotations/srandrade_DE.jsonl','data/doccano/anno
 h = []
 s = []
 for i in range(3):
-    file1 = llis_H_files[i]
-    file2 = llis_S_files[i]
+    file1 = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)), llis_H_files[i])
+    file2 = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)), llis_S_files[i])
     if i == 1: file2_encode=True
     else: file2_encode=False
     H_df, S_df = prepare_annot_dfs(file1, file2, name="llis", file2_encode=file2_encode)
@@ -154,7 +154,8 @@ for i in range(3):
 S_annot_df = pd.concat(s).reset_index(drop=True)
 H_annot_df = pd.concat(h).reset_index(drop=True)
 
-H_safecom, S_safecom = prepare_annot_dfs(file1=os.path.join('data','doccano','annotations','hswalsh_safecom_round2.jsonl'), file2=os.path.join('data','doccano','annotations','srandrad_safecom_v2.jsonl'))
+H_safecom, S_safecom = prepare_annot_dfs(file1=os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)), 'data','doccano','annotations','hswalsh_safecom_round2.jsonl'),
+                                         file2=os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)), 'data','doccano','annotations','srandrad_safecom_v2.jsonl'))
 
 metric = load_metric("seqeval")
 true_predictions = S_annot_df['tags']

@@ -18,7 +18,7 @@ from torch import cuda, FloatTensor
 from torch.nn import CrossEntropyLoss
 from datasets import Dataset
 
-from module.NER_utils import read_doccano_annots, clean_doccano_annots, split_docs_to_sentances, check_doc_to_sentence_split, tokenize_and_align_labels, compute_metrics, compute_classification_report, build_confusion_matrix, plot_eval_results
+from mika.kd.NER import read_doccano_annots, clean_doccano_annots, split_docs_to_sentances, check_doc_to_sentence_split, tokenize_and_align_labels, compute_metrics, compute_classification_report, build_confusion_matrix, plot_eval_results
 
 #set up GPU
 device = 'cuda' if cuda.is_available() else 'cpu'
@@ -29,8 +29,8 @@ print(device)
 nlp = spacy.load("en_core_web_trf")
 nlp.add_pipe("sentencizer")
 
-file = os.path.join('data','doccano','annotations','srandrad_safecom_v2.jsonl')
-LLIS_folder = os.path.join('data','doccano','annotations')
+file = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)), 'data','doccano','annotations','srandrad_safecom_v2.jsonl')
+LLIS_folder = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)), 'data','doccano','annotations')
 #read in doccano annotations
 df = read_doccano_annots(file)
 text_df = df[['data', 'label', 'Tracking #']] #"Lesson ID"]]
@@ -166,7 +166,7 @@ model =BertForTokenClassification.from_pretrained( #AutoModelForTokenClassificat
 #training setup
 data_collator = DataCollatorForTokenClassification(tokenizer=tokenizer)
 args = TrainingArguments(
-    "models/FMEA-ner-model-3ep",
+    os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)), "models/FMEA-ner-model"),
     evaluation_strategy="steps",
     save_strategy="epoch",
     learning_rate=2e-5,
@@ -246,7 +246,7 @@ build_confusion_matrix(labels, preds, label_ids, ids_to_labels, save=True, savep
 #"""
 #"""
 num_steps = trainer.state.max_steps
-filename = os.path.join(os.getcwd(),"models", "FMEA-ner-model-3ep", "checkpoint-"+str(num_steps), "trainer_state.json")
+filename = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)),"models", "FMEA-ner-model", "checkpoint-"+str(num_steps), "trainer_state.json")
 plot_eval_results(filename, save=True, savepath='examples/FMEA/DASC_2022/')
 trainer.save_model()
 #"""

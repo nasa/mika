@@ -10,10 +10,13 @@ import os
 from hdbscan import HDBSCAN
 from sklearn.feature_extraction.text import CountVectorizer
 import tomotopy as tp
-from module.topic_model_plus_class import Topic_Model_plus
+import sys
+import os
+sys.path.append(os.path.join("..", "..", ".."))
+from mika.kd import Topic_Model_plus
 
 list_of_attributes = ["Narrative"]
-csv_file_name = os.path.join("data","SAFENET","SAFENET_1999_2021.csv")
+csv_file_name = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)),"data","SAFENET","SAFENET_1999_2021.csv")
 name = os.path.join('safenet')
 extra_cols = ["Iteration", "Event Start Date", "Event Stop Date", "Incident Name",
               "Incident Number", "Event State", "Event Jurisdiction", "Event Local Unit",

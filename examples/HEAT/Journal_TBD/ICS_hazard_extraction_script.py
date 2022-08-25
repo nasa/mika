@@ -7,10 +7,10 @@ Functions for ICS-209-PLUS
 
 import sys
 import os
-sys.path.append(os.path.join(".."))
+sys.path.append(os.path.join("..","..",".."))
 
-from module.topic_model_plus_class import Topic_Model_plus
-from module.stopwords.ICS_stop_words import stop_words
+from mika.kd import Topic_Model_plus
+from mika.utils.stopwords.ICS_stop_words import stop_words
 from sklearn.feature_extraction.text import CountVectorizer
 from bertopic import BERTopic
 import os
@@ -20,7 +20,6 @@ import pandas as pd
 
 if __name__ == '__main__': 
     ICS_stop_words = stop_words
-    
     extra_cols = ["CY","DISCOVERY_DATE", "START_YEAR", "REPORT_DOY", "DISCOVERY_DOY",
                   "TOTAL_PERSONNEL", "TOTAL_AERIAL", "PCT_CONTAINED_COMPLETED",
                   "ACRES", "WF_FSR", "INJURIES", "FATALITIES","EST_IM_COST_TO_DATE", "STR_DAMAGED",
@@ -30,7 +29,7 @@ if __name__ == '__main__':
     list_of_attributes = ["REMARKS", "SIGNIF_EVENTS_SUMMARY", "MAJOR_PROBLEMS"]
     document_id_col = "INCIDENT_ID"
     
-    file_name = os.path.join('data','209-PLUS','ics209-plus-wildfire','ics209-plus-wildfire','ics209-plus-wf_sitreps_1999to2014.csv')
+    file_name = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)),'data','ICS','ics209-plus-wf_sitreps_1999to2014.csv')
     name = os.path.join('ICS_bertopic')
     
     ICS = Topic_Model_plus(document_id_col=document_id_col, extra_cols=extra_cols, csv_file=file_name, list_of_attributes=list_of_attributes, database_name=name, combine_cols=True, create_ids=True)

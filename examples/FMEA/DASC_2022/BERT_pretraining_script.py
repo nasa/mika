@@ -20,8 +20,8 @@ cuda.empty_cache()
 print(device)
 
 #load training data: LLIS, all of SAFECOM
-safecom = pd.read_csv('data/SAFECOM/SAFECOM_data.csv')
-llis = pd.read_excel('data/LLIS/lessons_learned_2021-12-10.xlsx')
+safecom = pd.read_csv(os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)),'data/SAFECOM/SAFECOM_data.csv'))
+llis = pd.read_excel(os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)),'data/LLIS/lessons_learned_2021-12-10.xlsx'))
 print(len(llis), len(safecom))
 safecom_text = safecom[['Narrative', 'Corrective Action']]
 llis_text = llis[['Recommendation(s)', 'Lesson(s) Learned', 'Driving Event']]
@@ -75,7 +75,7 @@ model = model.to(device)
 #data_collator = DataCollatorForTokenClassification(tokenizer=tokenizer)#
 data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer)
 args = TrainingArguments(
-    "models/Pre-trained-BERT",
+    os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)),"models/Pre-trained-BERT"),
     evaluation_strategy="steps",
     save_strategy="epoch",
     learning_rate=2e-5,
