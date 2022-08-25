@@ -10,7 +10,7 @@ import os
 import pandas as pd
 import numpy as np
 from transformers import Trainer, pipeline, TrainingArguments, AutoTokenizer, DataCollatorForTokenClassification, BertForTokenClassification
-from module.NER_utils import build_confusion_matrix, compute_classification_report, split_docs_to_sentances, tokenize, tokenize_and_align_labels, read_doccano_annots, clean_doccano_annots
+from mika.kd.NER import build_confusion_matrix, compute_classification_report, split_docs_to_sentances, tokenize, tokenize_and_align_labels, read_doccano_annots, clean_doccano_annots
 from datasets import load_from_disk, Dataset
 from torch import cuda, tensor
 import torch

@@ -5,7 +5,7 @@ Created on Thu Jun 16 12:03:38 2022
 @author: srandrad
 """
 
-from module.trend_analysis_functions import remove_outliers, plot_metric_time_series, plot_frequency_time_series
+from mika.kd.trend_analysis import remove_outliers, plot_metric_time_series, plot_frequency_time_series
 import numpy as np
 import pandas as pd
 import scipy.stats as stats
