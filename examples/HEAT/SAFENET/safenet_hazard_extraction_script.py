@@ -14,8 +14,9 @@ import sys
 import os
 sys.path.append(os.path.join("..", "..", ".."))
 from mika.kd import Topic_Model_plus
+from mika.utils import Data
 
-list_of_attributes = ["Narrative"]
+text_columns = ["Narrative"]
 csv_file_name = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)),"data","SAFENET","SAFENET_1999_2021.csv")
 name = os.path.join('safenet')
 extra_cols = ["Iteration", "Event Start Date", "Event Stop Date", "Incident Name",
@@ -25,32 +26,33 @@ extra_cols = ["Iteration", "Event Start Date", "Event Stop Date", "Incident Name
               "Human Factors", "Other Factors", "Narrative", "Immediate Action Taken",  "SAFENET Create Date"
               ]
 document_id_col = "ID"
-safenet = Topic_Model_plus(list_of_attributes=list_of_attributes, document_id_col=document_id_col, 
-                        csv_file=csv_file_name, database_name=name, extra_cols=extra_cols)
-safenet.prepare_data()
-raw_text = safenet.data_df[safenet.list_of_attributes] 
-raw_attrs = ['Raw_'+attr for attr in safenet.list_of_attributes]
-safenet.data_df[raw_attrs] = raw_text
-safenet.preprocess_data()
-safenet.save_preprocessed_data()
+safenet_data = Data()
+safenet_data.load(csv_file_name, text_columns=text_columns, id_col=document_id_col,name=name)
+safenet_data.prepare_data()
+raw_text = safenet_data.data_df[safenet_data.text_columns] 
+raw_attrs = ['Raw_'+attr for attr in safenet_data.text_columns]
+safenet_data.data_df[raw_attrs] = raw_text
+safenet_data.preprocess_data()
+safenet_data.save()
+safenet_tm = Topic_Model_plus(text_columns=text_columns, data=safenet_data)
 #run lda
 num_topics ={'Narrative': 50}
-safenet.lda(min_cf=1, num_topics=num_topics)
-safenet.save_lda_results()
-safenet.save_lda_models()
-for attr in list_of_attributes:
-    safenet.lda_visual(attr)
+safenet_tm.lda(min_cf=1, num_topics=num_topics)
+safenet_tm.save_lda_results()
+safenet_tm.save_lda_models()
+for attr in text_columns:
+    safenet_tm.lda_visual(attr)
 
 #"""#Run Bertopic
-safenet.data_df[safenet.list_of_attributes] = raw_text
+safenet_tm.data_df[safenet_tm.text_columns] = raw_text
 vectorizer_model = CountVectorizer(ngram_range=(1, 2), stop_words="english") #removes stopwords
 #hdbscan_model = HDBSCAN(min_cluster_size=3, min_samples=3) #allows for smaller topic sizes/prevents docs with no topics
-safenet.bert_topic(count_vectorizor=vectorizer_model)#, hdbscan=hdbscan_model)
-safenet.save_bert_results()
+safenet_tm.bert_topic(count_vectorizor=vectorizer_model)#, hdbscan=hdbscan_model)
+safenet_tm.save_bert_results()
 #get coherence
 #coh = ICS.get_bert_coherence(coh_method='c_v')
-safenet.save_bert_vis()
-safenet.reduce_bert_topics(num=100)
-safenet.save_bert_results()
-safenet.save_bert_vis()
+safenet_tm.save_bert_vis()
+safenet_tm.reduce_bert_topics(num=100)
+safenet_tm.save_bert_results()
+safenet_tm.save_bert_vis()
 #"""

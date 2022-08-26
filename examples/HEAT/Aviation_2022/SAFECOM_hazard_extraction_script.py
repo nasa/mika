@@ -13,9 +13,9 @@ import sys
 import os
 sys.path.append(os.path.join("..", "..", ".."))
 from mika.kd import Topic_Model_plus
+from mika.utils import Data
 
-
-list_of_attributes = ['Narrative']#'narr_public']#, 'corrective_public', 'notes']
+text_columns = ['Narrative']#'narr_public']#, 'corrective_public', 'notes']
 extra_cols_doi = ['region', 'agency', 'duplicate_yn', 'completed_yn', 'rep_by_org',
                    'air_number', 'air_type', 'air_model', 'air_manufacturer',
                    'air_owner', 'mission_destination', 'mission_depart', 'mission_hazmat',
@@ -31,67 +31,69 @@ extra_cols = ['Agency', 'Region', 'Location', 'Date', 'Date Submitted', 'Trackin
               'Type', 'Manufacturer', 'Model', 'Hazard', 'Incident	Management',
               'UAS', 'Accident', 'Airspace', 'Maintenance', 'Mishap Prevention'
               ]
-document_id_col = 'Tracking #'#id'
+id_col = 'Tracking #'
 csv_file_name = os.path.join('data','SAFECOM_data.csv')
 name = os.path.join('safecom')
 """
-safecom = Topic_Model_plus(list_of_attributes=list_of_attributes, document_id_col=document_id_col, 
-                        csv_file=csv_file_name, database_name=name, extra_cols=extra_cols)
+safecom_data = Data()
+safecom_data.load(csv_file_name, preprocessed=False, id_col=id_col, text_columns=text_columns, name='safecom')
+
 num_topics ={'Narrative': 96}
-safecom.prepare_data()
-fire_missions = [mission for mission in list(safecom.data_df['Mission Type']) if type(mission) is str and 'fire' in mission.lower()]
-safecom.data_df = safecom.data_df.loc[safecom.data_df['Mission Type'].isin(fire_missions)].reset_index(drop=True)
-safecom.doc_ids = safecom.data_df[document_id_col].tolist()
-raw_text = safecom.data_df[safecom.list_of_attributes] 
-raw_attrs = ['Raw_'+attr for attr in safecom.list_of_attributes]
-safecom.data_df[raw_attrs] = raw_text
-"""
-#safecom.preprocess_data()
-#safecom.save_preprocessed_data()
+safecom_data.prepare_data(remove_incomplete_rows=True)
+fire_missions = [mission for mission in list(safecom_data.data_df['Mission Type']) if type(mission) is str and 'fire' in mission.lower()]
+safecom_data.data_df = safecom_data.data_df.loc[safecom_data.data_df['Mission Type'].isin(fire_missions)].reset_index(drop=True)
+safecom_data.doc_ids = safecom_data.data_df[id_col].tolist()
+raw_text = safecom_data.data_df[safecom_data.text_columns] 
+raw_attrs = ['Raw_'+attr for attr in safecom_data.text_columns]
+safecom_data.data_df[raw_attrs] = raw_text
+safecom_data.preprocess_data()
+safecom_data.save("preprocessed_data.csv")
+safecom_tm = Topic_Model_plus(text_columns=text_columns, data=safecom_data)
 #"""
 #"""#Extract preprocessed data
 file = os.path.join('topic_model_results','preprocessed_data.csv')
-safecom = Topic_Model_plus(document_id_col=document_id_col, extra_cols=extra_cols, list_of_attributes=list_of_attributes, database_name=name, combine_cols=False)
-safecom.extract_preprocessed_data(file)
+safecom_data = Data()
+safecom_data.load(file, preprocessed=True, id_col=id_col, text_columns=text_columns, name='safecom')
+safecom_tm = Topic_Model_plus(text_columns=text_columns, data=safecom_data)
 #"""
 """#run hdp to get topic numbers
-safecom.database_name = "SAFECOM_hazards_hdp"
-safecom.hdp()
-for attr in list_of_attributes:
-    print(safecom.hdp_models[attr].k)
-safecom.save_lda_results()
-safecom.save_lda_models()
-for attr in list_of_attributes:
-    safecom.lda_visual(attr)
+safecom_tm.database_name = "SAFECOM_hazards_hdp"
+safecom_tm.hdp()
+for attr in text_columns:
+    print(safecom_tm.hdp_models[attr].k)
+safecom_tm.save_lda_results()
+safecom_tm.save_lda_models()
+for attr in text_columns:
+    safecom_tm.lda_visual(attr)
 """
 #"""
 num_topics ={'Narrative': 100}
-safecom.database_name = "SAFECOM_hazards_lda"
-safecom.lda(min_cf=1, num_topics=num_topics)
-safecom.save_lda_results()
-safecom.save_lda_models()
-for attr in list_of_attributes:
-    safecom.lda_visual(attr)
+safecom_tm.database_name = "SAFECOM_hazards_lda"
+safecom_tm.lda(min_cf=1, num_topics=num_topics)
+safecom_tm.save_lda_results()
+safecom_tm.save_lda_models()
+for attr in text_columns:
+    safecom_tm.lda_visual(attr)
 #"""
 
 """#Run hlda
-safecom.hlda(levels=3, eta=0.50, min_cf=1, min_df=1)
-safecom.save_hlda_models()
-safecom.save_hlda_results()
-for attr in list_of_attributes:
-    safecom.hlda_visual(attr)
+safecom_tm.hlda(levels=3, eta=0.50, min_cf=1, min_df=1)
+safecom_tm.save_hlda_models()
+safecom_tm.save_hlda_results()
+for attr in text_columns:
+    safecom_tm.hlda_visual(attr)
 """
 
 """#Run Bertopic
-safecom.data_df[safecom.list_of_attributes] = raw_text
+safecom_tm.data_df[safecom_tm.text_columns] = raw_text
 vectorizer_model = CountVectorizer(ngram_range=(1, 2), stop_words="english") #removes stopwords
 hdbscan_model = HDBSCAN(min_cluster_size=3, min_samples=3) #allows for smaller topic sizes/prevents docs with no topics
-safecom.bert_topic(count_vectorizor=vectorizer_model, hdbscan=hdbscan_model)
-safecom.save_bert_results()
+safecom_tm.bert_topic(count_vectorizor=vectorizer_model, hdbscan=hdbscan_model)
+safecom_tm.save_bert_results()
 #get coherence
 #coh = ICS.get_bert_coherence(coh_method='c_v')
-safecom.save_bert_vis()
-safecom.reduce_bert_topics(num=100)
-safecom.save_bert_results()
-safecom.save_bert_vis()
+safecom_tm.save_bert_vis()
+safecom_tm.reduce_bert_topics(num=100)
+safecom_tm.save_bert_results()
+safecom_tm.save_bert_vis()
 """

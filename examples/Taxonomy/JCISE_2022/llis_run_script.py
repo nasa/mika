@@ -6,10 +6,11 @@ Created on Wed Feb 24 16:40:39 2021
 """
 import sys
 import os
-from module.topic_model_plus_class import Topic_Model_plus
+from mika.kd import Topic_Model_plus
+from mika.utils import Data
 
 # these variables must be defined to create the object
-list_of_attributes = ['Lesson(s) Learned','Driving Event','Recommendation(s)']
+text_columns = ['Lesson(s) Learned','Driving Event','Recommendation(s)']
 document_id_col = 'Lesson ID'
 database_name = 'LLIS' # optional, used at beginning of folder for identification
 # optional, can use optimize instead
@@ -17,9 +18,9 @@ num_topics ={'Lesson(s) Learned':75, 'Driving Event':75, 'Recommendation(s)':75}
 
 # data file input
 filename = os.path.join('data','LLIS','useable_LL_combined.csv')
-
-# creating object
-tm = Topic_Model_plus(list_of_attributes=list_of_attributes, document_id_col=document_id_col, csv_file=filename, database_name=database_name)
+#for raw data
+#llis_data = Data()
+#llis_data.load(filename, preprocessed=False, text_columns=text_columns, id_col=document_id_col, name=database_name)
 
 # preparing the data: loading, dropping columns and rows
 # parameters: none required, any kwargs for pd.read_csv can be passed
@@ -28,12 +29,14 @@ tm = Topic_Model_plus(list_of_attributes=list_of_attributes, document_id_col=doc
 #stopwords = ['Ames','CalTech','Goddard','JPL','Laboratory','Langley','Glenn','Armstrong','Johnson','Kennedy','Marshall','Michoud','Headquarters','Plum','Brook','Stennis','Wallops','Appendix','January','February','March','April','May','June','July','August','September','October','November','December','however']
 
 # parameters: domain_stopwords, ngrams=True (used for custom ngrams), ngram_range=3, threshold=15, min_count=5
-#tm.preprocess_data(percent=.3, domain_stopwords=stopwords, ngrams=False, quot_correction=True, min_count=3) # min_count should be equivalent to min_cf in tm.lda
-#tm.save_preprocessed_data()
-
+#llis_.preprocess_data(percent=.3, domain_stopwords=stopwords, ngrams=False, quot_correction=True, min_count=3) # min_count should be equivalent to min_cf in tm.lda
+#llis_data.save()
+llis_data = Data()
 filepath = os.path.join('examples','Taxonomy', 'JCISE','LLIS_topics_Dec-03-2021')
-tm.extract_preprocessed_data(os.path.join(filepath,'preprocessed_data.csv'))
+llis_data.load(os.path.join(filepath, 'preprocessed_data.csv'), preprocessed=True, text_columns=text_columns, id_col=document_id_col, name=database_name)
 
+# creating object
+tm = Topic_Model_plus(text_columns=text_columns, data=llis_data)
 # perform lda: can pass in any parameter used in tp model
 # parameters: optional
 #tm.lda(min_df=2, min_cf=4, num_topics=num_topics, training_iterations=1000)
