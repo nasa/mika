@@ -11,14 +11,15 @@ Updates:
     these values should result in more words per risk factor
 @author: srandrad
 """
-
-from module.NER_utils import read_doccano_annots
+import sys
+import os
+sys.path.append(os.path.join("..", ".."))
+from mika.kd.NER import read_doccano_annots
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer 
 from sklearn import feature_selection
 from sklearn.utils.extmath import safe_sparse_dot
-import sys
-import os
+
 import numpy as np
 
 #reading in annotation file
@@ -87,7 +88,7 @@ def save_lexicons(y, dtf_features, p_value_limit, total_or_annotated):
                 data_dict[cat].append("")
     #save all words per category
     lexicon = pd.DataFrame(data_dict)
-    lexicon.to_csv("results/Risk_Factor_Lexicons_"+total_or_annotated+"_"+str(np.round(1-p_value_limit,2))+".csv")    
+    lexicon.to_csv("Risk_Factor_Lexicons_"+total_or_annotated+"_"+str(np.round(1-p_value_limit,2))+".csv")    
 
 #formating annotations and text
 annotated_texts = []

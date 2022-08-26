@@ -8,16 +8,15 @@ Update: removed topic model plus dependency
 import pandas as pd
 import sys
 import os
-from time import sleep
-from tqdm import tqdm
+sys.path.append(os.path.join("..", ".."))
 from mika.utils import Data
 from mika.utils.LLIS import drop_uniformitive_text
 
 #read in lexicons
-lexicon_file = os.path.join('results', 'Risk_Factor_Lexicons.csv')
+lexicon_file = os.path.join('Risk_Factor_Lexicons.csv')
 lexicons = pd.read_csv(lexicon_file, index_col=0) 
 #read in llis using Data
-llis_file = os.path.join('data', 'LLIS', 'useable_LL_combined.csv')
+llis_file = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir)),'data', 'LLIS', 'useable_LL_combined.csv')
 combine_cols = ['Abstract', 'Lesson(s) Learned', 'Recommendation(s)', 'Driving Event']
 llis = Data()
 llis.load(llis_file, id_col='Lesson ID', )
