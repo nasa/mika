@@ -8,7 +8,7 @@ import pandas as pd
 import tomotopy as tp
 
 # load data from file and separate into different parts of the survey
-filepath = os.path.join('data','Survey_Topic_word intrusion.xlsx')
+filepath = os.path.join('Survey_Topic_word intrusion.xlsx')
 df = pd.read_excel(filepath)
 q_idx = df.keys()
 word_q_idx = q_idx[1:7]

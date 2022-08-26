@@ -217,8 +217,8 @@ class word_intrusion_class():
 # LESSONS LEARNED LEVEL 1: 1 SAMPLES FOR WORD
 wi = word_intrusion_class()
 
-filepath = os.path.join('examples','Taxonomy','IDETC_2021','llis_idetc_results.csv')
-save_filepath = os.path.join('results','IDETC_2021_intruded_topics_lesson_1.csv')
+filepath = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir)),'IDETC_2021','llis_idetc_results.csv')
+save_filepath = os.path.join('IDETC_2021_intruded_topics_lesson_1.csv')
 topic_column_name = 'Lesson(s) Learned Level 1'
 doc_column_name = 'Lesson IDs for row'
 header = 2
@@ -229,8 +229,8 @@ wi.save_intruded_topics(filepath=save_filepath)
 # LESSONS LEARNED LEVEL 2: 1 SAMPLES FOR WORD
 wi = word_intrusion_class()
 
-filepath = os.path.join('examples','Taxonomy','IDETC_2021','llis_idetc_results.csv')
-save_filepath = os.path.join('results','IDETC_2021_intruded_topics_lesson_2.csv')
+filepath = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir)),'IDETC_2021','llis_idetc_results.csv')
+save_filepath = os.path.join('IDETC_2021_intruded_topics_lesson_2.csv')
 topic_column_name = 'Lesson(s) Learned Level 2'
 doc_column_name = 'Lesson IDs for row'
 header = 2
@@ -241,8 +241,8 @@ wi.save_intruded_topics(filepath=save_filepath)
 # DRIVING EVENT LEVEL 1: 1 SAMPLES FOR WORD
 wi = word_intrusion_class()
 
-filepath = os.path.join('examples','Taxonomy','IDETC_2021','llis_idetc_results.csv')
-save_filepath = os.path.join('results','IDETC_2021_intruded_topics_event_1.csv')
+filepath = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir)),'IDETC_2021','llis_idetc_results.csv')
+save_filepath = os.path.join('IDETC_2021_intruded_topics_event_1.csv')
 topic_column_name = 'Driving Event Level 1'
 doc_column_name = 'Lesson IDs for row'
 header = 2
@@ -253,8 +253,8 @@ wi.save_intruded_topics(filepath=save_filepath)
 # DRIVING EVENT LEVEL 2: 1 SAMPLES FOR WORD
 wi = word_intrusion_class()
 
-filepath = os.path.join('examples','Taxonomy','IDETC_2021','llis_idetc_results.csv')
-save_filepath = os.path.join('results','IDETC_2021_intruded_topics_event_2.csv')
+filepath = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir)),'IDETC_2021','llis_idetc_results.csv')
+save_filepath = os.path.join('IDETC_2021_intruded_topics_event_2.csv')
 topic_column_name = 'Driving Event Level 2'
 doc_column_name = 'Lesson IDs for row'
 header = 2
@@ -265,8 +265,8 @@ wi.save_intruded_topics(filepath=save_filepath)
 # RECOMMENDATIONS LEVEL 1: 1 SAMPLES FOR WORD
 wi = word_intrusion_class()
 
-filepath = os.path.join('examples','Taxonomy','IDETC_2021','llis_idetc_results.csv')
-save_filepath = os.path.join('results','IDETC_2021_intruded_topics_rec_1.csv')
+filepath = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir)),'IDETC_2021','llis_idetc_results.csv')
+save_filepath = os.path.join('IDETC_2021_intruded_topics_rec_1.csv')
 topic_column_name = 'Recommendation(s) Level 1'
 doc_column_name = 'Lesson IDs for row'
 header = 2
@@ -277,8 +277,8 @@ wi.save_intruded_topics(filepath=save_filepath)
 # RECOMMENDATIONS LEVEL 2: 1 SAMPLES FOR WORD
 wi = word_intrusion_class()
 
-filepath = os.path.join('examples','Taxonomy','IDETC_2021','llis_idetc_results.csv')
-save_filepath = os.path.join('results','IDETC_2021_intruded_topics_rec_2.csv')
+filepath = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir)),'IDETC_2021','llis_idetc_results.csv')
+save_filepath = os.path.join('IDETC_2021_intruded_topics_rec_2.csv')
 topic_column_name = 'Recommendation(s) Level 2'
 doc_column_name = 'Lesson IDs for row'
 header = 2

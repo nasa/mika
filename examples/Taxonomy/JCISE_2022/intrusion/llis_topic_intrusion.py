@@ -7,17 +7,17 @@ import os
 import tomotopy as tp
 import pandas as pd
 
-lesson_numbers_filename = os.path.join('examples','Taxonomy','IDETC_2021','topic_model_results','hlda_topic_dist_per_doc.csv') # only used for lesson numbers
+lesson_numbers_filename = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),'topic_model_results','hlda_topic_dist_per_doc.csv') # only used for lesson numbers
 ln_df = pd.read_csv(lesson_numbers_filename)
 lesson_numbers = ln_df['lesson number'].tolist()
 
-events_filename = os.path.join('examples','Taxonomy','IDETC_2021','topic_model_results','Driving Eventhlda_model_object.bin')
+events_filename = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)), 'topic_model_results','Driving Eventhlda_model_object.bin')
 events = tp.HLDAModel.load(events_filename)
 
-lessons_filename = os.path.join('examples','Taxonomy','IDETC_2021','topic_model_results','Lesson(s) Learnedhlda_model_object.bin')
+lessons_filename = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)), 'topic_model_results','Lesson(s) Learnedhlda_model_object.bin')
 lessons = tp.HLDAModel.load(lessons_filename)
 
-recommendations_filename = os.path.join('examples','Taxonomy','IDETC_2021','topic_model_results','Recommendation(s)hlda_model_object.bin')
+recommendations_filename = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)), 'topic_model_results','Recommendation(s)hlda_model_object.bin')
 recommendations = tp.HLDAModel.load(recommendations_filename)
 
 def get_doc_topics(mdl,lesson_numbers,lesson_id):

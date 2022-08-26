@@ -17,7 +17,7 @@ database_name = 'LLIS' # optional, used at beginning of folder for identificatio
 num_topics ={'Lesson(s) Learned':75, 'Driving Event':75, 'Recommendation(s)':75} # for lda only
 
 # data file input
-filename = os.path.join('data','LLIS','useable_LL_combined.csv')
+filename = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)), 'data','LLIS','useable_LL_combined.csv')
 #for raw data
 #llis_data = Data()
 #llis_data.load(filename, preprocessed=False, text_columns=text_columns, id_col=document_id_col, name=database_name)
@@ -32,7 +32,7 @@ filename = os.path.join('data','LLIS','useable_LL_combined.csv')
 #llis_.preprocess_data(percent=.3, domain_stopwords=stopwords, ngrams=False, quot_correction=True, min_count=3) # min_count should be equivalent to min_cf in tm.lda
 #llis_data.save()
 llis_data = Data()
-filepath = os.path.join('examples','Taxonomy', 'JCISE','LLIS_topics_Dec-03-2021')
+filepath = os.path.join('LLIS_topics_Dec-03-2021')
 llis_data.load(os.path.join(filepath, 'preprocessed_data.csv'), preprocessed=True, text_columns=text_columns, id_col=document_id_col, name=database_name)
 
 # creating object
