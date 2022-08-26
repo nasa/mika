@@ -26,6 +26,7 @@ class Data():
         self.doc_ids = []
         self.id_col = None
         self.__english_vocab = set([w.lower() for w in words.words()])
+    
     def __update_ids(self):
         self.doc_ids = self.data_df[self.id_col].tolist()
     
@@ -60,18 +61,21 @@ class Data():
         if self.id_col == "index":
             self.data_df['index'] = self.data_df.index
     
-    def load(self, filename, preprocessed=False, id_col=None, text_columns=[], load_kwargs={}, preprocessed_kwargs={}):
+    def load(self, filename, preprocessed=False, id_col=None, text_columns=[], name='', load_kwargs={}, preprocessed_kwargs={}):
         if preprocessed == True:
             self.__load_preprocessed(filename, id_col, text_columns, **preprocessed_kwargs)
         else:
             self.__load_raw(filename, load_kwargs)
         self.text_columns = text_columns
+        self.name = name
         self.id_col = id_col
         self.__update_ids()
     
     def save(self, results_path=""):
         if results_path == "":
             results_path = "preprocessed_data.csv"
+        if ".csv" not in results_path:
+            results_path+=".csv"
         self.data_df.to_csv(results_path, index=False)
         #print("Preprocessed data saves to: ", results_path)
     
@@ -113,7 +117,7 @@ class Data():
         self.id_col= "Unique IDs"
         self.doc_ids = self.data_df["Unique IDs"].tolist()
         
-    def prepare_data(self, combine_columns=[], remove_incomplete_rows=False, create_ids=False):
+    def prepare_data(self, combine_columns=[], remove_incomplete_rows=True, create_ids=False):
         """
         Prepares data by creating unique ids, removing and combining rows/cols as defined by user
         """
@@ -122,9 +126,10 @@ class Data():
             self.__combine_columns(combine_columns)
         if remove_incomplete_rows == True:
             self.__remove_incomplete_rows()
+        if create_ids == True:
             self.__create_unique_ids()
         self.__update_ids()
-        print("data preparation: ", (time()-start_time)/60,"minutes \n")
+        print("data preparation: ", round((time()-start_time)/60,2),"minutes \n")
     
     def sentence_tokenization(self):
         dfs = []
@@ -242,6 +247,7 @@ class Data():
         
     def __trigram_texts(self, texts, ngram_range, threshold, min_count):
         #NEEDS WORK - could probably replace with a BERT tokenizer
+        #very slow
         # changes word order!
         ngrams = []
         ngram_models = {}
@@ -251,7 +257,7 @@ class Data():
                 text_input = texts
             elif n > 2:
                 text_input = ngram_models[str(n-1)+"gram"][texts]
-            ngram_models[str(n)+"gram"]=Phrases(text_input, min_count=min_count, delimiter=b' ', threshold=threshold)
+            ngram_models[str(n)+"gram"]=Phrases(text_input, min_count=min_count, delimiter=' ', threshold=threshold)
         
         for text in texts:
             ngrams_={}
@@ -275,7 +281,7 @@ class Data():
                 
         return ngrams
     
-    def preprocess(self, domain_stopwords=[], ngrams=True, ngram_range=3, threshold=15, 
+    def preprocess_data(self, domain_stopwords=[], ngrams=True, ngram_range=3, threshold=15, 
                         min_count=5, quot_correction=False, spellcheck=False, segmentation=False, 
                         drop_short_docs_thres=3, percent=0.3, drop_na=False, save_words=[], drop_dups=False,
                         min_word_len=2, max_word_len=15):
@@ -340,9 +346,9 @@ class Data():
         self.data_df[cols] = self.data_df[cols].applymap(lambda y: np.nan if (type(y)==int or type(y)==float or len(y)==0) else y) 
         if drop_na: 
             self.data_df = self.data_df.dropna(how="any").reset_index(drop=True)
-        self.data_df = self.__remove_words_in_pct_of_docs(self.data_df, pct_=percent, save_words=save_words)
-        self.update_ids()
-        print("Processing time: ", (time()-start)/60, " minutes")
+        self.data_df = self.__remove_words_in_pct_of_docs(self.data_df, pct_=percent, save_words=save_words) #also slow
+        self.__update_ids()
+        print("Processing time: ", round((time()-start)/60,2), " minutes")
         if correction_list != []:
             return correction_list
                 
