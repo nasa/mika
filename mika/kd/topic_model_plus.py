@@ -204,7 +204,7 @@ class Topic_Model_plus():
             path = "_BERT_model_object.bin"
             if self.reduced: path = "_Reduced" + path
             self.BERT_models[col].save(os.path.join(self.folder_path,col+path),save_embedding_model=embedding_model)
-        self.save_preprocessed_data()
+        self.data.save()
         
     def save_bert_coherence(self, return_df=False, coh_method='u_mass', from_probs=False):
         self.get_bert_coherence(coh_method, from_probs)
@@ -682,7 +682,7 @@ class Topic_Model_plus():
         for col in self.text_columns:
             mdl = self.lda_models[col]
             mdl.save(os.path.join(self.folder_path,col+"_lda_model_object.bin"))
-        self.save_preprocessed_data()
+        self.data.save()
     
     def save_lda_document_topic_distribution(self, return_df=False):
         """
@@ -1131,7 +1131,7 @@ class Topic_Model_plus():
             mdl = self.hlda_models[col]
             mdl.save(os.path.join(self.folder_path,col+"_hlda_model_object.bin"))
             #print("hLDA model for "+col+" saved to: ", (self.folder_path+"/"+col+"_hlda_model_object.bin"))
-        self.save_preprocessed_data()
+        self.data.save()
         
     def save_hlda_topics(self, return_df=False, p_thres=0.001):
         """
