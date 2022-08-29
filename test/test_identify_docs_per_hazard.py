@@ -11,8 +11,8 @@ sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)),".."))
 
 import unittest
 
-from module.trend_analysis_functions import check_for_hazard_words, check_for_negation_words, get_hazard_info, get_results_info, set_up_docs_per_hazard_vars, get_hazard_df, get_hazard_topics
-from module.trend_analysis_functions import get_hazard_doc_ids, get_topics_per_doc, get_hazard_topics_per_doc, get_hazard_words, get_negation_words, record_hazard_doc_info, get_doc_time, get_doc_text, identify_docs_per_hazard
+from mika.kd.trend_analysis import check_for_hazard_words, check_for_negation_words, get_hazard_info, get_results_info, set_up_docs_per_hazard_vars, get_hazard_df, get_hazard_topics
+from mika.kd.trend_analysis import get_hazard_doc_ids, get_topics_per_doc, get_hazard_topics_per_doc, get_hazard_words, get_negation_words, record_hazard_doc_info, get_doc_time, get_doc_text, identify_docs_per_hazard
 import pandas as pd
 import numpy as np
 
