@@ -6,7 +6,7 @@ Created on Thu Aug 11 13:14:21 2022
 """
 
 #safecom utils
-def get_severity_FAA(severities): #SAFECOM
+def get_SAFECOM_severity_FAA(severities): #SAFECOM
     curr_severities = {hazard:0 for hazard in severities}
     for hazard in severities:
         s = severities[hazard]
@@ -24,7 +24,7 @@ def get_severity_FAA(severities): #SAFECOM
     return curr_severities
 
 
-def get_severity_USFS(severities):
+def get_SAFECOM_severity_USFS(severities):
     curr_severities = {hazard:0 for hazard in severities}
     for hazard in severities:
         s = severities[hazard]
@@ -38,3 +38,37 @@ def get_severity_USFS(severities):
             severity = 'Catastrophic'
         curr_severities[hazard] = severity
     return curr_severities
+
+def get_UAS_likelihood_FAA(frequency):
+    curr_likelihoods = {hazard:0 for hazard in frequency}
+    for hazard in frequency:
+        r = frequency[hazard]
+        if r==5:
+            likelihood = 'Frequent'
+        elif r==4:
+            likelihood = 'Probable'
+        elif r==3:
+            likelihood = 'Remote'
+        elif r==2:
+            likelihood = 'Extremely Remote'
+        elif r==1:
+            likelihood = 'Extremely Improbable'
+        curr_likelihoods[hazard] = likelihood
+    return curr_likelihoods
+
+def get_UAS_likelihood_USFS(frequency):
+    curr_likelihoods = {hazard:0 for hazard in frequency}
+    for hazard in frequency:
+        r = frequency[hazard]
+        if r==5:
+            likelihood = 'Frequent'
+        elif r==4:
+            likelihood = 'Probable'
+        elif r==3:
+            likelihood = 'Occasional'
+        elif r==2:
+            likelihood = 'Remote'
+        elif r==1:
+            likelihood = 'Improbable'
+        curr_likelihoods[hazard] = likelihood
+    return curr_likelihoods

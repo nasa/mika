@@ -379,7 +379,7 @@ def graph_ICS_time_series(time_of_occurence_days, time_of_occurence_pct_containe
     plot_frequency_time_series(frequency_fires, metric_name='Frequency', line_styles=line_styles, markers=markers, title=frequency_title, time_name="Year", xtick_freq=1, scale=False, save=save, dataset_name=results_path+"/ICS_fire_frequency", fontsize=fontsize, figsize=figsize)
     #plot severity
     
-def get_likelihoods_ICS(rates):
+def get_likelihood_ICS_USFS(rates):
     curr_likelihoods = {hazard:0 for hazard in rates}
     for hazard in rates:
         r = rates[hazard]
@@ -396,7 +396,24 @@ def get_likelihoods_ICS(rates):
         curr_likelihoods[hazard] = likelihood
     return curr_likelihoods
 
-def get_ICS_severity_category_USFS(severity_table, hazards):
+def get_likelihood_ICS_FAA(rates):
+    curr_likelihoods = {hazard:0 for hazard in rates}
+    for hazard in rates:
+        r = rates[hazard]
+        if r>=1000:
+            likelihood = 'Frequent'
+        elif r>=100 and r<1000:
+            likelihood = 'Probable'
+        elif r>=10 and r<100:
+            likelihood = 'Remote'
+        elif r>=1 and r<10:
+            likelihood = 'Extremely Remote'
+        elif r<1:
+            likelihood = 'Extremely Improbable'
+        curr_likelihoods[hazard] = likelihood
+    return curr_likelihoods
+
+def get_ICS_severity_USFS(severity_table, hazards):
     severities = {hazard:[] for hazard in hazards}
     #severity table -> index
     for hazard in hazards:
@@ -425,7 +442,7 @@ def get_ICS_severity_category_USFS(severity_table, hazards):
         curr_severities[hazard] = impact
     return curr_severities
 
-def get_ICS_severity_category(severity_table, hazards):
+def get_ICS_severity_FAA(severity_table, hazards):
     severities = {hazard:[] for hazard in hazards}
     #severity table -> index
     for hazard in hazards:
@@ -443,7 +460,7 @@ def get_ICS_severity_category(severity_table, hazards):
         str_dam = severity_df.at['Diff_Structures_Damages', hazard]
         str_des = severity_df.at['Diff_Structures_Destroyed', hazard]
         fatalities = severity_df.at['Diff_Fatalities', hazard]
-        if injuries == 0 and fatalities == 0 and str_des == 0 and str_dam ==0:
+        if injuries == 0 and fatalities == 0 and str_des == 0 and str_dam == 0:
              impact = "Minimal Impact"
         elif injuries <= 2 and fatalities == 0 and str_des <= 10 and str_dam <= 10:
              impact = "Minor Impact"
