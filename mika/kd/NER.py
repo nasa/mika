@@ -2,7 +2,7 @@
 """
 Created on Fri Mar 18 12:33:13 2022
 
-Utility functions for custom NER
+Utility functions for training custom NER models
 
 @author: srandrad
 """
