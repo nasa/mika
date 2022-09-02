@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Aug 18 15:30:38 2022
-
+To do: 
+    - remove correction list variable? 
+    - speed up functions: flatten nested functions
 @author: srandrad
 """
 import pandas as pd
@@ -186,15 +188,16 @@ class Data():
     def __lowercase_texts(self,texts):
         texts = [[word.lower() for word in text] for text in texts]
         return texts
+    
+    def __get_wordnet_pos(self, word):
+        tag = pos_tag([word])[0][1][0].upper()
+        tag_dict = {"J": wordnet.ADJ,"N": wordnet.NOUN,"V": wordnet.VERB,"R": wordnet.ADV}
+        if tag not in ['I','D','M','T','C','P']:return tag_dict.get(tag,wordnet.NOUN)
+        else: return "unnecessary word"
         
     def __lemmatize_texts(self,texts): #why is this so slow?
-        def get_wordnet_pos(word):
-            tag = pos_tag([word])[0][1][0].upper()
-            tag_dict = {"J": wordnet.ADJ,"N": wordnet.NOUN,"V": wordnet.VERB,"R": wordnet.ADV}
-            if tag not in ['I','D','M','T','C','P']:return tag_dict.get(tag,wordnet.NOUN)
-            else: return "unnecessary word"
         lemmatizer = WordNetLemmatizer()
-        texts = [[lemmatizer.lemmatize(w,get_wordnet_pos(w)) for w in text if get_wordnet_pos(w)!="unnecessary word"] for text in texts if not isinstance(text,float)]
+        texts = [[lemmatizer.lemmatize(w, self.__get_wordnet_pos(w)) for w in text if self.__get_wordnet_pos(w)!="unnecessary word"] for text in texts if not isinstance(text,float)]
         return texts
         
     def __remove_stopwords(self, texts, domain_stopwords):
@@ -204,45 +207,48 @@ class Data():
         texts = [[w for w in text if len(w)>=3] for text in texts if not isinstance(text,float)]
         return texts
     
+    def __quot_replace(self, word):
+        if word not in self.__english_vocab:
+            w_tmp = word.replace('quot','')
+            if w_tmp in self.__english_vocab:
+                word = w_tmp
+        return word
+    
     def __quot_normalize(self, texts):
-        def quot_replace(word):
-            if word not in self.__english_vocab:
-                w_tmp = word.replace('quot','')
-                if w_tmp in self.__english_vocab:
-                    word = w_tmp
-            return word
-        texts = [[quot_replace(word) for word in text] for text in texts if not isinstance(text,float)]
+        texts = [[self.__quot_replace(word) for word in text] for text in texts if not isinstance(text,float)]
         return texts
+    
+    def __spelling_replace(self, word, sym_spell, correction_list):
+        if word not in self.__english_vocab and not word.isupper() and not sum(1 for c in word if c.isupper()) > 1:
+            suggestions = sym_spell.lookup(word,Verbosity.CLOSEST,           max_edit_distance=2,include_unknown=True,transfer_casing=True)
+            correction = suggestions[0].term
+            correction_list.append(word+' --> '+correction)
+            word = correction
+        return word
     
     def __spellchecker(self, texts, correction_list):
-        def spelling_replace(word):
-            if word not in self.__english_vocab and not word.isupper() and not sum(1 for c in word if c.isupper()) > 1:
-                suggestions = sym_spell.lookup(word,Verbosity.CLOSEST,           max_edit_distance=2,include_unknown=True,transfer_casing=True)
-                correction = suggestions[0].term
-                correction_list.append(word+' --> '+correction)
-                word = correction
-            return word
         sym_spell = SymSpell()
         dictionary_path = pkg_resources.resource_filename("symspellpy", "frequency_dictionary_en_82_765.txt")
         sym_spell.load_dictionary(dictionary_path, term_index=0, count_index=1)
-        texts = [[spelling_replace(word) for word in text] for text in texts if not isinstance(text,float)]
+        texts = [[self.__spelling_replace(word, sym_spell, correction_list) for word in text] for text in texts if not isinstance(text,float)]
         return texts
     
+    def __segment_replace(self, text, sym_spell, correction_list):
+        for word in text:
+            if word not in self.__english_vocab and not word.isupper():
+                segmented_word = sym_spell.word_segmentation(word).corrected_string
+                if len(segmented_word.split())>1:
+                    text_str = ' '.join(text)
+                    text_str = text_str.replace(word,segmented_word)
+                    text = text_str.split()
+                    correction_list.append(word+' --> '+segmented_word)
+        return text
+    
     def __segment_text(self, texts, correction_list):
-        def segment_replace(text):
-            for word in text:
-                if word not in self.__english_vocab and not word.isupper():
-                    segmented_word = sym_spell.word_segmentation(word).corrected_string
-                    if len(segmented_word.split())>1:
-                        text_str = ' '.join(text)
-                        text_str = text_str.replace(word,segmented_word)
-                        text = text_str.split()
-                        correction_list.append(word+' --> '+segmented_word)
-            return text
         sym_spell = SymSpell()
         dictionary_path = pkg_resources.resource_filename("symspellpy", "frequency_dictionary_en_82_765.txt")
         sym_spell.load_dictionary(dictionary_path, term_index=0, count_index=1)
-        texts = [segment_replace(text) for text in texts if not isinstance(text,float)]
+        texts = [self.__segment_replace(text, sym_spell, correction_list) for text in texts if not isinstance(text,float)]
         return texts
         
     def __trigram_texts(self, texts, ngram_range, threshold, min_count):
@@ -356,7 +362,6 @@ class Data():
             num_docs = len(data_df)
             pct = np.round(pct_*num_docs)
             indicies_to_drop = []
-            sleep(0.5)
             for col in tqdm(self.text_columns,"Removing frequent words…"):
                 all_words = list(set([word for text in data_df[col] for word in text]))
                 good_words = save_words
@@ -374,7 +379,6 @@ class Data():
                     if text == []:
                         indicies_to_drop.append(i)
                     i+=1
-            sleep(0.5)
             indicies_to_drop = list(set(indicies_to_drop))
             self.data_df = data_df.drop(indicies_to_drop).reset_index(drop=True)
             return self.data_df
