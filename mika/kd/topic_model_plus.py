@@ -110,29 +110,16 @@ class Topic_Model_plus():
     # private attributes
     __english_vocab = set([w.lower() for w in words.words()])
 
-    def __init__(self, text_columns=[], data=None, ngrams=False):
-                 #document_id_col="", csv_file="", text_columns=[], extra_cols = [], data_name='', combine_cols=False, create_ids=False, min_word_len=2, max_word_len=15):
+    def __init__(self, text_columns=[], data=None, ngrams=None):
         """
         CLASS CONSTRUCTORS
         ------------------
-        data_csv : str
-            defines the input data file
-        id_col : str
-            defines the document id column label name
-        text_columns : list of str
-            defines various columns within a single database
-        extra_cols : list of str
-            a list of strings defining any extra columns in the database
-        folder_path : str
-            defines path to folder where output files are stored
-        name : str
-            defines output file names
-        combine_cols : boolean
-            defines whether to combine columns
-        min_word_len : int
-            minimum word length during tokenization
-        max_word_len : int
-            maxumum word length during tokenization
+        text_columns: list
+            defines various columns within a single database which will be used for topic modeling
+        data : Data
+            Data object storing the text corpus
+        ngrams : str
+            'tp' if the user wants tomotopy to form ngrams prior to applying a topic model 
         """
         self.text_columns = text_columns
         self.data = data
@@ -169,7 +156,7 @@ class Topic_Model_plus():
             topic_model = self.BERT_models[col]
             self.BERT_coherence[col] = self.calc_bert_coherence(docs, topics, topic_model, method=coh_method)
             
-    def calc_bert_coherence(self, docs, topics, topic_model, method = 'u_mass', num_words=10):
+    def calc_bert_coherence(self, docs, topics, topic_model, method='u_mass', num_words=10):
         # Preprocess Documents
         documents = pd.DataFrame({"Document": docs,
                                   "ID": range(len(docs)),
@@ -204,7 +191,7 @@ class Topic_Model_plus():
             path = "_BERT_model_object.bin"
             if self.reduced: path = "_Reduced" + path
             self.BERT_models[col].save(os.path.join(self.folder_path,col+path),save_embedding_model=embedding_model)
-        self.data.save()
+        self.data.save(results_path=os.path.join(self.folder_path,"preprocessed_data.csv"))
         
     def save_bert_coherence(self, return_df=False, coh_method='u_mass', from_probs=False):
         self.get_bert_coherence(coh_method, from_probs)
@@ -682,7 +669,7 @@ class Topic_Model_plus():
         for col in self.text_columns:
             mdl = self.lda_models[col]
             mdl.save(os.path.join(self.folder_path,col+"_lda_model_object.bin"))
-        self.data.save()
+        self.data.save(results_path=os.path.join(self.folder_path,"preprocessed_data.csv"))
     
     def save_lda_document_topic_distribution(self, return_df=False):
         """
@@ -854,7 +841,7 @@ class Topic_Model_plus():
         #if self.text_columns == ['Combined Text']:
         #    self.combine_cols = True
         #    preprocessed_filepath += "_combined_text"
-        self.extract_preprocessed_data(preprocessed_filepath+".csv")
+        self.data.load(preprocessed_filepath+".csv", preprocessed=True, id_col=self.data.id_col, text_columns=self.data.text_columns)
         self.folder_path = file_path
         
     def lda_visual(self, col):
@@ -1131,7 +1118,7 @@ class Topic_Model_plus():
             mdl = self.hlda_models[col]
             mdl.save(os.path.join(self.folder_path,col+"_hlda_model_object.bin"))
             #print("hLDA model for "+col+" saved to: ", (self.folder_path+"/"+col+"_hlda_model_object.bin"))
-        self.data.save()
+        self.data.save(results_path=os.path.join(self.folder_path,"preprocessed_data.csv"))
         
     def save_hlda_topics(self, return_df=False, p_thres=0.001):
         """
@@ -1259,7 +1246,7 @@ class Topic_Model_plus():
         
         self.__create_folder()
         try:
-            pd.read_csv(os.path.join(self.folder_path,'hlda_taxonomy.csv'))
+            self.taxonomy_df = pd.read_csv(os.path.join(self.folder_path,'hlda_taxonomy.csv'))
         except:
             self.save_hlda_taxonomy(return_df = True)
         taxonomy_level_data = {col+" Level "+str(lev): self.taxonomy_data[col+" Level "+str(lev)] for col in self.text_columns}
@@ -1325,7 +1312,7 @@ class Topic_Model_plus():
         if self.text_columns == ['Combined Text']:
             self.combine_cols = True
             preprocessed_filepath += "_combined_text"
-        self.extract_preprocessed_data(preprocessed_filepath+".csv")
+        self.data.load(preprocessed_filepath+".csv", preprocessed=True, id_col=self.data.id_col, text_columns=self.data.text_columns)
         self.folder_path = file_path
         
     def hlda_display(self, col, num_words = 5, display_options={"level 1": 1, "level 2": 6}, colors='bupu', filename=''):
