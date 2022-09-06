@@ -19,6 +19,7 @@ from gensim.utils import simple_tokenize
 from gensim.models import Phrases
 from symspellpy import SymSpell, Verbosity
 import pkg_resources
+import re
 
 class Data():
     def __init__(self, name=""):
@@ -32,7 +33,7 @@ class Data():
     def __update_ids(self):
         self.doc_ids = self.data_df[self.id_col].tolist()
     
-    def __load_preprocessed(self, filename, id_col, text_columns=[], drop_short_docs=True, drop_short_docs_thres=3, drop_duplicates=True, id_in_dups=True): #moved to data class
+    def __load_preprocessed(self, filename, id_col, text_columns=[], drop_short_docs=True, drop_short_docs_thres=3, drop_duplicates=True, id_in_dups=True, tokenized=True): #moved to data class
         """
         uses previously saved preprocessed data
         
@@ -44,7 +45,8 @@ class Data():
         self.id_col = id_col
         self.data_df = pd.read_csv(filename)
         self.text_columns = text_columns
-        self.data_df[self.text_columns] = self.data_df[self.text_columns].applymap(lambda y: self.__remove_quote_marks(y))
+        if tokenized == True:
+            self.data_df[self.text_columns] = self.data_df[self.text_columns].applymap(lambda y: self.__remove_quote_marks(y))
         if drop_duplicates == True:
             if id_in_dups: cols = self.text_columns + [self.id_col]
             else: cols = self.text_columns
@@ -52,7 +54,8 @@ class Data():
         if drop_short_docs == True:
             self.__drop_short_docs(thres=drop_short_docs_thres)
         self.__update_ids()
-        self.__check_for_ngrams() #we should remove this
+        cols_to_drop = [col for col in self.data_df.columns if "Unnamed" in col]
+        self.data_df = self.data_df.drop(cols_to_drop, axis=1)
         #print("Preprocessed data extracted from: ", file_name)
     
     def __load_raw(self, filename, kwargs):
@@ -62,6 +65,8 @@ class Data():
             self.data_df = pd.read_excel(filename, **kwargs)
         if self.id_col == "index":
             self.data_df['index'] = self.data_df.index
+        cols_to_drop = [col for col in self.data_df.columns if "Unnamed" in col]
+        self.data_df = self.data_df.drop(cols_to_drop, axis=1)
     
     def load(self, filename, preprocessed=False, id_col=None, text_columns=[], name='', load_kwargs={}, preprocessed_kwargs={}):
         if preprocessed == True:
@@ -109,6 +114,8 @@ class Data():
         j = 0
         for i in tqdm(range(len(self.data_df)), "Creating Unique IDs…"):
             current_id = self.data_df.iloc[i][self.id_col]
+            if type(current_id) is not str:
+                current_id = str(current_id)
             if current_id == prev_id:
                 j+=1
             else:
@@ -139,7 +146,10 @@ class Data():
             sentences_for_doc = {col:[] for col in self.text_columns}
             for col in self.text_columns:
                 text = self.data_df.at[i, col]
-                sentences_for_doc[col] = text.split(".")
+                punctuation = re.findall('[.!?]', text)
+                sentences_for_doc[col] = list(filter(None, re.split('[.!?]', text)))
+                sentences_for_doc[col] = [sentences_for_doc[col][i].strip(" ")+punctuation[i] for i in range(len(sentences_for_doc[col]))]
+                #sentences_for_doc[col] = #text.split(".")
             num_rows = max([len(sentences_for_doc[col]) for col in self.text_columns])
             for col in self.text_columns:
                 while len(sentences_for_doc[col])<num_rows:
@@ -158,25 +168,18 @@ class Data():
         word_list = word_list.strip("[]").split(", ")
         word_list = [w.replace("'","") for w in word_list]
         return word_list
-    
-    def __check_for_ngrams(self): #we should remove this....the user should know if their text is in ngrams or not
-        for i in range(len(self.data_df)):
-            for col in self.text_columns:
-                for word in self.data_df.iloc[i][col]:
-                    words = word.split(" ")
-                    if len(words)>1:
-                        self.ngrams = "custom"
-                        return
-        self.ngrams = "tp"
 
     def __drop_duplicate_docs(self, cols):
-        self.data_df = self.data_df.loc[self.data_df.astype(str).drop_duplicates(subset=cols, keep='last').index].reset_index(drop=True)
+        self.data_df = self.data_df.iloc[self.data_df.astype(str).drop_duplicates(subset=cols, keep='first').index,:].reset_index(drop=True)
         
     def __drop_short_docs(self, thres=3):
         indx_to_drop = []
         for i in range(len(self.data_df)):
             for col in self.text_columns:
-                if len(self.data_df.iloc[i][col])<thres:
+                text = self.data_df.at[i, col]
+                if type(text) is str:
+                    text = text.split(" ")
+                if len(text)<thres:
                     indx_to_drop.append(i)
         self.data_df = self.data_df.drop(indx_to_drop).reset_index(drop=True)
     
