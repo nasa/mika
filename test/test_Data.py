@@ -71,12 +71,12 @@ class test_Data(unittest.TestCase):
         #raw text
         self.test_class.id_col = self.test_id_col
         self.test_class.text_columns=self.test_text_cols
-        self.test_class._Data__load_preprocessed(self.test_filename, id_col=self.test_id_col, text_columns=self.test_text_cols, drop_short_docs=False, drop_duplicates=False, tokenized=False)
+        self.test_class._Data__load_preprocessed(self.test_filename, drop_short_docs=False, drop_duplicates=False, tokenized=False)
         pd.testing.assert_frame_equal(self.test_class.data_df, self.test_df)
         #preprocessed text
         self.test_class.id_col = self.test_id_col
         self.test_class.text_columns=self.test_text_cols
-        self.test_class._Data__load_preprocessed(self.test_preprocessed_filename, id_col=self.test_id_col, text_columns=self.test_text_cols, drop_short_docs=False, drop_duplicates=False, tokenized=True)
+        self.test_class._Data__load_preprocessed(self.test_preprocessed_filename, drop_short_docs=False, drop_duplicates=False, tokenized=True)
         pd.testing.assert_frame_equal(self.test_class.data_df, self.test_preprocessed_df)
     
     def test__load_raw(self):
@@ -85,6 +85,14 @@ class test_Data(unittest.TestCase):
         self.test_class._Data__load_raw(self.test_filename, kwargs={})
         pd.testing.assert_frame_equal(self.test_class.data_df, self.test_df)
     
+    def test__set_id_col_to_index(self):
+        self.test_class.data_df = self.test_df
+        self.test_class._Data__set_id_col_to_index()
+        correct_df = self.test_df.copy()
+        correct_df['index'] = correct_df.index
+        pd.testing.assert_frame_equal(self.test_class.data_df, correct_df)
+        self.assertEqual(self.test_class.id_col, 'index')
+        
     def test_load(self):
         #from raw
         self.test_class.load(self.test_filename, preprocessed=False, id_col=self.test_id_col, text_columns=self.test_text_cols)
@@ -101,7 +109,13 @@ class test_Data(unittest.TestCase):
         preprocessed_kwargs={"tokenized":False, 'drop_short_docs':False, 'drop_duplicates':False}
         self.test_class.load(self.test_filename, preprocessed=True, id_col=self.test_id_col, text_columns=self.test_text_cols, preprocessed_kwargs=preprocessed_kwargs)
         pd.testing.assert_frame_equal(self.test_class.data_df, self.test_df)
-    
+        #no id col given, use index
+        self.test_class.load(self.test_filename, preprocessed=False, id_col=None, text_columns=self.test_text_cols)
+        correct_df = self.test_df.copy()
+        correct_df['index'] = correct_df.index
+        pd.testing.assert_frame_equal(self.test_class.data_df, correct_df)
+        self.assertEqual(self.test_class.id_col, 'index')
+        
     def test__remove_quote_marks(self):
         word_list = "['the', 'quick', 'brown', 'fox', 'jumped', 'over', 'the', 'lazy', 'dog']"
         corrected_list = ['the', 'quick', 'brown', 'fox', 'jumped', 'over', 'the', 'lazy', 'dog']

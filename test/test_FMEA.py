@@ -20,4 +20,7 @@ class test_FMEA(unittest.TestCase):
         return
     def tearDown(self):
         return
+    def test_load_data(self):
+        return
+    #
     
