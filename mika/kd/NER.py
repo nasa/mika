@@ -10,6 +10,7 @@ import pandas as pd
 import os
 import json
 import numpy as np
+import regex as re
 # seqeval.metrics import classification_report
 from sklearn.metrics import confusion_matrix, classification_report, precision_recall_fscore_support, accuracy_score
 from datasets import load_metric
@@ -26,7 +27,7 @@ plt.rcParams["font.family"] = "Times New Roman"
 def read_doccano_annots(file, encoding=False):
     if encoding == False: f = open(file, "r") #safecom 
     else: f = open(file, "r", encoding='utf-8', errors='ignore') #LLIS hannah annots
-    list_of_str_jsons = f.read().split("\n")[:-2]#removing last item which is empty
+    list_of_str_jsons = f.read().split("\n")[:-1]#removing last item which is empty
     list_of_dict_jsons = [json.loads(data) for data in list_of_str_jsons]
     df = pd.DataFrame(list_of_dict_jsons)
     return df
@@ -55,7 +56,6 @@ def clean_annots_from_str(df):
     return df
 
 def clean_text_tags(text, labels): #input single text, list of labels [beg, end, tag]
-#there is a bug in this it is added unnecessary spaces...
     new_labels = []
     spaces_added = 0
     add_spaces = False
@@ -78,29 +78,29 @@ def clean_text_tags(text, labels): #input single text, list of labels [beg, end,
                 new_label = [new_label[0], new_label[1]-1, new_label[2]]
         #case 2: did not include begining or ending characters of token
         #check previous char for space, check next char for space/punctuation
-        else:
-            if new_label[0] > 0 and text[new_label[0]-1]!=" ": #did not include first char
-                precedding_char = text[new_label[0]-1]
-                if precedding_char.isalpha() == True: 
-                    new_label = [new_label[0]-1, new_label[1], new_label[2]]
-            if new_label[1]<len(text)-1 and text[new_label[1]]!=" ": #did not include trailing chars
-                procedding_char = text[new_label[1]]
-                if procedding_char.isalpha() == True: 
-                    new_end = text.find(" ", new_label[1])
-                    new_label = [new_label[0], new_end, new_label[2]]
-            #case 3: missing space -> need to update text and following labels by adding in a space
-            #this occurs when the precedding or following character is punctuation
-            if new_label[0] > 0 and (not text[new_label[0]-1].isalpha()) and text[new_label[0]-1]!=" ": #missing preceding space
-                new_text = text[:new_label[0]] + ' ' + text[new_label[0]:]
-                spaces_added += 1
-                #spaces need to be added to future labels and this label
-                new_label = [new_label[0]+1, new_label[1]+1, new_label[2]]
-                add_spaces=True
-            if new_label[1]<len(new_text)-2 and not new_text[new_label[1]:new_label[1]+2].isalpha(): #missing proceeding space
-                new_text = new_text[:new_label[1]] + ' ' + new_text[new_label[1]:]
-                spaces_added += 1
-                #spaces need to be added to future labels
-                add_spaces=True
+        #else:
+        if new_label[0] > 0 and text[new_label[0]-1]!=" ": #did not include first char
+            preceeding_char = text[new_label[0]-1]
+            if preceeding_char.isalpha() == True: 
+                new_label = [new_label[0]-1, new_label[1], new_label[2]]
+        if new_label[1]<len(text)-1 and text[new_label[1]] not in [" ", ".", ",", "?", "!"]: #did not include trailing chars
+            proceeding_char = text[new_label[1]]
+            if proceeding_char.isalpha() == True: 
+                new_end = re.search(r'[.!?\S]', text[new_label[0]:]).end() + new_label[1]
+                new_label = [new_label[0], new_end, new_label[2]]
+        #case 3: missing space -> need to update text and following labels by adding in a space
+        #this occurs when the preceeding or following character is punctuation
+        if new_label[0] > 0 and (not text[new_label[0]-1].isalpha()) and text[new_label[0]-1]!=" ": #missing preceding space
+            new_text = text[:new_label[0]] + ' ' + text[new_label[0]:]
+            spaces_added += 1
+            #spaces need to be added to future labels and this label
+            new_label = [new_label[0]+1, new_label[1]+1, new_label[2]]
+            add_spaces=True
+        if new_label[1]<len(new_text)-2 and (not new_text[new_label[1]:new_label[1]+1].isalpha()) and new_text[new_label[1]:new_label[1]+1]!=" ": #missing proceeding space
+            new_text = new_text[:new_label[1]] + ' ' + new_text[new_label[1]:]
+            spaces_added += 1
+            #spaces need to be added to future labels
+            add_spaces=True
         #update text for added spaces
         text = new_text
         new_labels.append(new_label)
@@ -192,7 +192,7 @@ def tokenize(sentence_df, tokenizer):
     tokenized_inputs = tokenizer(sentence_df["tokens"], is_split_into_words=True)
     return tokenized_inputs
 
-def compute_metrics(eval_preds, id2label): #couldn't move to utils bc of label_list
+def compute_metrics(eval_preds, id2label):
     logits, labels = eval_preds
     predictions = np.argmax(logits, axis=-1)
     # Remove ignored index (special tokens) and convert to labels

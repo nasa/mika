@@ -138,6 +138,7 @@ class FMEA():
         return self.data_df
     
     def group_docs_with_meta(self, grouping_col='UAS_cleaned', cluster_params={}, cluster_by=['CAU', 'MOD'], additional_cols=['Mission Type']):
+        #Currently unused
         self.data_df[self.id_col] = self.data_df.index.tolist()
         temp_grouped_df = self.data_df.copy()
         #group reports by category/mission type/phase
@@ -159,6 +160,7 @@ class FMEA():
         return self.grouped_df
     
     def cluster(self, df, cluster_by=[], additional_cols=[]):
+        #Currently unused
         text_list = []
         for i in range(len(df)):
             text = ""
@@ -183,17 +185,18 @@ class FMEA():
         df['cluster'] = labels
         #combine
         agg_function = {'CAU': lambda x: '; '.join(x),
-                                                'MOD': lambda x: '; '.join(x),
-                                                'EFF': lambda x: '; '.join(x),
-                                                'CON': lambda x: '; '.join(x),
-                                                'REC': lambda x: '; '.join(x),
-                                                self.id_col: lambda x: '; '.join(x)}
+                        'MOD': lambda x: '; '.join(x),
+                        'EFF': lambda x: '; '.join(x),
+                        'CON': lambda x: '; '.join(x),
+                        'REC': lambda x: '; '.join(x),
+                        self.id_col: lambda x: '; '.join(x)}
         for col in additional_cols:
             agg_function[col] = lambda x: '; '.join(x)
         grouped_df = df.groupby('cluster').agg(agg_function)
         return grouped_df
         
     def group_docs(self, grouping_col='Mission Type', db_params={'eps':1.00, 'min_samples':1}, cluster_by=['CAU', 'MOD']):
+        #Currently unused
         #ideas: cluster by cause, then mode, then combine all effects, controls, and recs
         #issues: identifying number of clusters - DBSCAN clustering
         causes = self.data_df['CAU'].tolist()

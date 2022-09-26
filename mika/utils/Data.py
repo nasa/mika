@@ -33,7 +33,11 @@ class Data():
     def __update_ids(self):
         self.doc_ids = self.data_df[self.id_col].tolist()
     
-    def __load_preprocessed(self, filename, id_col, text_columns=[], drop_short_docs=True, drop_short_docs_thres=3, drop_duplicates=True, id_in_dups=True, tokenized=True): #moved to data class
+    def __set_id_col_to_index(self):
+        self.id_col = 'index'
+        self.data_df['index'] = self.data_df.index
+        
+    def __load_preprocessed(self, filename, drop_short_docs=True, drop_short_docs_thres=3, drop_duplicates=True, id_in_dups=True, tokenized=True): #moved to data class
         """
         uses previously saved preprocessed data
         
@@ -42,9 +46,7 @@ class Data():
         file_name : str
             file name for extracting data
         """
-        self.id_col = id_col
         self.data_df = pd.read_csv(filename)
-        self.text_columns = text_columns
         if tokenized == True:
             self.data_df[self.text_columns] = self.data_df[self.text_columns].applymap(lambda y: self.__remove_quote_marks(y))
         if drop_duplicates == True:
@@ -63,19 +65,19 @@ class Data():
             self.data_df = pd.read_csv(open(filename,encoding='utf8',errors='ignore'), **kwargs)
         else: 
             self.data_df = pd.read_excel(filename, **kwargs)
-        if self.id_col == "index":
-            self.data_df['index'] = self.data_df.index
         cols_to_drop = [col for col in self.data_df.columns if "Unnamed" in col]
         self.data_df = self.data_df.drop(cols_to_drop, axis=1)
     
     def load(self, filename, preprocessed=False, id_col=None, text_columns=[], name='', load_kwargs={}, preprocessed_kwargs={}):
-        if preprocessed == True:
-            self.__load_preprocessed(filename, id_col, text_columns, **preprocessed_kwargs)
-        else:
-            self.__load_raw(filename, load_kwargs)
         self.text_columns = text_columns
         self.name = name
         self.id_col = id_col
+        if preprocessed == True:
+            self.__load_preprocessed(filename, **preprocessed_kwargs)
+        else:
+            self.__load_raw(filename, load_kwargs)
+        if id_col == None:
+            self.__set_id_col_to_index()
         self.__update_ids()
     
     def save(self, results_path=""):
