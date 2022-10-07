@@ -22,14 +22,14 @@ cuda.empty_cache()
 print(device)
 
 #load training data: ASRS, NTSB
-ASRS_file = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),'data/ASRS_1988_2022.csv')
+ASRS_file = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),'data/ASRS/ASRS_1988_2022.csv')
 ASRS_id_col = 'ACN'
 ASRS_text_cols = ['Report 1', 'Report 1.1', 'Report 2',	'Report 2.1', 'Report 1.2']
 ASRS = Data()
 ASRS.load(ASRS_file, id_col=ASRS_id_col, text_columns=ASRS_text_cols)
 ASRS_df = ASRS.data_df
 
-NTSB_file = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),'data/ntsb_full.csv')
+NTSB_file = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),'data/NTSB/ntsb_full_narratives.csv')
 NTSB_id_col = 'ev_id'
 NTSB_text_cols = ['narr_accp', 'narr_accf', 'narr_cause', 'narr_inc', 'REMARKS', 'CAUSE']
 NTSB = Data()
