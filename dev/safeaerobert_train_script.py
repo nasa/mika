@@ -20,6 +20,8 @@ from datasets import Dataset, concatenate_datasets
 device = 'cuda' if cuda.is_available() else 'cpu'
 cuda.empty_cache()
 print(device)
+import os
+os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
 
 #load training data: ASRS, NTSB
 ASRS_file = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),'data/ASRS/ASRS_1988_2022.csv')
@@ -58,7 +60,7 @@ for i in range(len(NTSB_df)):
 print("created new df of just text")
 text_df = pd.DataFrame({'Text':text})
 text_df = text_df.dropna().reset_index(drop=True)
-text_df = text_df.iloc[:10000][:]
+text_df = text_df.iloc[:1000][:]
 
 # set up train and eval dataset
 train_size=0.8
@@ -105,7 +107,7 @@ args = TrainingArguments(
     num_train_epochs=1,
     weight_decay=0.01,
     push_to_hub=False,
-    per_device_train_batch_size = 4,
+    per_device_train_batch_size = 1,
     per_device_eval_batch_size = 1,
     logging_steps=100,
     eval_steps = 500,
@@ -122,10 +124,10 @@ trainer = Trainer(
 
 train_result = trainer.train()
 trainer.save_model()
-
+final_train_metrics = train_result.metrics
 num_steps = trainer.state.max_steps
 filename = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),"models", "SafeAeroBERT", "checkpoint-"+str(num_steps), "trainer_state.json")
-plot_eval_results(filename, save=True, savepath="SafeAeroBERT_", loss=True, metrics=False)
+plot_eval_results(filename, save=True, savepath="SafeAeroBERT_", final_train_metrics=final_train_metrics, loss=True, metrics=False)
 
 r""" #get categories
 df = pd.read_excel(r"C:\Users\srandrad\OneDrive - NASA\Desktop\ASRS_DBOnline.xlsx")
