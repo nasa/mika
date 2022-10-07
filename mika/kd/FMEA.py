@@ -11,6 +11,7 @@ import pandas as pd
 import numpy as np
 from transformers import Trainer, pipeline, TrainingArguments, AutoTokenizer, DataCollatorForTokenClassification, BertForTokenClassification
 from mika.kd.NER import build_confusion_matrix, compute_classification_report, split_docs_to_sentances, tokenize, tokenize_and_align_labels, read_doccano_annots, clean_doccano_annots
+from models import FMEA_NER
 from datasets import load_from_disk, Dataset
 from torch import cuda, tensor
 import torch
@@ -26,32 +27,119 @@ spacy.prefer_gpu()
 device = 'cuda' if cuda.is_available() else 'cpu'
 
 class FMEA():
+    """
+    A class used for generated FMEAs from a data set of reports
+    
+    Attributes
+    -----------
+    
+    Methods
+    -----------
+    load_model(self, model_checkpoint=None):
+        loads custom NER model
+    load_data(self, filepath='', df=None, formatted=False, text_col="Narrative", id_col="Tracking #", label_col="labels"):
+        loads are preprocesses data for NER
+    predict(self):
+        performs NER
+    get_entities_per_doc(self, pred=True):
+        gets all the entities for each document
+    group_docs_with_meta(self, grouping_col='UAS_cleaned', cluster_by=['CAU', 'MOD'], additional_cols=['Mission Type']):
+        groups docs into fmea rows using metadata. Under development.
+    group_docs_manual(self, filename='', grouping_col='Mode', additional_cols=['Mission Type'], sample=1):
+        groups docs into fmea rows according to a file manually defining which docs go in which row
+    post_process_fmea(self, rows_to_drop=[], id_name='SAFECOM', phase_name='Mission Type', max_words=20):
+        post processes fmea by including the operational phase, cleaning sub-word tokens, and truncating the number of words per cell in the FMEA
+    calc_frequency(self, year_col=''):
+        calculates the frequency for each FMEA row and assigns it a category
+    calc_severity(self, severity_func, from_file=False, file_name='', file_kwargs={}):
+        calculates the severity for each FMEA row
+    calc_risk(self):
+        calculates the risk for each FMEA row as the product of severity and frequency
+    build_fmea(self, severity_func, group_by, group_by_kwargs={}, post_process_kwargs={}):
+        builds FMEA using previous functions
+    display_doc(self, doc_id, save=True, output_path="", colors_path=None, pred=True):
+        displays an annotated document, either from NER outputs or manually labeled data.
+    """
+    
     __english_vocab = set([w.lower() for w in words.words()])
     
     def __init__(self):
+        """
+        initializes FMEA object
+
+        Returns
+        -------
+        None.
+
+        """
         return
     
-    def load_model(self, model_checkpoint):
-        self.token_classifier = pipeline("token-classification", model=model_checkpoint, aggregation_strategy="simple", device=-1)#sets model on cpu
-        
-    def load_data(self, filepath, formatted=False, text_col="Narrative", id_col="Tracking #", label_col="labels"):
+    def load_model(self, model_checkpoint=None):
+        """
+        Loads in a fine-tuned custom NER model trained to extract FMEA entities
+        If no checkpoint is passed, the custom model from MIKA is used
+        Parameters
+        ----------
+        model_checkpoint : string, optional
+            model check point, can be from huggingface or a path from personal device
+
+        Returns
+        -------
+        None.
+
+        """
+        if model_checkpoint:
+            self.token_classifier = pipeline("token-classification", model=model_checkpoint, aggregation_strategy="simple", device=-1)#sets model on cpu
+        else:
+            self.token_classifier = FMEA_NER
+    def load_data(self, filepath='', df=None, formatted=False, text_col="Narrative", id_col="Tracking #", label_col="labels"):
+        """
+        Loads data to prepare for FMEA extraction. 
+        Sentence tokenization is performed for preprocessing, and the raw data is also saved.
+        Can input a filepath for a .jsonl (annotations from doccano) or .csv file.
+        Can also instead input a dataframe already loaded in.
+        Can also instead input a huggingface dataset object location.
+        Saves data formatted to input into the NER model.
+        Parameters
+        ----------
+        filepath : string, optional
+            Can input a filepath for a .jsonl (annotations from doccano) or .csv file. The default is ''.
+        df : pandas DataFrame, optional
+            Can instead input a pandas DataFrame already loaded in, with one column of text. The default is None.
+        formatted : Bool, optional
+            True if the input in filepath is a formatted dataset object. The default is False.
+        text_col : string, optional
+            The column where the text used for FMEA extraction is stored. The default is "Narrative".
+        id_col : string, optional
+            The id column in the dataframe. The default is "Tracking #".
+        label_col : string, optional
+            The column containing annotation labels if the data is annotated. The default is "labels".
+
+        Returns
+        -------
+        None.
+
+        """
         self.id_col = id_col
         self.text_col = text_col
         if formatted == True:
             self.input_data = load_from_disk(filepath)
             self.true_labels = self.input_data[label_col]
-        elif formatted == False:
-            if '.csv' in filepath:
-                test_data = pd.read_csv(filepath)#, index_col=0)
-                test_data = test_data.dropna(subset=[text_col])
+        elif formatted == False: 
+            if '.csv' in filepath or df is not None: #replace with Data class to limit testing needs?
+                if df is None:
+                    data = pd.read_csv(filepath)#, index_col=0)
+                    data = data.dropna(subset=[text_col])
+                else:
+                    data = df
                 #sentences
                 self.nlp = spacy.load("en_core_web_trf")
                 self.nlp.add_pipe("sentencizer")
-                test_docs = test_data[text_col].tolist()
-                docs = [self.nlp(doc) for doc in test_docs]
-                test_data['docs'] = docs
-                self.raw_df = test_data
-                sentence_df = split_docs_to_sentances(test_data, id_col=id_col,tags=False)
+                docs = data[text_col].tolist()
+                docs = [self.nlp(doc) for doc in docs]
+                data['docs'] = docs
+                self.raw_df = data
+                sentence_df = split_docs_to_sentances(data, id_col=id_col,tags=False)
                 self.data_df = sentence_df 
                 self.data_df['sentence'] = [sent.text for sent in sentence_df["sentence"].tolist()]
                 self.input_data = self.data_df['sentence'].tolist()
@@ -73,10 +161,37 @@ class FMEA():
                 self.true_labels = self.data_df['tags']
             
     def predict(self):
+        """
+        Performs named entity recognition on the input data
+        Returns
+        -------
+        Preds: 
+            Predicted entities per each document
+
+        """
         self.preds = self.token_classifier(self.input_data)
         return self.preds
     
-    def evaluate_preds(self, cm=True, class_report=True): #probably wont work with the pipeline... do this in training
+    def evaluate_preds(self, cm=True, class_report=True): 
+        """
+        
+        Can only be used if the input data is labeled. 
+        Evaluates the performance of the NER model against labeled data.
+        Parameters
+        ----------
+        cm : Boolean, optional
+            Creates a confusion matrix if True. The default is True.
+        class_report : Boolean, optional
+            Creates a classification report if True. The default is True.
+
+        Returns
+        -------
+        return_vals : Dictionary
+            Dict containing confusion matrix and classification report if specified.
+
+        """
+        #probably wont work with the pipeline... do this in training
+        
         return_vals = {}
         if cm == True:
             cm, true_predictions, labels = build_confusion_matrix(self.true_labels, self.raw_pred, self.pred_labels, self.id2label)
@@ -86,11 +201,15 @@ class FMEA():
             return_vals['Classification Report'] = classification_report
         return return_vals
     
-    """
-    for each id:
-        get len of text, add on to stop and start for each new sentence. 
-    """
-    def update_entities_per_sentence(self):
+    def __update_entities_per_sentence(self):
+        """
+        
+        Returns
+        -------
+        None.
+
+        """
+        #for each id: get len of text, add on to stop and start for each new sentence. 
         ids = self.raw_df[self.id_col].tolist()
         doc_ents = []
         for i in ids:
@@ -112,11 +231,29 @@ class FMEA():
         self.data_df['document entities'] = doc_ents
     
     def get_entities_per_doc(self, pred=True):
+        """
+        Gets all entites for each document. 
+        Note that this is required because the NER model is run on sentences.
+        This function reconstructs the documents from the sentences, while preserving the entities.
+
+        Parameters
+        ----------
+        pred : Boolean, optional
+            True if the entities per doc are from predicted entities.
+            False if the entities per doc are from labels.
+            The default is True.
+
+        Returns
+        -------
+        data_df
+            pandas DataFrame with documents as rows, entities as columns
+
+        """
         if pred==True:
             self.data_df['predicted entities'] = self.preds
         else: 
             self.data_df['predicted entities'] = self.data_df['tags']
-        self.update_entities_per_sentence()
+        self.__update_entities_per_sentence()
         self.data_df = self.data_df.groupby(self.id_col).agg({'document entities': 'sum', 'sentence': lambda x: ' '.join(x)})
         #go through predicted entities
         #for each entity add to the corresponding list
@@ -137,8 +274,27 @@ class FMEA():
         self.data_df[self.id_col] = self.data_df.index.tolist()
         return self.data_df
     
-    def group_docs_with_meta(self, grouping_col='UAS_cleaned', cluster_params={}, cluster_by=['CAU', 'MOD'], additional_cols=['Mission Type']):
-        #Currently unused
+    def group_docs_with_meta(self, grouping_col='UAS_cleaned', cluster_by=['CAU', 'MOD'], additional_cols=['Mission Type']):
+        """
+        Currently unused and in operable
+        Intented function is to group documents into an FMEA using a grouping column,
+        which is metadata from the initial dataset.
+
+        Parameters
+        ----------
+        grouping_col : string, optional
+            The column in the original dataset used to group documents into FMEA rows. The default is 'UAS_cleaned'.
+        cluster_by : TYPE, optional
+            DESCRIPTION. The default is ['CAU', 'MOD'].
+        additional_cols : list of strings, optional
+            additional columns in a dataset to include in the FMEA. The default is ['Mission Type'].
+
+        Returns
+        -------
+        TYPE
+            DESCRIPTION.
+
+        """
         self.data_df[self.id_col] = self.data_df.index.tolist()
         temp_grouped_df = self.data_df.copy()
         #group reports by category/mission type/phase
@@ -153,90 +309,33 @@ class FMEA():
         clustered_dfs = []
         for val in grouped_dfs:
             df = grouped_dfs[val]
-            grouped_df = self.cluster(df, cluster_by, additional_cols)
+            grouped_df = self.cluster(df, cluster_by, additional_cols) ###TODO: define and fix this
             grouped_df[grouping_col] = [val for i in range(len(grouped_df))]
             clustered_dfs.append(grouped_df)
         self.grouped_df = pd.concat(clustered_dfs)
         return self.grouped_df
     
-    def cluster(self, df, cluster_by=[], additional_cols=[]):
-        #Currently unused
-        text_list = []
-        for i in range(len(df)):
-            text = ""
-            for col in cluster_by:
-                text += ". " + df.iloc[i][col]
-            text_list.append(text)
-        vecs = []
-        for doc in self.nlp.pipe(text_list):
-            #print(doc.text)
-            if doc.text != "" and len(doc._.trf_data.tensors)>0:
-                vecs.append(doc._.trf_data.tensors[1][0])
-            else: 
-                vecs.append([])
-        correct_length = max([len(vecs[i]) for i in range(len(vecs))])
-        empty_vals = np.zeros(correct_length)
-        vecs = [v if v != [] else empty_vals for v in vecs]
-        vecs = np.stack(vecs)
-        #cluster
-        clustering_model = DBSCAN(eps=3.00, min_samples=1).fit(vecs)
-        #clustering_model = AgglomerativeClustering(n_clusters=None, affinity='cosine', linkage='average', distance_threshold=1).fit(vecs)
-        labels = clustering_model.labels_
-        df['cluster'] = labels
-        #combine
-        agg_function = {'CAU': lambda x: '; '.join(x),
-                        'MOD': lambda x: '; '.join(x),
-                        'EFF': lambda x: '; '.join(x),
-                        'CON': lambda x: '; '.join(x),
-                        'REC': lambda x: '; '.join(x),
-                        self.id_col: lambda x: '; '.join(x)}
-        for col in additional_cols:
-            agg_function[col] = lambda x: '; '.join(x)
-        grouped_df = df.groupby('cluster').agg(agg_function)
-        return grouped_df
-        
-    def group_docs(self, grouping_col='Mission Type', db_params={'eps':1.00, 'min_samples':1}, cluster_by=['CAU', 'MOD']):
-        #Currently unused
-        #ideas: cluster by cause, then mode, then combine all effects, controls, and recs
-        #issues: identifying number of clusters - DBSCAN clustering
-        causes = self.data_df['CAU'].tolist()
-        causes_modes = self.data_df['sentence']#['MOD'] #+". "+ self.data_df['MOD']#+". "+ self.data_df['EFF']+". "+self.data_df['CON']
-        causes_modes = causes_modes.tolist()
-        vecs = []
-        for doc in self.nlp.pipe(causes_modes):
-            if doc.text != "" and len(doc._.trf_data.tensors)>0:
-                vecs.append(doc._.trf_data.tensors[1][0])
-            else: 
-                vecs.append([])
-        correct_length = max([len(vecs[i]) for i in range(len(vecs))])
-        empty_vals = np.zeros(correct_length)
-        vecs = [v if v != [] else empty_vals for v in vecs]
-        vecs = np.stack(vecs)
-        #get mode vectors
-        mode_vecs = []
-        modes = self.data_df['MOD'].tolist()
-        for doc in self.nlp.pipe(modes):
-            if doc.text != "" and len(doc._.trf_data.tensors)>0:
-                mode_vecs.append(doc._.trf_data.tensors[1][0])
-            else: 
-                mode_vecs.append([])
-        #perform clustering: DBSCAN
-        clustering_model = DBSCAN(**db_params).fit(vecs)
-        clustering_model = AgglomerativeClustering(n_clusters=None, affinity='cosine', linkage='average', distance_threshold=0.01).fit(vecs)
-        labels = clustering_model.labels_
-        
-        self.data_df['cluster'] = labels
-        self.data_df[self.id_col] = self.data_df.index.tolist()
-        self.grouped_df = self.data_df.groupby('cluster').agg({'CAU': lambda x: '; '.join(x),
-                                                               'MOD': lambda x: '; '.join(x),
-                                                               'EFF': lambda x: '; '.join(x),
-                                                               'CON': lambda x: '; '.join(x),
-                                                               'REC': lambda x: '; '.join(x),
-                                                               self.id_col: lambda x: '; '.join(x)})
-        #get most representatice doc somehow?
-        return self.grouped_df
-    
     def group_docs_manual(self, filename='', grouping_col='Mode', additional_cols=['Mission Type'], sample=1):
+        """
+        Creates FMEA rows by grouping together documents according to values manually defined in a separate file.
+        Loads in the file and then aggregates the data. Sample IDs for documents in each row are created as well.
+        Parameters
+        ----------
+        filename : string, optional
+            filepath to the spreadsheet defining the rows. The default is ''.
+        grouping_col : string, optional
+            The column within the spreadsheet that defines the rows. The default is 'Mode'.
+        additional_cols : list, optional
+            Additional columns to include in the FMEA. The default is ['Mission Type'].
+        sample : int, optional
+            Number of samples to pull for each FMEA row. The default is 1.
+
+        Returns
+        -------
+        grouped_df : DataFrame
+            The grouped FMEA dataframe
+
+        """
         if '.xlsx' in filename: 
             manual_groups = pd.read_excel(filename)
         elif '.csv' in filename:
@@ -281,7 +380,26 @@ class FMEA():
         self.grouped_df['Sampled '+self.id_col] = sampled_ids
         return self.grouped_df
     
-    def post_process_fmea(self, rows_to_drop=[], id_name='SAFECOM', phase_name='Mission Type', max_words=20):
+    def post_process_fmea(self, id_name='SAFECOM', phase_name='Mission Type', max_words=20):
+        """
+        Post processes the FMEA to identify the column that contains the phase name,
+        clean sub-word tokens, and limit the number of words per cell.
+
+        Parameters
+        ----------
+        id_name : string, optional
+            Name of dataset used/name over the id column. The default is 'SAFECOM'.
+        phase_name : string, optional
+            Column that can be used to find the phase of operation. The default is 'Mission Type'.
+        max_words : int, optional
+            Maximum number of words in a cell in the FMEA. The default is 20.
+
+        Returns
+        -------
+        fmea_df : DataFrame
+            FMEA post processed DataFrame
+
+        """
         #clean data in NER columns: remove duplicate words, form tokens from token pieces
         for i in self.grouped_df.index:
             for ent in ['CAU', 'MOD', 'EFF', 'CON', 'REC']:
@@ -330,12 +448,43 @@ class FMEA():
         return self.fmea_df
     
     def get_year_per_doc(self, year_col='', config='/'):
+        """
+        #currently unused????
+
+        Parameters
+        ----------
+        year_col : TYPE, optional
+            DESCRIPTION. The default is ''.
+        config : TYPE, optional
+            DESCRIPTION. The default is '/'.
+
+        Returns
+        -------
+        None.
+
+        """
         if config == '/':
             self.raw_df['Year'] = [self.raw_df.at[i,year_col].split('/')[-1].split(" ")[0] for i in range(len(self.raw_df))]
         elif config == 'id':
             self.raw_df['Year'] = [num.split("-")[0] for num in self.raw_df[self.id_col]]
             
-    def calc_frequency(self, year_col=''): #something is wrong with the frequency
+    def calc_frequency(self, year_col=''): 
+        """
+        Calculates the frequency for each row and assigns it a category
+
+        Parameters
+        ----------
+        year_col : string, optional
+            The column the year for the report is stored in. The default is ''.
+
+        Returns
+        -------
+        grouped_df : DataFrame
+            Grouped df with requency column added
+
+        """
+        #something is wrong with the frequency
+        
         self.grouped_df[self.id_col]
         #total frequency
         frequency = [len(ids.split("; ")) for ids in self.grouped_df[self.id_col]]
@@ -372,6 +521,25 @@ class FMEA():
         return self.grouped_df
     
     def calc_severity(self, severity_func, from_file=False, file_name='', file_kwargs={}):
+        """
+        Calculates the severity for each row according to a defined severity function.
+
+        Parameters
+        ----------
+        severity_func : function
+            User defined function for calculating severity. Usually a linear combination of other values.
+        from_file : Boolean, optional
+            True if the severity value is already stored in a file, false if calculated from a severiy function. The default is False.
+        file_name : string, optional
+            filepath to a spread sheet containing the severity value for each document. The default is ''.
+        file_kwargs : dict, optional
+            any kwargs needed to read the file. Typically needed for .xlsx workbooks with multiple sheets. The default is {}.
+
+        Returns
+        -------
+        None.
+
+        """
         #severity func calculates the severity for each report in the raw df
         if from_file == False:
             self.raw_df = severity_func(self.raw_df)
@@ -394,21 +562,75 @@ class FMEA():
         return
     
     def calc_risk(self):
+        """
+        
+        Calculates risk as the product of severity and frequency.
+        Adds risk column to the grouped df
+        Returns
+        -------
+        None.
+
+        """
         self.grouped_df['risk'] = self.grouped_df['severity'] * self.grouped_df['frequency']
         return
     
-    def build_fmea(self, severity_func):
+    def build_fmea(self, severity_func, group_by, group_by_kwargs={}, post_process_kwargs={}):
+        """
+        Builds the FMEA using the above functions, all in one call.
+        Less customizable, but useful for a quick implementation.
+
+        Parameters
+        ----------
+        severity_func : function
+            DESCRIPTION.
+        group_by : 'string'
+            method to group together the FMEA rows, either manual file or by meta data.
+        group_by_kwargs : dict, optional
+            dictionary containing all inputs for the group_by function. The default is {}.
+        post_process_kwargs : dict, optional
+            dictionary containing all inputs for the post_process_fmea function. The default is {}.
+
+        Returns
+        -------
+        None.
+
+        """
         self.get_entities_per_doc()
-        self.group_docs()
+        if group_by == 'manual':
+            self.group_docs_manual(**group_by_kwargs)
+        elif group_by == 'meta':
+            self.group_docs_with_meta(**group_by_kwargs)
         self.calc_frequency()
         self.calc_severity(severity_func)
         self.calc_risk()
-        #prune excess columns
-        #add mission phase
+        #prune excess columns, add mission phase
+        self.post_process_fmea(**post_process_kwargs)
         #save table
-        return
+        self.fmea_df.to_csv(os.path.join(os.getcwd(),"fmea.csv"))
     
     def display_doc(self, doc_id, save=True, output_path="", colors_path=None, pred=True):
+        """
+        Displays an annotated document with entities highlighted accordingly
+
+        Parameters
+        ----------
+        doc_id : string
+            The id of the document to be dispalyed
+        save : Boolean, optional
+            Saves as html if true. Displays if False. The default is True.
+        output_path : string, optional
+            The filepath the display will be saved to. The default is "".
+        colors_path : string, optional
+            The path to a file that defines the colors to be used for each entity. The default is None.
+        pred : Boolean, optional
+            True if the displayed document is from predictions, False if from manual annotations. The default is True.
+
+        Returns
+        -------
+        html : TYPE
+            DESCRIPTION.
+
+        """
         #see https://spacy.io/usage/visualizers
         #doc = self.data_df.loc[self.data_df[self.id_col]==str(doc_id)].reset_index(drop=True)
         if pred == False:

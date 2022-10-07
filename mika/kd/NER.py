@@ -311,7 +311,9 @@ def plot_eval_metrics(eval_df, save, savepath):
     plt.show()
     return
 
-def plot_eval_results(filepath, final_train_metrics={}, final_eval_metrics={}, save=False, savepath=None):
+def plot_eval_results(filepath, final_train_metrics={}, final_eval_metrics={}, save=False, savepath=None, loss=True, metrics=True):
     eval_df, training_df = read_trainer_logs(filepath, final_train_metrics, final_eval_metrics)
-    plot_loss(eval_df, training_df, save, savepath)
-    plot_eval_metrics(eval_df, save, savepath)
+    if loss == True:
+        plot_loss(eval_df, training_df, save, savepath)
+    if metrics == True:
+        plot_eval_metrics(eval_df, save, savepath)

@@ -9,6 +9,8 @@ import os
 import pandas as pd
 import numpy as np
 from transformers import Trainer, AutoTokenizer, DataCollatorForTokenClassification, BertForTokenClassification
+import sys
+sys.path.append(os.path.join("..", "..", ".."))
 from mika.kd.NER import *
 from mika.kd import FMEA #import FMEA
 from datasets import load_from_disk, Dataset
@@ -45,7 +47,7 @@ def calc_safenet_severity(df, grouped_df):
     return df
 
 if __name__ == '__main__':
-    model_checkpoint = os.path.join(os.getcwd(),"models", "FMEA-ner-model", "checkpoint-1424")
+    model_checkpoint = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)),"models", "FMEA-ner-model", "checkpoint-1424")
     device = 'cuda' if cuda.is_available() else 'cpu'
     cuda.empty_cache()
     #device = 'cpu'
@@ -56,7 +58,7 @@ if __name__ == '__main__':
     fmea.load_model(model_checkpoint)
     print("loaded model")
     
-    file = "results/safenet_topics_May-04-2022/preprocessed_data.csv"#"results/SAFECOM_hazards_lda_topics_Apr-04-2022/preprocessed_data.csv"
+    file = os.path.join(os.getcwd(),"topic_model_results/preprocessed_data.csv")
     
     input_data = fmea.load_data(file, formatted=False, text_col='Raw_Narrative', id_col="ID") #Text
     
@@ -64,14 +66,14 @@ if __name__ == '__main__':
     preds = fmea.predict()
     df = fmea.get_entities_per_doc()
     
-    manual_cluster_file = os.path.join(os.getcwd(),"results", "safenet_topics_May-04-2022", 'hazard_docs.csv')
+    manual_cluster_file = os.path.join(os.getcwd(),"topic_model_results", 'hazard_docs.csv')
     fmea.group_docs_manual(manual_cluster_file, grouping_col='Hazard', additional_cols=[]) #Mode
-    fmea.grouped_df.to_csv(os.path.join(os.getcwd(),"results", "safenet_topics_May-04-2022", "grouped_df.csv"))
-    file_name = os.path.join(os.getcwd(),"results", "safenet_topics_May-04-2022","hazard_interpretation.xlsx")
+    fmea.grouped_df.to_csv(os.path.join(os.getcwd(),"topic_model_results", "grouped_df.csv"))
+    file_name = os.path.join(os.getcwd(),"topic_model_results","hazard_interpretation.xlsx")
     fmea.calc_severity(calc_safenet_severity, from_file=True, file_name=file_name, file_kwargs={'sheet_name':['topic-focused']})
     fmea.get_year_per_doc(year_col='Event Start Date', config='/')
     fmea.calc_frequency(year_col='Year')
     fmea.calc_risk()
     fmea.post_process_fmea(phase_name='', id_name='SAFENET', max_words=50)
     
-    fmea.fmea_df.to_csv(os.path.join(os.getcwd(),"results/safenet_topics_May-04-2022/safenet_fmea_2.csv"))
+    fmea.fmea_df.to_csv(os.path.join(os.getcwd(),"topic_model_results/safenet_fmea_2.csv"))

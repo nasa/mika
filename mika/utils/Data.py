@@ -103,7 +103,7 @@ class Data():
         
     def __remove_incomplete_rows(self):
         rows_to_drop = []
-        for i in tqdm(range(0, len(self.data_df)), "Preparing data…"):
+        for i in tqdm(range(0, len(self.data_df)), "Removing Incomplete Rows…"):
             for col in self.text_columns:
                 if str(self.data_df.iloc[i][col])=="" or isinstance(self.data_df.iloc[i][col],float):
                     rows_to_drop.append(i)
