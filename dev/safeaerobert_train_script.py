@@ -58,6 +58,7 @@ for i in range(len(NTSB_df)):
 print("created new df of just text")
 text_df = pd.DataFrame({'Text':text})
 text_df = text_df.dropna().reset_index(drop=True)
+text_df = text_df.iloc[:10000][:]
 
 # set up train and eval dataset
 train_size=0.8
@@ -69,7 +70,7 @@ print("defined training and test set")
 def tokenize(text_df, tokenizer):
     tokenized_inputs = tokenizer(text_df["Text"], is_split_into_words=False, padding='max_length', 
                                  truncation=True, 
-                                 return_special_tokens_mask=True , return_tensors="pt").to(device)
+                                 return_special_tokens_mask=True)# , return_tensors="pt").to(device)
     #, padding=True, truncation=True)
     return tokenized_inputs
 
