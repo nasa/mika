@@ -105,10 +105,10 @@ args = TrainingArguments(
     num_train_epochs=1,
     weight_decay=0.01,
     push_to_hub=False,
-    per_device_train_batch_size = 4,
-    per_device_eval_batch_size = 2,
-    logging_steps=10000,
-    eval_steps = 5000,
+    per_device_train_batch_size = 1,
+    per_device_eval_batch_size = 1,
+    logging_steps=100,
+    eval_steps = 500,
 )
 
 trainer = Trainer(
