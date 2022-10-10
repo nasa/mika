@@ -97,14 +97,14 @@ train_data = concatenate_datasets([train_data, train_labels], axis=1)
 model = AutoModelForMaskedLM.from_pretrained(model_checkpoint)
 
 print("model loaded")
-model = model.to('cuda')
+model = model.to('cuda:1')
 #training set up
 data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer)
 args = TrainingArguments(
     os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),"models/SafeAeroBERT"),
     evaluation_strategy="steps",
     save_strategy="epoch",
-    learning_rate=2e-5,
+    learning_rate=1e-3,
     num_train_epochs=1,
     weight_decay=0.01,
     push_to_hub=False,
