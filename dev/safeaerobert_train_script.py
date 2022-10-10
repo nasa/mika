@@ -61,7 +61,7 @@ for i in range(len(NTSB_df)):
 print("created new df of just text")
 text_df = pd.DataFrame({'Text':text})
 text_df = text_df.dropna().reset_index(drop=True)
-text_df = text_df.iloc[:1000][:]
+#text_df = text_df.iloc[:1000][:]
 
 # set up train and eval dataset
 train_size=0.8
@@ -105,13 +105,14 @@ args = TrainingArguments(
     evaluation_strategy="steps",
     save_strategy="epoch",
     learning_rate=1e-3,
-    num_train_epochs=1,
+    num_train_epochs=10,
     weight_decay=0.01,
     push_to_hub=False,
     per_device_train_batch_size = 1,
     per_device_eval_batch_size = 1,
-    logging_steps=100,
-    eval_steps = 500,
+    logging_steps=500,
+    eval_steps = 1000,
+    save_total_limit = 3 #saves only last 3 checkpoints
 )
 
 trainer = Trainer(
