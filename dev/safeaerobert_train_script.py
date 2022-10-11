@@ -108,11 +108,15 @@ args = TrainingArguments(
     num_train_epochs=10,
     weight_decay=0.01,
     push_to_hub=False,
-    per_device_train_batch_size = 1,
+    per_device_train_batch_size = 4,
     per_device_eval_batch_size = 1,
     logging_steps=500,
     eval_steps = 1000,
-    save_total_limit = 3 #saves only last 3 checkpoints
+    save_total_limit = 3, #saves only last 3 checkpoints
+    gradient_accumulation_steps=4,
+    gradient_checkpointing=True,
+    fp16=True,
+    optim="adafactor"
 )
 
 trainer = Trainer(
