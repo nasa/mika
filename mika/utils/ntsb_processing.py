@@ -23,7 +23,7 @@ for root, dirs, files in os.walk(file_path):
             # OPEN CURSOR AND EXECUTE SQL
             cur = conn.cursor()
             SQL_query = "SELECT *  \
-                        FROM ((narratives \
+                        FROM (((narratives \
                         INNER JOIN \
                             Events_Sequence \
                         ON \
@@ -35,7 +35,11 @@ for root, dirs, files in os.walk(file_path):
                         INNER JOIN \
                             aircraft \
                         ON \
-                            narratives.ev_id = aircraft.ev_id;"
+                            narratives.ev_id = aircraft.ev_id)\
+                        INNER JOIN \
+                             events \
+                        ON \
+                             narratives.ev_id = events.ev_id;"
             cur.execute(SQL_query);#"SELECT * FROM narratives");
     
             # OPEN CSV AND ITERATE THROUGH RESULTS
@@ -67,7 +71,7 @@ for root, dirs, files in os.walk(file_path):
 
 ntsb = pd.concat(dfs).reset_index(drop=True)
 print(len(ntsb))
-ntsb.to_csv("ntsb_full_tables.csv")
+ntsb.to_csv("ntsb_full.csv")
 
 dfs = []
 for root, dirs, files in os.walk(file_path):
