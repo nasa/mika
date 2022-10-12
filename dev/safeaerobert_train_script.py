@@ -61,7 +61,7 @@ for i in range(len(NTSB_df)):
 print("created new df of just text")
 text_df = pd.DataFrame({'Text':text})
 text_df = text_df.dropna().reset_index(drop=True)
-#text_df = text_df.iloc[:1000][:]
+text_df = text_df.iloc[:2000][:]
 
 # set up train and eval dataset
 train_size=0.8
