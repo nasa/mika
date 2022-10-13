@@ -100,7 +100,7 @@ args = TrainingArguments(
     os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),"models/SafeAeroBERT"),
     evaluation_strategy="steps",
     save_strategy="epoch",
-    learning_rate=1e-3,
+    learning_rate=1e-5,
     num_train_epochs=10,
     weight_decay=0.01,
     push_to_hub=False,
