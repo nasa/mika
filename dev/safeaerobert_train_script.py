@@ -21,8 +21,8 @@ device = 'cuda' if cuda.is_available() else 'cpu'
 cuda.empty_cache()
 print(device)
 import os
-#os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
-#os.environ["TOKENIZERS_PARALLELISM"] = "false"
+os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 #load training data: ASRS, NTSB
 ASRS_file = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),'data/ASRS/ASRS_1988_2022.csv')
