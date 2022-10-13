@@ -56,7 +56,7 @@ for col in NTSB_text_cols:
 print("created new df of just text")
 text_df = pd.DataFrame({'Text':text})
 text_df = text_df.dropna().reset_index(drop=True)
-text_df = text_df[:2000]
+
 # set up train and eval dataset
 train_size=0.8
 train_dataset = text_df.sample(frac=train_size,random_state=200)
@@ -105,11 +105,11 @@ args = TrainingArguments(
     weight_decay=0.01,
     push_to_hub=False,
     per_device_train_batch_size = 8,#256,
-    per_device_eval_batch_size = 8,#256,
-    logging_steps=1,
-    eval_steps = 1,
+    per_device_eval_batch_size = 128,#256,
+    logging_steps=100,
+    eval_steps = 100,
     save_total_limit = 3, #saves only last 3 checkpoints
-    gradient_accumulation_steps=32,#64,
+    gradient_accumulation_steps=14,#64,
     gradient_checkpointing=True,
     fp16=True,
     optim="adafactor"
@@ -127,9 +127,11 @@ trainer = Trainer(
 train_result = trainer.train()
 trainer.save_model()
 final_train_metrics = train_result.metrics
+metrics=trainer.evaluate()
+final_eval_metrics = metrics
 num_steps = trainer.state.max_steps
 filename = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),"models", "SafeAeroBERT", "checkpoint-"+str(num_steps), "trainer_state.json")
-plot_eval_results(filename, save=True, savepath="SafeAeroBERT_", final_train_metrics=final_train_metrics, loss=True, metrics=False)
+plot_eval_results(filename, save=True, savepath="SafeAeroBERT_", final_train_metrics=final_train_metrics, final_eval_metrics=final_eval_metrics, loss=True, metrics=False)
 
 r""" #get categories
 df = pd.read_excel(r"C:\Users\srandrad\OneDrive - NASA\Desktop\ASRS_DBOnline.xlsx")
