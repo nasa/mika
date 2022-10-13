@@ -92,6 +92,7 @@ model = AutoModelForMaskedLM.from_pretrained(model_checkpoint)
 
 print("model loaded")
 model.to(device)
+print(model.device)
 #training set up
 data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer)
 args = TrainingArguments(
