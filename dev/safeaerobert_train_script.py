@@ -16,7 +16,8 @@ from transformers import AutoTokenizer, AutoModelForMaskedLM, DataCollatorForLan
 from transformers import TrainingArguments, Trainer
 from torch import cuda
 from datasets import Dataset, concatenate_datasets
-
+import warnings
+warnings.filterwarnings("ignore")
 device = 'cuda' if cuda.is_available() else 'cpu'
 cuda.empty_cache()
 print(device)
@@ -74,19 +75,19 @@ def tokenize(text_df, tokenizer):
 train_data = Dataset.from_pandas(train_dataset).map(tokenize,
     fn_kwargs={'tokenizer':tokenizer},
     remove_columns=['Text'])
-#train_data.set_format("torch")
+
 test_data = Dataset.from_pandas(test_dataset).map(tokenize,
     fn_kwargs={'tokenizer':tokenizer},
     remove_columns=['Text'])
-#test_data.set_format("torch")
+
 print("tokenized data")
 
 test_labels = Dataset.from_pandas(pd.DataFrame({'labels':test_data['input_ids'].copy()}))
 train_labels = Dataset.from_pandas(pd.DataFrame({'labels':train_data['input_ids'].copy()}))
 test_data = concatenate_datasets([test_data, test_labels], axis=1)
 train_data = concatenate_datasets([train_data, train_labels], axis=1)
-
-
+test_data.set_format("torch")
+train_data.set_format("torch")
 #initiating model
 model = AutoModelForMaskedLM.from_pretrained(model_checkpoint)
 
