@@ -265,7 +265,7 @@ def read_trainer_logs(filepath, final_train_metrics, final_eval_metrics):
     if final_eval_metrics != {}:
         print(final_eval_metrics)
         print(eval_dicts[0])
-        final_eval_metrics['steps'] = eval_dicts[0]['steps']
+        final_eval_metrics['steps'] = eval_dicts[0]['step']
         eval_dicts.append(final_eval_metrics)
     if final_train_metrics != {}:
         final_train_metrics = {"loss": final_train_metrics['train_loss'],#['training_loss'],
@@ -274,6 +274,8 @@ def read_trainer_logs(filepath, final_train_metrics, final_eval_metrics):
         training_dicts.append(final_train_metrics)
     eval_df = pd.DataFrame(eval_dicts)
     training_df = pd.DataFrame(training_dicts)
+    print(eval_df)
+    print(training_df)
     return eval_df, training_df
 
 def plot_loss(eval_df, training_df, save, savepath):
