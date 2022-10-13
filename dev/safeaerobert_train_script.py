@@ -22,7 +22,7 @@ device = 'cuda' if cuda.is_available() else 'cpu'
 cuda.empty_cache()
 print(device)
 import os
-os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
+#os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 #load training data: ASRS, NTSB
@@ -94,6 +94,7 @@ model = AutoModelForMaskedLM.from_pretrained(model_checkpoint)
 print("model loaded")
 model.to(device)
 print(model.device)
+
 #training set up
 data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer)
 args = TrainingArguments(
