@@ -56,7 +56,6 @@ for col in NTSB_text_cols:
 print("created new df of just text")
 text_df = pd.DataFrame({'Text':text})
 text_df = text_df.dropna().reset_index(drop=True)
-text_df = text_df.iloc[:2000][:]
 
 # set up train and eval dataset
 train_size=0.8
@@ -107,8 +106,8 @@ args = TrainingArguments(
     push_to_hub=False,
     per_device_train_batch_size = 8,#256,
     per_device_eval_batch_size = 8,#256,
-    logging_steps=50,
-    eval_steps = 50,
+    logging_steps=1,
+    eval_steps = 1,
     save_total_limit = 3, #saves only last 3 checkpoints
     gradient_accumulation_steps=32,#64,
     gradient_checkpointing=True,
