@@ -56,7 +56,7 @@ for col in NTSB_text_cols:
 print("created new df of just text")
 text_df = pd.DataFrame({'Text':text})
 text_df = text_df.dropna().reset_index(drop=True)
-
+text_df = text_df[:2000]
 # set up train and eval dataset
 train_size=0.8
 train_dataset = text_df.sample(frac=train_size,random_state=200)
