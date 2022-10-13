@@ -21,8 +21,8 @@ device = 'cuda' if cuda.is_available() else 'cpu'
 cuda.empty_cache()
 print(device)
 import os
-os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
-os.environ["TOKENIZERS_PARALLELISM"] = "false"
+#os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
+#os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 #load training data: ASRS, NTSB
 ASRS_file = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),'data/ASRS/ASRS_1988_2022.csv')
@@ -51,13 +51,7 @@ for col in ASRS_text_cols:
     text += ASRS_df[col].tolist()
 for col in NTSB_text_cols:
     text += NTSB_df[col].to_list()
-"""
-for i in range(len(ASRS_df)):
-    for col in ASRS_text_cols:
-        text.append(ASRS_df.iloc[i][col])
-for i in range(len(NTSB_df)):
-    for col in NTSB_text_cols:
-        text.append(NTSB_df.iloc[i][col])"""
+
 print("created new df of just text")
 text_df = pd.DataFrame({'Text':text})
 text_df = text_df.dropna().reset_index(drop=True)
@@ -97,7 +91,7 @@ train_data = concatenate_datasets([train_data, train_labels], axis=1)
 model = AutoModelForMaskedLM.from_pretrained(model_checkpoint)
 
 print("model loaded")
-model = model.to('cuda:1')
+model.to('cuda:1')
 #training set up
 data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer)
 args = TrainingArguments(
@@ -105,15 +99,15 @@ args = TrainingArguments(
     evaluation_strategy="steps",
     save_strategy="epoch",
     learning_rate=1e-3,
-    num_train_epochs=10,
+    num_train_epochs=1,
     weight_decay=0.01,
     push_to_hub=False,
-    per_device_train_batch_size = 64,
-    per_device_eval_batch_size = 16,
+    per_device_train_batch_size = 8,#256,
+    per_device_eval_batch_size = 8,#256,
     logging_steps=50,
     eval_steps = 50,
     save_total_limit = 3, #saves only last 3 checkpoints
-    gradient_accumulation_steps=16,
+    gradient_accumulation_steps=32,#64,
     gradient_checkpointing=True,
     fp16=True,
     optim="adafactor"
