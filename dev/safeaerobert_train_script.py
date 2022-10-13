@@ -91,7 +91,7 @@ train_data = concatenate_datasets([train_data, train_labels], axis=1)
 model = AutoModelForMaskedLM.from_pretrained(model_checkpoint)
 
 print("model loaded")
-model.to('cuda:1')
+model.to(device)
 #training set up
 data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer)
 args = TrainingArguments(
