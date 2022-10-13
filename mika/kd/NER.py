@@ -266,7 +266,7 @@ def read_trainer_logs(filepath, final_train_metrics, final_eval_metrics):
         final_eval_metrics['steps'] = eval_dicts[0]['steps']
         eval_dicts.append(final_eval_metrics)
     if final_train_metrics != {}:
-        final_train_metrics = {"loss": final_train_metrics['training_loss'],
+        final_train_metrics = {"loss": final_train_metrics['train_loss'],#['training_loss'],
                                "epoch": final_train_metrics['epoch'],
                                "learning rate": "n/a"}
         training_dicts.append(final_train_metrics)
