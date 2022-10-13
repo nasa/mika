@@ -263,6 +263,8 @@ def read_trainer_logs(filepath, final_train_metrics, final_eval_metrics):
         else:
             eval_dicts.append(df.iloc[i]['log_history'])
     if final_eval_metrics != {}:
+        print(final_eval_metrics)
+        print(eval_dicts[0])
         final_eval_metrics['steps'] = eval_dicts[0]['steps']
         eval_dicts.append(final_eval_metrics)
     if final_train_metrics != {}:
