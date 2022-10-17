@@ -99,7 +99,7 @@ data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer)
 args = TrainingArguments(
     os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),"models/SafeAeroBERT"),
     evaluation_strategy="steps",
-    save_strategy="epoch",
+    save_strategy="steps",
     learning_rate=1e-5,
     num_train_epochs=10,
     weight_decay=0.01,
