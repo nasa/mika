@@ -106,6 +106,7 @@ args = TrainingArguments(
     push_to_hub=False,
     per_device_train_batch_size = 8,#256,
     per_device_eval_batch_size = 8,#256,
+    save_steps = 100,
     logging_steps = 100,
     eval_steps = 1000,
     save_total_limit = 3, #saves only last 3 checkpoints
