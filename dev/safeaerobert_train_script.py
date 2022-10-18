@@ -127,7 +127,8 @@ trainer = Trainer(
 rootdir = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),"models", "SafeAeroBERT")
 checkpoints = []
 for subdir, dirs, files in os.walk(rootdir):
-    checkpoints.append(subdir.split("-")[-1])
+    if 'checkpoint' in subdir: 
+        checkpoints.append(subdir.split("-")[-1])
 most_recent_checkpoint = max(checkpoints)
 checkpoint = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),"models", "SafeAeroBERT", "checkpoint-"+most_recent_checkpoint)
 train_result = trainer.train(checkpoint)
