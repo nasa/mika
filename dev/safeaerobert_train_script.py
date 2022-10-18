@@ -124,8 +124,8 @@ trainer = Trainer(
     data_collator=data_collator,
     tokenizer=tokenizer,
 )
-
-train_result = trainer.train()
+checkpoint = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),"models", "SafeAeroBERT", "checkpoint-100")
+train_result = trainer.train(checkpoint)
 trainer.save_model()
 #final_train_metrics = train_result.metrics
 metrics=trainer.evaluate()
