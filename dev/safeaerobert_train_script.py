@@ -22,7 +22,7 @@ device = 'cuda' if cuda.is_available() else 'cpu'
 cuda.empty_cache()
 print(device)
 import os
-os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
+#os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 #load training data: ASRS, NTSB
@@ -56,10 +56,9 @@ for col in NTSB_text_cols:
 print("created new df of just text")
 text_df = pd.DataFrame({'Text':text})
 text_df = text_df.dropna().reset_index(drop=True)
-text_df = text_df.iloc[:2000][:]
-
+#text_df = text_df[:2000]
 # set up train and eval dataset
-train_size=0.8
+train_size=0.9
 train_dataset = text_df.sample(frac=train_size,random_state=200)
 test_dataset = text_df.drop(train_dataset.index).reset_index(drop=True)
 train_dataset = train_dataset.reset_index(drop=True)
@@ -94,22 +93,24 @@ model = AutoModelForMaskedLM.from_pretrained(model_checkpoint)
 print("model loaded")
 model.to(device)
 print(model.device)
+
 #training set up
 data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer)
 args = TrainingArguments(
     os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),"models/SafeAeroBERT"),
     evaluation_strategy="steps",
-    save_strategy="epoch",
-    learning_rate=1e-3,
-    num_train_epochs=1,
+    save_strategy="steps",
+    learning_rate=1e-5,
+    num_train_epochs=10,
     weight_decay=0.01,
     push_to_hub=False,
     per_device_train_batch_size = 8,#256,
     per_device_eval_batch_size = 8,#256,
-    logging_steps=50,
-    eval_steps = 50,
+    save_steps = 100,
+    logging_steps = 100,
+    eval_steps = 1000,
     save_total_limit = 3, #saves only last 3 checkpoints
-    gradient_accumulation_steps=32,#64,
+    gradient_accumulation_steps=16,#64,
     gradient_checkpointing=True,
     fp16=True,
     optim="adafactor"
@@ -126,10 +127,13 @@ trainer = Trainer(
 
 train_result = trainer.train()
 trainer.save_model()
-final_train_metrics = train_result.metrics
+#final_train_metrics = train_result.metrics
+metrics=trainer.evaluate()
+#final_eval_metrics = metrics
 num_steps = trainer.state.max_steps
 filename = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),"models", "SafeAeroBERT", "checkpoint-"+str(num_steps), "trainer_state.json")
-plot_eval_results(filename, save=True, savepath="SafeAeroBERT_", final_train_metrics=final_train_metrics, loss=True, metrics=False)
+plot_eval_results(filename, save=True, savepath="SafeAeroBERT_", #final_train_metrics=final_train_metrics, final_eval_metrics=final_eval_metrics, 
+                  loss=True, metrics=False)
 
 r""" #get categories
 df = pd.read_excel(r"C:\Users\srandrad\OneDrive - NASA\Desktop\ASRS_DBOnline.xlsx")

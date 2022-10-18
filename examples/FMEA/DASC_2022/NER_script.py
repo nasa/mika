@@ -110,7 +110,7 @@ sentence_df['ner_tags'] = ner_tags
 ner_tags = [[labels_to_ids[label] for label in labels] for labels in llis_sentence_df['tags']]
 llis_sentence_df['ner_tags'] = ner_tags
 
-#load tokenizer
+#get tokens from setences
 sentence_df['tokens'] = [[tok.orth_ for tok in sentence_df.iloc[i]['sentence']] for i in range(len(sentence_df))]
 llis_sentence_df['tokens'] = [[tok.orth_ for tok in llis_sentence_df.iloc[i]['sentence']] for i in range(len(llis_sentence_df))]
 
