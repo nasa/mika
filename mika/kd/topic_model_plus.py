@@ -35,33 +35,63 @@ class Topic_Model_plus():
     
     Attributes
     ----------
-    data_csv : str
-        defines the input data file
-    id_col : str
-        defines the document id column label name
-    text_columns : list of str
-        defines various columns within a single dataset
-    extra_cols : list of str
-        a list of strings defining any extra columns in the database
-    folder_path : str
-        defines path to folder where output files are stored
-    data_name : str
-        defines output file names
-    combine_cols : boolean
-        defines whether to combine columns
-    correction_list : list of str
-        if spellchecker or segmentation is active, contains corrections made
+    text_columns: list
+        defines various columns within a single database which will be used for topic modeling
+    data : Data
+        Data object storing the text corpus
+    ngrams : str
+        'tp' if the user wants tomotopy to form ngrams prior to applying a topic model 
+    doc_ids : list
+        list of document ids pulled from data object
+    data_df : pandas dataframe
+        df storing documents pulled from data object
+    data_name : string
+        dataset name pulled from data object
+    id_col : string
+        the column storing the document ids pulled from data object
+    hlda_models : dictionary
+        variable for storing hlda models
+    lda_models : dictionary
+        variable for storing lda models
+    folder_path : string
+        destination for storing results and models
+        
     
     Methods
     -------
-    prepare_data(self, **kwargs)
-        removes incomplete rows or combines columns as defined by user
-    preprocess_data(self, domain_stopwords=[], ngrams=True, ngram_range=3, threshold=15, min_count=5,quot_correction=False,spellcheck=False,segmentation=False)
-        performs data preprocessing steps as defined by user
-    save_preprocessed_data(self)
-        saves preprocessed data to a file
-    extract_preprocessed_data(self, file_name)
-        uses previously saved preprocessed data
+    get_bert_coherence(self, coh_method='u_mass', from_probs=False):
+        gets coherence for bert models and saves it in a dictionary
+    calc_bert_coherence(self, docs, topics, topic_model, method='u_mass', num_words=10):
+        calculates coherence for a bertopic model using gensim coherence models
+    save_bert_model(self, embedding_model=True):
+        saves a BERTopic model
+    save_bert_coherence(self, return_df=False, coh_method='u_mass', from_probs=False):
+        saves the coherence scores for a bertopic model
+    get_bert_topic_diversity(self, topk=10):
+        gets topic diversity scores for a BERTopic model
+    save_bert_topic_diversity(self, topk=10, return_df=False):
+        saves topic diversity score for a bertopic model
+    bert_topic(self, sentence_transformer_model=None, umap=None, hdbscan=None, count_vectorizor=None, ngram_range=(1,3), BERTkwargs={}, from_probs=True, thresh=0.01):
+        function to train a bertopic model
+    reduce_bert_topics(self, num=30, from_probs=True, thresh=0.01):
+        reduces the number of topics in a trained bertopic model to the specified number.
+    save_bert_topics(self, return_df=False, p_thres=0.0001, coherence=False, coh_method='u_mass', from_probs=False):
+        saves bert topics results to file
+    save_bert_topics_from_probs(self, thresh=0.01, return_df=False, coherence=False, coh_method='u_mass', from_probs=True):
+        saves bertopic model results if using probability threshold
+    get_bert_topics_from_probs(self, topic_df, thresh=0.01, coherence=False):
+        saves topic model results including each topic number, words, number of words,
+        and best document when document topics are defined by a probabilty threshold
+    save_bert_taxonomy(self, return_df=False, p_thres=0.0001):
+        saves a taxonomy of topics from bertopic model
+    save_bert_document_topic_distribution(self, return_df=False):
+        saves the document topic distribution
+    save_bert_results(self, coherence=False, coh_method='u_mass', from_probs=True, thresh=0.01, topk=10):
+        saves the taxonomy, coherence, and document topic distribution in one excel file
+    save_bert_vis(self):
+        saves the bertopic visualization and hierarchy visualization
+    hdp(self, training_iterations=1000, iteration_step=10, to_lda=True, kwargs={}, topic_threshold=0.0):
+       performs HDP topic modeling which is useful when the number of topics is not known
     coherence_scores(self, mdl, lda_or_hlda, measure='c_v'):
         computes and returns coherence scores
     lda(self, num_topics={}, training_iterations=1000, iteration_step=10, remove_pct=0.3, **kwargs)
@@ -80,6 +110,12 @@ class Topic_Model_plus():
         gets lda models from file
     lda_visual(self, col)
         saves pyLDAvis output from lda to file
+    label_lda_topics(self, extractor_min_cf=5, extractor_min_df=3, extractor_max_len=5, extractor_max_cand=5000, labeler_min_df=5, labeler_smoothing=1e-2, labeler_mu=0.25, label_top_n=3):
+        Uses tomotopy's auto topic labeling tool to label topics. Stores labels in class; after running this function, a flag can be used to use labels or not in taxonomy saving functions.
+    label_hlda_topics(self, extractor_min_cf=5, extractor_min_df=3, extractor_max_len=5, extractor_max_cand=5000, labeler_min_df=5, labeler_smoothing=1e-2, labeler_mu=0.25, label_top_n=3):
+        Uses tomotopy's auto topic labeling tool to label topics. Stores labels in class; after running this function, a flag can be used to use labels or not in taxonomy saving functions.
+    save_mixed_taxonomy(self,use_labels=False):
+        A custom mixed lda/hlda model taxonomy. Must run lda and hlda with desired parameters first.
     hlda(self, levels=3, training_iterations=1000, iteration_step=10, remove_pct=0.3, **kwargs)
         performs hlda topic modeling
     save_hlda_results(self):
@@ -132,7 +168,16 @@ class Topic_Model_plus():
         self.ngrams = ngrams
         self.folder_path = ""
         
-    def __create_folder(self): #new version, just saves it within the folder
+    def __create_folder(self): 
+        """
+        makes a folder/directory for saving results
+
+        Returns
+        -------
+        None.
+
+        """
+        #new version, just saves it within the folder
         if self.folder_path == "":
             self.folder_path = 'topic_model_results'
             if os.path.isdir(self.folder_path) == True:
@@ -141,6 +186,25 @@ class Topic_Model_plus():
             os.makedirs(self.folder_path, exist_ok = True)
     
     def get_bert_coherence(self, coh_method='u_mass', from_probs=False):
+        """
+        gets coherence for bert models and saves it in a dictionary
+
+        Parameters
+        ----------
+        coh_method : string, optional
+            Method used to calculate coherence. Can be any method used in gensim. 
+            The default is 'u_mass'.
+        from_probs : boolean, optional
+            Whether or not to use document topic probabilities to assign topics.
+            True to use probabilities - i.e., each document can have multiple topics.
+            False to not use probabilities - i.e., each document only has one topics.
+            The default is False.
+
+        Returns
+        -------
+        None.
+
+        """
         self.BERT_coherence = {}
         for col in self.text_columns:
             if from_probs == False: #each document only has one topic
@@ -157,6 +221,29 @@ class Topic_Model_plus():
             self.BERT_coherence[col] = self.calc_bert_coherence(docs, topics, topic_model, method=coh_method)
             
     def calc_bert_coherence(self, docs, topics, topic_model, method='u_mass', num_words=10):
+        """
+        calculates coherence for a bertopic model using gensim coherence models
+
+        Parameters
+        ----------
+        docs : list
+            List of document text.
+        topics : List
+            List of topics per document.
+        topic_model : BERTopic model object
+            Object containing the trained topic model.
+        method : string, optional
+            Method used to calculate coherence. Can be any method used in gensim. 
+            The default is 'u_mass'.
+        num_words : int, optional
+            Number of words in the topic used to calculate coherence. The default is 10.
+
+        Returns
+        -------
+        coherence_per_topic : List
+            List of coherence scores for each topic.
+
+        """
         # Preprocess Documents
         documents = pd.DataFrame({"Document": docs,
                                   "ID": range(len(docs)),
@@ -186,6 +273,19 @@ class Topic_Model_plus():
         return coherence_per_topic
     
     def save_bert_model(self, embedding_model=True):
+        """
+        saves a BERTopic model
+
+        Parameters
+        ----------
+        embedding_model : boolean, optional
+            True to save the embedding model. The default is True.
+
+        Returns
+        -------
+        None.
+
+        """
         self.__create_folder()
         for col in self.text_columns:
             path = "_BERT_model_object.bin"
@@ -194,6 +294,28 @@ class Topic_Model_plus():
         self.data.save(results_path=os.path.join(self.folder_path,"preprocessed_data.csv"))
         
     def save_bert_coherence(self, return_df=False, coh_method='u_mass', from_probs=False):
+        """
+        saves the coherence scores for a bertopic model
+
+        Parameters
+        ----------
+        return_df : boolean, optional
+            True to return the coherence_df. The default is False.
+        coh_method : string, optional
+            Method used to calculate coherence. Can be any method used in gensim. 
+            The default is 'u_mass'.
+        from_probs : boolean, optional
+            Whether or not to use document topic probabilities to assign topics.
+            True to use probabilities - i.e., each document can have multiple topics.
+            False to not use probabilities - i.e., each document only has one topics.
+            The default is False.
+
+        Returns
+        -------
+        coherence_df : pandas DataFrame
+            Dataframe with each row a topic, column has coherence scores.
+
+        """
         self.get_bert_coherence(coh_method, from_probs)
         self.__create_folder()
         max_topics = max([len(self.BERT_models[col].topics)-1 for col in self.BERT_models])
@@ -217,6 +339,19 @@ class Topic_Model_plus():
         coherence_df.to_csv(os.path.join(self.folder_path,path+coh_method+".csv"))
     
     def get_bert_topic_diversity(self, topk=10):
+        """
+        gets topic diversity scores for a BERTopic model
+
+        Parameters
+        ----------
+        topk : int, optional
+            Number of words per topic used to calculate diversity. The default is 10.
+
+        Returns
+        -------
+        None.
+
+        """
         topic_diversity = TopicDiversity(topk=topk)
         self.diversity = {col: [] for col in self.text_columns}
         for col in self.text_columns:
@@ -226,6 +361,22 @@ class Topic_Model_plus():
             self.diversity[col].append(score)
     
     def save_bert_topic_diversity(self, topk=10, return_df=False):
+        """
+        saves topic diversity score for a bertopic model
+        
+        Parameters
+        ----------
+        topk : int, optional
+            Number of words per topic used to calculate diversity. The default is 10.
+        return_df : boolean, optional
+            True to return the diversity_df. The default is False.
+
+        Returns
+        -------
+        diversity_df : pandas DataFrame
+            Dataframe with topic diversity score.
+
+        """
         self.get_bert_topic_diversity(topk=10)
         diversity_df = pd.DataFrame(self.diversity)
         if return_df == True:
@@ -235,6 +386,34 @@ class Topic_Model_plus():
         diversity_df.to_csv(os.path.join(self.folder_path,path+".csv"))
         
     def bert_topic(self, sentence_transformer_model=None, umap=None, hdbscan=None, count_vectorizor=None, ngram_range=(1,3), BERTkwargs={}, from_probs=True, thresh=0.01):
+        """
+        function to train a bertopic model
+
+        Parameters
+        ----------
+        sentence_transformer_model : BERT model object, optional
+            BERT model object used for embeddings. The default is None.
+        umap : umap model object, optional
+            umap model object used for dimensionality reduction. The default is None.
+        hdbscan : hdbscan model object, optional
+            hdbscan model object for clustering. The default is None.
+        count_vectorizor : count vectorizor object, optional
+            count vectorizor object that is used for ctf-idf. The default is None.
+        ngram_range : tuple, optional
+            range of ngrams to be considered. The default is (1,3).
+        BERTkwargs : dict, optional
+            dictionary of kwargs passed into bertopic. The default is {}.
+        from_probs : boolean, optional
+            true to assign topics to documents based on a probability threshold (i.e., documents can have multiple topics). 
+            The default is True.
+        thresh : float, optional
+            probability threshold used when from_probs=True. The default is 0.01.
+
+        Returns
+        -------
+        None.
+
+        """
         self.sentence_models = {}; self.embeddings = {}; self.BERT_models = {}
         self.BERT_model_topics_per_doc = {}; self.BERT_model_probs={}; self.BERT_model_all_topics_per_doc={}
         for col in self.text_columns:
@@ -274,6 +453,24 @@ class Topic_Model_plus():
             self.reduced = False
     
     def reduce_bert_topics(self, num=30, from_probs=True, thresh=0.01):
+        """
+        reduces the number of topics in a trained bertopic model to the specified number.
+
+        Parameters
+        ----------
+        num : int optional
+            number of topics in the reduced model. The default is 30.
+        from_probs : boolean, optional
+            true to assign topics to documents based on a probability threshold (i.e., documents can have multiple topics). 
+            The default is True.
+        thresh : float, optional
+            probability threshold used when from_probs=True. The default is 0.01.
+
+        Returns
+        -------
+        None.
+
+        """
         self.reduced = True
         for col in self.text_columns:
             corpus = self.data_df[col]
@@ -299,10 +496,34 @@ class Topic_Model_plus():
                         
             self.BERT_model_probs[col] = probs
             
-    def save_bert_topics(self, return_df=False, p_thres=0.001, coherence=False, coh_method='u_mass', from_probs=False):
+    def save_bert_topics(self, return_df=False, p_thres=0.0001, coherence=False, coh_method='u_mass', from_probs=False):
         """
-        saves bert topics to file
+        saves bert topics results to file
+
+        Parameters
+        ----------
+        return_df : boolean, optional
+            True to return the results dfs. The default is False.
+        p_thres : float, optional
+            word-topic probability threshold required for a word to be considered in a topic. 
+            The default is 0.0001.
+        coherence : boolean, optional
+            true to calculate coherence for the model and save the results. The default is False.
+        coh_method : string, optional
+            Method used to calculate coherence. Can be any method used in gensim. 
+            The default is 'u_mass'.
+        from_probs : boolean, optional
+            true to assign topics to documents based on a probability threshold (i.e., documents can have multiple topics). 
+            The default is True.
+
+        Returns
+        -------
+        dfs : dictionary of dataframes
+            dictionary of dataframes where each key is a text column and each value is the corresponding
+            topic model results
+
         """
+    
         #saving raw topics with coherence
         self.__create_folder()
         dfs = {}
@@ -347,6 +568,31 @@ class Topic_Model_plus():
             return dfs
     
     def save_bert_topics_from_probs(self, thresh=0.01, return_df=False, coherence=False, coh_method='u_mass', from_probs=True):
+        """
+        saves bertopic model results if using probability threshold
+
+        Parameters
+        ----------
+        thresh : float, optional
+            probability threshold used when from_probs=True. The default is 0.01.
+        return_df : boolean, optional
+            True to return the results dfs. The default is False.
+        coherence : boolean, optional
+            true to calculate coherence for the model and save the results. The default is False.
+        coh_method : string, optional
+            Method used to calculate coherence. Can be any method used in gensim. 
+            The default is 'u_mass'.
+        from_probs : boolean, optional
+            true to assign topics to documents based on a probability threshold (i.e., documents can have multiple topics). 
+            The default is True.
+
+        Returns
+        -------
+        topic_prob_dfs : dictionary of dataframes
+            dictionary of dataframes where each key is a text column and each value is the corresponding
+            topic model results
+
+        """
         topic_dfs = self.save_bert_topics(return_df=True, coherence=coherence, coh_method=coh_method, from_probs=True)
         topic_prob_dfs = self.get_bert_topics_from_probs(topic_dfs, thresh, coherence)
         if return_df == False:
@@ -360,6 +606,27 @@ class Topic_Model_plus():
             return topic_prob_dfs
         
     def get_bert_topics_from_probs(self, topic_df, thresh=0.01, coherence=False):
+        """
+        saves topic model results including each topic number, words, number of words,
+        and best document when document topics are defined by a probabilty threshold
+
+        Parameters
+        ----------
+        topic_df : dictionary of dataframes
+            dictionary of dataframes where each key is a text column and each value is the corresponding
+            topic model results
+        thresh : float, optional
+            probability threshold used when from_probs=True. The default is 0.01.
+        coherence : boolean, optional
+            true to calculate coherence for the model and save the results. The default is False.
+        
+        Returns
+        -------
+        new_topic_dfs : dictionary of dataframes
+            dictionary of dataframes where each key is a text column and each value is the corresponding
+            topic model results
+
+        """
         cols = ['topic number', 'topic words', 'number of words', 'best documents']
         if coherence == True: cols += ['coherence']
         new_topic_dfs = {col:topic_df[col][cols] for col in self.text_columns}
@@ -376,6 +643,24 @@ class Topic_Model_plus():
         return new_topic_dfs
         
     def save_bert_taxonomy(self, return_df=False, p_thres=0.0001):
+        """
+        saves a taxonomy of topics from bertopic model
+
+        Parameters
+        ----------
+        return_df : boolean, optional
+            True to return the results dfs. The default is False.
+        p_thres : float, optional
+            word-topic probability threshold required for a word to be considered in a topic. 
+            The default is 0.0001.
+
+        Returns
+        -------
+        taxonomy_df : pandas Dataframe
+            taxonomy dataframe with a column for each text column and each row a
+            unique combination of topics found in the documents
+
+        """
         self.__create_folder()
         taxonomy_data = {col:[] for col in self.text_columns}
         for col in self.text_columns:
@@ -412,6 +697,20 @@ class Topic_Model_plus():
         taxonomy_df.to_csv(file)
     
     def save_bert_document_topic_distribution(self, return_df=False):
+        """
+        saves the document topic distribution 
+
+        Parameters
+        ----------
+        return_df : boolean, optional
+            True to return the results df. The default is False.
+        
+        Returns
+        -------
+        doc_df : pandas DataFrame
+            dataframe with a row for each document and the probability for each topic 
+
+        """
         self.__create_folder()
         doc_data = {col: [] for col in self.text_columns}
         doc_data['document number'] = self.doc_ids
@@ -429,7 +728,28 @@ class Topic_Model_plus():
     def save_bert_results(self, coherence=False, coh_method='u_mass', from_probs=True, thresh=0.01, topk=10):
         """
         saves the taxonomy, coherence, and document topic distribution in one excel file
+
+        Parameters
+        ----------
+        coherence : boolean, optional
+            true to calculate coherence for the model and save the results. The default is False.
+        coh_method : string, optional
+            Method used to calculate coherence. Can be any method used in gensim. 
+            The default is 'u_mass'.
+        from_probs : boolean, optional
+            true to assign topics to documents based on a probability threshold (i.e., documents can have multiple topics). 
+            The default is True.
+        thresh : float, optional
+            probability threshold used when from_probs=True. The default is 0.01.
+        topk : int, optional
+            Number of words per topic used to calculate diversity. The default is 10.
+        
+        Returns
+        -------
+        None.
+
         """
+        
         
         self.__create_folder()
         data = {}
@@ -455,6 +775,14 @@ class Topic_Model_plus():
                 data[results].to_excel(writer2, sheet_name = result_label, index = False)
     
     def save_bert_vis(self):
+        """
+        saves the bertopic visualization and hierarchy visualization
+
+        Returns
+        -------
+        None.
+
+        """
         self.__create_folder()
         if self.reduced:
             file = os.path.join(self.folder_path, 'Reduced')
@@ -468,6 +796,27 @@ class Topic_Model_plus():
             hfig.write_html(file+'bertopics_hierarchy_viz.html')
     
     def hdp(self, training_iterations=1000, iteration_step=10, to_lda=True, kwargs={}, topic_threshold=0.0):
+        """
+        performs HDP topic modeling which is useful when the number of topics is not known
+
+        Parameters
+        ----------
+        training_iterations : int, optional
+            number of training iterations. The default is 1000.
+        iteration_step : int, optional
+            number of steps per iteration. The default is 10.
+        to_lda : boolean, optional
+            True to convert the hdp model to an lda model. The default is True.
+        kwargs : dict, optional
+            kwargs to pass into the hdp model. The default is {}.
+        topic_threshold : float, optional
+            probability threshold used when converting hdp topics to lda topics. The default is 0.0.
+
+        Returns
+        -------
+        None.
+
+        """
         start = time()
         self.hdp_models = {}
         self.hdp_coherence = {}
@@ -497,21 +846,22 @@ class Topic_Model_plus():
         
     def coherence_scores(self, mdl, lda_or_hlda, measure='c_v'):
         """
-        computes and returns coherence scores
-        
-        ARGUMENTS
-        ---------
+        computes and returns coherence scores for lda and hlda modelos
+
+        Parameters
+        ----------
         mdl : lda or hlda model object
             topic model object created previously
         lda_or_hlda : str
             denotes whether coherence is being calculated for lda or hlda
-        measure : str
-            denotes which coherence metric to compute
-            
-        RETURNS
+        measure : string, optional
+            denotes which coherence metric to compute. The default is 'c_v'.
+
+        Returns
         -------
         scores : dict
             coherence scores, averages, and std dev
+
         """
         
         scores = {}
@@ -532,6 +882,20 @@ class Topic_Model_plus():
         return scores
     
     def __create_corpus_of_ngrams(self, texts):
+        """
+        creates ngrams for a corpus using tomotopy 
+
+        Parameters
+        ----------
+        texts : list
+            list of documents in string format.
+
+        Returns
+        -------
+        corpus : tomotopy corpus object
+            tomotopy corpus object with ngrams
+
+        """
         corpus = tp.utils.Corpus()
         for text in texts:
             corpus.add_doc(text)
@@ -541,7 +905,34 @@ class Topic_Model_plus():
         corpus.concat_ngrams(cands, delimiter=' ')
         return corpus
     
-    def __find_optimized_lda_topic_num(self, col, max_topics, training_iterations=1000, iteration_step=10, thres = 0.005, **kwargs):
+    def __find_optimized_lda_topic_num(self, col, max_topics, training_iterations=1000, iteration_step=10, coh_thres = 0.005, **kwargs):
+        """
+        Under development. Used to automate the elbow method for finding the ideal
+        number of topics in lda models
+
+        Parameters
+        ----------
+        col : string
+            text column of the dataset the topic optimization is performed on
+        max_topics : int
+            maximum number of topics to consider
+        training_iterations : int, optional
+            number of training iterations. The default is 1000.
+        iteration_step : int, optional
+            number of steps per iteration. The default is 10.
+        coh_thres : float, optional
+            the threshold for the difference in coherence needed to define the best number of topics.
+            If the difference in coherence between a model with topics = k+1 and a model with
+            topics = k is less than the threshold, then k+1 is the ideal topic number.
+            The default is 0.005.
+        **kwargs : dict
+            any kwargs for the lda topic model.
+
+        Returns
+        -------
+        None.
+
+        """
         coherence = []
         LL = []
         perplexity = []
@@ -603,13 +994,37 @@ class Topic_Model_plus():
         best_index = 0
         diffs = [abs(coherence[i]-coherence[i-1]) for i in range(1, len(coherence))]
         for diff in diffs:
-            if diff<thres:
+            if diff<coh_thres:
                 best_index = diffs.index(diff)
                 break
         best_num_of_topics = topic_num[best_index]
         self.lda_num_topics[col] = best_num_of_topics
         
     def __lda_optimization(self, max_topics=200,training_iterations=1000, iteration_step=10, thres = 0.005, **kwargs):
+        """
+        runs the lda optimization for all text columns 
+
+        Parameters
+        ----------
+        max_topics : int
+            maximum number of topics to consider
+        training_iterations : int, optional
+            number of training iterations. The default is 1000.
+        iteration_step : int, optional
+            number of steps per iteration. The default is 10.
+        coh_thres : float, optional
+            the threshold for the difference in coherence needed to define the best number of topics.
+            If the difference in coherence between a model with topics = k+1 and a model with
+            topics = k is less than the threshold, then k+1 is the ideal topic number.
+            The default is 0.005.
+        **kwargs : dict
+            any kwargs for the lda topic model.
+
+        Returns
+        -------
+        None.
+
+        """
         #needs work
         start = time()
         self.lda_num_topics = {}
@@ -619,23 +1034,30 @@ class Topic_Model_plus():
         print("LDA topic optomization: ", (time()-start)/60, " minutes")
     
     def lda(self, num_topics={}, training_iterations=1000, iteration_step=10, max_topics=0, **kwargs):
+        """
+        
+
+        Parameters
+        ----------
+        num_topics : dict, optional
+            keys are columns in text_columns, values are the number of topics lda forms
+            optional - if omitted, lda optimization is run and produces the num_topics The default is {}.
+        training_iterations : int, optional
+            number of training iterations. The default is 1000.
+        iteration_step : int, optional
+            number of steps per iteration. The default is 10.
+        max_topics : int, optional
+            maximum number of topics to consider The default is 0.
+        **kwargs : dict
+            any kwargs for the lda topic model.
+
+        Returns
+        -------
+        None.
+
+        """
         # TO DO: the function of the num_topics var is not easy to understand - nd to make clearer and revise corresponding argument description in docstring
-        """
-        performs lda topic modeling
-        
-        ARGUMENTS
-        ---------
-        num_topics : dict
-            keys are values in text_columns, values are the number of topics lda forms
-            optional - if omitted, lda optimization is run and produces the num_topics
-        training_iterations : int
-            number of training iterations
-        iteration_step : int
-            iteration step size for training
-        **kwargs:
-            any key-word arguments that can be passed into the tp lda model (i.e. hyperparaters alpha, beta, eta)
-        """
-        
+
         start = time()
         self.lda_models = {}
         self.lda_coherence = {}
@@ -664,6 +1086,11 @@ class Topic_Model_plus():
     def save_lda_models(self):
         """
         saves lda models to file
+
+        Returns
+        -------
+        None.
+
         """
         self.__create_folder()
         for col in self.text_columns:
@@ -674,6 +1101,17 @@ class Topic_Model_plus():
     def save_lda_document_topic_distribution(self, return_df=False):
         """
         saves lda document topic distribution to file or returns the dataframe to another function
+
+        Parameters
+        ----------
+        return_df : boolean, optional
+            True to return the results df. The default is False.
+        
+        Returns
+        -------
+        doc_df : pandas DataFrame
+            dataframe with a row for each document and the probability for each topic
+
         """
         
         #identical to hlda function except for lda tag
@@ -692,7 +1130,18 @@ class Topic_Model_plus():
     
     def save_lda_coherence(self, return_df=False):
         """
-        saves lda coherence to file or returns the dataframe to another function
+        saves lda coherence to file or returns the dataframe to another functio
+
+        Parameters
+        ----------
+        return_df : boolean, optional
+            True to return the results df. The default is False.
+
+        Returns
+        -------
+        coherence_df : pandas DataFrame
+            Dataframe with each row a topic, column has coherence scores.
+
         """
         
         self.__create_folder()
@@ -717,6 +1166,21 @@ class Topic_Model_plus():
     def save_lda_topics(self, return_df=False, p_thres=0.001):
         """
         saves lda topics to file
+
+        Parameters
+        ----------
+        return_df : boolean, optional
+            True to return the results df. The default is False.
+        p_thres : float, optional
+            word-topic probability threshold required for a word to be considered in a topic. 
+            The default is 0.001.
+
+        Returns
+        -------
+        dfs : dictionary of dataframes
+            dictionary of dataframes where each key is a text column and each value is the corresponding
+            topic model results
+
         """
         
         #saving raw topics with coherence
@@ -764,6 +1228,22 @@ class Topic_Model_plus():
     def save_lda_taxonomy(self, return_df=False, use_labels=False, num_words=10):
         """
         saves lda taxonomy to file or returns the dataframe to another function
+
+        Parameters
+        ----------
+        return_df : boolean, optional
+            True to return the results df. The default is False.
+        use_labels : boolean, optional
+            True to use topic labels generated from tomotopy. The default is False.
+        num_words : int, optional
+            Number of words to display in the taxonomy. The default is 10.
+
+        Returns
+        -------
+        taxonomy_df : pandas Dataframe
+            Taxonomy dataframe with a column for each text column and each row a
+            unique combination of topics found in the documents
+
         """
         
         self.__create_folder()
@@ -806,8 +1286,12 @@ class Topic_Model_plus():
     def save_lda_results(self):
         """
         saves the taxonomy, coherence, and document topic distribution in one excel file
+
+        Returns
+        -------
+        None.
+
         """
-        
         self.__create_folder()
         data = {}
         topics_dict = self.save_lda_topics(return_df=True)
@@ -823,11 +1307,16 @@ class Topic_Model_plus():
     def lda_extract_models(self, file_path):
         """
         gets lda models from file
-        
-        ARGUMENTS
-        ---------
+
+        Parameters
+        ----------
         file_path : str
             path to file
+
+        Returns
+        -------
+        None.
+
         """
         self.lda_num_topics = {}
         self.lda_coherence = {}
@@ -847,13 +1336,17 @@ class Topic_Model_plus():
     def lda_visual(self, col):
         """
         saves pyLDAvis output from lda to file
-        
-        ARGUMENTS
-        ---------
+
+        Parameters
+        ----------
         col : str
             reference to column of interest
+
+        Returns
+        -------
+        None.
+
         """
-        
         self.__create_folder()
         mdl = self.lda_models[col]
         topic_term_dists = np.stack([mdl.get_topic_word_dist(k) for k in range(mdl.k)])
@@ -874,11 +1367,16 @@ class Topic_Model_plus():
     def hlda_visual(self, col):
         """
         saves pyLDAvis output from hlda to file
-        
-        ARGUMENTS
-        ---------
+
+        Parameters
+        ----------
         col : str
             reference to column of interest
+
+        Returns
+        -------
+        None.
+
         """
         self.__create_folder()
         mdl = self.hlda_models[col]
@@ -983,12 +1481,17 @@ class Topic_Model_plus():
     def save_mixed_taxonomy(self,use_labels=False):
         """
         A custom mixed lda/hlda model taxonomy. Must run lda and hlda with desired parameters first.
-        
-        ARGUMENTS
-        ---------
-        
+
+        Parameters
+        ----------
+        use_labels : boolean, optional
+            True to use topic labels. The default is False.
+
+        Returns
+        -------
+        None.
+
         """
-        
         col_for_lda = [self.text_columns[i] for i in [0,2]]
         col_for_hlda = self.text_columns[1]
         
@@ -1055,19 +1558,23 @@ class Topic_Model_plus():
     def hlda(self, levels=3, training_iterations=1000, iteration_step=10, **kwargs):
         """
         performs hlda topic modeling
-        
-        ARGUMENTS
-        ---------
-        levels : int
-            number of hierarchical levels
-        training_iterations : int
-            number of training iterations
-        iteration_step : int
-            iteration step size for training
-        **kwargs:
-            any key-word arguments that can be passed into the tp lda model (i.e. hyperparaters alpha, gamma, eta)
+
+        Parameters
+        ----------
+        levels : int, optional
+            number of hierarchical levels. The default is 3.
+        training_iterations : int, optional
+            number of training iterations. The default is 1000.
+        iteration_step : int, optional
+            number of steps per iteration. The default is 10.
+        **kwargs : dict
+            any kwargs for the hlda topic model
+
+        Returns
+        -------
+        None.
+
         """
-        
         start = time()
         self.hlda_models = {}
         self.hlda_coherence = {}
@@ -1094,6 +1601,17 @@ class Topic_Model_plus():
     def save_hlda_document_topic_distribution(self, return_df=False):
         """
         saves hlda document topic distribution to file
+
+        Parameters
+        ----------
+        return_df : boolean, optional
+            True to return the results df. The default is False.
+        
+        Returns
+        -------
+        doc_df : pandas DataFrame
+            dataframe with a row for each document and the probability for each topic
+
         """
         
         self.__create_folder()
@@ -1112,6 +1630,11 @@ class Topic_Model_plus():
     def save_hlda_models(self):
         """
         saves hlda models to file
+        
+        Returns
+        -------
+        None.
+
         """
         self.__create_folder()
         for col in self.text_columns:
@@ -1123,6 +1646,21 @@ class Topic_Model_plus():
     def save_hlda_topics(self, return_df=False, p_thres=0.001):
         """
         saves hlda topics to file
+
+        Parameters
+        ----------
+        return_df : boolean, optional
+            True to return the results df. The default is False.
+        p_thres : float, optional
+            word-topic probability threshold required for a word to be considered in a topic. 
+            The default is 0.001.
+
+        Returns
+        -------
+        dfs : dictionary of dataframes
+            dictionary of dataframes where each key is a text column and each value is the corresponding
+            topic model results
+
         """
         #saving raw topics with coherence
         self.__create_folder()
@@ -1174,6 +1712,17 @@ class Topic_Model_plus():
     def save_hlda_coherence(self, return_df=False):
         """
         saves hlda coherence to file
+
+        Parameters
+        ----------
+        return_df : boolean, optional
+            True to return the results df. The default is False.
+
+        Returns
+        -------
+        coherence_df : pandas DataFrame
+            Dataframe with each row a topic, column has coherence scores.
+
         """
         self.__create_folder()
         coherence_data = {}
@@ -1196,6 +1745,22 @@ class Topic_Model_plus():
     def save_hlda_taxonomy(self, return_df=False, use_labels=False, num_words=10):
         """
         saves hlda taxonomy to file
+
+        Parameters
+        ----------
+        return_df : boolean, optional
+            True to return the results df. The default is False.
+        use_labels : boolean, optional
+            True to use topic labels generated from tomotopy. The default is False.
+        num_words : int, optional
+            Number of words to display in the taxonomy. The default is 10.
+
+        Returns
+        -------
+        taxonomy_df : pandas Dataframe
+            Taxonomy dataframe with a column for each text column and each row a
+            unique combination of topics found in the documents
+
         """
         
         self.__create_folder()
@@ -1236,12 +1801,21 @@ class Topic_Model_plus():
     
     def save_hlda_level_n_taxonomy(self, lev=1, return_df=False):
         """
-        saves hlda taxonomy at level n
-        
-        ARGUMENTS
-        ---------
-        lev : int
-            level number to save
+        aves hlda taxonomy at level n
+
+        Parameters
+        ----------
+        lev : int, optional
+            the level number to save. The default is 1.
+        return_df : boolean, optional
+            True to return the results df. The default is False.
+
+        Returns
+        -------
+        taxonomy_level_df : pandas Dataframe
+            Taxonomy dataframe with a column for each text column and each row a
+            unique combination of topics found in the documents
+
         """
         
         self.__create_folder()
@@ -1275,8 +1849,13 @@ class Topic_Model_plus():
     def save_hlda_results(self):
         """
         saves the taxonomy, level 1 taxonomy, raw topics coherence, and document topic distribution in one excel file
-        """
         
+
+        Returns
+        -------
+        None.
+
+        """
         self.__create_folder()
         data = {}
         data["taxonomy"] = self.save_hlda_taxonomy(return_df=True)
@@ -1293,13 +1872,17 @@ class Topic_Model_plus():
     def hlda_extract_models(self, file_path):
         """
         gets hlda models from file
-        
-        ARGUMENTS
-        ---------
-        file_path : str
+
+        Parameters
+        ----------
+        file_path : string
             path to file
+
+        Returns
+        -------
+        None.
+
         """
-        
         #TO DO: add extract preprocessed data, use existing folder
         self.hlda_models = {}
         self.hlda_coherence = {}
@@ -1316,28 +1899,34 @@ class Topic_Model_plus():
         self.folder_path = file_path
         
     def hlda_display(self, col, num_words = 5, display_options={"level 1": 1, "level 2": 6}, colors='bupu', filename=''):
-        # TO DO: levels/level/lev are used inconsistently as params throughout this class
         """
         saves graphviz visualization of hlda tree structure
-        
-        ARGUMENTS
-        ---------
-        col : str
+
+        Parameters
+        ----------
+        col : string
             column of interest
-        num_words : int
-            number of words per node
-        display_options : dict, nested
-            keys are levels, values are max nodes
-            {"level 1": n} n is the max number over level 1 nodes
-        colors: str
+        num_words : int, optional
+            number of words per node. The default is 5.
+        display_options : dictionary, optional
+            nested dictiary where keys are levels and values are the max number of nodes. 
+            The default is {"level 1": 1, "level 2": 6}.
+        colors : string, optional
             brewer colorscheme used, default is blue-purple
-            see http://graphviz.org/doc/info/colors.html#brewer for options
-        filename: str
+            see http://graphviz.org/doc/info/colors.html#brewer for options. 
+            The default is 'bupu'.
+        filename : string, optional
             can input a filename for where the topics are stored in order to make display 
-            after hlda; must be an ouput from "save_hlda_topics()" or hlda.bin object
-        
+            after hlda; must be an ouput from "save_hlda_topics()" or hlda.bin object. 
+            The default is ''.
+
+        Returns
+        -------
+        None.
+
         """
-        
+        # TO DO: levels/level/lev are used inconsistently as params throughout this class
+        #filename arg is weird....
         try:
             from graphviz import Digraph
         except ImportError as error:
