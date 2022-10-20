@@ -106,7 +106,7 @@ args = TrainingArguments(
     push_to_hub=False,
     per_device_train_batch_size = 8,#256,
     per_device_eval_batch_size = 8,#256,
-    save_steps = 100,
+    save_steps = 10,
     logging_steps = 100,
     eval_steps = 1000,
     save_total_limit = 3, #saves only last 3 checkpoints
@@ -124,8 +124,14 @@ trainer = Trainer(
     data_collator=data_collator,
     tokenizer=tokenizer,
 )
-
-train_result = trainer.train()
+rootdir = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),"models", "SafeAeroBERT")
+checkpoints = []
+for subdir, dirs, files in os.walk(rootdir):
+    if 'checkpoint' in subdir: 
+        checkpoints.append(subdir.split("-")[-1])
+most_recent_checkpoint = max(checkpoints)
+checkpoint = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),"models", "SafeAeroBERT", "checkpoint-"+most_recent_checkpoint)
+train_result = trainer.train(checkpoint)
 trainer.save_model()
 #final_train_metrics = train_result.metrics
 metrics=trainer.evaluate()
