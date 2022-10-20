@@ -2,7 +2,8 @@
 @author: hswalsh
 """
 
-import os
+import sys, os
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)),"..","..",".."))
 import pandas as pd
 import numpy as np
 from sentence_transformers import SentenceTransformer, losses, InputExample, util, evaluation
@@ -43,7 +44,7 @@ train_loss = losses.CosineSimilarityLoss(model=model)
 evaluator = evaluation.EmbeddingSimilarityEvaluator(llis_validate_sent1, llis_validate_sent2, llis_validate_label)
 
 # fine tune model
-num_epochs = 2 # takes approx. 1 day per epoch on my macbook
+num_epochs = 2
 warmup_steps = 0
 model_save_path = os.path.join('models', 'fine_tuned_llis_model')
 model.fit(train_objectives=[(train_dataloader, train_loss)], epochs=num_epochs, evaluation_steps=100, evaluator=evaluator, warmup_steps=warmup_steps, output_path=model_save_path)

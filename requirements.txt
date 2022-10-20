@@ -1,7 +1,5 @@
 pandas
-tomotopy
 numpy
-time
 tqdm
 datetime
 nltk
@@ -10,4 +8,8 @@ pyLDAvis
 matplotlib
 sklearn
 symspellpy
-collections
+collection
+python-time
+tomotopy
+torch
+openpyxl

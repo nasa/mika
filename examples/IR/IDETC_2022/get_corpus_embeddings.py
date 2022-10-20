@@ -2,7 +2,8 @@
 @author: hswalsh
 """
 
-import os
+import sys, os
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)),"..","..",".."))
 import pandas as pd
 import numpy as np
 from sentence_transformers import SentenceTransformer
@@ -12,7 +13,7 @@ import time
 
 # pick your model - comment out one
 #model = SentenceTransformer('msmarco-roberta-base-v3') # this is the model we are starting with and would like to fine tune further; possibly check input sequence length as well
-model = SentenceTransformer(os.path.join('results', 'fine_tuned_llis_model')) # fine tuned model
+model = SentenceTransformer(os.path.join('models', 'fine_tuned_llis_model')) # fine tuned model
 
 # load LLIS data for fine-tuning
 llis_filename = os.path.join('data','LLIS','lessons_learned_2021-12-10.xlsx')

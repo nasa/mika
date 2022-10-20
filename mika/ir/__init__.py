@@ -6,3 +6,4 @@ __init__ file to import all IR functions and classes
 @author: srandrad
 """
 
+from mika.ir.search import search
