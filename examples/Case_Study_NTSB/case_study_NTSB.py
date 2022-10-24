@@ -9,6 +9,9 @@ import pandas as pd
 from mika.utils import Data
 from mika.ir import search
 from datetime import datetime as dt
+from mika.kd.topic_model_plus import Topic_Model_plus
+from mika.kd import trend_analysis
+from mika.kd import NER
 
 # before loading data, grab only recent reports and save as a new csv
 ntsb_filepath = os.path.join("data/NTSB/ntsb_full.csv")
@@ -40,8 +43,8 @@ print(ir_ntsb.run_search(query,return_k=5))
 
 # taxonomy
 # - narr_cause and narr_accf/narr_accp - these are in ntsb_full_narratives.csv
-# tm = Topic_Model_plus(text_columns=ntsb_text_columns, data=ntsb_data)
-#
+tm = Topic_Model_plus(text_columns=ntsb_text_columns, data=ntsb_data)
+
 # NER for FMEA
 # - rows: event table
 # - severities: injuries table

@@ -13,3 +13,8 @@ python-time
 tomotopy
 torch
 openpyxl
+bertopic
+octis
+datasets
+seaborn
+wordcloud
