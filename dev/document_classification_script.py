@@ -16,6 +16,8 @@ import sys, os
 from torch import cuda
 sys.path.append(os.path.join(".."))
 from mika.utils import Data
+
+os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 
@@ -74,7 +76,7 @@ def train_test_model(ASRS_df, contributing_factors, models, train_size, test_siz
     tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
     for model_checkpoint in models:
         for contributing_factor in contributing_factors:
-            print(model_checkpoint, "-----", "contributing_factor")
+            print(model_checkpoint, "-----", contributing_factor)
             cuda.empty_cache()
             classification_model = AutoModelForSequenceClassification.from_pretrained(model_checkpoint, num_labels=2)
             encoded_dataset = prepare_data(X_train, y_train, X_val, y_val, X_test, y_test, contributing_factor, tokenizer)
