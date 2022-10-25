@@ -57,11 +57,12 @@ print("created new df of just text")
 text_df = pd.DataFrame({'Text':text})
 text_df = text_df.dropna().reset_index(drop=True)
 #text_df = text_df[:2000]
+train_dataset = text_df
 # set up train and eval dataset
-train_size=0.9
-train_dataset = text_df.sample(frac=train_size,random_state=200)
-test_dataset = text_df.drop(train_dataset.index).reset_index(drop=True)
-train_dataset = train_dataset.reset_index(drop=True)
+#train_size=0.9
+#train_dataset = text_df.sample(frac=train_size,random_state=200)
+#test_dataset = text_df.drop(train_dataset.index).reset_index(drop=True)
+#train_dataset = train_dataset.reset_index(drop=True)
 
 print("defined training and test set")
 def tokenize(text_df, tokenizer):
@@ -75,17 +76,18 @@ train_data = Dataset.from_pandas(train_dataset).map(tokenize,
     fn_kwargs={'tokenizer':tokenizer},
     remove_columns=['Text'])
 
-test_data = Dataset.from_pandas(test_dataset).map(tokenize,
-    fn_kwargs={'tokenizer':tokenizer},
-    remove_columns=['Text'])
+num_tokens = sum([len(tokens) for tokens in train_data['tokens']])
+#test_data = Dataset.from_pandas(test_dataset).map(tokenize,
+#    fn_kwargs={'tokenizer':tokenizer},
+#    remove_columns=['Text'])
 
 print("tokenized data")
 
-test_labels = Dataset.from_pandas(pd.DataFrame({'labels':test_data['input_ids'].copy()}))
+#test_labels = Dataset.from_pandas(pd.DataFrame({'labels':test_data['input_ids'].copy()}))
 train_labels = Dataset.from_pandas(pd.DataFrame({'labels':train_data['input_ids'].copy()}))
-test_data = concatenate_datasets([test_data, test_labels], axis=1)
+#test_data = concatenate_datasets([test_data, test_labels], axis=1)
 train_data = concatenate_datasets([train_data, train_labels], axis=1)
-test_data.set_format("torch")
+#test_data.set_format("torch")
 train_data.set_format("torch")
 #initiating model
 model = AutoModelForMaskedLM.from_pretrained(model_checkpoint)
@@ -98,7 +100,7 @@ print(model.device)
 data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer)
 args = TrainingArguments(
     os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),"models/SafeAeroBERT"),
-    evaluation_strategy="steps",
+    #evaluation_strategy="steps",
     save_strategy="steps",
     learning_rate=1e-5,
     num_train_epochs=10,
@@ -108,7 +110,7 @@ args = TrainingArguments(
     per_device_eval_batch_size = 8,#256,
     save_steps = 10,
     logging_steps = 100,
-    eval_steps = 1000,
+    #eval_steps = 1000,
     save_total_limit = 3, #saves only last 3 checkpoints
     gradient_accumulation_steps=16,#64,
     gradient_checkpointing=True,
@@ -120,7 +122,7 @@ trainer = Trainer(
     model=model,
     args=args,
     train_dataset=train_data,
-    eval_dataset=test_data,
+    #eval_dataset=test_data,
     data_collator=data_collator,
     tokenizer=tokenizer,
 )
@@ -128,7 +130,7 @@ rootdir = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),"mo
 checkpoints = []
 for subdir, dirs, files in os.walk(rootdir):
     if 'checkpoint' in subdir: 
-        checkpoints.append(subdir.split("-")[-1])
+        checkpoints.append(int(subdir.split("-")[-1]))
 most_recent_checkpoint = max(checkpoints)
 checkpoint = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),"models", "SafeAeroBERT", "checkpoint-"+most_recent_checkpoint)
 train_result = trainer.train(checkpoint)

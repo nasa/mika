@@ -297,7 +297,7 @@ class Data():
 
         """
         dfs = []
-        for i in range(len(self.data_df)):
+        for i in tqdm(range(len(self.data_df)), "Sentence Tokenization…"):
             sentences_for_doc = {col:[] for col in self.text_columns}
             for col in self.text_columns:
                 text = self.data_df.at[i, col]
@@ -307,7 +307,6 @@ class Data():
                                           if j <= len(punctuation)-1
                                           else sentences_for_doc[col][j].strip(" ")
                                           for j in range(len(sentences_for_doc[col]))]
-                #sentences_for_doc[col] = #text.split(".")
             num_rows = max([len(sentences_for_doc[col]) for col in self.text_columns])
             for col in self.text_columns:
                 while len(sentences_for_doc[col])<num_rows:
