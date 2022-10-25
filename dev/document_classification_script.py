@@ -26,7 +26,8 @@ contributing_factors = ['Human Factors', #'Weather', #'Software and Automation',
                         ]#'Environment - Non Weather Related']
 checkpoint = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),"models", "SafeAeroBERT", "checkpoint-1000")
 
-model_checkpoints = ["allenai/scibert_scivocab_uncased", "bert-base-uncased", checkpoint] #add safeaerbert
+model_checkpoints = [#"allenai/scibert_scivocab_uncased", 
+                     "bert-base-uncased", checkpoint] #add safeaerbert
 
 def train_classifier(tokenizer, model, encoded_dataset, contributing_factor, compute_metrics, batch_size=8):
     args = TrainingArguments(
