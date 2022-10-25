@@ -9,4 +9,3 @@ from mika.utils import SAFECOM
 from mika.utils import LLIS
 from mika.utils import SAFENET
 from mika.utils.Data import Data
-from mika.utils.remove_nans import remove_nans
