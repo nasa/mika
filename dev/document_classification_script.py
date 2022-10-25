@@ -16,6 +16,8 @@ import sys, os
 from torch import cuda
 sys.path.append(os.path.join(".."))
 from mika.utils import Data
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
 
 contributing_factors = ['Human Factors', #'Weather', #'Software and Automation', 
                         'Procedure', #'Airport', 'Airspace Structure', 
@@ -33,10 +35,10 @@ def train_classifier(tokenizer, model, encoded_dataset, contributing_factor, com
     learning_rate=1e-3,
     per_device_train_batch_size=batch_size,
     per_device_eval_batch_size=batch_size,
-    num_train_epochs=5,
+    num_train_epochs=10,
     weight_decay=0.01,
     push_to_hub=False,
-    gradient_accumulation_steps=4,
+    gradient_accumulation_steps=16,
     gradient_checkpointing=True,
     fp16=True,
     optim="adafactor"
