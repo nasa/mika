@@ -20,7 +20,6 @@ from gensim.models import Phrases
 from symspellpy import SymSpell, Verbosity
 import pkg_resources
 import re
-from mika.utils.remove_nans import remove_nans
 
 class Data():
     def __init__(self, name=""):
