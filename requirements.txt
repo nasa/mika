@@ -13,6 +13,7 @@ python-time
 tomotopy
 torch
 openpyxl
+joblib==1.1.0
 bertopic
 octis
 datasets

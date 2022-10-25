@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import normalize
 from symspellpy import SymSpell, Verbosity
 import pkg_resources
-#from bertopic import BERTopic
+from bertopic import BERTopic
 from sentence_transformers import SentenceTransformer
 import gensim.corpora as corpora
 from gensim.models.coherencemodel import CoherenceModel

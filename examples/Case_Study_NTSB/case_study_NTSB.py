@@ -12,6 +12,7 @@ from datetime import datetime as dt
 from mika.kd.topic_model_plus import Topic_Model_plus
 from mika.kd import trend_analysis
 from mika.kd import NER
+from sklearn.feature_extraction.text import CountVectorizer
 
 # before loading data, grab only recent reports and save as a new csv
 ntsb_filepath = os.path.join("data/NTSB/ntsb_full.csv")
@@ -44,6 +45,20 @@ print(ir_ntsb.run_search(query,return_k=5))
 # taxonomy
 # - narr_cause and narr_accf/narr_accp - these are in ntsb_full_narratives.csv
 tm = Topic_Model_plus(text_columns=ntsb_text_columns, data=ntsb_data)
+vectorizer_model = CountVectorizer(ngram_range=(1, 3), stop_words="english") #removes stopwords
+#tm.bert_topic(sentence_transformer_model=None, umap=None, hdbscan=None, count_vectorizor=vectorizer_model, ngram_range=(1,3), BERTkwargs={}, from_probs=False, thresh=0.01)
+#tm.save_bert_model()
+
+BERTkwargs={"calculate_probabilities":True, "top_n_words": 20, 'min_topic_size':150}
+tm.bert_topic(count_vectorizor=vectorizer_model, BERTkwargs=BERTkwargs, from_probs=True)
+tm.save_bert_results(from_probs=True) #warning: saving in excel can result in missing data when char limit is reached
+tm.save_bert_topics_from_probs()
+
+#get coherence
+tm.save_bert_coherence(coh_method='c_v')
+tm.save_bert_coherence(coh_method='c_npmi')
+tm.save_bert_vis()
+tm.save_bert_model()
 
 # NER for FMEA
 # - rows: event table

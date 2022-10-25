@@ -33,10 +33,11 @@ filename = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.
 #llis_data.save()
 llis_data = Data()
 filepath = os.path.join('data/LLIS')
-llis_data.load(os.path.join(filepath, 'preprocessed_data_LLIS.csv'), preprocessed=True, text_columns=text_columns, id_col=document_id_col, name=database_name)
+llis_data.load(os.path.join(filepath, 'useable_LL.csv'), preprocessed=False, text_columns=text_columns, id_col=document_id_col, name=database_name)
 
 # creating object
 tm = Topic_Model_plus(text_columns=text_columns, data=llis_data)
+tm.bert_topic(sentence_transformer_model=None, umap=None, hdbscan=None, count_vectorizor=None, ngram_range=(1,3), BERTkwargs={}, from_probs=False, thresh=0.01)
 # perform lda: can pass in any parameter used in tp model
 # parameters: optional
 #tm.lda(min_df=2, min_cf=4, num_topics=num_topics, training_iterations=1000)
