@@ -26,7 +26,7 @@ contributing_factors = ['Human Factors', #'Weather', #'Software and Automation',
                         ]#'Environment - Non Weather Related']
 checkpoint = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),"models", "SafeAeroBERT", "checkpoint-1000")
 
-model_checkpoints = [#"allenai/scibert_scivocab_uncased", 
+model_checkpoints = ["allenai/scibert_scivocab_uncased", 
                      "bert-base-uncased", checkpoint] #add safeaerbert
 
 def train_classifier(tokenizer, model, encoded_dataset, contributing_factor, compute_metrics, batch_size=8):
@@ -66,7 +66,7 @@ def evaluate_test_set(trainer, encoded_dataset, data_type, average='weighted'):
     accuracy = accuracy_score(labels, y_pred)
     return precision, recall, fscore, accuracy
 
-def train_test_model(ASRS_df, contributing_factors, models, train_size, test_size, val_size, compute_metrics, save_results=False):
+def train_test_model(ASRS_df, contributing_factors, models, train_size, test_size, val_size, compute_metrics, save_results=False, batch_size=2):
     test_results = {model: [] for model in models}
     train_results = {model: [] for model in models}
     val_results = {model: [] for model in models}
@@ -81,7 +81,7 @@ def train_test_model(ASRS_df, contributing_factors, models, train_size, test_siz
             classification_model = AutoModelForSequenceClassification.from_pretrained(model_checkpoint, num_labels=2)
             encoded_dataset = prepare_data(X_train, y_train, X_val, y_val, X_test, y_test, contributing_factor, tokenizer)
             classification_model.to('cuda')
-            trainer = train_classifier(tokenizer, classification_model, encoded_dataset, contributing_factor, compute_metrics, batch_size=2)
+            trainer = train_classifier(tokenizer, classification_model, encoded_dataset, contributing_factor, compute_metrics, batch_size=batch_size)
             precision, recall, fscore, accuracy = evaluate_test_set(trainer, encoded_dataset, data_type='test', average='weighted')
             test_results[model_checkpoint].append(accuracy)
             test_results[model_checkpoint].append(precision)
@@ -210,4 +210,4 @@ ASRS.load(ASRS_file, id_col=ASRS_id_col, text_columns=ASRS_text_cols)
 ASRS.prepare_data(combine_columns=ASRS_text_cols, remove_incomplete_rows=False)
 ASRS_df = ASRS.data_df
 
-test_results_df, train_results_df, val_results_df, combined_results = train_test_model(ASRS_df, contributing_factors, model_checkpoints, train_size=4000, test_size=500, val_size=500, compute_metrics=compute_metrics, save_results=True)
+test_results_df, train_results_df, val_results_df, combined_results = train_test_model(ASRS_df, contributing_factors, model_checkpoints, train_size=4000, test_size=500, val_size=500, compute_metrics=compute_metrics, save_results=True, batch_size=8)
