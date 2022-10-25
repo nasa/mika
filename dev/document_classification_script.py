@@ -17,7 +17,6 @@ from torch import cuda
 sys.path.append(os.path.join(".."))
 from mika.utils import Data
 
-os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 
