@@ -28,7 +28,8 @@ ntsb_data = Data()
 ntsb_text_columns = ['narr_accf'] # narrative accident final and narrative accident cause
 ntsb_document_id_col = 'ev_id'
 ntsb_database_name = 'NTSB'
-ntsb_data.load(ntsb_recent_filepath, preprocessed=False, text_columns=ntsb_text_columns, id_col=ntsb_document_id_col, name=ntsb_database_name) # way to load as str?
+ntsb_data.load(ntsb_recent_filepath, preprocessed=False, text_columns=ntsb_text_columns, id_col=ntsb_document_id_col, name=ntsb_database_name,preprocessed_kwargs={'dtype':str}) # way to load as str?
+ntsb_data.prepare_data()
 
 # IR
 # there are options here to use pretrained or finetuned models - comment out appropriate lines as needed
