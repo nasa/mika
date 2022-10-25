@@ -32,8 +32,8 @@ filename = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.
 #llis_.preprocess_data(percent=.3, domain_stopwords=stopwords, ngrams=False, quot_correction=True, min_count=3) # min_count should be equivalent to min_cf in tm.lda
 #llis_data.save()
 llis_data = Data()
-filepath = os.path.join('LLIS_topics_Dec-03-2021')
-llis_data.load(os.path.join(filepath, 'preprocessed_data.csv'), preprocessed=True, text_columns=text_columns, id_col=document_id_col, name=database_name)
+filepath = os.path.join('data/LLIS')
+llis_data.load(os.path.join(filepath, 'preprocessed_data_LLIS.csv'), preprocessed=True, text_columns=text_columns, id_col=document_id_col, name=database_name)
 
 # creating object
 tm = Topic_Model_plus(text_columns=text_columns, data=llis_data)
@@ -48,15 +48,15 @@ tm = Topic_Model_plus(text_columns=text_columns, data=llis_data)
 #tm.save_hlda_models()
 #tm.save_hlda_results()
 
-tm.lda_extract_models(filepath)
-tm.hlda_extract_models(filepath)
+#tm.lda_extract_models(filepath)
+#tm.hlda_extract_models(filepath)
 
 # label - need to add a way to save these
-tm.label_lda_topics(extractor_min_cf=3, extractor_min_df=2, extractor_max_len=5, extractor_max_cand=10000, labeler_min_df=1, labeler_smoothing=1e-2, labeler_mu=0.3, label_top_n=1)
-tm.label_hlda_topics(extractor_min_cf=3, extractor_min_df=2, extractor_max_len=5, extractor_max_cand=10000, labeler_min_df=1, labeler_smoothing=1e-2, labeler_mu=0.3, label_top_n=1) # these settings worked at least once: extractor_min_cf=3, extractor_min_df=2, extractor_max_len=5, extractor_max_cand=10000, labeler_min_df=1, labeler_smoothing=1e-2, labeler_mu=0.3, label_top_n=1
+#tm.label_lda_topics(extractor_min_cf=3, extractor_min_df=2, extractor_max_len=5, extractor_max_cand=10000, labeler_min_df=1, labeler_smoothing=1e-2, labeler_mu=0.3, label_top_n=1)
+#tm.label_hlda_topics(extractor_min_cf=3, extractor_min_df=2, extractor_max_len=5, extractor_max_cand=10000, labeler_min_df=1, labeler_smoothing=1e-2, labeler_mu=0.3, label_top_n=1) # these settings worked at least once: extractor_min_cf=3, extractor_min_df=2, extractor_max_len=5, extractor_max_cand=10000, labeler_min_df=1, labeler_smoothing=1e-2, labeler_mu=0.3, label_top_n=1
 
 # save desired taxonomy
-tm.save_mixed_taxonomy(use_labels=True)
+#tm.save_mixed_taxonomy(use_labels=True)
 
 # save visuals
 #tm.lda_visual('Lesson(s) Learned')
