@@ -29,7 +29,7 @@ checkpoint = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),
 model_checkpoints = ["allenai/scibert_scivocab_uncased", 
                      "bert-base-uncased", checkpoint] #add safeaerbert
 
-def train_classifier(tokenizer, model, encoded_dataset, contributing_factor, compute_metrics, batch_size=8):
+def train_classifier(tokenizer, model, encoded_dataset, contributing_factor, compute_metrics, batch_size=4):
     args = TrainingArguments(
     f"{contributing_factor}-finetuned",
     evaluation_strategy = "epoch",
@@ -40,7 +40,7 @@ def train_classifier(tokenizer, model, encoded_dataset, contributing_factor, com
     num_train_epochs=5,
     weight_decay=0.01,
     push_to_hub=False,
-    gradient_accumulation_steps=16,
+    gradient_accumulation_steps=8,
     gradient_checkpointing=True,
     fp16=True,
     optim="adafactor"
@@ -210,4 +210,4 @@ ASRS.load(ASRS_file, id_col=ASRS_id_col, text_columns=ASRS_text_cols)
 ASRS.prepare_data(combine_columns=ASRS_text_cols, remove_incomplete_rows=False)
 ASRS_df = ASRS.data_df
 
-test_results_df, train_results_df, val_results_df, combined_results = train_test_model(ASRS_df, contributing_factors, model_checkpoints, train_size=4000, test_size=500, val_size=500, compute_metrics=compute_metrics, save_results=True, batch_size=8)
+test_results_df, train_results_df, val_results_df, combined_results = train_test_model(ASRS_df, contributing_factors, model_checkpoints, train_size=4000, test_size=500, val_size=500, compute_metrics=compute_metrics, save_results=True, batch_size=4)
