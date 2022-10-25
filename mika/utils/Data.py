@@ -208,7 +208,8 @@ class Data():
             for col in combine_columns:
                 if text != "":
                     text += ". " 
-                text += str(self.data_df.iloc[i][col])
+                #col_text = self.data_df.at[i, col]
+                text += str(self.data_df.at[i, col])
             combined_text.append(text)
         self.data_df["Combined Text"] = combined_text
         self.combined_text_col = ["Combined Text"]
@@ -302,7 +303,10 @@ class Data():
                 text = self.data_df.at[i, col]
                 punctuation = re.findall('[.!?]', text)
                 sentences_for_doc[col] = list(filter(None, re.split('[.!?]', text)))
-                sentences_for_doc[col] = [sentences_for_doc[col][i].strip(" ")+punctuation[i] for i in range(len(sentences_for_doc[col]))]
+                sentences_for_doc[col] = [sentences_for_doc[col][j].strip(" ")+punctuation[j] 
+                                          if j <= len(punctuation)-1
+                                          else sentences_for_doc[col][j].strip(" ")
+                                          for j in range(len(sentences_for_doc[col]))]
                 #sentences_for_doc[col] = #text.split(".")
             num_rows = max([len(sentences_for_doc[col]) for col in self.text_columns])
             for col in self.text_columns:

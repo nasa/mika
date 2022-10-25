@@ -341,16 +341,17 @@ class test_Data(unittest.TestCase):
         return
     
     def test_sentence_tokenization(self):
-        sentence_df = pd.DataFrame({'text':['the quick brown fox jumps over the lazy dog. Hello, world! How vexingly quick daft zebras jump!'],
+        sentence_df = pd.DataFrame({'text':['the quick brown fox jumps over the lazy dog. Hello, world! How vexingly quick daft zebras jump! Hello, world'],
                        'id':[1]})
         self.test_class.data_df = sentence_df
         self.test_class.id_col = self.test_id_col
         self.test_class.text_columns = ['text']
-        correct_df = sentence_df = pd.DataFrame({'text':['the quick brown fox jumps over the lazy dog. Hello, world! How vexingly quick daft zebras jump!' for i in range(3)],
-                                                 'id':[1, 1, 1],
+        correct_df = sentence_df = pd.DataFrame({'text':['the quick brown fox jumps over the lazy dog. Hello, world! How vexingly quick daft zebras jump! Hello, world' for i in range(4)],
+                                                 'id':[1, 1, 1, 1],
                                                  'text Sentences':['the quick brown fox jumps over the lazy dog.',
                                                                    'Hello, world!',
-                                                                   'How vexingly quick daft zebras jump!']})
+                                                                   'How vexingly quick daft zebras jump!',
+                                                                   'Hello, world']})
         self.test_class.sentence_tokenization()
         pd.testing.assert_frame_equal(self.test_class.data_df, correct_df)
     
