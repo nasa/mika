@@ -4,8 +4,8 @@ Created on Wed Feb 24 16:40:39 2021
 
 @author: srandrad
 """
-import sys
-import os
+import sys, os
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)),"..","..",".."))
 from mika.kd import Topic_Model_plus
 from mika.utils import Data
 
