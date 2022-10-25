@@ -33,7 +33,7 @@ def train_classifier(tokenizer, model, encoded_dataset, contributing_factor, com
     args = TrainingArguments(
     f"{contributing_factor}-finetuned",
     evaluation_strategy = "epoch",
-    save_strategy = "no",
+    save_strategy = "steps",
     learning_rate=1e-3,
     per_device_train_batch_size=batch_size,
     per_device_eval_batch_size=batch_size,
@@ -41,6 +41,7 @@ def train_classifier(tokenizer, model, encoded_dataset, contributing_factor, com
     weight_decay=0.01,
     push_to_hub=False,
     gradient_accumulation_steps=8,
+    save_steps= 10,
     gradient_checkpointing=True,
     fp16=True,
     optim="adafactor"
