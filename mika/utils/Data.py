@@ -20,6 +20,7 @@ from gensim.models import Phrases
 from symspellpy import SymSpell, Verbosity
 import pkg_resources
 import re
+from mika.utils.remove_nans import remove_nans
 
 class Data():
     def __init__(self, name=""):
@@ -47,6 +48,7 @@ class Data():
             file name for extracting data
         """
         self.data_df = pd.read_csv(filename)
+        self.data_df = self.data_df.fillna('')
         if tokenized == True:
             self.data_df[self.text_columns] = self.data_df[self.text_columns].applymap(lambda y: self.__remove_quote_marks(y))
         if drop_duplicates == True:
@@ -67,6 +69,7 @@ class Data():
             self.data_df = pd.read_excel(filename, **kwargs)
         cols_to_drop = [col for col in self.data_df.columns if "Unnamed" in col]
         self.data_df = self.data_df.drop(cols_to_drop, axis=1)
+        self.data_df = self.data_df.fillna('')
     
     def load(self, filename, preprocessed=False, id_col=None, text_columns=[], name='', load_kwargs={}, preprocessed_kwargs={}):
         self.text_columns = text_columns

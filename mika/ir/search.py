@@ -1,5 +1,5 @@
 # hswalsh
-from mika.utils import remove_nans
+#from mika.utils.remove_nans import remove_nans
 from sentence_transformers import SentenceTransformer, util
 from nltk.tokenize import sent_tokenize
 import numpy as np
@@ -24,7 +24,7 @@ class search():
         
         self.corpus = [data.data_df[col].tolist() for col in self.cols]
         self.corpus = [item for sublist in self.corpus for item in sublist]
-        self.corpus = remove_nans(self.corpus)
+        #self.corpus = remove_nans(self.corpus)
         self.__make_sentence_corpus()
         return
     
