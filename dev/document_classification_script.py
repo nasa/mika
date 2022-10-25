@@ -37,7 +37,7 @@ def train_classifier(tokenizer, model, encoded_dataset, contributing_factor, com
     learning_rate=1e-3,
     per_device_train_batch_size=batch_size,
     per_device_eval_batch_size=batch_size,
-    num_train_epochs=10,
+    num_train_epochs=5,
     weight_decay=0.01,
     push_to_hub=False,
     gradient_accumulation_steps=16,
