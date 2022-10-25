@@ -29,8 +29,8 @@ ntsb_text_columns = ['narr_accf'] # narrative accident final and narrative accid
 ntsb_document_id_col = 'ev_id'
 ntsb_database_name = 'NTSB'
 ntsb_data.load(ntsb_recent_filepath, preprocessed=False, text_columns=ntsb_text_columns, id_col=ntsb_document_id_col, name=ntsb_database_name,preprocessed_kwargs={'dtype':str}) # way to load as str?
-ntsb_data.prepare_data()
-
+ntsb_data.prepare_data(create_ids=True, combine_columns=ntsb_text_columns, remove_incomplete_rows=False)
+    
 # IR
 # there are options here to use pretrained or finetuned models - comment out appropriate lines as needed
 model = os.path.join('models', 'fine_tuned_llis_model')
@@ -52,14 +52,7 @@ vectorizer_model = CountVectorizer(ngram_range=(1, 3), stop_words="english") #re
 
 BERTkwargs={"calculate_probabilities":True, "top_n_words": 20, 'min_topic_size':150}
 tm.bert_topic(count_vectorizor=vectorizer_model, BERTkwargs=BERTkwargs, from_probs=True)
-tm.save_bert_results(from_probs=True) #warning: saving in excel can result in missing data when char limit is reached
-tm.save_bert_topics_from_probs()
-
-#get coherence
-tm.save_bert_coherence(coh_method='c_v')
-tm.save_bert_coherence(coh_method='c_npmi')
-tm.save_bert_vis()
-tm.save_bert_model()
+tm.save_bert_results(from_probs=True)
 
 # NER for FMEA
 # - rows: event table
