@@ -10,7 +10,7 @@ import csv
 import os
 import pandas as pd
 
-file_path = r"C:\Users\srandrad\OneDrive - NASA\Desktop\ntsb"
+file_path = r"C:\Users\srandrad\OneDrive - NASA\Desktop\avall"
 dfs = []
 for root, dirs, files in os.walk(file_path):
     for file in files:
@@ -25,9 +25,9 @@ for root, dirs, files in os.walk(file_path):
             SQL_query = "SELECT *  \
                         FROM (((narratives \
                         INNER JOIN \
-                            Events_Sequence \
+                            seq_of_events \
                         ON \
-                            narratives.ev_id = Events_Sequence.ev_id) \
+                            narratives.ev_id = seq_of_events.ev_id) \
                         INNER JOIN \
                             injury \
                         ON \
