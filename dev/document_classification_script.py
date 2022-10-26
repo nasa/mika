@@ -37,6 +37,8 @@ def get_most_recent_checkpoint(save_name, contributing_factor):
     for subdir, dirs, files in os.walk(rootdir):
         if 'checkpoint' in subdir: 
             checkpoints.append(int(subdir.split("-")[-1]))
+    if checkpoints == []:
+        return None
     most_recent_checkpoint = max(checkpoints)
     checkpoint = os.path.join(os.getcwd(), f"{contributing_factor}-{save_name}-finetuned", "checkpoint-"+str(most_recent_checkpoint))
     return checkpoint
