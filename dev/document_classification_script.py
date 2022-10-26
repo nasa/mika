@@ -29,9 +29,9 @@ checkpoint = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),
 model_checkpoints = ["allenai/scibert_scivocab_uncased", 
                      "bert-base-uncased", checkpoint] #add safeaerbert
 
-def train_classifier(tokenizer, model, encoded_dataset, contributing_factor, compute_metrics, batch_size=4):
+def train_classifier(tokenizer, model, encoded_dataset, contributing_factor, compute_metrics, model_name, batch_size=4):
     args = TrainingArguments(
-    f"{contributing_factor}-{model}-finetuned",
+    f"{contributing_factor}-{model_name}-finetuned",
     evaluation_strategy = "epoch",
     save_strategy = "steps",
     learning_rate=1e-3,
@@ -83,7 +83,7 @@ def train_test_model(ASRS_df, contributing_factors, models, train_size, test_siz
             classification_model = AutoModelForSequenceClassification.from_pretrained(model_checkpoint, num_labels=2)
             encoded_dataset = prepare_data(X_train, y_train, X_val, y_val, X_test, y_test, contributing_factor, tokenizer)
             classification_model.to('cuda')
-            trainer = train_classifier(tokenizer, classification_model, encoded_dataset, contributing_factor, compute_metrics, batch_size=batch_size)
+            trainer = train_classifier(tokenizer, classification_model, encoded_dataset, contributing_factor, compute_metrics, model_checkpoint, batch_size=batch_size)
             precision, recall, fscore, accuracy = evaluate_test_set(trainer, encoded_dataset, data_type='test', average='weighted')
             test_results[model_checkpoint].append(accuracy)
             test_results[model_checkpoint].append(precision)
