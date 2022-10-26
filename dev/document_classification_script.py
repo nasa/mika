@@ -53,7 +53,7 @@ def train_classifier(tokenizer, model, encoded_dataset, contributing_factor, com
     num_train_epochs=5,
     weight_decay=0.01,
     push_to_hub=False,
-    gradient_accumulation_steps=16,
+    gradient_accumulation_steps=8,
     save_steps= 10,
     gradient_checkpointing=True,
     fp16=True,
