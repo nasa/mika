@@ -44,7 +44,8 @@ def train_classifier(tokenizer, model, encoded_dataset, contributing_factor, com
     save_steps= 10,
     gradient_checkpointing=True,
     fp16=True,
-    optim="adafactor"
+    optim="adafactor",
+    save_total_limit = 2 #saves only last 2 checkpoints
     )
     
     trainer = Trainer(
