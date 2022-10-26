@@ -31,7 +31,7 @@ model_checkpoints = ["allenai/scibert_scivocab_uncased",
 
 def train_classifier(tokenizer, model, encoded_dataset, contributing_factor, compute_metrics, batch_size=4):
     args = TrainingArguments(
-    f"{contributing_factor}-finetuned",
+    f"{contributing_factor}-{model}-finetuned",
     evaluation_strategy = "epoch",
     save_strategy = "steps",
     learning_rate=1e-3,
@@ -40,7 +40,7 @@ def train_classifier(tokenizer, model, encoded_dataset, contributing_factor, com
     num_train_epochs=5,
     weight_decay=0.01,
     push_to_hub=False,
-    gradient_accumulation_steps=8,
+    gradient_accumulation_steps=16,
     save_steps= 10,
     gradient_checkpointing=True,
     fp16=True,
