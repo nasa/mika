@@ -38,7 +38,7 @@ def get_most_recent_checkpoint(save_name, contributing_factor):
         if 'checkpoint' in subdir: 
             checkpoints.append(int(subdir.split("-")[-1]))
     most_recent_checkpoint = max(checkpoints)
-    checkpoint = os.path.join(os.getcwd(), f"{contributing_factor}-{save_name}-finetuned", "checkpoint-"+most_recent_checkpoint)
+    checkpoint = os.path.join(os.getcwd(), f"{contributing_factor}-{save_name}-finetuned", "checkpoint-"+str(most_recent_checkpoint))
     return checkpoint
     
 def train_classifier(tokenizer, model, encoded_dataset, contributing_factor, compute_metrics, model_name, batch_size=4):
