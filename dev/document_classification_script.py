@@ -29,9 +29,13 @@ checkpoint = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),
 model_checkpoints = ["allenai/scibert_scivocab_uncased", 
                      "bert-base-uncased", checkpoint] #add safeaerbert
 
+def get_most_recent_checkpoint(save_name):
+    return
+    
 def train_classifier(tokenizer, model, encoded_dataset, contributing_factor, compute_metrics, model_name, batch_size=4):
+    save_name = model_name.split("/")[-1]
     args = TrainingArguments(
-    f"{contributing_factor}-{model_name}-finetuned",
+    f"{contributing_factor}-{save_name}-finetuned",
     evaluation_strategy = "epoch",
     save_strategy = "steps",
     learning_rate=1e-3,
