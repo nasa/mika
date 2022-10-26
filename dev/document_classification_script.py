@@ -29,8 +29,17 @@ checkpoint = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),
 model_checkpoints = ["allenai/scibert_scivocab_uncased", 
                      "bert-base-uncased", checkpoint] #add safeaerbert
 
-def get_most_recent_checkpoint(save_name):
-    return
+def get_most_recent_checkpoint(save_name, contributing_factor):
+    rootdir = os.path.join(os.getcwd(), f"{contributing_factor}-{save_name}-finetuned")
+    if os.path.isdir(rootdir) == False:
+        return None
+    checkpoints = []
+    for subdir, dirs, files in os.walk(rootdir):
+        if 'checkpoint' in subdir: 
+            checkpoints.append(int(subdir.split("-")[-1]))
+    most_recent_checkpoint = max(checkpoints)
+    checkpoint = os.path.join(os.getcwd(), f"{contributing_factor}-{save_name}-finetuned", "checkpoint-"+most_recent_checkpoint)
+    return checkpoint
     
 def train_classifier(tokenizer, model, encoded_dataset, contributing_factor, compute_metrics, model_name, batch_size=4):
     save_name = model_name.split("/")[-1]
@@ -60,8 +69,11 @@ def train_classifier(tokenizer, model, encoded_dataset, contributing_factor, com
     tokenizer=tokenizer,
     compute_metrics=compute_metrics
     )
-    
-    history = trainer.train()
+    checkpoint = get_most_recent_checkpoint(save_name, contributing_factor)
+    if checkpoint is not None:
+        history = trainer.train(checkpoint)
+    else:
+        history = trainer.train()
     return trainer
 
 def evaluate_test_set(trainer, encoded_dataset, data_type, average='weighted'):
