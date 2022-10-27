@@ -18,7 +18,8 @@ sys.path.append(os.path.join(".."))
 from mika.utils import Data
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
-os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+#os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
 
 contributing_factors = ['Human Factors', #'Weather', #'Software and Automation', 
                         'Procedure', #'Airport', 'Airspace Structure', 
