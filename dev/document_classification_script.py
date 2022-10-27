@@ -29,11 +29,26 @@ checkpoint = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),
 model_checkpoints = ["allenai/scibert_scivocab_uncased", 
                      "bert-base-uncased", checkpoint] #add safeaerbert
 
-def train_classifier(tokenizer, model, encoded_dataset, contributing_factor, compute_metrics, batch_size=4):
+def get_most_recent_checkpoint(save_name, contributing_factor):
+    rootdir = os.path.join(os.getcwd(), f"{contributing_factor}-{save_name}-finetuned")
+    if os.path.isdir(rootdir) == False:
+        return None
+    checkpoints = []
+    for subdir, dirs, files in os.walk(rootdir):
+        if 'checkpoint' in subdir: 
+            checkpoints.append(int(subdir.split("-")[-1]))
+    if checkpoints == []:
+        return None
+    most_recent_checkpoint = max(checkpoints)
+    checkpoint = os.path.join(os.getcwd(), f"{contributing_factor}-{save_name}-finetuned", "checkpoint-"+str(most_recent_checkpoint))
+    return checkpoint
+    
+def train_classifier(tokenizer, model, encoded_dataset, contributing_factor, compute_metrics, model_name, batch_size=4):
+    save_name = model_name.split("/")[-1]
     args = TrainingArguments(
-    f"{contributing_factor}-finetuned",
+    f"{contributing_factor}-{save_name}-finetuned",
     evaluation_strategy = "epoch",
-    save_strategy = "no",
+    save_strategy = "steps",
     learning_rate=1e-3,
     per_device_train_batch_size=batch_size,
     per_device_eval_batch_size=batch_size,
@@ -41,9 +56,11 @@ def train_classifier(tokenizer, model, encoded_dataset, contributing_factor, com
     weight_decay=0.01,
     push_to_hub=False,
     gradient_accumulation_steps=8,
+    save_steps= 10,
     gradient_checkpointing=True,
     fp16=True,
-    optim="adafactor"
+    optim="adafactor",
+    save_total_limit = 2 #saves only last 2 checkpoints
     )
     
     trainer = Trainer(
@@ -54,8 +71,11 @@ def train_classifier(tokenizer, model, encoded_dataset, contributing_factor, com
     tokenizer=tokenizer,
     compute_metrics=compute_metrics
     )
-    
-    history = trainer.train()
+    checkpoint = get_most_recent_checkpoint(save_name, contributing_factor)
+    if checkpoint is not None:
+        history = trainer.train(checkpoint)
+    else:
+        history = trainer.train()
     return trainer
 
 def evaluate_test_set(trainer, encoded_dataset, data_type, average='weighted'):
@@ -81,7 +101,7 @@ def train_test_model(ASRS_df, contributing_factors, models, train_size, test_siz
             classification_model = AutoModelForSequenceClassification.from_pretrained(model_checkpoint, num_labels=2)
             encoded_dataset = prepare_data(X_train, y_train, X_val, y_val, X_test, y_test, contributing_factor, tokenizer)
             classification_model.to('cuda')
-            trainer = train_classifier(tokenizer, classification_model, encoded_dataset, contributing_factor, compute_metrics, batch_size=batch_size)
+            trainer = train_classifier(tokenizer, classification_model, encoded_dataset, contributing_factor, compute_metrics, model_checkpoint, batch_size=batch_size)
             precision, recall, fscore, accuracy = evaluate_test_set(trainer, encoded_dataset, data_type='test', average='weighted')
             test_results[model_checkpoint].append(accuracy)
             test_results[model_checkpoint].append(precision)

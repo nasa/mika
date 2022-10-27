@@ -9,6 +9,8 @@ import os
 import pandas as pd
 import numpy as np
 from transformers import Trainer, AutoTokenizer, DataCollatorForTokenClassification, BertForTokenClassification
+import sys
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)),"..","..", ".."))
 from mika.kd.NER import *
 from mika.kd import FMEA #import FMEA
 from datasets import load_from_disk, Dataset
@@ -37,6 +39,7 @@ if __name__ == '__main__':
     fmea.display_doc(doc_id="21-0098", save=True, output_path="results/21-0098_display_annotated", colors_path=os.path.join(os.getcwd(),'data','NER_label_config.json'), pred=False)
     """
     model_checkpoint = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)),"models", "FMEA-ner-model", "checkpoint-1424")
+    print(model_checkpoint)
     #device = 'cuda' if cuda.is_available() else 'cpu'
     #cuda.empty_cache()
     device = 'cpu'
@@ -46,10 +49,8 @@ if __name__ == '__main__':
     fmea.load_model(model_checkpoint)
     print("loaded model")
     
-    #file = "data/srandrad_safecom_v2.jsonl"
     file = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)),"data/SAFECOM/SAFECOM_UAS_fire_data.csv")
     #TODO: join annotations to raw df
-    #file = "data/NER_test_dataset"
     input_data = fmea.load_data(file, formatted=False, text_col='Text')
     
     print("loaded data")
@@ -67,5 +68,3 @@ if __name__ == '__main__':
     #"""
     fmea.fmea_df.to_csv(os.path.join(os.getcwd(),"safecom_fmea_.csv"))
     
-    #metrics = fmea.evaluate_preds()
-    #print(metrics["Confusion Matrix"])

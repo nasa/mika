@@ -44,7 +44,7 @@ text_df = text_df.dropna().reset_index(drop=True)
 train_size=0.8
 train_dataset = text_df.sample(frac=train_size,random_state=200)
 test_dataset = text_df.drop(train_dataset.index).reset_index(drop=True)
-train_dataset = text_df.reset_index(drop=True)
+train_dataset = train_dataset.reset_index(drop=True)
 
         
 def tokenize(text_df, tokenizer):
