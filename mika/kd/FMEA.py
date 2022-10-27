@@ -10,8 +10,8 @@ import os
 import pandas as pd
 import numpy as np
 from transformers import Trainer, pipeline, TrainingArguments, AutoTokenizer, DataCollatorForTokenClassification, BertForTokenClassification
-from mika.kd.NER import build_confusion_matrix, compute_classification_report, split_docs_to_sentances, tokenize, tokenize_and_align_labels, read_doccano_annots, clean_doccano_annots
-from models import FMEA_NER
+from mika.kd.NER import build_confusion_matrix, compute_classification_report, split_docs_to_sentences, tokenize, tokenize_and_align_labels, read_doccano_annots, clean_doccano_annots
+#from models import FMEA_NER
 from datasets import load_from_disk, Dataset
 from torch import cuda, tensor
 import torch
@@ -90,8 +90,8 @@ class FMEA():
         """
         if model_checkpoint:
             self.token_classifier = pipeline("token-classification", model=model_checkpoint, aggregation_strategy="simple", device=-1)#sets model on cpu
-        else:
-            self.token_classifier = FMEA_NER
+        #else:
+        #    self.token_classifier = FMEA_NER
     def load_data(self, filepath='', df=None, formatted=False, text_col="Narrative", id_col="Tracking #", label_col="labels"):
         """
         Loads data to prepare for FMEA extraction. 
@@ -139,7 +139,7 @@ class FMEA():
                 docs = [self.nlp(doc) for doc in docs]
                 data['docs'] = docs
                 self.raw_df = data
-                sentence_df = split_docs_to_sentances(data, id_col=id_col,tags=False)
+                sentence_df = split_docs_to_sentences(data, id_col=id_col,tags=False)
                 self.data_df = sentence_df 
                 self.data_df['sentence'] = [sent.text for sent in sentence_df["sentence"].tolist()]
                 self.input_data = self.data_df['sentence'].tolist()
@@ -154,7 +154,7 @@ class FMEA():
                 test_data['docs'] = docs
                 self.raw_df = test_data
                 test_data['tags'] = [offsets_to_biluo_tags(test_data.at[i,'docs'], test_data.at[i,'label']) for i in range(len(test_data))]
-                sentence_df = split_docs_to_sentances(test_data, id_col=id_col, tags=True)
+                sentence_df = split_docs_to_sentences(test_data, id_col=id_col, tags=True)
                 self.data_df = sentence_df 
                 self.data_df['sentence'] = [sent.text for sent in sentence_df["sentence"].tolist()]
                 self.input_data = self.data_df['sentence'].tolist()

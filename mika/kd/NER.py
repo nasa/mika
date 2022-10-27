@@ -200,9 +200,9 @@ def identify_bad_annotations(text_df):
         [bad_tokens.append(text_df_issues.iloc[ind]['docs'][i]) for i in inds]
     return bad_tokens
 
-def split_docs_to_sentances(text_df, id_col = 'Tracking #', tags=True): 
+def split_docs_to_sentences(text_df, id_col = 'Tracking #', tags=True): 
     """
-    splits a dataframe of documents into a new dataframe where each sentance from
+    splits a dataframe of documents into a new dataframe where each sentence from
     each document is in its own row. This is useful for using BERT models with
     maximum character limits.
 
@@ -219,10 +219,10 @@ def split_docs_to_sentances(text_df, id_col = 'Tracking #', tags=True):
     Returns
     -------
     sentence_df : pandas DataFrame
-        New dataframe where each row is a sentance.
+        New dataframe where each row is a sentence.
 
     """
-    #split each document into one row per sentance
+    #split each document into one row per sentence
     sentence_tags_total = []
     sentences_in_list = []
     ids = []
@@ -253,7 +253,7 @@ def check_doc_to_sentence_split(sentence_df):
     Parameters
     ----------
     sentence_df : pandas DataFrame
-        Dataframe where each row is a sentance. Has columns 'sentence' and 'tags'
+        Dataframe where each row is a sentence. Has columns 'sentence' and 'tags'
 
     Returns
     -------
@@ -312,7 +312,7 @@ def tokenize_and_align_labels(sentence_df, tokenizer, align_labels=True):
     Parameters
     ----------
     sentence_df : pandas DataFrame
-        Dataframe where each row is a sentance. Has columns 'sentence' and 'tags'
+        Dataframe where each row is a sentence. Has columns 'sentence' and 'tags'
     tokenizer : tokenizer object
         tokenizer object, usually an autotokenizer Transformers BERT model
     align_labels : Boolean, optional
@@ -342,7 +342,7 @@ def tokenize(sentence_df, tokenizer):
     Parameters
     ----------
     sentence_df : pandas DataFrame
-        Dataframe where each row is a sentance. Has columns 'sentence' and 'tags'
+        Dataframe where each row is a sentence. Has columns 'sentence' and 'tags'
     tokenizer : tokenizer object
         tokenizer object, usually an autotokenizer Transformers BERT model
 
