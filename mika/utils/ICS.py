@@ -12,6 +12,37 @@ import scipy.stats as stats
 from tqdm import tqdm
 
 def check_anamolies(time_of_occurence_days, time_of_occurence_pct_contained, frequency, fires, hazards):
+    """
+    Checks for discrpencies between counts and metrics.
+    Specifically identifies if there are missing values.
+    For example, the number of fire ids should be equal to the frequency.
+
+    Parameters
+    ----------
+    time_of_occurence_days : dict
+        Nested dict with keys as hazards and inner dictionary with keys as years and values as a list of
+        operational time of occurrence in days.
+    time_of_occurence_pct_contained : dict
+        Nested dict with keys as hazards and inner dictionary with keys as years and values as a list of
+        operational time of occurrence in percent containment.
+    frequency : dict
+        Nested dict with keys as hazards and inner dictionary with keys as years and values as
+        frequency.
+    fires : dict
+        Nested dict with keys as hazards and inner dictionary with keys as years and values as 
+        a list of fire ids associated with the hazard.
+    hazards : list
+        List of hazard names.
+
+    Returns
+    -------
+    anomolous_hazards : dict
+        Nested dictionary with the metrics as keys. Inner dictionary has hazard as keys and
+        a list of years with data discrepancies as values.
+    anoms : boolean
+        True if any anomolies are detected.
+
+    """
     anomolous_hazards = {'OTTO days':{},
                         'OTTO pct': {},
                         'frequency days': {},
@@ -46,139 +77,181 @@ def check_anamolies(time_of_occurence_days, time_of_occurence_pct_contained, fre
     return anomolous_hazards, anoms
 
 def calc_metrics(hazard_file, preprocessed_df, rm_outliers=True, distance=3, target='Combined Text', ids="INCIDENT_ID", unique_ids_col="INCIDENT_ID"):
-     """
-    uses the hazard focused sheet in the hazard interpretation results to calculate metrics.
-    hazards are identified based on subject-action pairs 
-    ARGUMENTS
-     ---------
-     hazard_file: string
-         the location of the interpretation xlsx file
-     preprocessed_df: string
-         the location of preprocessed data that was fed into the model
-     rm_outliers: boolean 
-         used to remove outliers or not
-     """
-     years = preprocessed_df["START_YEAR"].unique()
-     years.sort()
-     hazard_info = pd.read_excel(hazard_file, sheet_name=['Hazard-focused'])
-     hazards = hazard_info['Hazard-focused']['Hazard name'].tolist()
-     categories = hazard_info['Hazard-focused']['Hazard Category'].tolist()
+    """
+    Uses the hazard focused sheet in the hazard interpretation results to calculate metrics.
+    hazards are identified based on subject-action pairs
     
-     time_of_occurence_days = {name:{year:[] for year in years} for name in hazards}
-     time_of_occurence_pct_contained = {name:{year:[] for year in years} for name in hazards}
-     frequency = {name:{year:0 for year in years} for name in hazards}
-     fires = {name:{year:[] for year in years} for name in hazards}
-     unique_ids = {name:{year:[] for year in years} for name in hazards}
-     frequency_fires ={name:{year:0 for year in years} for name in hazards}
+    Note that this method was only used in 2021 DASC paper and is no longer
+    the prefered method for HEAT.
+    Parameters
+    ----------
+    hazard_file : string
+        Location of the hazard interpretaion xlsx files.
+    preprocessed_df : pandas dataframe
+        DataFrame containing the preprocessed data.
+    rm_outliers : Boolean, optional
+        True to remove outliers from metric calculation. The default is True.
+    distance : int, optional
+        Maximum distance between hazard subject-descriptor words. The default is 3.
+    target : string, optional
+        Column in preprocessed df containing the target text. The default is 'Combined Text'.
+    ids : string, optional
+        Column in preprocessed df containing document ids. The default is "INCIDENT_ID".
+    unique_ids_col : string, optional
+        Column in preprocessed df containing unique document ids. The default is "INCIDENT_ID".
 
-     for year in tqdm(years):
-        temp_df = preprocessed_df.loc[preprocessed_df["START_YEAR"]==year].reset_index(drop=True)
-        fire_ids = temp_df[ids].unique()
-        for id_ in fire_ids:
-            temp_fire_df = temp_df.loc[temp_df[ids]==id_].reset_index(drop=True)
-            #date corrections
-            start_date = temp_fire_df["DISCOVERY_DOY"].unique() #should only have one start date
-            if len(start_date) != 1: 
-                start_date = min(start_date)
-            else: 
-                start_date = start_date[0]
-            if start_date == 365:
-                    start_date = 0
+    Returns
+    -------
+    time_of_occurence_days : dict
+        Nested dict with keys as hazards and inner dictionary with keys as years and values as a list of
+        operational time of occurrence in days.
+    time_of_occurence_pct_contained : dict
+        Nested dict with keys as hazards and inner dictionary with keys as years and values as a list of
+        operational time of occurrence in percent containment.
+    frequency : dict
+        Nested dict with keys as hazards and inner dictionary with keys as years and values as
+        frequency.
+    fires : dict
+        Nested dict with keys as hazards and inner dictionary with keys as years and values as 
+        a list of fire ids associated with the hazard.
+    frequency_fires : dict
+        Nested dict with keys as hazards and inner dictionary with keys as years and values as
+        frequency. Frequency is calculated as the number of unique fires, rather than total hazard occurrence.
+    categories : list
+        List of hazard categories.
+    hazards : list
+        List of hazard names.
+    years : List
+        List of years in the dataset.
+    unique_ids : List
+        List of unique document ids.
+
+    """ 
+    years = preprocessed_df["START_YEAR"].unique()
+    years.sort()
+    hazard_info = pd.read_excel(hazard_file, sheet_name=['Hazard-focused'])
+    hazards = hazard_info['Hazard-focused']['Hazard name'].tolist()
+    categories = hazard_info['Hazard-focused']['Hazard Category'].tolist()
+   
+    time_of_occurence_days = {name:{year:[] for year in years} for name in hazards}
+    time_of_occurence_pct_contained = {name:{year:[] for year in years} for name in hazards}
+    frequency = {name:{year:0 for year in years} for name in hazards}
+    fires = {name:{year:[] for year in years} for name in hazards}
+    unique_ids = {name:{year:[] for year in years} for name in hazards}
+    frequency_fires ={name:{year:0 for year in years} for name in hazards}
+
+    for year in tqdm(years):
+       temp_df = preprocessed_df.loc[preprocessed_df["START_YEAR"]==year].reset_index(drop=True)
+       fire_ids = temp_df[ids].unique()
+       for id_ in fire_ids:
+           temp_fire_df = temp_df.loc[temp_df[ids]==id_].reset_index(drop=True)
+           #date corrections
+           start_date = temp_fire_df["DISCOVERY_DOY"].unique() #should only have one start date
+           if len(start_date) != 1: 
+               start_date = min(start_date)
+           else: 
+               start_date = start_date[0]
+           if start_date == 365:
+                   start_date = 0
+       
+           for j in range(len(temp_fire_df)):
+               text = temp_fire_df.iloc[j][target]
+               #check for hazard
+               for i in range(len(hazard_info['Hazard-focused'])):
+                   hazard_name = hazard_info['Hazard-focused'].iloc[i]['Hazard name']
+                   hazard_subject_words = hazard_info['Hazard-focused'].iloc[i]['Hazard Noun/Subject']
+                   hazard_subject_words = hazard_subject_words.split(", ")
+                   hazard_action_words = hazard_info['Hazard-focused'].iloc[i]['Action/Descriptor']
+                   hazard_action_words = hazard_action_words.split(", ")
+                   negation_words = hazard_info['Hazard-focused'].iloc[i]['Negation words']
+                   #check if a word in text is in hazard words, for each list in hazard words, no words in negation words
+                   hazard_found = False
+                   for word in hazard_subject_words:
+                       if word in text:
+                           hazard_found = True
+                           subject_index = text.index(word)
+                           break
+                   if hazard_found == True:
+                       hazard_found = False
+                       for word in hazard_action_words:
+                           if word in text:
+                               hazard_index = text.index(word)
+                               if abs(hazard_index-subject_index)<=distance:
+                                   hazard_found = True
+                                   break
+                               else:
+                                   hazard_found = False
+            
+                   if isinstance(negation_words,str):
+                       for word in negation_words.split(", "): #removes texts that have negation words
+                           if word in text:
+                               hazard_found = False 
+                   
+                   if hazard_found == True:
+                       time_of_hazard = int(temp_fire_df.iloc[j]["REPORT_DOY"])
+                   
+                       #correct dates
+                       if time_of_hazard<start_date: 
+                           #print("dates corrected")
+                           if time_of_hazard<30 and start_date<330: #report day is days since start, not doy 
+                               time_of_hazard+=start_date
+                           elif time_of_hazard<30 and start_date>=330:
+                               start_date = start_date-365 #fire spans two years
+                           else: #start and report day were incorrectly switched
+                               temp_start = start_date
+                               start_date = time_of_hazard
+                               time_of_hazard = temp_start
+                               
+                       time_of_occurence_days[hazard_name][year].append(time_of_hazard-int(start_date))
+                       time_of_occurence_pct_contained[hazard_name][year].append(temp_fire_df.iloc[j]["PCT_CONTAINED_COMPLETED"])
+                       fires[hazard_name][year].append(id_)
+                       unique_ids[hazard_name][year].append(temp_fire_df.iloc[j][unique_ids_col])
+                       frequency[hazard_name][year] += 1
+    for name in frequency_fires:
+        for year in frequency_fires[name]:
+            frequency_fires[name][year] = len(set(fires[name][year]))
+    
+    anomolous_hazards, anoms = check_anamolies(time_of_occurence_days, time_of_occurence_pct_contained, frequency, fires, hazards)
+    if anoms == True:
+        print("Error in calculation:")
+        print(anomolous_hazards)
         
-            for j in range(len(temp_fire_df)):
-                text = temp_fire_df.iloc[j][target]
-                #check for hazard
-                for i in range(len(hazard_info['Hazard-focused'])):
-                    hazard_name = hazard_info['Hazard-focused'].iloc[i]['Hazard name']
-                    hazard_subject_words = hazard_info['Hazard-focused'].iloc[i]['Hazard Noun/Subject']
-                    hazard_subject_words = hazard_subject_words.split(", ")
-                    hazard_action_words = hazard_info['Hazard-focused'].iloc[i]['Action/Descriptor']
-                    hazard_action_words = hazard_action_words.split(", ")
-                    negation_words = hazard_info['Hazard-focused'].iloc[i]['Negation words']
-                    #check if a word in text is in hazard words, for each list in hazard words, no words in negation words
-                    hazard_found = False
-                    for word in hazard_subject_words:
-                        if word in text:
-                            hazard_found = True
-                            subject_index = text.index(word)
-                            break
-                    if hazard_found == True:
-                        hazard_found = False
-                        for word in hazard_action_words:
-                            if word in text:
-                                hazard_index = text.index(word)
-                                if abs(hazard_index-subject_index)<=distance:
-                                    hazard_found = True
-                                    break
-                                else:
-                                    hazard_found = False
-                    """
-                    additional_action_words = hazard_info['Hazard-focused'].iloc[i]['Action']
-                    if hazard_found == True and not isinstance(additional_action_words,float):
-                        hazard_found = False
-                        for word in additional_action_words.split(", "):
-                            if word in text:
-                                hazard_index = text.index(word)
-                                if abs(hazard_index-subject_index)<=distance:
-                                    hazard_found = True
-                                    break
-                                else:
-                                    hazard_found = False
-                                    """
-                    """
-                    hazard_words = [hazard_subject_words, hazard_action_words]
-                    for word_list in hazard_words:
-                        hazard_found = False #ensures a word from each list must show up
-                        for word in word_list:
-                            if word in text:
-                                hazard_found = True
-                        if hazard_found == False: #ensures a word from each list must show up
-                            break
-                    """
-                    
-                    if isinstance(negation_words,str):
-                        for word in negation_words.split(", "): #removes texts that have negation words
-                            if word in text:
-                                hazard_found = False 
-                    
-                    if hazard_found == True:
-                        time_of_hazard = int(temp_fire_df.iloc[j]["REPORT_DOY"])
-                    
-                        #correct dates
-                        if time_of_hazard<start_date: 
-                            #print("dates corrected")
-                            if time_of_hazard<30 and start_date<330: #report day is days since start, not doy 
-                                time_of_hazard+=start_date
-                            elif time_of_hazard<30 and start_date>=330:
-                                start_date = start_date-365 #fire spans two years
-                            else: #start and report day were incorrectly switched
-                                temp_start = start_date
-                                start_date = time_of_hazard
-                                time_of_hazard = temp_start
-                                
-                        time_of_occurence_days[hazard_name][year].append(time_of_hazard-int(start_date))
-                        time_of_occurence_pct_contained[hazard_name][year].append(temp_fire_df.iloc[j]["PCT_CONTAINED_COMPLETED"])
-                        fires[hazard_name][year].append(id_)
-                        unique_ids[hazard_name][year].append(temp_fire_df.iloc[j][unique_ids_col])
-                        frequency[hazard_name][year] += 1
-     for name in frequency_fires:
-         for year in frequency_fires[name]:
-             frequency_fires[name][year] = len(set(fires[name][year]))
-     
-     anomolous_hazards, anoms = check_anamolies(time_of_occurence_days, time_of_occurence_pct_contained, frequency, fires, hazards)
-     if anoms == True:
-         print("Error in calculation:")
-         print(anomolous_hazards)
-         
-     if rm_outliers == True:
-         for year in years:
-             for hazard in hazards:
-                 if len(time_of_occurence_pct_contained[hazard][year])>9 and hazard != 'Law Violations':
-                    time_of_occurence_days[hazard][year] = remove_outliers(time_of_occurence_days[hazard][year])
-                    time_of_occurence_pct_contained[hazard][year] = remove_outliers(time_of_occurence_pct_contained[hazard][year])
-     return time_of_occurence_days, time_of_occurence_pct_contained, frequency, fires, frequency_fires, categories, hazards, years, unique_ids
+    if rm_outliers == True:
+        for year in years:
+            for hazard in hazards:
+                if len(time_of_occurence_pct_contained[hazard][year])>9 and hazard != 'Law Violations':
+                   time_of_occurence_days[hazard][year] = remove_outliers(time_of_occurence_days[hazard][year])
+                   time_of_occurence_pct_contained[hazard][year] = remove_outliers(time_of_occurence_pct_contained[hazard][year])
+    return time_of_occurence_days, time_of_occurence_pct_contained, frequency, fires, frequency_fires, categories, hazards, years, unique_ids
 
 def calc_severity(fires, summary_reports, rm_all_outliers=False, rm_severity_outliers=True, round_to=1):
+    """
+    Calculates severity for an individual fire and stores the value for each hazard.
+    Specific for ICS reports.
+
+    Parameters
+    ----------
+    fires : dict
+        Nested dict with keys as hazards and inner dictionary with keys as years and values as 
+        a list of fire ids associated with the hazard.
+    summary_reports : Pandas DataFrame
+        DataFrame of the ICS summary reports detailing total damages.
+    rm_all_outliers : Boolean, optional
+        True to remove outliers from all severity metrics. The default is False.
+    rm_severity_outliers : Boolean, optional
+        True to remove outliers from only the average severity metric. The default is True.
+    round_to : int, optional
+        Number of decimals to round the severity values to. The default is 1.
+
+    Returns
+    -------
+    severity_total : dict
+        Dictionary with hazard names as keys and a list of total severtiy as values.
+    severity_table : Pandas DataFrame
+        DataFrame with a row for each hazard. Columns are averages and std deviations for total
+        severity and for each severity metric.
+
+    """
     severity_total = {}; injuries_total = {}; fatalities_total = {}; str_dam_total = {}; str_des_total = {}
     for hazard in fires:
         severity_total[hazard] = {}; injuries_total[hazard] = {}; fatalities_total[hazard] = {}
@@ -212,6 +285,29 @@ def calc_severity(fires, summary_reports, rm_all_outliers=False, rm_severity_out
     return severity_total, severity_table
 
 def correct_dates(preprocessed_df, temp_hazard_df, i, id_col):
+    """
+    Function used to correct dates in ICS-209-PLUS situation reports.
+    Corrects both start dates and time of hazard dates.
+
+    Parameters
+    ----------
+    preprocessed_df : pandas dataframe
+        DataFrame containing the preprocessed data.
+    temp_hazard_df : pandas dataframe
+        DataFrame containing the reports for a specific hazard
+    i : int
+        Index of the row in the hazard_df currently being corrected.
+    id_col : string
+        The column in preprocessed df containing document ids.
+
+    Returns
+    -------
+    start_date : int
+        DOY of the fire start.
+    time_of_hazard : int
+        DOY of the report containing the hazard.
+
+    """
     fire_df = preprocessed_df.loc[preprocessed_df[id_col]==temp_hazard_df.iloc[i][id_col]]
     start_date = fire_df["DISCOVERY_DOY"].unique() #should only have one start date
     if len(start_date) != 1: 
@@ -236,6 +332,45 @@ def correct_dates(preprocessed_df, temp_hazard_df, i, id_col):
     return start_date, time_of_hazard
 
 def calc_ICS_metrics(docs_per_hazard, preprocessed_df, id_col, unique_ids_col, rm_outliers=True):
+    """
+    Method used to calculate ICS metrics.
+    
+    Note that this is the preferred method for HEAT, used in journal paper.
+
+    Parameters
+    ----------
+    docs_per_hazard : dict
+        Nested dictionary with hazards as keys, inner dictionary has years as keys and
+        a list of document ids as values.
+    preprocessed_df : pandas dataframe
+        DataFrame containing the preprocessed data.
+    id_col : string
+        The column in preprocessed df containing document ids.
+    unique_ids_col : string
+        The column in preprocessed df containing unique document ids.
+    rm_outliers : Boolean, optional
+        True to remove outliers from all severity metrics. The default is True.
+
+    Returns
+    -------
+    time_of_occurence_days : dict
+        Nested dict with keys as hazards and inner dictionary with keys as years and values as a list of
+        operational time of occurrence in days.
+    time_of_occurence_pct_contained : dict
+        Nested dict with keys as hazards and inner dictionary with keys as years and values as a list of
+        operational time of occurrence in percent containment.
+    frequency : dict
+        Nested dict with keys as hazards and inner dictionary with keys as years and values as
+        frequency.
+    fires : dict
+        Nested dict with keys as hazards and inner dictionary with keys as years and values as 
+        a list of fire ids associated with the hazard.
+    frequency_fires : dict
+        Nested dict with keys as hazards and inner dictionary with keys as years and values as
+        frequency. Frequency is calculated as the number of unique fires, rather than total hazard occurrence.
+    
+
+    """
     time_of_occurence_days = {name:{year:[] for year in docs_per_hazard[name]} for name in docs_per_hazard}
     time_of_occurence_pct_contained = {name:{year:[] for year in docs_per_hazard[name]} for name in docs_per_hazard}
     frequency = {name:{year:0 for year in docs_per_hazard[name]} for name in docs_per_hazard}
@@ -249,8 +384,8 @@ def calc_ICS_metrics(docs_per_hazard, preprocessed_df, id_col, unique_ids_col, r
             for j in range(len(temp_hazard_df)):
                 start_date, time_of_hazard = correct_dates(preprocessed_df, temp_hazard_df, j, id_col)
                 time_of_occurence_days[hazard][year].append(time_of_hazard-int(start_date))
-                #time_of_occurence_pct_contained[hazard][year].append(temp_hazard_df.iloc[j]["PCT_CONTAINED_COMPLETED"])
-                if temp_hazard_df.iloc[j]["PCT_CONTAINED_COMPLETED"] <= 100: time_of_occurence_pct_contained[hazard][year].append(temp_hazard_df.iloc[j]["PCT_CONTAINED_COMPLETED"])
+                if temp_hazard_df.iloc[j]["PCT_CONTAINED_COMPLETED"] <= 100: 
+                    time_of_occurence_pct_contained[hazard][year].append(temp_hazard_df.iloc[j]["PCT_CONTAINED_COMPLETED"])
                 fires[hazard][year].append(temp_hazard_df.iloc[j][id_col])
                 unique_ids[hazard][year].append(temp_hazard_df.iloc[j][unique_ids_col])
                 frequency[hazard][year] += 1
@@ -276,31 +411,44 @@ def calc_ICS_metrics(docs_per_hazard, preprocessed_df, id_col, unique_ids_col, r
 
 def create_primary_results_table(time_of_occurence_days, time_of_occurence_pct_contained, frequency, fire_freq, preprocessed_df, categories, hazards, years, interval=False, round_to=1):
     """
-    creates the primary results table consisting of average OTTO, frequency, and rate for each hazard
+    Creates the primary results table consisting of average OTTO, frequency, and rate for each hazard
     all arguments are outputs from calc_metrics
-    ARGUMENTS
-    ---------
-    time_of_occurence_days: nested dict
-        dict with keys as hazard names, values as dict.
-        inner dict has keys as years and values as list of OTTO in days.
-    time_of_occurence_pct_contained: nested dict
-        dict with keys as hazard names, values as dict.
-        inner dict has keys as years and values as list of OTTO in pct containment.
-    frequency: nested dict
-        dict with keys as hazard names, values as dict.
-        inner dict has keys as years and values as integer frequency
-    fires: nested dict
-        dict with keys as hazard names, values as dict.
-        inner dict has keys as years and values as list of fire ids with that hazard
-    preprocessed_df: dataframe
-        the preprocessed data df
-    categories: list
-        list of hazard categories
-    hazards: list 
-        list of hazard names
-    years: list
-        list of years the data spans
     
+    Works with calc_ICS_metrics and  calc_metrics outputs.
+    
+    Parameters
+    ----------
+    time_of_occurence_days : dict
+        Nested dict with keys as hazards and inner dictionary with keys as years and values as a list of
+        operational time of occurrence in days.
+    time_of_occurence_pct_contained : dict
+        Nested dict with keys as hazards and inner dictionary with keys as years and values as a list of
+        operational time of occurrence in percent containment.
+    frequency : dict
+        Nested dict with keys as hazards and inner dictionary with keys as years and values as
+        frequency.
+    fire_freq : dict
+        Nested dict with keys as hazards and inner dictionary with keys as years and values as
+        frequency. Frequency is calculated as the number of unique fires, rather than total hazard occurrence.
+    preprocessed_df : pandas dataframe
+        DataFrame containing the preprocessed data.
+    categories : list
+        List of hazard categories.
+    hazards : list
+        List of hazard names.
+    years : List
+        List of years in the dataset.
+    interval : Boolean, optional
+        True to display means and std deviations as a confidence interval. The default is False.
+    round_to : int, optional
+        Number of decimals to round the severity values to. The default is 1.
+
+    Returns
+    -------
+    data_df : Pandas DataFrame
+        DataFrame with a row for each hazard and a column for each metric,
+        including frequency, otto, severity, etc.
+
     """
     data_df = {"Hazard Category": categories,
                "Hazard Name": hazards}
@@ -347,6 +495,45 @@ def create_primary_results_table(time_of_occurence_days, time_of_occurence_pct_c
     return data_df
 
 def graph_ICS_time_series(time_of_occurence_days, time_of_occurence_pct_contained, frequency, frequency_fires, hazards, categories, std_dev=True, save=True, results_path="", fontsize=16, figsize=(6,4), titles=True):
+    """
+    Used to graph all metric time series
+
+    Parameters
+    ----------
+    time_of_occurence_days : dict
+        Nested dict with keys as hazards and inner dictionary with keys as years and values as a list of
+        operational time of occurrence in days.
+    time_of_occurence_pct_contained : dict
+        Nested dict with keys as hazards and inner dictionary with keys as years and values as a list of
+        operational time of occurrence in percent containment.
+    frequency : dict
+        Nested dict with keys as hazards and inner dictionary with keys as years and values as
+        frequency.
+    frequency_fires : dict
+        Nested dict with keys as hazards and inner dictionary with keys as years and values as
+        frequency. Frequency is calculated as the number of unique fires, rather than total hazard occurrence.
+    hazards : list
+        List of hazard names.
+    categories : list
+        List of hazard categories.
+    std_dev : Boolean, optional
+        True to show standard deviations as error bars. The default is True.
+    save : Boolean, optional
+        True to save figures as pdf. The default is True.
+    results_path : string, optional
+        Path used to save figures. The default is "".
+    fontsize : int, optional
+        Fontsize for the figures. The default is 16.
+    figsize : tuple, optional
+        Figure size for the figures. The default is (6,4).
+    titles : Boolean, optional
+        True to display titles on figures. The default is True.
+
+    Returns
+    -------
+    None.
+
+    """
     line_styles = []
     line_style_options = ['--', ':','-']
     line_style_dict = {list(set(categories))[i]:line_style_options[i] for i in range(len(list(set(categories))))}
@@ -370,9 +557,9 @@ def graph_ICS_time_series(time_of_occurence_days, time_of_occurence_pct_containe
         otto_pct_title = ""
         frequency_title = ""
         total_frequency_title = ""
-    plot_metric_time_series(metric_data=time_of_occurence_days, metric_name='Days', line_styles=line_styles, markers=markers, title=otto_days_title, time_name="Year", scaled=False, xtick_freq=1, show_std=std_dev, save=save, dataset_name=results_path+"/ICS_OTTO_days", yscale=None, fontsize=fontsize, figsize=figsize)
+    plot_metric_time_series(metric_data=time_of_occurence_days, metric_name='OTTO (Days)', line_styles=line_styles, markers=markers, title=otto_days_title, time_name="Year", scaled=False, xtick_freq=1, show_std=std_dev, save=save, dataset_name=results_path+"/ICS_OTTO_days", yscale=None, fontsize=fontsize, figsize=figsize)
     #plot pct contained
-    plot_metric_time_series(metric_data=time_of_occurence_pct_contained, metric_name='% Containment', line_styles=line_styles, markers=markers, title=otto_pct_title, time_name="Year", scaled=False, xtick_freq=1, show_std=std_dev, save=save, dataset_name=results_path+"/ICS_OTTO_pct", yscale=None, fontsize=fontsize, figsize=figsize)
+    plot_metric_time_series(metric_data=time_of_occurence_pct_contained, metric_name='OTTO (% Containment)', line_styles=line_styles, markers=markers, title=otto_pct_title, time_name="Year", scaled=False, xtick_freq=1, show_std=std_dev, save=save, dataset_name=results_path+"/ICS_OTTO_pct", yscale=None, fontsize=fontsize, figsize=figsize)
     #plot total frequency
     plot_frequency_time_series(frequency, metric_name='Frequency', line_styles=line_styles, markers=markers, title=total_frequency_title, time_name="Year", xtick_freq=1, scale=False, save=save, dataset_name=results_path+"/ICS_total_frequency", fontsize=fontsize, figsize=figsize)
     #plot fire frequency
@@ -380,6 +567,20 @@ def graph_ICS_time_series(time_of_occurence_days, time_of_occurence_pct_containe
     #plot severity
     
 def get_likelihood_ICS_USFS(rates):
+    """
+    Assigns a liklihood category according to USFS risk matrix
+
+    Parameters
+    ----------
+    rates : dict
+        Dictionary with keys as hazards and values as rates of occurence.
+
+    Returns
+    -------
+    curr_likelihoods : dict
+        Dictionary with keys as hazards and values as likelihood category.
+
+    """
     curr_likelihoods = {hazard:0 for hazard in rates}
     for hazard in rates:
         r = rates[hazard]
@@ -397,6 +598,20 @@ def get_likelihood_ICS_USFS(rates):
     return curr_likelihoods
 
 def get_likelihood_ICS_FAA(rates):
+    """
+    Assigns a liklihood category according to FAA General Aviation risk matrix
+
+    Parameters
+    ----------
+    rates : dict
+        Dictionary with keys as hazards and values as rates of occurence.
+
+    Returns
+    -------
+    curr_likelihoods : dict
+        Dictionary with keys as hazards and values as likelihood category.
+
+    """
     curr_likelihoods = {hazard:0 for hazard in rates}
     for hazard in rates:
         r = rates[hazard]
@@ -414,6 +629,23 @@ def get_likelihood_ICS_FAA(rates):
     return curr_likelihoods
 
 def get_ICS_severity_USFS(severity_table, hazards):
+    """
+    Assigns a severity category according ot USFS risk matrix
+
+    Parameters
+    ----------
+    severity_table : Pandas DataFrame
+        DataFrame with a row for each hazard. Columns are averages and std deviations for total
+        severity and for each severity metric.
+    hazards : list
+        List of hazard names.
+
+    Returns
+    -------
+    curr_severities : dict
+        Dictionary with hazards as keys and severity category as values.
+
+    """
     severities = {hazard:[] for hazard in hazards}
     #severity table -> index
     for hazard in hazards:
@@ -443,6 +675,23 @@ def get_ICS_severity_USFS(severity_table, hazards):
     return curr_severities
 
 def get_ICS_severity_FAA(severity_table, hazards):
+    """
+    Assigns a severity category according ot FAA risk matrix
+
+    Parameters
+    ----------
+    severity_table : Pandas DataFrame
+        DataFrame with a row for each hazard. Columns are averages and std deviations for total
+        severity and for each severity metric.
+    hazards : list
+        List of hazard names.
+
+    Returns
+    -------
+    curr_severities : dict
+        Dictionary with hazards as keys and severity category as values.
+
+    """
     severities = {hazard:[] for hazard in hazards}
     #severity table -> index
     for hazard in hazards:
