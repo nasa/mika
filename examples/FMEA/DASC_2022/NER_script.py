@@ -18,7 +18,7 @@ from torch import cuda, FloatTensor
 from torch.nn import CrossEntropyLoss
 from datasets import Dataset
 
-from mika.kd.NER import read_doccano_annots, clean_doccano_annots, split_docs_to_sentances, check_doc_to_sentence_split, tokenize_and_align_labels, compute_metrics, compute_classification_report, build_confusion_matrix, plot_eval_results
+from mika.kd.NER import read_doccano_annots, clean_doccano_annots, split_docs_to_sentences, check_doc_to_sentence_split, tokenize_and_align_labels, compute_metrics, compute_classification_report, build_confusion_matrix, plot_eval_results
 
 #set up GPU
 device = 'cuda' if cuda.is_available() else 'cpu'
@@ -95,12 +95,12 @@ print(frequencies)
 
 #prepare dataset and dataloader
 #convert df from docs to sentences
-sentence_df = split_docs_to_sentances(text_df, id_col='Tracking #', tags=True)
+sentence_df = split_docs_to_sentences(text_df, id_col='Tracking #', tags=True)
 check_doc_to_sentence_split(sentence_df)
 
 inds_to_drop = [i for i in range(len(sentence_df)) if set(sentence_df.iloc[i]['tags'])=={'O'}]
 sentence_df = sentence_df.drop(inds_to_drop).reset_index(drop=True)
-llis_sentence_df = split_docs_to_sentances(llis_df, id_col='Lesson ID',  tags=True)
+llis_sentence_df = split_docs_to_sentences(llis_df, id_col='Lesson ID',  tags=True)
 check_doc_to_sentence_split(llis_sentence_df)
 inds_to_drop = [i for i in range(len(llis_sentence_df)) if set(llis_sentence_df.iloc[i]['tags'])=={'O'}]
 llis_sentence_df = llis_sentence_df.drop(inds_to_drop).reset_index(drop=True)

@@ -6,7 +6,21 @@ Created on Thu Aug 11 13:14:21 2022
 """
 
 #safecom utils
-def get_SAFECOM_severity_FAA(severities): #SAFECOM
+def get_SAFECOM_severity_FAA(severities):
+    """
+    Assigns a severity category according to FAA risk matrix
+
+    Parameters
+    ----------
+    severities : dict
+        Dictionary with keys as hazards and values as average severities.
+
+    Returns
+    -------
+    curr_severities : dict
+        Dictionary with keys as hazards and values as severity category.
+
+    """
     curr_severities = {hazard:0 for hazard in severities}
     for hazard in severities:
         s = severities[hazard]
@@ -25,6 +39,20 @@ def get_SAFECOM_severity_FAA(severities): #SAFECOM
 
 
 def get_SAFECOM_severity_USFS(severities):
+    """
+    Assigns a severity category according to USFS risk matrix
+
+    Parameters
+    ----------
+    severities : dict
+        Dictionary with keys as hazards and values as average severities.
+
+    Returns
+    -------
+    curr_severities : dict
+        Dictionary with keys as hazards and values as severity category.
+
+    """
     curr_severities = {hazard:0 for hazard in severities}
     for hazard in severities:
         s = severities[hazard]
@@ -40,6 +68,20 @@ def get_SAFECOM_severity_USFS(severities):
     return curr_severities
 
 def get_UAS_likelihood_FAA(frequency):
+    """
+    Assigns a liklihood category according to FAA risk matrix
+
+    Parameters
+    ----------
+    rates : dict
+        Dictionary with keys as hazards and values as rates of occurence.
+
+    Returns
+    -------
+    curr_likelihoods : dict
+        Dictionary with keys as hazards and values as likelihood category.
+
+    """
     curr_likelihoods = {hazard:0 for hazard in frequency}
     for hazard in frequency:
         r = frequency[hazard]
@@ -57,6 +99,20 @@ def get_UAS_likelihood_FAA(frequency):
     return curr_likelihoods
 
 def get_UAS_likelihood_USFS(frequency):
+    """
+    Assigns a liklihood category according to USFS risk matrix
+
+    Parameters
+    ----------
+    rates : dict
+        Dictionary with keys as hazards and values as rates of occurence.
+
+    Returns
+    -------
+    curr_likelihoods : dict
+        Dictionary with keys as hazards and values as likelihood category.
+
+    """
     curr_likelihoods = {hazard:0 for hazard in frequency}
     for hazard in frequency:
         r = frequency[hazard]
