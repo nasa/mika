@@ -27,7 +27,7 @@ contributing_factors = ['Human Factors', #'Weather', #'Software and Automation',
                         ]#'Environment - Non Weather Related']
 checkpoint = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),"models", "SafeAeroBERT", "checkpoint-1000")
 
-model_checkpoints = ["allenai/scibert_scivocab_uncased", 
+model_checkpoints = [#"allenai/scibert_scivocab_uncased", 
                      "bert-base-uncased", checkpoint] #add safeaerbert
 
 def get_most_recent_checkpoint(save_name, contributing_factor):
