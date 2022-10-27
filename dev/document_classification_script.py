@@ -231,4 +231,4 @@ ASRS.load(ASRS_file, id_col=ASRS_id_col, text_columns=ASRS_text_cols)
 ASRS.prepare_data(combine_columns=ASRS_text_cols, remove_incomplete_rows=False)
 ASRS_df = ASRS.data_df
 
-test_results_df, train_results_df, val_results_df, combined_results = train_test_model(ASRS_df, contributing_factors, model_checkpoints, train_size=100, test_size=50, val_size=500, compute_metrics=compute_metrics, save_results=True, batch_size=4)
+test_results_df, train_results_df, val_results_df, combined_results = train_test_model(ASRS_df, contributing_factors, model_checkpoints, train_size=100, test_size=50, val_size=50, compute_metrics=compute_metrics, save_results=True, batch_size=4)
