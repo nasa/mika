@@ -139,7 +139,7 @@ if __name__ == '__main__':
     document_id_col = "Unique IDs"
     ICS = Topic_Model_plus(document_id_col=document_id_col, extra_cols=extra_cols, text_columns=text_columns, combine_cols=False)
     ICS_tm.combine_cols = True
-    filepath = smart_nlp_path+r"\output data\ICS__combined_topics-May-26-2021"
+    filepath = ""
     ICS_tm.hlda_extract_models(filepath)
     ICS_tm.save_hlda_results()
     """
