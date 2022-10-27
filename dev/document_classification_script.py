@@ -55,12 +55,12 @@ def train_classifier(tokenizer, model, encoded_dataset, contributing_factor, com
     per_device_eval_batch_size=2,
     num_train_epochs=5,
     weight_decay=0.01,
-    push_to_hub=False,
-    gradient_accumulation_steps=8,
-    save_steps= 10,
-    gradient_checkpointing=True,
-    fp16=True,
-    optim="adafactor",
+    #push_to_hub=False,
+    #gradient_accumulation_steps=8,
+    #save_steps= 10,
+    #gradient_checkpointing=True,
+    #fp16=True,
+    #optim="adafactor",
     save_total_limit = 2 #saves only last 2 checkpoints
     )
     
@@ -70,7 +70,7 @@ def train_classifier(tokenizer, model, encoded_dataset, contributing_factor, com
     train_dataset=encoded_dataset["train"],
     eval_dataset=encoded_dataset["valid"],
     tokenizer=tokenizer,
-    #compute_metrics=compute_metrics
+    compute_metrics=compute_metrics
     )
     checkpoint = get_most_recent_checkpoint(save_name, contributing_factor)
     if checkpoint is not None:
