@@ -318,7 +318,7 @@ class Topic_Model_plus():
         """
         self.get_bert_coherence(coh_method, from_probs)
         self.__create_folder()
-        max_topics = max([len(self.BERT_models[col].topics)-1 for col in self.BERT_models])
+        max_topics = max([len(self.BERT_models[col].topics_)-1 for col in self.BERT_models])
         coherence_score = {"topic numbers": ["average score"]+['std dev']+[i for i in range(0,max_topics)]}
         for col in self.text_columns:
             coherence_score[col] = []
@@ -356,7 +356,7 @@ class Topic_Model_plus():
         self.diversity = {col: [] for col in self.text_columns}
         for col in self.text_columns:
             output = {'topics': [[words for words,_ in topic] 
-                                 for topic in self.BERT_models[col].topics.values()]}
+                                 for topic in self.BERT_models[col].topics_.values()]}
             score = topic_diversity.score(output)
             self.diversity[col].append(score)
     
@@ -544,7 +544,7 @@ class Topic_Model_plus():
                 except:
                     self.get_bert_coherence(coh_method, from_probs=from_probs)
                     topics_data["coherence"] = self.BERT_coherence[col]
-            for k in mdl.topics:
+            for k in mdl.topics_:
                 topics_data["topic number"].append(k)
                 topics_data["number of words"].append(len(mdl.get_topic(k)))
                 topics_data["topic words"].append(", ".join([word[0] for word in mdl.get_topic(k) if word[1]>p_thres]))
