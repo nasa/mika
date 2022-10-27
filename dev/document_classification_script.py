@@ -70,7 +70,7 @@ def train_classifier(tokenizer, model, encoded_dataset, contributing_factor, com
     train_dataset=encoded_dataset["train"],
     eval_dataset=encoded_dataset["valid"],
     tokenizer=tokenizer,
-    compute_metrics=compute_metrics
+    #compute_metrics=compute_metrics
     )
     checkpoint = get_most_recent_checkpoint(save_name, contributing_factor)
     if checkpoint is not None:
