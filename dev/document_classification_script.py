@@ -18,7 +18,7 @@ sys.path.append(os.path.join(".."))
 from mika.utils import Data
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
-
+os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 
 contributing_factors = ['Human Factors', #'Weather', #'Software and Automation', 
                         'Procedure', #'Airport', 'Airspace Structure', 
@@ -51,7 +51,7 @@ def train_classifier(tokenizer, model, encoded_dataset, contributing_factor, com
     save_strategy = "steps",
     learning_rate=1e-3,
     per_device_train_batch_size=batch_size,
-    per_device_eval_batch_size=batch_size,
+    per_device_eval_batch_size=2,
     num_train_epochs=5,
     weight_decay=0.01,
     push_to_hub=False,
@@ -230,4 +230,4 @@ ASRS.load(ASRS_file, id_col=ASRS_id_col, text_columns=ASRS_text_cols)
 ASRS.prepare_data(combine_columns=ASRS_text_cols, remove_incomplete_rows=False)
 ASRS_df = ASRS.data_df
 
-test_results_df, train_results_df, val_results_df, combined_results = train_test_model(ASRS_df, contributing_factors, model_checkpoints, train_size=4000, test_size=500, val_size=500, compute_metrics=compute_metrics, save_results=True, batch_size=4)
+#test_results_df, train_results_df, val_results_df, combined_results = train_test_model(ASRS_df, contributing_factors, model_checkpoints, train_size=4000, test_size=500, val_size=500, compute_metrics=compute_metrics, save_results=True, batch_size=4)
