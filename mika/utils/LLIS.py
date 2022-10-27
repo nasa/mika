@@ -6,6 +6,23 @@ Created on Fri Aug 19 16:14:04 2022
 """
 
 def drop_uniformitive_text(data_df, text_cols):
+    """
+    removes rows from LLIS dataframe where the rows simple state
+    "see XXX" or "same as XXX" or "none"
+
+    Parameters
+    ----------
+    data_df : Pandas DataFrame
+        DataFrame of LLIS documents.
+    text_cols : list
+        List of columns in data_df containing text.
+
+    Returns
+    -------
+    data_df : Pandas DataFrame
+        DataFrame of LLIS documents.
+
+    """
     rows_to_drop = []
     for i in range(0, len(data_df)):
         drop = False
