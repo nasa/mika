@@ -7,7 +7,7 @@ Functions for ICS-209-PLUS
 
 import sys
 import os
-sys.path.append(os.path.join("..","..",".."))
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)),"..","..",".."))
 
 from mika.kd import Topic_Model_plus
 from mika.utils import Data
@@ -30,15 +30,15 @@ if __name__ == '__main__':
     text_columns = ["REMARKS", "SIGNIF_EVENTS_SUMMARY", "MAJOR_PROBLEMS"]
     document_id_col = "INCIDENT_ID"
     
-    file_name = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)),'data','ICS','ics209-plus-wf_sitreps_1999to2014.csv')
+    file_name = os.path.join('data','ICS','ics209-plus-wf_sitreps_1999to2014.csv')
     name = os.path.join('ICS_bertopic')
     ICS_data = Data()
     ICS_data.load(file_name, id_col=document_id_col, text_columns=text_columns, load_kwargs={'dtype':str})
-    ICS_data.prepare_data(create_ids=True, combine_columns=text_columns, remove_incomplete_rows=False)
+    ICS_data.prepare_data(create_ids=True, combine_columns=text_columns, remove_incomplete_rows=True)
     ICS_data.text_columns = ['Combined Text']
     save_words = ['jurisdictions', 'team', 'command', 'organization', 'type', 'involved', 'transition', 'transfer', 'impact', 'concern', 'site', 'nation', 'political', 'social', 'adjacent', 'community', 'cultural', 'tribal', 'monument', 'archeaological', 'highway', 'traffic', 'road', 'travel', 'interstate', 'closure', 'remain', 'remains', 'close', 'block', 'continue', 'impact', 'access', 'limit', 'limited', 'terrain', 'rollout', 'snag', 'steep', 'debris', 'access', 'terrian', 'concern', 'hazardous', 'pose', 'heavy', 'rugged', 'difficult', 'steep', 'narrow', 'violation', 'notification', 'respond', 'law', 'patrol', 'cattle', 'buffalo', 'grow', 'allotment', 'ranch', 'sheep', 'livestock', 'grazing', 'pasture', 'threaten', 'concern', 'risk', 'threat', 'evacuation', 'evacuate', ' threaten', 'threat', 'resident', ' residence', 'level', 'notice', 'community', 'structure', 'subdivision', 'mandatory', 'order', 'effect', 'remain', 'continue', 'issued', 'issue', 'injury', 'hospital', 'injured', 'accident', 'treatment', 'laceration', 'firefighter', 'treated', 'minor', 'report', 'transport', 'heat', 'shoulder', 'ankle', 'medical', 'released', 'military', 'unexploded', 'national', 'training', 'present', 'ordinance', 'guard', 'infrastructure', 'utility', 'powerline', 'water', 'electric', 'pipeline', 'powerlines', 'watershed', 'pole', 'power', 'gas', 'concern', 'near', 'hazard', 'critical', 'threaten', 'threat', 'off', 'weather', 'behavior', 'wind', 'thunderstorm', 'storm', 'gusty', 'lightning', 'flag', 'unpredictable', 'extreme', 'erratic', 'strong', 'red', 'warning', 'species', 'specie', 'habitat', 'animal', 'plant', 'conservation', 'threaten', 'endanger', 'threat', 'sensitive', 'threatened', 'endangered', 'risk', 'loss', 'impacts', 'unstaffed', 'resources', 'support', 'crew', 'aircraft', 'helicopter', 'engines', 'staffing', 'staff', 'lack', 'need', 'shortage', 'minimal', 'share', 'necessary', 'limited', 'limit', 'fatigue', 'flood', 'flashflood', 'flash', 'risk', 'potential', 'mapping', 'map', 'reflect', 'accurate', 'adjustment', 'change', 'reflect', 'aircraft', 'heli', 'helicopter', 'aerial', 'tanker', 'copter', 'grounded', 'ground', 'suspended', 'suspend', 'smoke', 'impact', 'hazard', 'windy', 'humidity', 'moisture', 'hot', 'drought', 'low', 'dry', 'prolonged']
     #use filtered reports
-    file = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)),'data','ICS','summary_reports_cleaned.csv')
+    file = os.path.join('data','ICS','summary_reports_cleaned.csv')
     filtered_df = pd.read_csv(file)
     filtered_ids = filtered_df['INCIDENT_ID'].unique()
     ICS_data.data_df = ICS_data.data_df.loc[ICS_data.data_df['INCIDENT_ID'].isin(filtered_ids)].reset_index(drop=True)

@@ -51,7 +51,7 @@ start_time = time.time() # start timer
 
 # sbert model
 #sbert_model = SentenceTransformer('msmarco-roberta-base-v3') # this model is for asymmetric search and is tuned for cosine similarity (models tuned for cosine similarity will prefer retrieval of shorter documents - models trained for dot product will prefer retrieval of longer documents); this is a roberta model as opposed to pure bert; can be replaced with fine tuned model
-sbert_model = SentenceTransformer(os.path.join('results', 'fine_tuned_llis_model')) # fine tuned model
+sbert_model = SentenceTransformer(os.path.join('models', 'fine_tuned_llis_model')) # fine tuned model
 
 # get query embedding
 query_embedding = sbert_model.encode(query, convert_to_tensor=True)

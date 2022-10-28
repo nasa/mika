@@ -5,7 +5,8 @@ Created on Wed Jan  5 15:40:54 2022
 @author: srandrad
 """
 
-import os
+import sys, os
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)),"..","..",".."))
 import pandas as pd
 from sentence_transformers import SentenceTransformer, util
 import time
