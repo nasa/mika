@@ -53,7 +53,7 @@ def train_classifier(tokenizer, model, encoded_dataset, contributing_factor, com
     learning_rate=1e-3,
     per_device_train_batch_size=batch_size,
     per_device_eval_batch_size=2,
-    num_train_epochs=5,
+    num_train_epochs=2,
     weight_decay=0.01,
     #push_to_hub=False,
     #gradient_accumulation_steps=8,
@@ -95,13 +95,15 @@ def train_test_model(ASRS_df, contributing_factors, models, train_size, test_siz
     X_train, y_train, X_val, y_val, X_test, y_test = split_data_for_all_categories(contributing_factors, X, y, train_size, test_size, val_size)
     save_data_counts(contributing_factors, X_train, y_train, X_val, y_val, X_test, y_test)
     tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+    
     for model_checkpoint in models:
+        classification_model = AutoModelForSequenceClassification.from_pretrained(model_checkpoint, num_labels=2)
         for contributing_factor in contributing_factors:
             print(model_checkpoint, "-----", contributing_factor)
             cuda.empty_cache()
-            classification_model = AutoModelForSequenceClassification.from_pretrained(model_checkpoint, num_labels=2)
             encoded_dataset = prepare_data(X_train, y_train, X_val, y_val, X_test, y_test, contributing_factor, tokenizer)
-            classification_model.to('cuda')
+            print(encoded_dataset)
+            #classification_model.to('cuda')
             trainer = train_classifier(tokenizer, classification_model, encoded_dataset, contributing_factor, compute_metrics, model_checkpoint, batch_size=batch_size)
             precision, recall, fscore, accuracy = evaluate_test_set(trainer, encoded_dataset, data_type='test', average='weighted')
             test_results[model_checkpoint].append(accuracy)
@@ -221,14 +223,14 @@ def compute_metrics(eval_predictions):
             "recall": recall,
             "f1": fscore, 
             "accuracy": accuracy}
-
-#load in data
-ASRS_file = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),'data/ASRS/ASRS_1988_2022.csv')
-ASRS_id_col = 'ACN'
-ASRS_text_cols = ['Report 1', 'Report 1.1', 'Report 2',	'Report 2.1', 'Report 1.2']
-ASRS = Data()
-ASRS.load(ASRS_file, id_col=ASRS_id_col, text_columns=ASRS_text_cols)
-ASRS.prepare_data(combine_columns=ASRS_text_cols, remove_incomplete_rows=False)
-ASRS_df = ASRS.data_df
-
-test_results_df, train_results_df, val_results_df, combined_results = train_test_model(ASRS_df, contributing_factors, model_checkpoints, train_size=100, test_size=50, val_size=50, compute_metrics=compute_metrics, save_results=True, batch_size=4)
+if __name__ == '__main__':
+    #load in data
+    ASRS_file = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),'data/ASRS/ASRS_1988_2022.csv')
+    ASRS_id_col = 'ACN'
+    ASRS_text_cols = ['Report 1', 'Report 1.1', 'Report 2',	'Report 2.1', 'Report 1.2']
+    ASRS = Data()
+    ASRS.load(ASRS_file, id_col=ASRS_id_col, text_columns=ASRS_text_cols)
+    ASRS.prepare_data(combine_columns=ASRS_text_cols, remove_incomplete_rows=False)
+    ASRS_df = ASRS.data_df
+    
+    test_results_df, train_results_df, val_results_df, combined_results = train_test_model(ASRS_df, contributing_factors, model_checkpoints, train_size=100, test_size=50, val_size=50, compute_metrics=compute_metrics, save_results=True, batch_size=4)
