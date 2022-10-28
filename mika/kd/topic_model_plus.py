@@ -1327,9 +1327,6 @@ class Topic_Model_plus():
             self.lda_num_topics[col] = self.lda_models[col].k
         #print("LDA models extracted from: ", file_path)
         preprocessed_filepath = os.path.join(file_path,"preprocessed_data")
-        #if self.text_columns == ['Combined Text']:
-        #    self.combine_cols = True
-        #    preprocessed_filepath += "_combined_text"
         self.data.load(preprocessed_filepath+".csv", preprocessed=True, id_col=self.data.id_col, text_columns=self.data.text_columns)
         self.folder_path = file_path
         
