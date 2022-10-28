@@ -5,7 +5,7 @@ TopicModel+ class definition
 @author: srandrad, hswalsh
 """
 import pandas as pd
-#import tomotopy as tp
+import tomotopy as tp
 import numpy as np
 from time import time,sleep
 from tqdm import tqdm
@@ -27,7 +27,7 @@ from bertopic import BERTopic
 from sentence_transformers import SentenceTransformer
 import gensim.corpora as corpora
 from gensim.models.coherencemodel import CoherenceModel
-#from octis.evaluation_metrics.diversity_metrics import TopicDiversity
+from octis.evaluation_metrics.diversity_metrics import TopicDiversity
 
 class Topic_Model_plus():
     """
