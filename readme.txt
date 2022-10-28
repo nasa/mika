@@ -14,8 +14,12 @@ smart_nlp (main project directory)
 	|
 	---readme.txt - this file
 	---requirements.txt - python package requirements
-	---module/ - main project code
+	---mika/ - main MIKA toolkit code
 	---test/ - test files, using python unittest
+	---docs/ - documentation files
+	---examples/ - examples of implementing MIKA capabilities
+	---models/ - any custom BERT models used in MIKA
+
 
 # Quick Start
 
