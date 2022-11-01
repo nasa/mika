@@ -38,17 +38,17 @@ model = os.path.join('models', 'fine_tuned_llis_model')
 query = 'fatigue crack'
 ir_ntsb = search(ntsb_data, model)
 embeddings_path = os.path.join('data', 'LLIS', 'llis_sentence_embeddings_finetune.npy')
-#embeddings_path = os.path.join('data', 'LLIS', 'llis_sentence_embeddings.npy')
-#ir_ntsb.get_sentence_embeddings(embeddings_path) # comment this out if the embeddings already exist
-ir_ntsb.load_sentence_embeddings(embeddings_path)
+embeddings_path = os.path.join('data', 'LLIS', 'llis_sentence_embeddings.npy')
+ir_ntsb.get_sentence_embeddings(embeddings_path) # comment this out if the embeddings already exist
+#ir_ntsb.load_sentence_embeddings(embeddings_path) # uncomment this if you wish to load sentence embeddings that already exist
 print(ir_ntsb.run_search(query,return_k=5))
 
 # taxonomy
 # - narr_cause and narr_accf/narr_accp - these are in ntsb_full_narratives.csv
 tm = Topic_Model_plus(text_columns=ntsb_text_columns, data=ntsb_data)
 vectorizer_model = CountVectorizer(ngram_range=(1, 3), stop_words="english") #removes stopwords
-#tm.bert_topic(sentence_transformer_model=None, umap=None, hdbscan=None, count_vectorizor=vectorizer_model, ngram_range=(1,3), BERTkwargs={}, from_probs=False, thresh=0.01)
-#tm.save_bert_model()
+tm.bert_topic(sentence_transformer_model=None, umap=None, hdbscan=None, count_vectorizor=vectorizer_model, ngram_range=(1,3), BERTkwargs={}, from_probs=False, thresh=0.01)
+tm.save_bert_model()
 
 BERTkwargs={"calculate_probabilities":True, "top_n_words": 20, 'min_topic_size':150}
 tm.bert_topic(count_vectorizor=vectorizer_model, BERTkwargs=BERTkwargs, from_probs=True)
