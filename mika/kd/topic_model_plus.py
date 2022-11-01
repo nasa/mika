@@ -355,8 +355,10 @@ class Topic_Model_plus():
         topic_diversity = TopicDiversity(topk=topk)
         self.diversity = {col: [] for col in self.text_columns}
         for col in self.text_columns:
-            output = {'topics': [[words for words,_ in topic] 
-                                 for topic in self.BERT_models[col].topics_.values()]}
+            ordered_topics = list(set(self.BERT_models[col].topics_))
+            ordered_topics.sort()
+            output = {'topics': [[words for words,_ in self.BERT_models[col].get_topic(topic)] 
+                                 for topic in ordered_topics]}
             score = topic_diversity.score(output)
             self.diversity[col].append(score)
     
@@ -544,7 +546,9 @@ class Topic_Model_plus():
                 except:
                     self.get_bert_coherence(coh_method, from_probs=from_probs)
                     topics_data["coherence"] = self.BERT_coherence[col]
-            for k in mdl.topics_:
+            ordered_topics = list(set(mdl.topics_))
+            ordered_topics.sort()
+            for k in ordered_topics:
                 topics_data["topic number"].append(k)
                 topics_data["number of words"].append(len(mdl.get_topic(k)))
                 topics_data["topic words"].append(", ".join([word[0] for word in mdl.get_topic(k) if word[1]>p_thres]))
