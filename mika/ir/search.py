@@ -24,7 +24,6 @@ class search():
         
         self.corpus = [data.data_df[col].tolist() for col in self.cols]
         self.corpus = [item for sublist in self.corpus for item in sublist]
-        #self.corpus = remove_nans(self.corpus)
         self.__make_sentence_corpus()
         return
     
@@ -55,7 +54,7 @@ class search():
         
         self.__make_sentence_corpus()
         self.sentence_corpus_embeddings = self.sbert_model.encode(self.sentence_corpus, convert_to_tensor=True)
-        embeddings_as_numpy = self.sentence_corpus_embeddings.numpy()
+        embeddings_as_numpy = self.sentence_corpus_embeddings.cpu().numpy()
         np.save(savepath, embeddings_as_numpy)
         
     def load_sentence_embeddings(self, filepath):
