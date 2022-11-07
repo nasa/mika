@@ -51,7 +51,7 @@ vectorizer_model = CountVectorizer(ngram_range=(1, 3), stop_words="english") #re
 tm.bert_topic(sentence_transformer_model=None, umap=None, hdbscan=None, count_vectorizor=vectorizer_model, ngram_range=(1,3), BERTkwargs={}, from_probs=False, thresh=0.01)
 tm.save_bert_model()
 
-BERTkwargs={"calculate_probabilities":True, "top_n_words": 20, 'min_topic_size':150}
+BERTkwargs={"top_n_words": 20, 'min_topic_size':150}
 tm.bert_topic(count_vectorizor=vectorizer_model, BERTkwargs=BERTkwargs, from_probs=True)
 tm.save_bert_results(from_probs=True)
 tm.save_bert_taxonomy()
@@ -69,7 +69,7 @@ print(device)
 fmea = FMEA()
 fmea.load_model(model_checkpoint)
 print("loaded model")
-input_data = fmea.load_data(ntsb_recent_filepath, formatted=False, text_col='narr_accf')
+input_data = fmea.load_data(ntsb_recent_filepath, id_col=ntsb_document_id_col, formatted=False, text_col='narr_accf')
 
 print("loaded data")
 preds = fmea.predict()
