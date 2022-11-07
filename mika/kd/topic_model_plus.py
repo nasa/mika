@@ -11,18 +11,9 @@ from time import time,sleep
 from tqdm import tqdm
 import os
 import datetime
-from nltk.corpus import stopwords
-from nltk.corpus import wordnet
-from nltk.corpus import words
-from nltk.stem import WordNetLemmatizer
-from nltk import pos_tag
-from gensim.utils import simple_tokenize
-from gensim.models import Phrases
 import pyLDAvis
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import normalize
-from symspellpy import SymSpell, Verbosity
-import pkg_resources
 from bertopic import BERTopic
 from sentence_transformers import SentenceTransformer
 import gensim.corpora as corpora
@@ -140,12 +131,7 @@ class Topic_Model_plus():
 
 #   TO DO:
 #   add hyper parameter tuning for lda (alpha and beta and k/number of topics) and hlda (eta, alpha, gamma)
-#   some of the attributes are ambiguously named - can we make these clearer? e.g. name, combine_cols
-#   some docstring short descriptions may be improved
     
-    # private attributes
-    __english_vocab = set([w.lower() for w in words.words()])
-
     def __init__(self, text_columns=[], data=None, ngrams=None):
         """
         CLASS CONSTRUCTORS
@@ -292,7 +278,42 @@ class Topic_Model_plus():
             if self.reduced: path = "_Reduced" + path
             self.BERT_models[col].save(os.path.join(self.folder_path,col+path),save_embedding_model=embedding_model)
         self.data.save(results_path=os.path.join(self.folder_path,"preprocessed_data.csv"))
-        
+    
+    def load_bert_model(self, file_path, reduced=False, from_probs=False, thresh=0.01):
+        """
+        Loads trained bertopic model(s)
+
+        Parameters
+        ----------
+        file_path : string
+            file path to the folder storing the model(s)
+        reduced : bool, optional
+            True if the model is a reduced topic model, by default False
+        from_probs : bool, optional
+            Whether or not to use document topic probabilities to assign topics.
+            True to use probabilities - i.e., each document can have multiple topics.
+            False to not use probabilities - i.e., each document only has one topics, by default False
+        thresh : float, optional
+            probability threshold used when from_probs=True, by default 0.01
+        """
+        self.BERT_models = {}
+        self.BERT_model_topics_per_doc = {}
+        self.BERT_model_probs={}
+        self.BERT_model_all_topics_per_doc={}
+        for col in self.text_columns:
+            path = "_BERT_model_object.bin"
+            if reduced: 
+                path = "_Reduced" + path
+                self.reduced = True
+            self.BERT_models[col] = BERTopic.load(os.path.join(file_path,col+path))
+            self.BERT_model_topics_per_doc[col] = self.BERT_models[col].topics_
+            self.BERT_model_probs[col] = self.BERT_models[col].probabilities_
+            if from_probs == True:
+                self.__get_all_topics_for_doc(col, self.BERT_model_probs[col], thresh, self.BERT_model_topics_per_doc[col])
+        preprocessed_filepath = os.path.join(file_path,"preprocessed_data")
+        self.data.load(preprocessed_filepath+".csv", preprocessed=True, id_col=self.data.id_col, text_columns=self.data.text_columns)
+        self.folder_path = file_path
+
     def save_bert_coherence(self, return_df=False, coh_method='u_mass', from_probs=False):
         """
         saves the coherence scores for a bertopic model
@@ -383,7 +404,7 @@ class Topic_Model_plus():
         diversity_df = pd.DataFrame(self.diversity)
         if return_df == True:
             return diversity_df
-        path = "BERT_diversity_"
+        path = "BERT_diversity"
         if self.reduced: path = "Reduced_" + path
         diversity_df.to_csv(os.path.join(self.folder_path,path+".csv"))
         
@@ -425,6 +446,7 @@ class Topic_Model_plus():
                 embeddings = sentence_model.encode(corpus, show_progress_bar=False)
                 topic_model = BERTopic(umap_model=umap, vectorizer_model=count_vectorizor, hdbscan_model=hdbscan,
                                        verbose=True, n_gram_range=ngram_range, embedding_model=sentence_model,
+                                       calculate_probabilities=from_probs,
                                        **BERTkwargs)
                 topics, probs = topic_model.fit_transform(corpus, embeddings)
                 self.sentence_models[col] = sentence_model
@@ -432,27 +454,43 @@ class Topic_Model_plus():
             else:
                 corpus = self.data_df[col]
                 topic_model = BERTopic(umap_model=umap, vectorizer_model=count_vectorizor, hdbscan_model=hdbscan,
-                                       verbose=True, n_gram_range=ngram_range, **BERTkwargs)
+                                       verbose=True, n_gram_range=ngram_range, calculate_probabilities=from_probs,
+                                       **BERTkwargs)
                 topics, probs = topic_model.fit_transform(corpus)
             self.BERT_models[col] = topic_model
             self.BERT_model_topics_per_doc[col] = topics
             self.BERT_model_probs[col] = probs
             if from_probs == True:
-                best_topics_per_doc = [np.argmax(prob_list) if max(prob_list)>thresh else -1 for prob_list in probs]
-                self.BERT_model_topics_per_doc[col] = best_topics_per_doc
-                self.BERT_model_all_topics_per_doc[col] = [[] for i in range(len(probs))]
-                for i in range(len(probs)):
-                    topic_probs = probs[i]#.strip("[]").split(" ")
-                    if len(topic_probs) > len(topics):
-                        topic_probs = [t for t in topic_probs if len(t)>0]
-                    topic_indices = [ind for ind in range(len(topic_probs)) if float(topic_probs[ind])>thresh]
-                    if len(topic_indices)==0:
-                        topic_indices = [-1]
-                        self.BERT_model_all_topics_per_doc[col][i] = [-1]
-                    else:
-                        self.BERT_model_all_topics_per_doc[col][i] = topic_indices
-
+                self.__get_all_topics_for_doc(col, probs, thresh, topics)
             self.reduced = False
+
+    def __get_all_topics_for_doc(self, col, probs, thresh, topics):
+        """
+        Helper function that gets all the topics for every document based on a probability threshold
+        Parameters
+        ----------
+        col : string
+            column of the dataset currently being used
+        probs : list
+            list of probabilities per topic per document
+        thresh : float
+            threshold that a p should be greater than for a document to be considered in the topic
+        topics : list
+            list of topics
+        """
+        best_topics_per_doc = [np.argmax(prob_list) if max(prob_list)>thresh else -1 for prob_list in probs]
+        self.BERT_model_topics_per_doc[col] = best_topics_per_doc
+        self.BERT_model_all_topics_per_doc[col] = [[] for i in range(len(probs))]
+        for i in range(len(probs)):
+            topic_probs = probs[i]#.strip("[]").split(" ")
+            if len(topic_probs) > len(topics):
+                topic_probs = [t for t in topic_probs if len(t)>0]
+            topic_indices = [ind for ind in range(len(topic_probs)) if float(topic_probs[ind])>thresh]
+            if len(topic_indices)==0:
+                topic_indices = [-1]
+                self.BERT_model_all_topics_per_doc[col][i] = [-1]
+            else:
+                self.BERT_model_all_topics_per_doc[col][i] = topic_indices
     
     def reduce_bert_topics(self, num=30, from_probs=True, thresh=0.01):
         """
@@ -477,25 +515,14 @@ class Topic_Model_plus():
         for col in self.text_columns:
             corpus = self.data_df[col]
             topic_model = self.BERT_models[col]
-            topics, probs = topic_model.reduce_topics(corpus, self.BERT_model_topics_per_doc[col], 
-                                                      self.BERT_model_probs[col] , nr_topics=num)
+            topic_model.reduce_topics(corpus, #self.BERT_model_topics_per_doc[col], 
+                                                      #self.BERT_model_probs[col] , 
+                                                      nr_topics=num)
             self.BERT_models[col] = topic_model
-            self.BERT_model_topics_per_doc[col] = topics
+            self.BERT_model_topics_per_doc[col] = topic_model.topics_
+            probs = topic_model.probabilities_
             if from_probs == True:
-                best_topics_per_doc = [np.argmax(prob_list) if max(prob_list)>thresh else -1 for prob_list in probs]
-                self.BERT_model_topics_per_doc[col] = best_topics_per_doc
-                self.BERT_model_all_topics_per_doc[col] = [[] for i in range(len(probs))]
-                for i in range(len(probs)):
-                    topic_probs = probs[i]#.strip("[]").split(" ")
-                    if len(topic_probs) > len(topics):
-                        topic_probs = [t for t in topic_probs if len(t)>0]
-                    topic_indices = [ind for ind in range(len(topic_probs)) if float(topic_probs[ind])>thresh]
-                    if len(topic_indices)==0:
-                        topic_indices = [-1]
-                        self.BERT_model_all_topics_per_doc[col][i] = [-1]
-                    else:
-                        self.BERT_model_all_topics_per_doc[col][i] = topic_indices
-                        
+                self.__get_all_topics_for_doc(col, probs, thresh, self.BERT_model_topics_per_doc[col])
             self.BERT_model_probs[col] = probs
             
     def save_bert_topics(self, return_df=False, p_thres=0.0001, coherence=False, coh_method='u_mass', from_probs=False):
@@ -695,9 +722,9 @@ class Topic_Model_plus():
         if return_df == True:
             return taxonomy_df
         if self.reduced:
-            file = os.path.join(self.folder_path,col+"_reduced_bert_taxonomy.csv")
+            file = os.path.join(self.folder_path,"Reduced_BERT_taxonomy.csv")
         else: 
-            file = os.path.join(self.folder_path,'bert_taxonomy.csv')
+            file = os.path.join(self.folder_path,'BERT_taxonomy.csv')
         taxonomy_df.to_csv(file)
     
     def save_bert_document_topic_distribution(self, return_df=False):
@@ -724,9 +751,9 @@ class Topic_Model_plus():
         if return_df == True:
             return doc_df
         if self.reduced:
-            file = os.path.join(self.folder_path,col+"_reduced_bert_topic_dist_per_doc.csv")
+            file = os.path.join(self.folder_path,"Reduced_BERT_topic_dist_per_doc.csv")
         else: 
-            file = os.path.join(self.folder_path,"bert_topic_dist_per_doc.csv")
+            file = os.path.join(self.folder_path,"BERT_topic_dist_per_doc.csv")
         doc_df.to_csv(file)
         
     def save_bert_results(self, coherence=False, coh_method='u_mass', from_probs=True, thresh=0.01, topk=10):
@@ -1884,7 +1911,6 @@ class Topic_Model_plus():
         None.
 
         """
-        #TO DO: add extract preprocessed data, use existing folder
         self.hlda_models = {}
         self.hlda_coherence = {}
         for col in self.text_columns:
