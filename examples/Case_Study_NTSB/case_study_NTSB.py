@@ -69,10 +69,13 @@ print(device)
 fmea = FMEA()
 fmea.load_model(model_checkpoint)
 print("loaded model")
-input_data = fmea.load_data(ntsb_recent_filepath, id_col=ntsb_document_id_col, formatted=False, text_col='narr_accf')
+input_data = fmea.load_data('narr_accf', ntsb_document_id_col, filepath=ntsb_recent_filepath, formatted=False)
 
 print("loaded data")
 preds = fmea.predict()
+df = fmea.get_entities_per_doc()
+fmea.group_docs_with_meta(grouping_col='Occurrence_Description', additional_cols=['Phase no'])
+fmea.grouped_df.to_csv(os.path.join(os.getcwd(),"safecom_fmea_test.csv"))
 
 # HEAT
 # - aircraft info table
