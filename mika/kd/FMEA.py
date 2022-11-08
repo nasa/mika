@@ -10,7 +10,7 @@ import os
 import pandas as pd
 import numpy as np
 from transformers import Trainer, pipeline, TrainingArguments, AutoTokenizer, DataCollatorForTokenClassification, BertForTokenClassification
-from mika.kd.NER import build_confusion_matrix, compute_classification_report, split_docs_to_sentences, tokenize, tokenize_and_align_labels, read_doccano_annots, clean_doccano_annots
+from mika.kd.NER import build_confusion_matrix, compute_classification_report, split_docs_to_sentences, read_doccano_annots, clean_doccano_annots
 #from models import FMEA_NER
 from datasets import load_from_disk, Dataset
 from torch import cuda, tensor
@@ -275,7 +275,7 @@ class FMEA():
         self.data_df[self.id_col] = self.data_df.index.tolist()
         return self.data_df
     
-    def group_docs_with_meta(self, grouping_col, cluster_by=['CAU', 'MOD'], additional_cols=[]):
+    def group_docs_with_meta(self, grouping_col, additional_cols=[], sample=1):
         """
         Currently unused and in operable
         Intented function is to group documents into an FMEA using a grouping column,
@@ -285,10 +285,10 @@ class FMEA():
         ----------
         grouping_col : string
             The column in the original dataset used to group documents into FMEA rows.
-        cluster_by : TYPE, optional
-            DESCRIPTION. The default is ['CAU', 'MOD'].
         additional_cols : list of strings, optional
             additional columns in a dataset to include in the FMEA. The default is [].
+        sample : int, optional
+            Number of samples to pull for each FMEA row. The default is 1.
 
         Returns
         -------
@@ -296,25 +296,30 @@ class FMEA():
             DESCRIPTION.
 
         """
-        self.data_df[self.id_col] = self.data_df.index.tolist()
+        #self.data_df[self.id_col] = self.data_df.index.tolist()
         temp_grouped_df = self.data_df.copy()
         #group reports by category/mission type/phase
-        temp_grouped_df[grouping_col] = self.raw_df[grouping_col].tolist()
-        for col in additional_cols:
-            temp_grouped_df[col] = self.raw_df[col].tolist()
-        grouping_col_vals = temp_grouped_df[grouping_col].unique()
-        grouped_dfs = {val: temp_grouped_df.loc[temp_grouped_df[grouping_col]==val].reset_index(drop=True) for val in grouping_col_vals if val is not np.nan}
-        if len(grouping_col_vals) > len(grouped_dfs):
-            grouped_dfs['nan'] = temp_grouped_df.loc[temp_grouped_df[grouping_col].isnull()].reset_index(drop=True)
-        #within each category/mission type/phase, group by mode/cause
-        clustered_dfs = []
-        for val in grouped_dfs:
-            df = grouped_dfs[val]
-            grouped_df = self.cluster(df, cluster_by, additional_cols) ###TODO: define and fix this
-            grouped_df[grouping_col] = [val for i in range(len(grouped_df))]
-            clustered_dfs.append(grouped_df)
-        self.grouped_df = pd.concat(clustered_dfs)
+        temp_grouped_df['cluster'] = self.raw_df[grouping_col].tolist()
+        #cluster = self.raw_df[grouping_col].tolist()
+        agg_dict = {'CAU': lambda x: '; '.join([i for i in x if i!="" and type(i)==str]),
+                    'MOD': lambda x: '; '.join([i for i in x if i!="" and type(i)==str]),
+                    'EFF': lambda x: '; '.join([i for i in x if i!="" and type(i)==str]),
+                    'CON': lambda x: '; '.join([i for i in x if i!="" and type(i)==str]),
+                    'REC': lambda x: '; '.join([i for i in x if i!="" and type(i)==str]),
+                    self.id_col: lambda x: '; '.join([str(i) for i in x])}#str(x))} #this may not work for all data sets
+        ad_col_dict = {col: lambda x: '; '.join(set([i.replace("Fire, ","") for i in x])) for col in additional_cols}
+        agg_dict.update(ad_col_dict)
+        self.grouped_df = temp_grouped_df.groupby('cluster').agg(agg_dict)
+
+        sampled_ids = []
+        for i in range(len(self.grouped_df)):
+            ids = self.grouped_df.iloc[i][self.id_col].split("; ")
+            sampled = random.sample(ids, min(len(ids),sample))
+            sampled = "; ".join(sampled)
+            sampled_ids.append(sampled)
+        self.grouped_df['Sampled '+self.id_col] = sampled_ids
         return self.grouped_df
+        
     
     def group_docs_manual(self, filename, grouping_col, additional_cols=[], sample=1):
         """
@@ -450,7 +455,7 @@ class FMEA():
     
     def get_year_per_doc(self, year_col, config='/'):
         """
-        #currently unused????
+        Used to convert dates to years prior to calculating frequency
 
         Parameters
         ----------
@@ -496,11 +501,11 @@ class FMEA():
         years_frequency = {year:[] for year in years}
         for i in range(len(self.grouped_df)):
             ids = self.grouped_df.iloc[i][self.id_col].split("; ")
-            year_ids = self.raw_df.loc[self.raw_df[self.id_col].isin(ids)][year_col].tolist()#[num.split("-")[0] for num in ids]
+            year_ids = self.raw_df.loc[self.raw_df[self.id_col].isin(ids)][year_col].tolist()
             for year in years_frequency:
                 years_frequency[year].append(year_ids.count(year))
         for year in years_frequency:
-            self.grouped_df[year+" Frequency"] = years_frequency[year]
+            self.grouped_df[str(year)+" Frequency"] = years_frequency[year]
         # FAA frequency: 
         self.grouped_df['rate'] = self.grouped_df['Total Frequency']/len(years)
         FAA_freqs = []
@@ -548,7 +553,7 @@ class FMEA():
             severity_per_row = []
             for i in range(len(self.grouped_df)):
                 ids = self.grouped_df.iloc[i][self.id_col].split("; ")
-                temp_df = self.raw_df.loc[self.raw_df[self.id_col ].isin(ids)]
+                temp_df = self.raw_df.loc[self.raw_df[self.id_col].astype(str).isin(ids)]
                 severities = temp_df['severity'].tolist()
                 severity_per_row.append(np.average(severities))
             self.grouped_df['severity'] = severity_per_row
@@ -575,7 +580,7 @@ class FMEA():
         self.grouped_df['risk'] = self.grouped_df['severity'] * self.grouped_df['frequency']
         return
     
-    def build_fmea(self, severity_func, group_by, group_by_kwargs={}, post_process_kwargs={}):
+    def build_fmea(self, severity_func, group_by, year_col, group_by_kwargs={}, post_process_kwargs={}, save=True):
         """
         Builds the FMEA using the above functions, all in one call.
         Less customizable, but useful for a quick implementation.
@@ -586,6 +591,8 @@ class FMEA():
             DESCRIPTION.
         group_by : 'string'
             method to group together the FMEA rows, either manual file or by meta data.
+        year_col : string
+            The column the year for the report is stored in. 
         group_by_kwargs : dict, optional
             dictionary containing all inputs for the group_by function. The default is {}.
         post_process_kwargs : dict, optional
@@ -601,13 +608,14 @@ class FMEA():
             self.group_docs_manual(**group_by_kwargs)
         elif group_by == 'meta':
             self.group_docs_with_meta(**group_by_kwargs)
-        self.calc_frequency()
+        self.calc_frequency(year_col)
         self.calc_severity(severity_func)
         self.calc_risk()
         #prune excess columns, add mission phase
         self.post_process_fmea(**post_process_kwargs)
         #save table
-        self.fmea_df.to_csv(os.path.join(os.getcwd(),"fmea.csv"))
+        if save == True:
+            self.fmea_df.to_csv(os.path.join(os.getcwd(),"fmea.csv"))
     
     def display_doc(self, doc_id, save=True, output_path="", colors_path=None, pred=True):
         """
