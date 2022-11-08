@@ -60,7 +60,7 @@ if __name__ == '__main__':
     
     file = os.path.join(os.getcwd(),"topic_model_results/preprocessed_data.csv")
     
-    input_data = fmea.load_data(file, formatted=False, text_col='Raw_Narrative', id_col="ID") #Text
+    input_data = fmea.load_data(filepath=file, formatted=False, text_col='Raw_Narrative', id_col="ID") #Text
     
     print("loaded data")
     preds = fmea.predict()

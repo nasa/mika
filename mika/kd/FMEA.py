@@ -92,7 +92,7 @@ class FMEA():
             self.token_classifier = pipeline("token-classification", model=model_checkpoint, aggregation_strategy="simple", device=-1)#sets model on cpu
         #else:
         #    self.token_classifier = FMEA_NER
-    def load_data(self, filepath='', df=None, formatted=False, text_col="Narrative", id_col="Tracking #", label_col="labels"):
+    def load_data(self, text_col, id_col, filepath='', df=None, formatted=False, label_col="labels"):
         """
         Loads data to prepare for FMEA extraction. 
         Sentence tokenization is performed for preprocessing, and the raw data is also saved.
@@ -102,16 +102,17 @@ class FMEA():
         Saves data formatted to input into the NER model.
         Parameters
         ----------
+        text_col : string
+            The column where the text used for FMEA extraction is stored.
+        id_col : string
+            The id column in the dataframe. 
         filepath : string, optional
             Can input a filepath for a .jsonl (annotations from doccano) or .csv file. The default is ''.
         df : pandas DataFrame, optional
             Can instead input a pandas DataFrame already loaded in, with one column of text. The default is None.
         formatted : Bool, optional
             True if the input in filepath is a formatted dataset object. The default is False.
-        text_col : string, optional
-            The column where the text used for FMEA extraction is stored. The default is "Narrative".
-        id_col : string, optional
-            The id column in the dataframe. The default is "Tracking #".
+        
         label_col : string, optional
             The column containing annotation labels if the data is annotated. The default is "labels".
 
@@ -274,7 +275,7 @@ class FMEA():
         self.data_df[self.id_col] = self.data_df.index.tolist()
         return self.data_df
     
-    def group_docs_with_meta(self, grouping_col='UAS_cleaned', cluster_by=['CAU', 'MOD'], additional_cols=['Mission Type']):
+    def group_docs_with_meta(self, grouping_col, cluster_by=['CAU', 'MOD'], additional_cols=[]):
         """
         Currently unused and in operable
         Intented function is to group documents into an FMEA using a grouping column,
@@ -282,12 +283,12 @@ class FMEA():
 
         Parameters
         ----------
-        grouping_col : string, optional
-            The column in the original dataset used to group documents into FMEA rows. The default is 'UAS_cleaned'.
+        grouping_col : string
+            The column in the original dataset used to group documents into FMEA rows.
         cluster_by : TYPE, optional
             DESCRIPTION. The default is ['CAU', 'MOD'].
         additional_cols : list of strings, optional
-            additional columns in a dataset to include in the FMEA. The default is ['Mission Type'].
+            additional columns in a dataset to include in the FMEA. The default is [].
 
         Returns
         -------
@@ -315,18 +316,18 @@ class FMEA():
         self.grouped_df = pd.concat(clustered_dfs)
         return self.grouped_df
     
-    def group_docs_manual(self, filename='', grouping_col='Mode', additional_cols=['Mission Type'], sample=1):
+    def group_docs_manual(self, filename, grouping_col, additional_cols=[], sample=1):
         """
         Creates FMEA rows by grouping together documents according to values manually defined in a separate file.
         Loads in the file and then aggregates the data. Sample IDs for documents in each row are created as well.
         Parameters
         ----------
-        filename : string, optional
-            filepath to the spreadsheet defining the rows. The default is ''.
-        grouping_col : string, optional
-            The column within the spreadsheet that defines the rows. The default is 'Mode'.
+        filename : string
+            filepath to the spreadsheet defining the rows.
+        grouping_col : string
+            The column within the spreadsheet that defines the rows.
         additional_cols : list, optional
-            Additional columns to include in the FMEA. The default is ['Mission Type'].
+            Additional columns to include in the FMEA.
         sample : int, optional
             Number of samples to pull for each FMEA row. The default is 1.
 
@@ -380,7 +381,7 @@ class FMEA():
         self.grouped_df['Sampled '+self.id_col] = sampled_ids
         return self.grouped_df
     
-    def post_process_fmea(self, id_name='SAFECOM', phase_name='Mission Type', max_words=20):
+    def post_process_fmea(self, id_name='ID', phase_name='Mission Type', max_words=20):
         """
         Post processes the FMEA to identify the column that contains the phase name,
         clean sub-word tokens, and limit the number of words per cell.
@@ -447,14 +448,14 @@ class FMEA():
                     self.fmea_df.at[i, col] = " ".join(self.fmea_df.at[i,col].split(" ")[:max_words])
         return self.fmea_df
     
-    def get_year_per_doc(self, year_col='', config='/'):
+    def get_year_per_doc(self, year_col, config='/'):
         """
         #currently unused????
 
         Parameters
         ----------
-        year_col : TYPE, optional
-            DESCRIPTION. The default is ''.
+        year_col : string,
+            The colomn in the raw dataframe with the date information.
         config : TYPE, optional
             DESCRIPTION. The default is '/'.
 
@@ -468,14 +469,14 @@ class FMEA():
         elif config == 'id':
             self.raw_df['Year'] = [num.split("-")[0] for num in self.raw_df[self.id_col]]
             
-    def calc_frequency(self, year_col=''): 
+    def calc_frequency(self, year_col): 
         """
         Calculates the frequency for each row and assigns it a category
 
         Parameters
         ----------
-        year_col : string, optional
-            The column the year for the report is stored in. The default is ''.
+        year_col : string
+            The column the year for the report is stored in. 
 
         Returns
         -------
@@ -666,7 +667,7 @@ class FMEA():
         html = spacy.displacy.render(ent_input, options=options, style="ent", manual=True, jupyter=False, page=True)
         if save == True:
             if output_path == "":
-                output_path = os.path.join(os.getcwd(),"results", str(doc_id)+"_display")
+                output_path = os.path.join(os.getcwd(), str(doc_id)+"_display")
                 pdf_path = output_path+".pdf"
             output = Path(output_path+".html")
             output.open("w", encoding="utf-8").write(html)

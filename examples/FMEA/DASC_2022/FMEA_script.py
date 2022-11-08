@@ -32,12 +32,7 @@ def safecom_severity(hazardous_mat, injury, damage):
     return severity
 
 if __name__ == '__main__':
-    """
-    fmea = FMEA()
-    file = "data/annotated_LLIS_IAA/srandrad_safecom_v2.jsonl"
-    input_data = fmea.load_data(file, formatted=False, text_col='data')
-    fmea.display_doc(doc_id="21-0098", save=True, output_path="results/21-0098_display_annotated", colors_path=os.path.join(os.getcwd(),'data','NER_label_config.json'), pred=False)
-    """
+    
     model_checkpoint = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)),"models", "FMEA-ner-model", "checkpoint-1424")
     print(model_checkpoint)
     #device = 'cuda' if cuda.is_available() else 'cpu'
@@ -51,20 +46,20 @@ if __name__ == '__main__':
     
     file = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)),"data/SAFECOM/SAFECOM_UAS_fire_data.csv")
     #TODO: join annotations to raw df
-    input_data = fmea.load_data(file, formatted=False, text_col='Text')
+    input_data = fmea.load_data(filepath=file, formatted=False, text_col='Text', id_col='Tracking #')
     
     print("loaded data")
     preds = fmea.predict()
     df = fmea.get_entities_per_doc()
-    fmea.display_doc(doc_id="21-0098", save=True, output_path="", colors_path=os.path.join(os.getcwd(),'data','NER_label_config.json'))
-    #fmea.group_docs_with_meta()
+    fmea.display_doc(doc_id="21-0098", save=True, output_path="test", colors_path=os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)),'data','doccano','NER_label_config.json'))
     #"""
     manual_cluster_file = os.path.join(os.getcwd(),"SAFECOM_UAS_clusters_V1.xlsx")
-    fmea.group_docs_manual(manual_cluster_file, grouping_col='Mode')
+    fmea.group_docs_manual(manual_cluster_file, grouping_col='Mode', additional_cols=['Mission Type'])
     fmea.calc_severity(calc_severity)
-    fmea.calc_frequency()
+    fmea.get_year_per_doc('Date')
+    fmea.calc_frequency('Year')
     fmea.calc_risk()
-    fmea.post_process_fmea(max_words=10)
+    fmea.post_process_fmea(id_name='SAFECOM', max_words=10)
     #"""
-    fmea.fmea_df.to_csv(os.path.join(os.getcwd(),"safecom_fmea_.csv"))
+    fmea.fmea_df.to_csv(os.path.join(os.getcwd(),"safecom_fmea_test.csv"))
     
