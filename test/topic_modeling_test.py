@@ -29,9 +29,15 @@ class test_topic_modeling_methods(unittest.TestCase):
         self.raw_test_data.load(csv_file_name, preprocessed=False, id_col=document_id_col, text_columns=raw_text_columns)
     
     def tearDown(self):
+        #delete test folder/everything in it
+        file_path = 'topic_model_results'
+        for root, dirs, files in os.walk(file_path):
+            for file in files:
+                os.remove(os.path.join(root, file))
+        os.rmdir(file_path) 
         return 
     def test_lda_functions(self): # integration test
-        #add save_lda_results, label_lda_topics, lda_visual
+        #add label_lda_topics
         # add asserts for comparing the output csvs/dfs
         num_topics ={'Lesson(s) Learned':5, 'Driving Event':5, 'Recommendation(s)':5}
         test_lda = Topic_Model_plus(text_columns=self.test_data.text_columns, data=self.test_data)
@@ -41,22 +47,29 @@ class test_topic_modeling_methods(unittest.TestCase):
         test_lda.save_lda_document_topic_distribution()
         test_lda.save_lda_coherence()
         test_lda.save_lda_taxonomy()
+        test_lda.save_lda_results()
+        for col in self.test_data.text_columns:
+            test_lda.lda_visual(col)
         file_path = test_lda.folder_path #path from saved
         
         doc_topics1 = pd.read_csv(os.path.join(file_path,"lda_topic_dist_per_doc.csv"))#.applymap(str)
         tax1 = pd.read_csv(os.path.join(file_path,"lda_taxonomy.csv")).applymap(str)
         coherence_1 = pd.read_csv(os.path.join(file_path,"lda_coherence.csv")).applymap(str)
-        
+        results1 = pd.read_excel(os.path.join(file_path,"lda_results.xlsx"))
+
         #testing functions from bin
         test_lda.lda_extract_models(file_path)
         test_lda.save_lda_document_topic_distribution()
         test_lda.save_lda_coherence()
         test_lda.save_lda_taxonomy()
-        
+        test_lda.save_lda_results()
+        for col in self.test_data.text_columns:
+            test_lda.lda_visual(col)
+
         doc_topics2 = pd.read_csv(os.path.join(file_path,"lda_topic_dist_per_doc.csv"))#.applymap(str)
         tax2 = pd.read_csv(os.path.join(file_path,"lda_taxonomy.csv")).applymap(str)
         coherence_2 = pd.read_csv(os.path.join(file_path,"lda_coherence.csv")).applymap(str)
-        
+        results2 = pd.read_excel(os.path.join(file_path,"lda_results.xlsx"))
         #delete test folder/everything in it
         for root, dirs, files in os.walk(file_path):
             for file in files:
@@ -75,9 +88,11 @@ class test_topic_modeling_methods(unittest.TestCase):
         self.assertEqual(doc_topics1.equals(doc_topics2), True)
         self.assertEqual(tax1.equals(tax2), True)
         self.assertEqual(coherence_1.equals(coherence_2), True)
+        for sheet in results1:
+            self.assertTrue(results1[sheet].equals(results2[sheet]))
     
     def test_hlda_functions(self): # integration test
-        #add label_hlda_topics, mixed_taxonomy, save_hlda_results, hlda_display?
+        #add label_hlda_topics, mixed_taxonomy
         test_hlda = Topic_Model_plus(text_columns=self.test_data.text_columns, data=self.test_data)
         test_hlda.hlda(training_iterations=100)
         test_hlda.save_hlda_models()
@@ -86,6 +101,9 @@ class test_topic_modeling_methods(unittest.TestCase):
         test_hlda.save_hlda_topics()
         test_hlda.save_hlda_level_n_taxonomy()
         test_hlda.save_hlda_taxonomy()
+        test_hlda.save_hlda_results()
+        for col in self.test_data.text_columns:
+            test_hlda.hlda_display(col)
         file_path = test_hlda.folder_path
         
         doc_topics1 = pd.read_csv(os.path.join(file_path,"hlda_topic_dist_per_doc.csv"))#.applymap(str)
@@ -95,6 +113,7 @@ class test_topic_modeling_methods(unittest.TestCase):
         topics1 = {}
         for attr in self.test_data.text_columns:
             topics1[attr] = pd.read_csv(os.path.join(file_path,attr+"_hlda_topics.csv")).applymap(str)
+        results1 = pd.read_excel(os.path.join(file_path,"hlda_results.xlsx"))
         
         #testing functions from bin
         file_path = test_hlda.folder_path 
@@ -104,6 +123,9 @@ class test_topic_modeling_methods(unittest.TestCase):
         test_hlda.save_hlda_taxonomy()
         test_hlda.save_hlda_topics()
         test_hlda.save_hlda_level_n_taxonomy()
+        test_hlda.save_hlda_results()
+        for col in self.test_data.text_columns:
+            test_hlda.hlda_display(col)
         
         doc_topics2 = pd.read_csv(os.path.join(file_path,"hlda_topic_dist_per_doc.csv"))#.applymap(str)
         tax2 = pd.read_csv(os.path.join(file_path,"hlda_taxonomy.csv")).applymap(str)
@@ -112,6 +134,7 @@ class test_topic_modeling_methods(unittest.TestCase):
         topics2 = {}
         for attr in self.test_data.text_columns:
             topics2[attr] = pd.read_csv(os.path.join(file_path,attr+"_hlda_topics.csv")).applymap(str)
+        results2 = pd.read_excel(os.path.join(file_path,"hlda_results.xlsx"))
         
         #delete test folder/everything in it
         for root, dirs, files in os.walk(file_path):
@@ -134,6 +157,8 @@ class test_topic_modeling_methods(unittest.TestCase):
         self.assertEqual(level_1_tax1.equals(level_1_tax2), True)
         for attr in self.test_data.text_columns:
             self.assertEqual(topics1[attr].equals(topics2[attr]), True, attr) #this sometimes gives an failed test with the best document
+        for sheet in results1:
+            self.assertTrue(results1[sheet].equals(results2[sheet]))
 
     def test_bertopic_functions(self):
         #bert_topic, reduce_bert_topics, save_bert_topics_from_probs, save_bert_taxonomy
