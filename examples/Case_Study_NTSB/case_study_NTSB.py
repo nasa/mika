@@ -75,7 +75,7 @@ print("loaded data")
 preds = fmea.predict()
 df = fmea.get_entities_per_doc()
 fmea.group_docs_with_meta(grouping_col='Occurrence_Description', additional_cols=['Phase no'])
-fmea.grouped_df.to_csv(os.path.join(os.getcwd(),"safecom_fmea_test.csv"))
+fmea.grouped_df.to_csv(os.path.join(os.getcwd(),"ntsb_fmea_test.csv"))
 
 # HEAT
 # - aircraft info table
