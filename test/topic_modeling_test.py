@@ -7,15 +7,17 @@ Created on Thu Mar 18 17:33:36 2021
 
 import sys, os
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)),".."))
-
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning) 
 from mika.kd import Topic_Model_plus
 from mika.utils import Data
 import pandas as pd
 import unittest
 
-def truncate(num, digits):
-   sp = str(num).split('.')
-   return '.'.join([sp[0], sp[1][:digits]])
+def clean_list(df, col):
+            df_col = df[col].tolist()#[1:]
+            df_col = [[j.strip("'") for j in i.strip("[]").split(", ") if len(j)>0] for i in df_col]
+            return df_col
 
 class test_topic_modeling_methods(unittest.TestCase):
     def setUp(self):
@@ -31,11 +33,13 @@ class test_topic_modeling_methods(unittest.TestCase):
     def tearDown(self):
         #delete test folder/everything in it
         file_path = 'topic_model_results'
-        for root, dirs, files in os.walk(file_path):
-            for file in files:
-                os.remove(os.path.join(root, file))
-        os.rmdir(file_path) 
+        if os.path.isdir(file_path) == True:
+            for root, dirs, files in os.walk(file_path):
+                for file in files:
+                    os.remove(os.path.join(root, file))
+            os.rmdir(file_path) 
         return 
+
     def test_lda_functions(self): # integration test
         #add label_lda_topics
         # add asserts for comparing the output csvs/dfs
@@ -80,12 +84,12 @@ class test_topic_modeling_methods(unittest.TestCase):
         for i in range(len(doc_topics1)):
             for col in self.test_data.text_columns:
                 nums = [num for num in doc_topics1.iloc[i][col].strip("[]").split(" ") if len(num)>1]
-                doc_topics1.at[i,col] = [truncate(float(num),1) for num in nums]
+                doc_topics1.at[i,col] = [round(float(num),1) for num in nums]
                 nums = [num for num in doc_topics2.iloc[i][col].strip("[]").split(" ") if len(num)>1]
-                doc_topics2.at[i,col] = [truncate(float(num),1) for num in nums]
+                doc_topics2.at[i,col] = [round(float(num),1) for num in nums]
                 
         #checking we get the same output when using a bin object
-        self.assertEqual(doc_topics1.equals(doc_topics2), True)
+        pd.testing.assert_frame_equal(doc_topics1.round(3), doc_topics2.round(3), atol=0.5)
         self.assertEqual(tax1.equals(tax2), True)
         self.assertEqual(coherence_1.equals(coherence_2), True)
         for sheet in results1:
@@ -104,6 +108,7 @@ class test_topic_modeling_methods(unittest.TestCase):
         test_hlda.save_hlda_results()
         for col in self.test_data.text_columns:
             test_hlda.hlda_display(col)
+            test_hlda.hlda_visual(col)
         file_path = test_hlda.folder_path
         
         doc_topics1 = pd.read_csv(os.path.join(file_path,"hlda_topic_dist_per_doc.csv"))#.applymap(str)
@@ -126,6 +131,7 @@ class test_topic_modeling_methods(unittest.TestCase):
         test_hlda.save_hlda_results()
         for col in self.test_data.text_columns:
             test_hlda.hlda_display(col)
+            test_hlda.hlda_visual(col)
         
         doc_topics2 = pd.read_csv(os.path.join(file_path,"hlda_topic_dist_per_doc.csv"))#.applymap(str)
         tax2 = pd.read_csv(os.path.join(file_path,"hlda_taxonomy.csv")).applymap(str)
@@ -146,12 +152,12 @@ class test_topic_modeling_methods(unittest.TestCase):
         for i in range(len(doc_topics1)):
             for col in self.test_data.text_columns:
                 nums = [num for num in doc_topics1.iloc[i][col].strip("[]").split(" ") if len(num)>1]
-                doc_topics1.at[i,col] = [truncate(float(num),2) for num in nums]
+                doc_topics1.at[i,col] = [round(float(num),2) for num in nums]
                 nums = [num for num in doc_topics2.iloc[i][col].strip("[]").split(" ") if len(num)>1]
-                doc_topics2.at[i,col] = [truncate(float(num),2) for num in nums]
+                doc_topics2.at[i,col] = [round(float(num),2) for num in nums]
                 
         #checking we get the same output when using a bin object
-        self.assertEqual(doc_topics1.equals(doc_topics2), True)
+        pd.testing.assert_frame_equal(doc_topics1.round(3), doc_topics2.round(3), atol=0.5)
         self.assertEqual(tax1.equals(tax2), True)
         self.assertEqual(coherence_1.equals(coherence_2), True)
         self.assertEqual(level_1_tax1.equals(level_1_tax2), True)
@@ -159,57 +165,84 @@ class test_topic_modeling_methods(unittest.TestCase):
             self.assertEqual(topics1[attr].equals(topics2[attr]), True, attr) #this sometimes gives an failed test with the best document
         for sheet in results1:
             self.assertTrue(results1[sheet].equals(results2[sheet]))
-
+    
     def test_bertopic_functions(self):
-        #bert_topic, reduce_bert_topics, save_bert_topics_from_probs, save_bert_taxonomy
-        #save_bert_document_topic_distribution, save_bert_results, save_bert_vis,
-        #save_bert_coherence, save_bert_model, save_bert_topic_diversity
         test_bert = Topic_Model_plus(text_columns=self.raw_test_data.text_columns, data=self.raw_test_data)
         test_bert.bert_topic()
+        
         test_bert.save_bert_model()
         test_bert.save_bert_document_topic_distribution()
         test_bert.save_bert_coherence()
-        test_bert.save_bert_topics()
+        test_bert.save_bert_topics(coherence=True)
         test_bert.save_bert_topics_from_probs()
         test_bert.save_bert_taxonomy()
         test_bert.save_bert_topic_diversity()
-        test_bert.save_bert_results()
+        test_bert.save_bert_results(coherence=True)
         #test_bert.save_bert_vis() #too few topics for visualization?
         file_path = test_bert.folder_path
-        #reduced topics
-        test_bert.reduce_bert_topics(num=3)
-        test_bert.save_bert_model()
-        test_bert.save_bert_document_topic_distribution()
-        test_bert.save_bert_coherence()
-        test_bert.save_bert_topics()
-        test_bert.save_bert_topics_from_probs()
-        test_bert.save_bert_taxonomy()
-        test_bert.save_bert_topic_diversity()
-        test_bert.save_bert_results()
-        #test_bert.save_bert_vis() #too few topics for visualization?
         # load original results
         doc_topics1 = pd.read_csv(os.path.join(file_path,"BERT_topic_dist_per_doc.csv"))#.applymap(str)
-        coherence1 = pd.read_csv(os.path.join(file_path,"BERT_coherence_u_mass.csv")).applymap(str)
+        coherence1 = pd.read_csv(os.path.join(file_path,"BERT_coherence_u_mass.csv")).round(3).applymap(str)
         topics1 = {}
         topics_from_probs1 = {}
         for attr in self.raw_test_data.text_columns:
-            topics1[attr] = pd.read_csv(os.path.join(file_path,attr+"_BERT_topics.csv")).applymap(str)
+            topics1[attr] = pd.read_csv(os.path.join(file_path,attr+"_BERT_topics.csv")).round(3).applymap(str)
             topics_from_probs1[attr] = pd.read_csv(os.path.join(file_path,attr+"_BERT_topics_modified.csv")).applymap(str)
+            #check that the number of documents per topic is correct when using from_probs
+            total_docs = clean_list(topics_from_probs1[attr], 'documents')
+            number_of_docs = [int(i) for i in topics_from_probs1[attr]['number of documents in topic'].tolist()]
+            for i in range(len(topics_from_probs1[attr])):
+                self.assertEqual(len(total_docs[i]), number_of_docs[i])
+            
         tax1 = pd.read_csv(os.path.join(file_path,"BERT_taxonomy.csv")).applymap(str)
-        diversity1 =  pd.read_csv(os.path.join(file_path,"BERT_diversity.csv")).applymap(str)
-        results1 =  pd.read_excel(os.path.join(file_path,"BERTopic_results.xlsx")).applymap(str)
-        # load reduced reuslts
-        doc_topics_reduced1 = pd.read_csv(os.path.join(file_path,"Reduced_BERT_topic_dist_per_doc.csv"))#.applymap(str)
-        coherence_reduced1 = pd.read_csv(os.path.join(file_path,"Reduced_BERT_coherence_u_mass.csv")).applymap(str)
+        diversity1 =  pd.read_csv(os.path.join(file_path,"BERT_diversity.csv")).round(3).applymap(str)
+        results1 =  pd.read_excel(os.path.join(file_path,"BERTopic_results.xlsx"), sheet_name=None)
+        
+        #testing results sheets are correct
+        pd.testing.assert_frame_equal(results1['taxonomy'].applymap(str), tax1.drop(['Unnamed: 0'], axis=1))
+        pd.testing.assert_frame_equal(results1['coherence'].round(3).applymap(str), coherence1.drop(['Unnamed: 0'], axis=1))
+        pd.testing.assert_frame_equal(results1['document topic distribution'], doc_topics1.drop(['Unnamed: 0'], axis=1))
+        pd.testing.assert_frame_equal(results1['topic diversity'].round(3).applymap(str), diversity1.drop(['Unnamed: 0'], axis=1))
+        for attr in self.raw_test_data.text_columns:
+            pd.testing.assert_frame_equal(results1[attr].round(3).applymap(str), topics1[attr].drop(['Unnamed: 0'], axis=1)[results1[attr].columns], attr)
+        
+        #reduced topics
+        test_bert.reduce_bert_topics(num=3, from_probs=True) #some kind of interaction between from probs and coherence????
+        test_bert.save_bert_model()
+        test_bert.save_bert_document_topic_distribution()
+        test_bert.save_bert_coherence() #somethings wrong with the reduced coherence
+        test_bert.save_bert_topics(coherence=True)
+        test_bert.save_bert_topics_from_probs()
+        test_bert.save_bert_taxonomy()
+        test_bert.save_bert_topic_diversity() 
+        test_bert.save_bert_results(coherence=True)
+        #test_bert.save_bert_vis() #too few topics for visualization?
+        
+        # load reduced results
+        doc_topics_reduced1 = pd.read_csv(os.path.join(file_path,"Reduced_BERT_topic_dist_per_doc.csv"))
+        coherence_reduced1 = pd.read_csv(os.path.join(file_path,"Reduced_BERT_coherence_u_mass.csv")).round(3).applymap(str)
         topics_reduced1 = {}
         topics_from_probs_reduced1 = {}
         for attr in self.raw_test_data.text_columns:
-            topics_reduced1[attr] = pd.read_csv(os.path.join(file_path,attr+"_Reduced_BERT_topics.csv")).applymap(str)
-            topics_from_probs_reduced1[attr] = pd.read_csv(os.path.join(file_path,attr+"_reduced_BERT_topics_modified.csv")).applymap(str)
+            topics_reduced1[attr] = pd.read_csv(os.path.join(file_path,attr+"_Reduced_BERT_topics.csv")).round(3).applymap(str)
+            topics_from_probs_reduced1[attr] = pd.read_csv(os.path.join(file_path,attr+"_reduced_BERT_topics_modified.csv")).round(3).applymap(str)
+            #check that the number of documents per topic is correct when using from_probs
+            total_docs = clean_list(topics_from_probs_reduced1[attr], 'documents')
+            number_of_docs = [int(i) for i in topics_from_probs_reduced1[attr]['number of documents in topic'].tolist()]
+            for i in range(len(topics_from_probs_reduced1[attr])):
+                self.assertEqual(len(total_docs[i]), number_of_docs[i])
+            
         tax_reduced1 = pd.read_csv(os.path.join(file_path,"Reduced_BERT_taxonomy.csv")).applymap(str)
         diversity_reduced1 =  pd.read_csv(os.path.join(file_path,"Reduced_BERT_diversity.csv")).applymap(str)
-        results_reduced1 =  pd.read_excel(os.path.join(file_path,"Reduced_BERTopic_results.xlsx")).applymap(str)
-
+        results_reduced1 =  pd.read_excel(os.path.join(file_path,"Reduced_BERTopic_results.xlsx"), sheet_name=None)
+        #testing results sheets are correct
+        pd.testing.assert_frame_equal(results_reduced1['taxonomy'].applymap(str), tax_reduced1.drop(['Unnamed: 0'], axis=1))
+        pd.testing.assert_frame_equal(results_reduced1['coherence'].round(3).applymap(str), coherence_reduced1.drop(['Unnamed: 0'], axis=1))
+        pd.testing.assert_frame_equal(results_reduced1['document topic distribution'], doc_topics_reduced1.drop(['Unnamed: 0'], axis=1))
+        pd.testing.assert_frame_equal(results_reduced1['topic diversity'].applymap(str), diversity_reduced1.drop(['Unnamed: 0'], axis=1))
+        for attr in self.raw_test_data.text_columns:
+            pd.testing.assert_frame_equal(results_reduced1[attr].round(3).applymap(str), topics_reduced1[attr][results_reduced1[attr].columns])
+        
         #testing results from saved model
         #normal model
         test_bert.load_bert_model(file_path, reduced=False, from_probs=True)
@@ -223,54 +256,46 @@ class test_topic_modeling_methods(unittest.TestCase):
         #test_bert.save_bert_vis() #too few topics for visualization?
         # load original results
         doc_topics2 = pd.read_csv(os.path.join(file_path,"BERT_topic_dist_per_doc.csv"))#.applymap(str)
-        coherence2 = pd.read_csv(os.path.join(file_path,"BERT_coherence_u_mass.csv")).applymap(str)
+        coherence2 = pd.read_csv(os.path.join(file_path,"BERT_coherence_u_mass.csv")).round(3).applymap(str)
         topics2 = {}
         topics_from_probs2 = {}
         for attr in self.raw_test_data.text_columns:
-            topics2[attr] = pd.read_csv(os.path.join(file_path,attr+"_BERT_topics.csv")).applymap(str)
+            topics2[attr] = pd.read_csv(os.path.join(file_path,attr+"_BERT_topics.csv")).round(3).applymap(str)
             topics_from_probs2[attr] = pd.read_csv(os.path.join(file_path,attr+"_BERT_topics_modified.csv")).applymap(str)
         tax2 = pd.read_csv(os.path.join(file_path,"BERT_taxonomy.csv")).applymap(str)
-        diversity2 =  pd.read_csv(os.path.join(file_path,"BERT_diversity.csv")).applymap(str)
-        results2 =  pd.read_excel(os.path.join(file_path,"BERTopic_results.xlsx")).applymap(str)
+        diversity2 =  pd.read_csv(os.path.join(file_path,"BERT_diversity.csv")).round(3).applymap(str)
+        results2 =  pd.read_excel(os.path.join(file_path,"BERTopic_results.xlsx"), sheet_name=None)
         
         #reduced model
         test_bert.load_bert_model(file_path, reduced=True, from_probs=True)
         test_bert.save_bert_document_topic_distribution()
         test_bert.save_bert_coherence()
-        test_bert.save_bert_topics()
+        test_bert.save_bert_topics(coherence=True)
         test_bert.save_bert_topics_from_probs()
         test_bert.save_bert_taxonomy()
         test_bert.save_bert_topic_diversity()
-        test_bert.save_bert_results()
+        test_bert.save_bert_results(coherence=True)
         #test_bert.save_bert_vis() #too few topics for visualization?
         # load reduced reuslts
         doc_topics_reduced2 = pd.read_csv(os.path.join(file_path,"Reduced_BERT_topic_dist_per_doc.csv"))#.applymap(str)
-        coherence_reduced2 = pd.read_csv(os.path.join(file_path,"Reduced_BERT_coherence_u_mass.csv")).applymap(str)
+        coherence_reduced2 = pd.read_csv(os.path.join(file_path,"Reduced_BERT_coherence_u_mass.csv")).round(3).applymap(str)
         topics_reduced2 = {}
         topics_from_probs_reduced2 = {}
         for attr in self.raw_test_data.text_columns:
-            topics_reduced2[attr] = pd.read_csv(os.path.join(file_path,attr+"_Reduced_BERT_topics.csv")).applymap(str)
-            topics_from_probs_reduced2[attr] = pd.read_csv(os.path.join(file_path,attr+"_reduced_BERT_topics_modified.csv")).applymap(str)
+            topics_reduced2[attr] = pd.read_csv(os.path.join(file_path,attr+"_Reduced_BERT_topics.csv")).round(3).applymap(str)
+            topics_from_probs_reduced2[attr] = pd.read_csv(os.path.join(file_path,attr+"_reduced_BERT_topics_modified.csv")).round(3).applymap(str)
         tax_reduced2 = pd.read_csv(os.path.join(file_path,"Reduced_BERT_taxonomy.csv")).applymap(str)
-        diversity_reduced2 =  pd.read_csv(os.path.join(file_path,"Reduced_BERT_diversity.csv")).applymap(str)
-        results_reduced2 =  pd.read_excel(os.path.join(file_path,"Reduced_BERTopic_results.xlsx")).applymap(str)
+        diversity_reduced2 =  pd.read_csv(os.path.join(file_path,"Reduced_BERT_diversity.csv")).round(3).applymap(str)
+        results_reduced2 =  pd.read_excel(os.path.join(file_path,"Reduced_BERTopic_results.xlsx"), sheet_name=None)
 
         #delete test folder/everything in it
         for root, dirs, files in os.walk(file_path):
             for file in files:
                 os.remove(os.path.join(root, file))
         os.rmdir(file_path)
-
-        #rounding to account for differences due to float number system
-        for i in range(len(doc_topics1)):
-            for col in self.raw_test_data.text_columns:
-                nums = [num for num in doc_topics1.iloc[i][col].strip("[]").split(" ") if len(num)>1]
-                doc_topics1.at[i,col] = [truncate(float(num),2) for num in nums]
-                nums = [num for num in doc_topics2.iloc[i][col].strip("[]").split(" ") if len(num)>1]
-                doc_topics2.at[i,col] = [truncate(float(num),2) for num in nums]
                 
         #checking we get the same output when using a bin object
-        self.assertEqual(doc_topics1.equals(doc_topics2), True)
+        pd.testing.assert_frame_equal(doc_topics1.round(3), doc_topics2.round(3), atol=0.5)
         self.assertEqual(tax1.equals(tax2), True)
         self.assertEqual(coherence1.equals(coherence2), True)
         for attr in self.raw_test_data.text_columns:
@@ -279,25 +304,17 @@ class test_topic_modeling_methods(unittest.TestCase):
         pd.testing.assert_frame_equal(diversity1, diversity2)
         for sheet in results1:
             self.assertTrue(results1[sheet].equals(results2[sheet]))
-            
-        #rounding to account for differences due to float number system
-        for i in range(len(doc_topics_reduced1)):
-            for col in self.raw_test_data.text_columns:
-                nums = [num for num in doc_topics_reduced1.iloc[i][col].strip("[]").split(" ") if len(num)>1]
-                doc_topics_reduced1.at[i,col] = [truncate(float(num),2) for num in nums]
-                nums = [num for num in doc_topics_reduced2.iloc[i][col].strip("[]").split(" ") if len(num)>1]
-                doc_topics_reduced2.at[i,col] = [truncate(float(num),2) for num in nums]
-            
+
         #checking we get the same output when using a bin object
-        self.assertEqual(doc_topics_reduced1.equals(doc_topics_reduced2), True)
+        pd.testing.assert_frame_equal(doc_topics_reduced1.round(3), doc_topics_reduced2.round(3), atol=0.5)
         self.assertEqual(tax_reduced1.equals(tax_reduced2), True)
         self.assertEqual(coherence_reduced1.equals(coherence_reduced2), True)
         for attr in self.raw_test_data.text_columns:
-            self.assertEqual(topics_reduced1[attr].equals(topics_reduced2[attr]), True, attr) #this sometimes gives an failed test with the best document
+            pd.testing.assert_frame_equal(topics_reduced1[attr], topics_reduced2[attr])
             self.assertEqual(topics_from_probs_reduced1[attr].equals(topics_from_probs_reduced2[attr]), True, attr)
         pd.testing.assert_frame_equal(diversity_reduced1, diversity_reduced2)
         for sheet in results_reduced1:
             self.assertTrue(results_reduced1[sheet].equals(results_reduced2[sheet]))
-            
+        
 if __name__ == '__main__':
     unittest.main()

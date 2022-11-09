@@ -205,7 +205,7 @@ class Topic_Model_plus():
                         docs.append(text[doc])
             topic_model = self.BERT_models[col]
             self.BERT_coherence[col] = self.calc_bert_coherence(docs, topics, topic_model, method=coh_method)
-            
+
     def calc_bert_coherence(self, docs, topics, topic_model, method='u_mass', num_words=10):
         """
         calculates coherence for a bertopic model using gensim coherence models
@@ -236,19 +236,20 @@ class Topic_Model_plus():
                                   "Topic": topics})
         documents_per_topic = documents.groupby(['Topic'], as_index=False).agg({'Document': ' '.join})
         cleaned_docs = topic_model._preprocess_text(documents_per_topic.Document.values)
-
+        
         # Extract vectorizer and analyzer from BERTopic
         vectorizer = topic_model.vectorizer_model
         analyzer = vectorizer.build_analyzer()
 
         # Extract features for Topic Coherence evaluation
-        words = vectorizer.get_feature_names()
+        words = vectorizer.get_feature_names_out()
         tokens = [analyzer(doc) for doc in cleaned_docs]
         dictionary = corpora.Dictionary(tokens)
         corpus = [dictionary.doc2bow(token) for token in tokens]
+        ordered_topics = list(set(topics))
+        ordered_topics.sort()
         topic_words = [[words for words, _ in topic_model.get_topic(topic)[:num_words]]
-                       for topic in range(len(set(topics))-1)]
-       
+                       for topic in ordered_topics]
         # Evaluate
         coherence_model = CoherenceModel(topics=topic_words,
                                          texts=tokens,
@@ -339,8 +340,13 @@ class Topic_Model_plus():
         """
         self.get_bert_coherence(coh_method, from_probs)
         self.__create_folder()
-        max_topics = max([len(self.BERT_models[col].topics_)-1 for col in self.BERT_models])
-        coherence_score = {"topic numbers": ["average score"]+['std dev']+[i for i in range(0,max_topics)]}
+        max_topics = max([len(set(self.BERT_models[col].topics_))-1 for col in self.BERT_models])
+        if self.reduced == True: #Why? bug in bertopic?
+            start_ind = -1
+        else:
+            start_ind = 0
+        start_ind = -1
+        coherence_score = {"topic numbers": ["average score"]+['std dev']+[i for i in range(start_ind, max_topics)]}
         for col in self.text_columns:
             coherence_score[col] = []
             c_scores = self.BERT_coherence[col]
@@ -349,7 +355,7 @@ class Topic_Model_plus():
             std_coherence = np.std(c_scores)
             coherence_score[col].append(std_coherence)
             coherence_per_topic = c_scores
-            for i in range(0, (max_topics-len(coherence_per_topic))):
+            for i in range(start_ind, (max_topics-len(coherence_per_topic))):
                 coherence_per_topic.append("n/a")
             coherence_score[col] += coherence_per_topic
         coherence_df = pd.DataFrame(coherence_score)
@@ -478,8 +484,6 @@ class Topic_Model_plus():
         topics : list
             list of topics
         """
-        best_topics_per_doc = [np.argmax(prob_list) if max(prob_list)>thresh else -1 for prob_list in probs]
-        self.BERT_model_topics_per_doc[col] = best_topics_per_doc
         self.BERT_model_all_topics_per_doc[col] = [[] for i in range(len(probs))]
         for i in range(len(probs)):
             topic_probs = probs[i]#.strip("[]").split(" ")
@@ -492,7 +496,7 @@ class Topic_Model_plus():
             else:
                 self.BERT_model_all_topics_per_doc[col][i] = topic_indices
     
-    def reduce_bert_topics(self, num=30, from_probs=True, thresh=0.01):
+    def reduce_bert_topics(self, num=30, from_probs=False, thresh=0.01):
         """
         reduces the number of topics in a trained bertopic model to the specified number.
 
@@ -552,8 +556,6 @@ class Topic_Model_plus():
             topic model results
 
         """
-    
-        #saving raw topics with coherence
         self.__create_folder()
         dfs = {}
         for col in self.text_columns:
@@ -565,14 +567,10 @@ class Topic_Model_plus():
                            "topic words": [],
                            "number of words": [],
                            "best documents": [],
-                           #"coherence": [],
                            "documents": []}
             if coherence == True: 
-                try:
-                    topics_data["coherence"] = self.BERT_coherence[col]
-                except:
-                    self.get_bert_coherence(coh_method, from_probs=from_probs)
-                    topics_data["coherence"] = self.BERT_coherence[col]
+                self.get_bert_coherence(coh_method, from_probs=from_probs)
+                topics_data["coherence"] = self.BERT_coherence[col]
             ordered_topics = list(set(mdl.topics_))
             ordered_topics.sort()
             for k in ordered_topics:
@@ -756,7 +754,7 @@ class Topic_Model_plus():
             file = os.path.join(self.folder_path,"BERT_topic_dist_per_doc.csv")
         doc_df.to_csv(file)
         
-    def save_bert_results(self, coherence=False, coh_method='u_mass', from_probs=True, thresh=0.01, topk=10):
+    def save_bert_results(self, coherence=False, coh_method='u_mass', from_probs=False, thresh=0.01, topk=10):
         """
         saves the taxonomy, coherence, and document topic distribution in one excel file
 
@@ -769,7 +767,7 @@ class Topic_Model_plus():
             The default is 'u_mass'.
         from_probs : boolean, optional
             true to assign topics to documents based on a probability threshold (i.e., documents can have multiple topics). 
-            The default is True.
+            The default is False.
         thresh : float, optional
             probability threshold used when from_probs=True. The default is 0.01.
         topk : int, optional
@@ -1087,8 +1085,6 @@ class Topic_Model_plus():
         None.
 
         """
-        # TO DO: the function of the num_topics var is not easy to understand - nd to make clearer and revise corresponding argument description in docstring
-
         start = time()
         self.lda_models = {}
         self.lda_coherence = {}
@@ -1952,8 +1948,6 @@ class Topic_Model_plus():
         None.
 
         """
-        # TO DO: levels/level/lev are used inconsistently as params throughout this class
-        #filename arg is weird....
         try:
             from graphviz import Digraph
         except ImportError as error:
@@ -1997,6 +1991,6 @@ class Topic_Model_plus():
                         dot.edge(str(parent_id),str(topic_id))
                         nodes["level "+str(level)].append(topic_id)
 
-        dot.col(layout='twopi')
-        dot.col(overlap="voronoi")
+        dot.attr(layout='twopi')
+        dot.attr(overlap="voronoi")
         dot.render(filename = os.path.join(self.folder_path,col+"_hlda_network"), format = 'png')
