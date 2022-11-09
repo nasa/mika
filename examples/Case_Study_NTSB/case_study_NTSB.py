@@ -16,20 +16,20 @@ from sklearn.feature_extraction.text import CountVectorizer
 from torch import cuda
 
 # before loading data, grab only recent reports and save as a new csv
-ntsb_filepath = os.path.join("data/NTSB/ntsb_full.csv")
+#ntsb_filepath = os.path.join("data/NTSB/ntsb_full.csv")
+ntsb_filepath = os.path.join("data/NTSB/ntsb_recent_full.csv")
 ntsb_df = pd.read_csv(ntsb_filepath)
 datetimes = [dt.strptime(date_str, "%Y-%m-%d %H:%M:%S") for date_str in ntsb_df['lchg_date']]
 ntsb_df['datetimes'] = datetimes
 ntsb_df = ntsb_df.loc[ntsb_df['datetimes'] >= dt.strptime("09/01/2022", "%m/%d/%Y")]
-ntsb_recent_filepath = os.path.join("data/NTSB/ntsb_recent_full.csv")
-ntsb_df.to_csv(ntsb_recent_filepath)
+ntsb_df.to_csv(ntsb_filepath)
 
 # now load into Data()
 ntsb_data = Data()
 ntsb_text_columns = ['narr_cause', 'narr_accf'] # narrative accident cause and narrative accident final
-ntsb_document_id_col = 'ev_id'
+ntsb_document_id_col = 'id'
 ntsb_database_name = 'NTSB'
-ntsb_data.load(ntsb_recent_filepath, preprocessed=False, text_columns=ntsb_text_columns, id_col=ntsb_document_id_col, name=ntsb_database_name,preprocessed_kwargs={'dtype':str}) # way to load as str?
+ntsb_data.load(ntsb_filepath, preprocessed=False, text_columns=ntsb_text_columns, name=ntsb_database_name,preprocessed_kwargs={'dtype':str}) # way to load as str?
 ntsb_data.prepare_data(create_ids=True, combine_columns=ntsb_text_columns, remove_incomplete_rows=False)
     
 # IR
@@ -69,12 +69,12 @@ print(device)
 fmea = FMEA()
 fmea.load_model(model_checkpoint)
 print("loaded model")
-input_data = fmea.load_data('narr_accf', ntsb_document_id_col, filepath=ntsb_recent_filepath, formatted=False)
+input_data = fmea.load_data('narr_accf', ntsb_document_id_col, filepath=ntsb_filepath, formatted=False)
 
 print("loaded data")
 preds = fmea.predict()
 df = fmea.get_entities_per_doc()
-fmea.group_docs_with_meta(grouping_col='Occurrence_Description', additional_cols=['Phase no'])
+fmea.group_docs_with_meta(grouping_col='Occurrence_Description', additional_cols=['phase_no'])
 fmea.grouped_df.to_csv(os.path.join(os.getcwd(),"ntsb_fmea_test.csv"))
 
 # HEAT

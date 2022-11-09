@@ -1,5 +1,4 @@
 # hswalsh
-#from mika.utils.remove_nans import remove_nans
 from sentence_transformers import SentenceTransformer, util
 from nltk.tokenize import sent_tokenize
 import numpy as np
