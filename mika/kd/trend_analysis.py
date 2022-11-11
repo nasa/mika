@@ -1058,6 +1058,99 @@ def plot_frequency_time_series(metric_data, metric_name='Frequency', line_styles
     if save: plt.savefig(dataset_name+'_hazard_'+metric_name+'.pdf', bbox_inches="tight") 
     plt.show()
 
+def make_pie_chart(docs, data, predictor, hazards, id_field, predictor_label=None, save=True):
+    """makes a set of pie charts, with one pie chart per hazard showing the distribution of the categorical predictor variable specified.
+
+    Parameters
+    ----------
+    docs : Dict
+        nested dictionary used to store documents per hazard. Keys are hazards 
+        and value is an inner dict. Inner dict has keys as time variables (e.g., years) and 
+        values are lists.
+    data : pandas DataFrame
+        pandas datframe containing documents.
+    predictor : string
+        column in the data that has the categorical predictor of interest
+    hazards : list
+        list of hazards
+    id_field : string
+        the column in preprocessed df that contains document ids
+    predictor_label : string, optional
+        predictor label to be shown in the figure title, by default None
+    save : bool, optional
+        True to save the figure, by default True
+    """
+    if not predictor_label: predictor_label=predictor
+    num_rows = int(np.ceil(len(hazards)/3))
+    extra_axes = len(hazards)%3
+    fig, axes = plt.subplots(num_rows, 3, figsize=(17,9))
+    if extra_axes>0:
+        for x in range(1,extra_axes):
+            fig.delaxes(axes[num_rows-1][3-x])
+    #set up lables, colors dict
+    total_docs_with_hazards = [doc for hazard in hazards for year in docs[hazard] for doc in docs[hazard][year] ]
+    labels = data.loc[data[id_field].isin(total_docs_with_hazards)][predictor].value_counts().index.sort_values()
+    colors = cm.coolwarm(np.linspace(0, 1, len(labels)))
+    for ax, hazard in zip(axes.flatten(), hazards):
+        total_docs = [doc for year in docs[hazard] for doc in docs[hazard][year]]
+        hazard_data = data.loc[data[id_field].isin(total_docs)].reset_index(drop=True)
+        val_counts = hazard_data[predictor].value_counts()
+        values = [val_counts[val] if val in val_counts else 0 for val in labels]
+        _, _, autopct = ax.pie(values, labels=labels, colors=colors, autopct='%1.1f%%', textprops={'fontsize': 12},labeldistance=None, pctdistance=1.2)
+        for txt in autopct:
+            if float(txt.get_text().strip("%"))<3.0:
+                txt.set_visible(False)
+                
+        ax.set_title(hazard+" per "+predictor_label, fontdict={'fontsize': 14})
+    axes[0,0].legend(bbox_to_anchor=(-0.2, 1),fontsize=14)
+    plt.savefig('hazard_'+predictor+'.pdf', bbox_inches="tight") 
+    plt.show()
+
+def chi_squared_tests(preprocessed_df, hazards, predictors, pred_dict={}): 
+    """ Performs chi-squared test for each predictor to determine if there is a statistically
+    significant difference in the counts of the predictor between reports with  and without each hazard
+
+    Parameters
+    ----------
+    preprocessed_df : pandas DataFrame
+        pandas datframe containing documents.
+    hazards : pandas DataFrame
+        pandas datframe containing documents.
+    predictors : list
+        list of columns in the dataframe with categorical predictors of interest.
+    pred_dict : dict, optional
+        dictionary with predictors from predicotr list as keys and names to disply in the table as values, default is {}.
+
+    Returns
+    -------
+    stats_df : pandas DataFrame
+        pandas dataframe containing the chi-squared statistic and p-val for each hazard-predictor pair
+    """
+    count_dfs = {}
+    pred_dict = {'region_corrected':'Region', 'Type': "Aircraft Type", 'Agency':'Agency'}
+    if pred_dict == None:
+        pred_dict = {predictor: predictor for predictor in predictors}
+    stat_vals = {(pred_dict[pred],val): [] for pred in predictors for val in ["chi-squared", "p-val"]}
+    for predictor in predictors:
+        pred_vals = [val for val in preprocessed_df[predictor].value_counts().index]
+        diff_observed_expected = {pred_val:[] for pred_val in pred_vals}
+        for hazard in hazards:
+            expected, observed, stats = pg.chi2_independence(preprocessed_df, x=predictor,y=hazard)
+            stat_vals[(pred_dict[predictor], "p-val")].append((stats.iloc[0]['pval'].round(3)))
+            stat_vals[(pred_dict[predictor], "chi-squared")].append((stats.iloc[0]['chi2'].round(3)))
+            for i in range(len(expected)):
+                pred_val = expected.index[i]
+                diff_observed_expected[pred_val].append(observed.iloc[i][0] - expected.iloc[i][0])
+                diff_observed_expected[pred_val].append(observed.iloc[i][1] - expected.iloc[i][1])
+        iterables = [hazards, [0,1]]
+        index = pd.MultiIndex.from_product(iterables, names=["Hazard", "Present"])
+        pred_df = pd.DataFrame(diff_observed_expected, index=index)
+        count_dfs[predictor] = pred_df
+    iterables = [[pred_dict[pred] for pred in predictors], ["p-val", "chi-squared"]]
+    index = pd.MultiIndex.from_product(iterables, names=["Predictor", "Measure"])
+    stats_df = pd.DataFrame(stat_vals, index=hazards, columns=index)
+    return stats_df
+
 def create_correlation_matrix(predictors_scaled, frequencies_scaled, graph=True, mask_vals=False, figsize=(6,4), fontsize=12, save=False, results_path="", title=False):
     """
     creates the correlation matrix between all predictors and all hazard frequencies
@@ -1519,7 +1612,7 @@ def plot_risk_matrix(likelihoods, severities, figsize=(9,5), save=False, results
         plt.savefig(results_path+".pdf", bbox_inches="tight")
     plt.show()
 
-def sample_for_recall(preprocessed_df, id_col, text_col, hazards, save_path, num_sample=100): ##TODO: rename
+def sample_for_accuracy(preprocessed_df, id_col, text_col, hazards, save_path, num_sample=100): ##TODO: rename
     """
     generates a spreadsheet of randomly sampled documents to analyze the quality of hazard extraction
 
