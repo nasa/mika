@@ -296,7 +296,9 @@ class FMEA():
             DESCRIPTION.
 
         """
-        #self.data_df[self.id_col] = self.data_df.index.tolist()
+        if additional_cols != []:
+            for col in additional_cols:
+                self.data_df[col] = self.raw_df[col].tolist()
         temp_grouped_df = self.data_df.copy()
         #group reports by category/mission type/phase
         temp_grouped_df['cluster'] = self.raw_df[grouping_col].tolist()
@@ -307,7 +309,7 @@ class FMEA():
                     'CON': lambda x: '; '.join([i for i in x if i!="" and type(i)==str]),
                     'REC': lambda x: '; '.join([i for i in x if i!="" and type(i)==str]),
                     self.id_col: lambda x: '; '.join([str(i) for i in x])}#str(x))} #this may not work for all data sets
-        ad_col_dict = {col: lambda x: '; '.join(set([i.replace("Fire, ","") for i in x])) for col in additional_cols}
+        ad_col_dict = {col: lambda x: '; '.join(set([str(i) for i in x])) for col in additional_cols}
         agg_dict.update(ad_col_dict)
         self.grouped_df = temp_grouped_df.groupby('cluster').agg(agg_dict)
 
