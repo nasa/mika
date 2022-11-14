@@ -341,12 +341,7 @@ class Topic_Model_plus():
         self.get_bert_coherence(coh_method, from_probs)
         self.__create_folder()
         max_topics = max([len(set(self.BERT_models[col].topics_))-1 for col in self.BERT_models])
-        if self.reduced == True: #Why? bug in bertopic?
-            start_ind = -1
-        else:
-            start_ind = 0
-        start_ind = -1
-        coherence_score = {"topic numbers": ["average score"]+['std dev']+[i for i in range(start_ind, max_topics)]}
+        coherence_score = {"topic numbers": ["average score"]+['std dev']+[i for i in range(-1, max_topics)]}
         for col in self.text_columns:
             coherence_score[col] = []
             c_scores = self.BERT_coherence[col]
@@ -355,7 +350,7 @@ class Topic_Model_plus():
             std_coherence = np.std(c_scores)
             coherence_score[col].append(std_coherence)
             coherence_per_topic = c_scores
-            for i in range(start_ind, (max_topics-len(coherence_per_topic))):
+            for i in range(-1, (max_topics-len(coherence_per_topic))):
                 coherence_per_topic.append("n/a")
             coherence_score[col] += coherence_per_topic
         coherence_df = pd.DataFrame(coherence_score)
