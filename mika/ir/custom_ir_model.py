@@ -3,6 +3,7 @@ from sentence_transformers import SentenceTransformer, util
 from nltk.tokenize import sent_tokenize
 import numpy as np
 import pandas as pd
+import torch
 
 class custom_ir_model():
     """
@@ -135,6 +136,4 @@ class custom_ir_model():
         model.fit(train_objectives=[(train_dataloader, train_loss)], epochs=num_epochs, warmup_steps=warmup_steps, show_progress_bar=True)
         
         # save the model
-        model.save(os.path.join('results',model_name)
-
-    
+        model.save(os.path.join('results',model_name))

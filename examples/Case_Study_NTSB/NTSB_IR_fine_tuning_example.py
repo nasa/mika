@@ -10,6 +10,7 @@ from mika.utils import Data
 from datetime import datetime as dt
 import pandas as pd
 from transformers import T5Tokenizer, T5ForConditionalGeneration
+import torch
 
 # before loading data, grab only recent reports and save as a new csv
 #ntsb_filepath = os.path.join("data/NTSB/ntsb_full.csv")
@@ -29,14 +30,14 @@ ntsb_data.load(ntsb_filepath, preprocessed=False, text_columns=ntsb_text_columns
 ntsb_data.prepare_data(create_ids=True, combine_columns=ntsb_text_columns, remove_incomplete_rows=False)
 
 # using custom_ir_model to setup the training data and fine-tune the model
-model = SentenceTransformer('msmarco-roberta-base-v3')
+model = SentenceTransformer('sentence-transformers/msmarco-roberta-base-v3')
 ntsb_custom_ir_model = custom_ir_model(base_model=model, training_data=ntsb_data)
 
 embeddings_path = os.path.join('data', 'LLIS', 'llis_sentence_embeddings_finetune.npy')
 ntsb_custom_ir_model.load_sentence_embeddings(embeddings_path)
-tokenizer = T5Tokenizer.from_pretrained('msmarco-roberta-base-v3')
+tokenizer = T5Tokenizer.from_pretrained('BeIR/query-gen-msmarco-t5-large-v1')
 
-model = T5ForConditionalGeneration.from_pretrained('msmarco-roberta-base-v3')
+model = T5ForConditionalGeneration.from_pretrained('BeIR/query-gen-msmarco-t5-large-v1')
 model.eval()
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 model.to(device)
