@@ -38,9 +38,6 @@ ntsb_custom_ir_model.load_sentence_embeddings(embeddings_path)
 tokenizer = T5Tokenizer.from_pretrained('BeIR/query-gen-msmarco-t5-large-v1')
 
 model = T5ForConditionalGeneration.from_pretrained('BeIR/query-gen-msmarco-t5-large-v1')
-model.eval()
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
-model.to(device)
 
 training_data_filepath = os.path.join('data','ir_model_training_data.csv')
 ntsb_custom_ir_model.prepare_training_data(tokenizer, model, training_data_filepath)
