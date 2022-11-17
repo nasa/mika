@@ -93,7 +93,7 @@ class custom_ir_model():
         """
         
         # define training corpus based on designated text columns in Data object; this can be changed using cols
-        training_corpus = self.training_data.data_df[self.cols].agg(' '.join, axis=1)
+        training_corpus = self.training_data.data_df[self.cols].agg(' '.join, axis=1).tolist()
                 
         input_ids = tokenizer.encode(training_corpus, return_tensors='pt')
         outputs = model.generate(input_ids=input_ids, max_length=max_length, do_sample=do_sample, top_p=top_p, num_return_sequences=num_return_sequences)
