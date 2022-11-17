@@ -1,9 +1,11 @@
 # hswalsh
-from sentence_transformers import SentenceTransformer, util
+import sys, os
+from sentence_transformers import SentenceTransformer, util, InputExample, datasets, losses
 from nltk.tokenize import sent_tokenize
 import numpy as np
 import pandas as pd
 import torch
+import re
 
 class custom_ir_model():
     """
@@ -73,7 +75,7 @@ class custom_ir_model():
         embeddings_as_numpy = np.load(filepath)
         self.sentence_corpus_embeddings = torch.from_numpy(embeddings_as_numpy)
     
-    def prepare_training_data(self, tokenizer, model, save_filepath=None, max_length=64, do_sample=True, top_p=0.95, num_return_sequences=3):
+    def prepare_training_data(self, tokenizer, model, save_filepath=None, max_length=64, do_sample=True, top_p=0.95, num_return_sequences=1):
         """
         Prepares data for fine tuning the model.
         
@@ -94,20 +96,19 @@ class custom_ir_model():
         
         # define training corpus based on designated text columns in Data object; this can be changed using cols
         training_corpus = self.training_data.data_df[self.cols].agg(' '.join, axis=1).tolist()
-        
-        device = 'cuda' if torch.cuda.is_available() else 'cpu'
-        model.to(device)
-                
-        input_ids = tokenizer.encode(training_corpus, return_tensors='pt')
-        input_ids.to(device)
-        
-        outputs = model.generate(input_ids=input_ids, max_length=max_length, do_sample=do_sample, top_p=top_p, num_return_sequences=num_return_sequences)
+        training_corpus = [doc for doc in training_corpus if re.search('[a-zA-Z]', doc)]
+        input_ids = []
+        outputs = []
         training_data = []
-        for i in range(len(outputs)):
-            training_data.append([tokenizer.decode(outputs[i], skip_special_tokens=True), training_corpus[i]])
+        for i in range(0,len(training_corpus)):
+            input_ids.append(tokenizer.encode(training_corpus[i], return_tensors='pt', truncation=True))
+            outputs.append(model.generate(input_ids=input_ids[i], max_length=max_length, do_sample=do_sample, top_p=top_p, num_return_sequences=num_return_sequences))
+            for idx, out in enumerate(outputs[i]):
+                query_i = tokenizer.decode(out, skip_special_tokens=True)
+                training_data.append([query_i, training_corpus[i]])
         training_data = pd.DataFrame(training_data)
         self.training_data = training_data
-        training_data.to_csv(save_filepath)
+        training_data.to_csv(save_filepath, index=False)
         
     def fine_tune_model(self, data_filepath=None, train_batch_size=16, model=None, num_epochs=3, model_name='custom_model'):
         """
@@ -132,7 +133,7 @@ class custom_ir_model():
                
         # setup data loader and loss function
         train_batch_size = train_batch_size
-        train_dataloader = NoDuplicatesDataLoader(self.train_examples, shuffle=True, batch_size=train_batch_size)
+        train_dataloader = datasets.NoDuplicatesDataLoader(self.train_examples, batch_size=train_batch_size)
         train_loss = losses.MultipleNegativesRankingLoss(model)
         
         # fine tune the model

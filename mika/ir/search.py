@@ -13,13 +13,13 @@ class search():
     ----------
     data : Data() object
         Data object loaded using mika.utils.Data
-    model : str
-        Either a path to a custom model or a name of a pretrained model.
+    model :
+        
     """
 
     def __init__(self, data=None, model=''):
         self.cols = data.text_columns
-        self.sbert_model = SentenceTransformer(model)
+        self.sbert_model = model
         
         self.corpus = [data.data_df[col].tolist() for col in self.cols]
         self.corpus = [item for sublist in self.corpus for item in sublist]

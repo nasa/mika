@@ -14,6 +14,7 @@ from mika.kd import trend_analysis
 from mika.kd import FMEA
 from sklearn.feature_extraction.text import CountVectorizer
 from torch import cuda
+from sentence_transformers import SentenceTransformer
 
 # before loading data, grab only recent reports and save as a new csv
 #ntsb_filepath = os.path.join("data/NTSB/ntsb_full.csv")
@@ -34,14 +35,13 @@ ntsb_data.prepare_data(create_ids=True, combine_columns=ntsb_text_columns, remov
     
 # IR
 # there are options here to use pretrained or finetuned models - comment out appropriate lines as needed
-model = os.path.join('models', 'fine_tuned_llis_model')
-#model = 'all-distilroberta-v1'
+#model = os.path.join('models', 'fine_tuned_llis_model')
+model = SentenceTransformer('all-distilroberta-v1')
 query = 'fatigue crack'
 ir_ntsb = search(ntsb_data, model)
-embeddings_path = os.path.join('data', 'LLIS', 'llis_sentence_embeddings_finetune.npy')
-#embeddings_path = os.path.join('data', 'LLIS', 'llis_sentence_embeddings.npy')
-#ir_ntsb.get_sentence_embeddings(embeddings_path) # comment this out if the embeddings already exist
-ir_ntsb.load_sentence_embeddings(embeddings_path) # uncomment this if you wish to load sentence embeddings that already exist
+embeddings_path = os.path.join('data', 'NTSB', 'ntsb_sentence_embeddings_finetune.npy')
+ir_ntsb.get_sentence_embeddings(embeddings_path) # comment this out if the embeddings already exist
+#ir_ntsb.load_sentence_embeddings(embeddings_path) # uncomment this if you wish to load sentence embeddings that already exist
 print(ir_ntsb.run_search(query,return_k=5))
 
 # bert topics

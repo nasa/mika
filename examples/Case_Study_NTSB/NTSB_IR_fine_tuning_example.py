@@ -6,6 +6,7 @@ import sys, os
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)),"..",".."))
 from sentence_transformers import SentenceTransformer
 from mika.ir.custom_ir_model import custom_ir_model
+from mika.ir.search import search
 from mika.utils import Data
 from datetime import datetime as dt
 import pandas as pd
@@ -37,10 +38,10 @@ embeddings_path = os.path.join('data', 'LLIS', 'llis_sentence_embeddings_finetun
 ntsb_custom_ir_model.load_sentence_embeddings(embeddings_path)
 tokenizer = T5Tokenizer.from_pretrained('BeIR/query-gen-msmarco-t5-large-v1')
 
-model = T5ForConditionalGeneration.from_pretrained('BeIR/query-gen-msmarco-t5-large-v1')
+t5_model = T5ForConditionalGeneration.from_pretrained('BeIR/query-gen-msmarco-t5-large-v1')
 
 training_data_filepath = os.path.join('data','ir_model_training_data.csv')
-ntsb_custom_ir_model.prepare_training_data(tokenizer, model, training_data_filepath)
+ntsb_custom_ir_model.prepare_training_data(tokenizer, t5_model, training_data_filepath)
 ntsb_custom_ir_model.fine_tune_model(data_filepath=training_data_filepath, train_batch_size=16, model=model, num_epochs=3, model_name='custom_model')
 
 # quick check of semantic search using the fine tuned model
