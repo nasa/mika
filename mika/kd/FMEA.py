@@ -292,8 +292,8 @@ class FMEA():
 
         Returns
         -------
-        TYPE
-            DESCRIPTION.
+        grouped_df : DataFrame
+            The grouped FMEA dataframe
 
         """
         if additional_cols != []:
