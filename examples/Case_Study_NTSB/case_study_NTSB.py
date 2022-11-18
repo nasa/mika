@@ -20,7 +20,7 @@ from sentence_transformers import SentenceTransformer
 #ntsb_filepath = os.path.join("data/NTSB/ntsb_full.csv")
 ntsb_filepath = os.path.join("data/NTSB/ntsb_recent_full.csv")
 ntsb_df = pd.read_csv(ntsb_filepath)
-datetimes = [dt.strptime(date_str, "%Y-%m-%d %H:%M:%S") for date_str in ntsb_df['lchg_date']]
+datetimes = [dt.strptime(date_str, "%Y-%m-%d %H:%M:%S") for date_str in ntsb_df['ev_date']] #switch to ev_date
 ntsb_df['datetimes'] = datetimes
 ntsb_df = ntsb_df.loc[ntsb_df['datetimes'] >= dt.strptime("09/01/2022", "%m/%d/%Y")]
 ntsb_df.to_csv(ntsb_filepath)
@@ -30,7 +30,7 @@ ntsb_data = Data()
 ntsb_text_columns = ['narr_cause', 'narr_accf'] # narrative accident cause and narrative accident final
 ntsb_document_id_col = 'id'
 ntsb_database_name = 'NTSB'
-ntsb_data.load(ntsb_filepath, preprocessed=False, text_columns=ntsb_text_columns, name=ntsb_database_name,preprocessed_kwargs={'dtype':str}) # way to load as str?
+ntsb_data.load(ntsb_filepath, preprocessed=False, text_columns=ntsb_text_columns, name=ntsb_database_name, load_kwargs={'dtype':str}) # way to load as str?
 ntsb_data.prepare_data(create_ids=True, combine_columns=ntsb_text_columns, remove_incomplete_rows=False)
     
 # IR
