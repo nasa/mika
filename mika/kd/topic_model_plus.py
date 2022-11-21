@@ -46,6 +46,8 @@ class Topic_Model_plus():
         variable for storing lda models
     folder_path : string
         destination for storing results and models
+    results_path : string
+        destentation to create results folder in
         
     
     Methods
@@ -132,7 +134,7 @@ class Topic_Model_plus():
 #   TO DO:
 #   add hyper parameter tuning for lda (alpha and beta and k/number of topics) and hlda (eta, alpha, gamma)
     
-    def __init__(self, text_columns=[], data=None, ngrams=None):
+    def __init__(self, text_columns=[], data=None, ngrams=None, results_path=''):
         """
         CLASS CONSTRUCTORS
         ------------------
@@ -142,6 +144,8 @@ class Topic_Model_plus():
             Data object storing the text corpus
         ngrams : str
             'tp' if the user wants tomotopy to form ngrams prior to applying a topic model 
+        results_path : str
+            location to create results folder.
         """
         self.text_columns = text_columns
         self.data = data
@@ -153,6 +157,10 @@ class Topic_Model_plus():
         self.lda_models = {}
         self.ngrams = ngrams
         self.folder_path = ""
+        if results_path != '':
+            self.results_path = results_path + '/'
+        else:
+            self.results_path = results_path
         
     def __create_folder(self): 
         """
@@ -165,7 +173,7 @@ class Topic_Model_plus():
         """
         #new version, just saves it within the folder
         if self.folder_path == "":
-            self.folder_path = 'topic_model_results'
+            self.folder_path = self.results_path+ 'topic_model_results'
             if os.path.isdir(self.folder_path) == True:
                 today_str = datetime.date.today().strftime("%b-%d-%Y")
                 self.folder_path += today_str

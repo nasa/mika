@@ -19,6 +19,7 @@ from sklearn.metrics import mean_squared_error, accuracy_score, r2_score, recall
 from wordcloud import WordCloud
 import seaborn as sn
 from tqdm import tqdm
+import pingouin as pg
 import random
 
 def minmax_scale(data_list):

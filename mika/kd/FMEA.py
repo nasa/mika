@@ -133,6 +133,7 @@ class FMEA():
                     data = data.dropna(subset=[text_col])
                 else:
                     data = df
+                    data = data.dropna(subset=[text_col])
                 #sentences
                 self.nlp = spacy.load("en_core_web_trf")
                 self.nlp.add_pipe("sentencizer")
