@@ -34,13 +34,13 @@ ntsb_data.prepare_data(create_ids=True, combine_columns=ntsb_text_columns, remov
 model = SentenceTransformer('sentence-transformers/msmarco-roberta-base-v3')
 ntsb_custom_ir_model = custom_ir_model(base_model=model, training_data=ntsb_data)
 
-embeddings_path = os.path.join('data', 'LLIS', 'llis_sentence_embeddings_finetune.npy')
+embeddings_path = os.path.join('data', 'NTSB', 'ntsb_sentence_embeddings_finetune.npy')
 ntsb_custom_ir_model.load_sentence_embeddings(embeddings_path)
 tokenizer = T5Tokenizer.from_pretrained('BeIR/query-gen-msmarco-t5-large-v1')
 
 t5_model = T5ForConditionalGeneration.from_pretrained('BeIR/query-gen-msmarco-t5-large-v1')
 
-training_data_filepath = os.path.join('data','ir_model_training_data.csv')
+training_data_filepath = os.path.join('data','NTSB','ir_model_training_data.csv')
 ntsb_custom_ir_model.prepare_training_data(tokenizer, t5_model, training_data_filepath)
 ntsb_custom_ir_model.fine_tune_model(data_filepath=training_data_filepath, train_batch_size=16, model=model, num_epochs=3, model_name='custom_model')
 

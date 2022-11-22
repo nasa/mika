@@ -20,9 +20,12 @@ class search():
     def __init__(self, data=None, model=''):
         self.cols = data.text_columns
         self.sbert_model = model
+        self.doc_ids = data.data_df[data.id_col]
         
         self.corpus = [data.data_df[col].tolist() for col in self.cols]
         self.corpus = [item for sublist in self.corpus for item in sublist]
+        self.corpus_ids = [self.doc_ids.tolist() for col in self.cols]
+        self.corpus_ids = [item for sublist in self.corpus_ids for item in sublist]
         self.__make_sentence_corpus()
         return
     
@@ -69,10 +72,11 @@ class search():
         -------
         None
         """
+        
         embeddings_as_numpy = np.load(filepath)
         self.sentence_corpus_embeddings = torch.from_numpy(embeddings_as_numpy)
     
-    def run_search(self, query, return_k=1):
+    def run_search(self, query, return_k=1, show_id=True):
         """
         Run the search using a query and loaded corpus embeddings.
         
@@ -82,6 +86,8 @@ class search():
             Query to search
         return_k : int
             Number of results to return
+        show_id : Bool
+            If true, returns document ID (in addition to index) in top_hits
         
         RETURNS
         -------
@@ -96,5 +102,10 @@ class search():
         top_hit_idx = [self.sentence_doc_idx[id_k] for id_k in top_hit_ids]
         top_hit_scores = [hits[0][k]['score'] for k in k_range]
         top_hit_text = [self.corpus[self.sentence_doc_idx[id_k]] for id_k in top_hit_ids]
-        top_hits = pd.DataFrame({'top_hit_idx': top_hit_idx, 'top_hit_scores': top_hit_scores, 'top_hit_text': top_hit_text})
+        if show_id == True:
+            top_hit_doc = [self.corpus_ids[top_hit_idx[id_j]] for id_j in range(0,len(top_hit_idx))]
+            return_data = {'top_hit_idx': top_hit_idx, 'top_hit_doc': top_hit_doc, 'top_hit_scores': top_hit_scores, 'top_hit_text': top_hit_text}
+        else:
+            return_data = {'top_hit_idx': top_hit_idx, 'top_hit_scores': top_hit_scores, 'top_hit_text': top_hit_text}
+        top_hits = pd.DataFrame(return_data)
         return top_hits
