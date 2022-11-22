@@ -37,12 +37,14 @@ ntsb_data.prepare_data(create_ids=True, combine_columns=ntsb_text_columns, remov
 # there are options here to use pretrained or finetuned models - comment out appropriate lines as needed
 model = SentenceTransformer(os.path.join('models', 'fine_tuned_llis_model'))
 #model = SentenceTransformer('all-distilroberta-v1')
-query = 'fatigue crack'
 ir_ntsb = search(ntsb_data, model)
 embeddings_path = os.path.join('data', 'NTSB', 'ntsb_sentence_embeddings_finetune.npy')
 ir_ntsb.get_sentence_embeddings(embeddings_path) # comment this out if the embeddings already exist
 #ir_ntsb.load_sentence_embeddings(embeddings_path) # uncomment this if you wish to load sentence embeddings that already exist
-ir_df = ir_ntsb.run_search(query,return_k=5)
+
+queries = ['fatigue crack', 'fuel leak', 'low visibility']
+for query in queries:
+    print(ir_ntsb.run_search(query,return_k=5))
 
 # bert topics
 # - narr_cause and narr_accf/narr_accp - these are in ntsb_full_narratives.csv
