@@ -42,7 +42,7 @@ embeddings_path = os.path.join('data', 'NTSB', 'ntsb_sentence_embeddings_finetun
 ir_ntsb.get_sentence_embeddings(embeddings_path) # comment this out if the embeddings already exist
 #ir_ntsb.load_sentence_embeddings(embeddings_path) # uncomment this if you wish to load sentence embeddings that already exist
 
-queries = ['fatigue crack', 'fuel leak', 'low visibility']
+queries = ['what components are vulnerable to fatigue crack', 'what are the consequences of a fuel leak', 'what are the risks of low visibility']
 for query in queries:
     print(ir_ntsb.run_search(query,return_k=5))
 
