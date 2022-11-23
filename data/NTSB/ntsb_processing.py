@@ -51,7 +51,9 @@ def add_list_of_phases_mishaps(df, occurrence_dict, from_occurrence_code, phase_
     df = df.drop(ind_to_drop).reset_index(drop=True)
     return df
 
-file_path = r"C:\Users\srandrad\OneDrive - NASA\Desktop\ntsb_test"
+file_path = input("enter the path to the folder of NTSB data: ")
+print("you entered: ", file_path)
+file_path = os.path.normpath(file_path.strip("'").strip('"'))
 
 for root, dirs, files in os.walk(file_path):
     for file in files:
@@ -138,7 +140,7 @@ for root, dirs, files in os.walk(file_path):
 docs = pd.concat(documentation_dfs).drop_duplicates().reset_index(drop=True)
 keys = docs.loc[(docs['Column']=='Occurrence_Code') & (docs['Table']=='Events_Sequence')].reset_index(drop=True)['code_iaids'].tolist()
 vals = docs.loc[(docs['Column']=='Occurrence_Code') & (docs['Table']=='Events_Sequence')].reset_index(drop=True)['meaning'].tolist()
-occurrence_dict =dict(zip(keys, vals))
+occurrence_dict = dict(zip(keys, vals))
 
 dfs = []
 for root, dirs, files in os.walk(file_path):
@@ -170,7 +172,7 @@ ntsb_from_occurrences = pd.concat(dfs).drop_duplicates().reset_index(drop=True)
 ntsb_from_occurrences = add_list_of_phases_mishaps(ntsb_from_occurrences, occurrence_dict, False, phase_dict) #need to make different occurrence dicts
 ntsb_from_occurrences = ntsb_from_occurrences.drop(['Occurrence_Code', 'Phase_of_Flight'], axis=1)
 ntsb = pd.concat([ntsb_from_events, ntsb_from_occurrences]).reset_index(drop=True)
-ntsb.to_csv("ntsb_full.csv")
+#ntsb.to_csv("ntsb_full.csv")
 print("Size of NTSB:", len(ntsb))
 
 dfs = []

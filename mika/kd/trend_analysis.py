@@ -23,15 +23,19 @@ import pingouin as pg
 import random
 
 def minmax_scale(data_list):
-    """
-    performs minmax scaling on a single data list in order to normalize the data.
+    """Performs minmax scaling on a single data list in order to normalize the data.
     normalization is required prior to regression and ML.
     Also it is used for graphing multiple time series on the same axes.
-    
-    ARGUMENTS
-    ---------
-    data_list: list
+
+    Parameters
+    ----------
+    data_list : list
         list of numerical data that will be scaled using minmax scaling
+
+    Returns
+    -------
+    scaled_list : list
+        list of data scaled between 0-1
     """
     max_ = max(data_list)
     min_ = min(data_list)
@@ -43,12 +47,17 @@ def minmax_scale(data_list):
 
 def corr_sig(df=None):
     """returns the probability matrix for a correlation matrix
-    
-    ARGUMENTS
-    ---------
-    df: dataframe
+
+    Parameters
+    ----------
+    df : Pandas Dataframe, optional
         df storing the data that is used to create the correlation matrix.
-        rows are years, columns are predictors + hazard frequencies
+        rows are years, columns are predictors + hazard frequencies, by default None
+
+    Returns
+    -------
+    p_matrix : numpy array
+        numpy array with p_values for corresponding dataframe entries
     """
     p_matrix = np.zeros(shape=(df.shape[1],df.shape[1]))
     for col in df.columns:
@@ -72,8 +81,8 @@ def regression_feature_importance(predictors, hazards, correlation_mat_total):
         rows are years, columns are predictors + hazard frequencies
     Returns
     -------
-    results_df : TYPE
-        DESCRIPTION.
+    results_df : pandas dataframe
+        dataframe containing both the mse and r2 scores for the model
 
     """
     data = correlation_mat_total
@@ -133,12 +142,12 @@ def regression_feature_importance(predictors, hazards, correlation_mat_total):
 
 def multiple_reg_feature_importance(predictors, hazards, correlation_mat_total, save=False, results_path="", 
                                     r2_fontsize=10, r2_figsize=(3.5,4), predictor_import_fontsize=10, predictor_import_figsize=(7,4)):
-    """
-    builds multiple regression model for hazrd frequency given the predictors.
+    """builds multiple regression model for hazrd frequency given the predictors.
     also performs predictor importance to identify which predictors are most relevant to the hazards frequency
-    
-    ARGUMENTS
-    ---------
+    predictors and hazards must be values from the correlation_mat_total
+
+    Parameters
+    ----------
     predictors: list
         list of predictor names, used to identify inputs to multiple regression
     hazards: list
@@ -146,8 +155,28 @@ def multiple_reg_feature_importance(predictors, hazards, correlation_mat_total, 
     correlation_mat_total: dataframe
         stores the time series values that were used for correlation matrix. 
         rows are years, columns are predictors + hazard frequencies
+    save : bool, optional
+        True to save resulting figure, by default False
+    results_path : str, optional
+        _description_, by default ""
+    r2_fontsize : int, optional
+        Frontsize for r2 figure, by default 10
+    r2_figsize : tuple, optional
+        figsize for r2 figure, by default (3.5,4)
+    predictor_import_fontsize : int, optional
+        fontsize for predictor importancce figure, by default 10
+    predictor_import_figsize : tuple, optional
+        figsize for predictor importance figure, by default (7,4)
+
+    Returns
+    -------
+    results_df : Pandas Dataframe
+        dataframe containing both the mse and r2 scores for the model
+    delta_df : Pandas Dataframe
+        dataframe containing the difference between the total model and the model when the predictor is shuffled
+    coefficient_df : Pandas Dataframe
+        dataframe containing the regression coefficients for predictor importance
     """
-    #predictors and hazards must be values from the correlation_mat_total
     data = correlation_mat_total
     predictors = predictors
     hazards = [h for h in hazards]
@@ -258,8 +287,8 @@ def remove_outliers(data, threshold=1.5, rm_outliers=True):
 
     Returns
     -------
-    TYPE
-        DESCRIPTION.
+    new_data : list
+        list of the data points with outliers removed
 
     """
     if data == [] or rm_outliers == False:
@@ -846,9 +875,80 @@ def identify_docs_per_hazard(hazard_file, preprocessed_df, results_file, text_fi
 
     return frequency, docs_per_hazard, hazard_words_per_doc, topics_per_doc, hazard_topics_per_doc
 
+def identify_docs_per_fmea_row(df, grouping_col, year_col, id_col):
+    """ identifies the documents corresponding to each row in an fmea
+
+    Parameters
+    ----------
+    df :  pandas DataFrame
+        pandas datframe containing documents.
+    grouping_col : string
+        the column in df that is used to group documents into FMEA rows
+    year_col : string
+        the column in df that contains document time values, such as report year
+    id_col : string
+        the column in df that contains document ids
+    Returns
+    -------
+    frequency : Dict
+        dictionary used to store hazard frequencies. Keys are hazards and values are ints.
+    docs_per_row : Dict
+        nested dictionary used to store documents per hazard. Keys are hazards 
+        and value is an inner dict. Inner dict has keys as time variables (e.g., years) and 
+        values are lists.
+    """
+    years = list(df[year_col].astype(str).unique())
+    years.sort()
+    grouping_vals = list(df[grouping_col].astype(str).unique())
+    frequency = {val: {year:0 for year in years} for val in grouping_vals}
+    docs_per_row = {val:{year:[] for year in years} for val in grouping_vals}
+    for year in years:
+        for val in grouping_vals:
+            temp_df = df.loc[(df[grouping_col]==val) & (df[year_col]==year)]
+            docs_per_row[val][year] = temp_df[id_col].tolist()
+            frequency[val][year] = len(temp_df[id_col].tolist())
+    return frequency, docs_per_row
+
+def calc_severity_per_hazard(docs, df, id_field, metric='average'):
+    """used to calculate the severity for each hazard occurrence, as well as the average severity
+
+    Parameters
+    ----------
+    docs : Dict
+        nested dictionary used to store documents per hazard. Keys are hazards 
+        and value is an inner dict. Inner dict has keys as time variables (e.g., years) and 
+        values are lists.
+    df :pandas DataFrame
+        pandas datframe containing documents with severity per document already calculated
+    id_field : string
+        the column in df that contains document ids
+    metric : string, optional
+        whether to calculate the average or maximum severity, default is 'average'
+    Returns
+    -------
+    severities : Dict
+        nested dictionary used to store severities per hazard occurrence. Keys are hazards 
+        and value is an inner dict. Inner dict has keys as time variables (e.g., years) and 
+        values are lists of severities.
+    total_severities_hazard : Dict
+        Dictionary used to store average severity per hazard. Keys are hazards 
+        and value is average severity.
+    """
+    time_period = set([t for hazard in docs for t in (docs[hazard].keys())])
+    severities = {name:{str(time_p):[] for time_p in time_period} for name in docs}
+    for hazard in docs:
+        for year in docs[hazard]:
+            curr_docs = docs[hazard][year]
+            severities[hazard][year] = df.loc[df[id_field].isin(curr_docs)]['severity'].tolist()
+    if metric == 'average':
+        total_severities_hazard = {hazard: round(np.average([sev for year in severities[hazard] for sev in severities[hazard][year]]),3) for hazard in severities}
+    elif metric == 'max':
+        total_severities_hazard = {hazard: max([sev for year in severities[hazard] for sev in severities[hazard][year]]) for hazard in severities}
+    return severities, total_severities_hazard
+
 def plot_metric_time_series(metric_data, metric_name, line_styles=[], markers=[], title="", 
                             time_name="Year", scaled=False, xtick_freq=5, show_std=True, 
-                            save=False, dataset_name="", yscale=None, legend=True, figsize=(6,4),
+                            save=False, results_path="", yscale=None, legend=True, figsize=(6,4),
                             fontsize=16):
     """
     plots a time series for specified metrics for all hazards (i.e., line chart)
@@ -876,8 +976,8 @@ def plot_metric_time_series(metric_data, metric_name, line_styles=[], markers=[]
         true to show std deviation on time series as error bars. The default is True.
     save : boolean, optional
         true to save the plot as a pdf. The default is False.
-    dataset_name : string, optional
-        name of the dataset, used for saving the plot. The default is "".
+    results_path : string, optional
+        path to save figure to. The default is "".
     yscale : string, optional
         yscale parameter, can be used to change scaling to log. The default is None.
     legend : boolean, optional
@@ -903,6 +1003,10 @@ def plot_metric_time_series(metric_data, metric_name, line_styles=[], markers=[]
     plt.title(title, fontsize=fontsize)
     plt.xlabel(time_name, fontsize=fontsize)
     plt.ylabel(metric_name, fontsize=fontsize)
+    if markers == []:
+        markers = ['.' for i in range(len(averages))]
+    if line_styles == []:
+        line_styles = ['-' for i in range(len(averages))]
     if yscale == 'log':
         plt.yscale('symlog')
     i=0
@@ -913,11 +1017,15 @@ def plot_metric_time_series(metric_data, metric_name, line_styles=[], markers=[]
         hazard_stddev = stddevs[hazard]
         num_removed = 0
         for ind in nans:
-            temp_time_vals.pop(ind-num_removed)
-            hazard_avs.pop(ind-num_removed)
-            hazard_stddev.pop(ind-num_removed)
-            num_removed+=1
-        temp_time_vals = [int(t) for t in temp_time_vals]
+            if ind != 0:
+                temp_time_vals.pop(ind-num_removed)
+                hazard_avs.pop(ind-num_removed)
+                hazard_stddev.pop(ind-num_removed)
+                num_removed+=1
+            else:
+                hazard_avs[0] = 0
+                hazard_stddev[0] = 0
+        temp_time_vals = [t for t in temp_time_vals]
         if show_std == True:
             plt.errorbar(temp_time_vals, hazard_avs, yerr=hazard_stddev, color=colors[i], marker=markers[i], linestyle=line_styles[i], label=hazard, capsize=5, markeredgewidth=1)
         else:
@@ -925,14 +1033,18 @@ def plot_metric_time_series(metric_data, metric_name, line_styles=[], markers=[]
         i += 1
     if legend: 
         plt.legend(bbox_to_anchor=(1, 1.1), loc='upper left', fontsize=fontsize-2)
-    plt.xticks(np.arange(0, int(len(time_vals))+1, xtick_freq),rotation=45)
+    plt.xticks(np.arange(0, int(len(time_vals))+1, xtick_freq),rotation=45,  labels=[time_vals[ind] for ind in np.arange(0, int(len(time_vals))+1, xtick_freq)])
     plt.margins(x=0.05)
     plt.tick_params(labelsize=fontsize)
-    if save: 
-        plt.savefig(dataset_name+'_hazard_'+metric_name+'.pdf', bbox_inches="tight") 
+    if save == True:
+        if results_path != "":
+                save_path = os.path.join(results_path, 'hazard_'+metric_name+'.pdf')
+        else:
+            save_path = 'hazard_'+metric_name+'.pdf'
+        plt.savefig(save_path, bbox_inches="tight") 
     plt.show()
     
-def plot_metric_averages(metric_data, metric_name, show_std=True, title="", save=False, legend=True, dataset_name="",
+def plot_metric_averages(metric_data, metric_name, show_std=True, title="", save=False, results_path="", legend=True,
                          figsize=(6,4), fontsize=16):
     """
     plots metric averages as a barchart
@@ -950,10 +1062,10 @@ def plot_metric_averages(metric_data, metric_name, show_std=True, title="", save
         title to add to plot. The default is "".
     save : boolean, optional
         true to save the plot as a pdf. The default is False.
+    results_path : string, optional
+        path to save figure to. The default is "".
     legend : boolean, optional
         true to show legend, false to hide legend. The default is True.
-    dataset_name : string, optional
-        name of the dataset, used for saving the plot. The default is "".
     figsize : tuple, optional
         size of the plot in inches. The default is (6,4).
     fontsize : int, optional
@@ -968,10 +1080,13 @@ def plot_metric_averages(metric_data, metric_name, show_std=True, title="", save
     avg = {hazard: np.average([m for year in metric_data[hazard] for m in metric_data[hazard][year]]) for hazard in metric_data}
     stddev = {hazard: np.std([m for year in metric_data[hazard] for m in metric_data[hazard][year]]) for hazard in metric_data}
     x_pos = np.arange(len(metric_data))
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=figsize)
     colors = cm.tab20(np.linspace(0, 1, len(metric_data)))
     labels = [key for key in metric_data.keys()]
-    ax.bar(x_pos, avg.values(), yerr=stddev.values(), align='center', ecolor='black', capsize=10, color=colors)
+    if show_std == True:
+        ax.bar(x_pos, avg.values(), yerr=stddev.values(), align='center', ecolor='black', capsize=10, color=colors)
+    else:
+        ax.bar(x_pos, avg.values(), align='center', color=colors)
     plt.xlabel("Hazard", fontsize=fontsize)
     plt.ylabel(metric_name, fontsize=fontsize)
     plt.title(title, fontsize=fontsize)
@@ -987,13 +1102,18 @@ def plot_metric_averages(metric_data, metric_name, show_std=True, title="", save
         labels = ["\n".join(textwrap.wrap(i,mean_length)) for i in labels]
         ax.set_xticks(np.asarray([i for i in range(len(metric_data))]))
         ax.set_xticklabels(labels,rotation=45,ha="right",rotation_mode='anchor')
-    if save: plt.savefig(dataset_name+'_hazard_bar_'+metric_name+'.pdf', bbox_inches="tight") 
+    if save == True:
+        if results_path != "":
+                save_path = os.path.join(results_path, 'hazard_bar_'+metric_name+'.pdf')
+        else:
+            save_path = 'hazard_'+metric_name+'.pdf'
+        plt.savefig(save_path, bbox_inches="tight") 
     plt.show()
     
 def plot_frequency_time_series(metric_data, metric_name='Frequency', line_styles=[], 
                                markers=[], title="", time_name="Year", xtick_freq=5, 
-                               scale=True, save=False, dataset_name="", legend=True,
-                               figsize=(6,4), fontsize=16):
+                               scale=True, save=False, results_path="",  yscale=None, 
+                               legend=True, figsize=(6,4), fontsize=16):
     """
     plots hazard frequency over time. 
     different from plot metric time series because of input data.
@@ -1019,8 +1139,10 @@ def plot_frequency_time_series(metric_data, metric_name='Frequency', line_styles
         true to minmax scale data, false to use raw data. The default is False.
     save : boolean, optional
         true to save the plot as a pdf. The default is False.
-    dataset_name : string, optional
-        name of the dataset, used for saving the plot. The default is "".
+    results_path : string, optional
+        path to save figure to. The default is "".
+    yscale : string, optional
+        yscale parameter, can be used to change scaling to log. The default is None.
     legend : boolean, optional
         true to show legend, false to hide legend. The default is True.
     figsize : tuple, optional
@@ -1042,11 +1164,17 @@ def plot_frequency_time_series(metric_data, metric_name='Frequency', line_styles
     else:
         hazard_freqs_scaled = frequencies
         y_label = metric_name
+    if markers == []:
+        markers = ['.' for i in range(len(hazard_freqs_scaled))]
+    if line_styles == []:
+        line_styles = ['-' for i in range(len(hazard_freqs_scaled))]
     colors = cm.tab20(np.linspace(0, 1, len(frequencies)))
     plt.figure(figsize=figsize)
     plt.ylabel(y_label, fontsize=fontsize)
     plt.xlabel(time_name, fontsize=fontsize)
     plt.title(title, fontsize=fontsize)
+    if yscale == 'log':
+        plt.yscale('symlog')
     i = 0
     for hazard in hazard_freqs_scaled:
         plt.plot(time_vals, hazard_freqs_scaled[hazard], color=colors[i], label=hazard, marker=markers[i], linestyle=line_styles[i])
@@ -1056,10 +1184,15 @@ def plot_frequency_time_series(metric_data, metric_name='Frequency', line_styles
     plt.xticks(np.arange(0, int(len(time_vals))+1, xtick_freq),rotation=45)
     plt.margins(x=0.05)
     plt.tick_params(labelsize=fontsize)
-    if save: plt.savefig(dataset_name+'_hazard_'+metric_name+'.pdf', bbox_inches="tight") 
+    if save: 
+        if results_path != "":
+            save_path = os.path.join(results_path, 'hazard_'+metric_name+'.pdf')
+        else:
+            save_path = 'hazard_'+metric_name+'.pdf'
+        plt.savefig(save_path, bbox_inches="tight") 
     plt.show()
 
-def make_pie_chart(docs, data, predictor, hazards, id_field, predictor_label=None, save=True):
+def make_pie_chart(docs, data, predictor, hazards, id_field, predictor_label=None, save=True, results_path="", pie_kwargs={}, fontsize=16, figsize=(17,9), padding=5):
     """makes a set of pie charts, with one pie chart per hazard showing the distribution of the categorical predictor variable specified.
 
     Parameters
@@ -1080,13 +1213,19 @@ def make_pie_chart(docs, data, predictor, hazards, id_field, predictor_label=Non
         predictor label to be shown in the figure title, by default None
     save : bool, optional
         True to save the figure, by default True
+    results_path : string, optional
+        path to save figure to. The default is "".
+    pie_kwargs : Dict, optional
+        Dictionary to pass kwargs into the piechart, default an empty dictionary
+    fontsize : int, optional
+        fontsize for the plot. The default is 16.
     """
     if not predictor_label: predictor_label=predictor
     num_rows = int(np.ceil(len(hazards)/3))
     extra_axes = len(hazards)%3
-    fig, axes = plt.subplots(num_rows, 3, figsize=(17,9))
+    fig, axes = plt.subplots(num_rows, 3, figsize=figsize)
     if extra_axes>0:
-        for x in range(1,extra_axes):
+        for x in range(1,extra_axes+2):
             fig.delaxes(axes[num_rows-1][3-x])
     #set up lables, colors dict
     total_docs_with_hazards = [doc for hazard in hazards for year in docs[hazard] for doc in docs[hazard][year] ]
@@ -1097,14 +1236,21 @@ def make_pie_chart(docs, data, predictor, hazards, id_field, predictor_label=Non
         hazard_data = data.loc[data[id_field].isin(total_docs)].reset_index(drop=True)
         val_counts = hazard_data[predictor].value_counts()
         values = [val_counts[val] if val in val_counts else 0 for val in labels]
-        _, _, autopct = ax.pie(values, labels=labels, colors=colors, autopct='%1.1f%%', textprops={'fontsize': 12},labeldistance=None, pctdistance=1.2)
+        _, _, autopct = ax.pie(values, labels=labels, colors=colors, autopct='%1.1f%%', #textprops={'fontsize': fontsize-2}, 
+        labeldistance=None, **pie_kwargs)
         for txt in autopct:
             if float(txt.get_text().strip("%"))<3.0:
                 txt.set_visible(False)
                 
-        ax.set_title(hazard+" per "+predictor_label, fontdict={'fontsize': 14})
-    axes[0,0].legend(bbox_to_anchor=(-0.2, 1),fontsize=14)
-    plt.savefig('hazard_'+predictor+'.pdf', bbox_inches="tight") 
+        ax.set_title(hazard, fontdict={'fontsize': fontsize})
+    axes[0,0].legend(bbox_to_anchor=(-0.2, 1),fontsize=fontsize, title=predictor_label)
+    fig.tight_layout(pad=padding)
+    if save == True:
+        if results_path != '':
+            save_path = os.path.join(results_path, predictor+'_pie_charts.pdf')
+        else:
+            save_path = predictor+'_pie_charts.pdf'
+        plt.savefig(save_path, bbox_inches="tight") 
     plt.show()
 
 def chi_squared_tests(preprocessed_df, hazards, predictors, pred_dict={}): 
