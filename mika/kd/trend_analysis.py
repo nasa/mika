@@ -1025,7 +1025,7 @@ def plot_metric_time_series(metric_data, metric_name, line_styles=[], markers=[]
             else:
                 hazard_avs[0] = 0
                 hazard_stddev[0] = 0
-        temp_time_vals = [int(t) for t in temp_time_vals]
+        temp_time_vals = [t for t in temp_time_vals]
         if show_std == True:
             plt.errorbar(temp_time_vals, hazard_avs, yerr=hazard_stddev, color=colors[i], marker=markers[i], linestyle=line_styles[i], label=hazard, capsize=5, markeredgewidth=1)
         else:
@@ -1033,7 +1033,7 @@ def plot_metric_time_series(metric_data, metric_name, line_styles=[], markers=[]
         i += 1
     if legend: 
         plt.legend(bbox_to_anchor=(1, 1.1), loc='upper left', fontsize=fontsize-2)
-    plt.xticks(ticks=[int(time_vals[ind]) for ind in range(0, int(len(time_vals))+1, xtick_freq)],rotation=45,  labels=[str(time_vals[ind]) for ind in range(0, int(len(time_vals))+1, xtick_freq)])
+    plt.xticks(np.arange(0, int(len(time_vals))+1, xtick_freq),rotation=45,  labels=[time_vals[ind] for ind in np.arange(0, int(len(time_vals))+1, xtick_freq)])
     plt.margins(x=0.05)
     plt.tick_params(labelsize=fontsize)
     if save == True:
@@ -1229,21 +1229,21 @@ def make_pie_chart(docs, data, predictor, hazards, id_field, predictor_label=Non
             fig.delaxes(axes[num_rows-1][3-x])
     #set up lables, colors dict
     total_docs_with_hazards = [doc for hazard in hazards for year in docs[hazard] for doc in docs[hazard][year] ]
-    labels = data.loc[data[id_field].isin(total_docs_with_hazards)][predictor].value_counts().index.sort_values().tolist()
-    labels.remove('')
+    labels = data.loc[data[id_field].isin(total_docs_with_hazards)][predictor].value_counts().index.sort_values()
     colors = cm.coolwarm(np.linspace(0, 1, len(labels)))
     for ax, hazard in zip(axes.flatten(), hazards):
         total_docs = [doc for year in docs[hazard] for doc in docs[hazard][year]]
         hazard_data = data.loc[data[id_field].isin(total_docs)].reset_index(drop=True)
         val_counts = hazard_data[predictor].value_counts()
         values = [val_counts[val] if val in val_counts else 0 for val in labels]
-        _, _, autopct = ax.pie(values, labels=labels, colors=colors, autopct='%1.1f%%', textprops={'fontsize': fontsize-2}, labeldistance=None, **pie_kwargs)
+        _, _, autopct = ax.pie(values, labels=labels, colors=colors, autopct='%1.1f%%', #textprops={'fontsize': fontsize-2}, 
+        labeldistance=None, **pie_kwargs)
         for txt in autopct:
             if float(txt.get_text().strip("%"))<3.0:
                 txt.set_visible(False)
                 
         ax.set_title(hazard, fontdict={'fontsize': fontsize})
-    axes[0,0].legend(bbox_to_anchor=(-0.2, 1),fontsize=fontsize, title=predictor_label,title_fontsize=fontsize)
+    axes[0,0].legend(bbox_to_anchor=(-0.2, 1),fontsize=fontsize, title=predictor_label)
     fig.tight_layout(pad=padding)
     if save == True:
         if results_path != '':
@@ -1676,7 +1676,7 @@ def plot_USFS_risk_matrix(likelihoods, severities, figsize=(9,5), save=False, re
         plt.savefig(results_path+".pdf", bbox_inches="tight")
     plt.show()
 
-def plot_risk_matrix(likelihoods, severities, figsize=(9,5), save=False, results_path="", fontsize=12, max_chars=20, annot_font=12):
+def plot_risk_matrix(likelihoods, severities, figsize=(9,5), save=False, results_path="", fontsize=12, max_chars=20):
     """
     plots a FAA risk matrix from likelihood and severity categories
 
@@ -1698,8 +1698,8 @@ def plot_risk_matrix(likelihoods, severities, figsize=(9,5), save=False, results
         maximum characters per line in a cell of the risk matrix.
         used to improve readability and ensure hazard names are contained in a cell.
         The default is 20.
-    annot_font : int, optional
-        figure annotation fontsize. The default is 12.
+    title : boolean, optional
+        Dtrue to show title. The default is False.
 
     Returns
     -------
@@ -1712,6 +1712,7 @@ def plot_risk_matrix(likelihoods, severities, figsize=(9,5), save=False, results
     annotation_df = pd.DataFrame([["" for i in range(5)] for j in range(5)],
                          columns=['Minimal Impact', 'Minor Impact', 'Major Impact', 'Hazardous Impact', 'Catastrophic Impact'],
                           index=['Frequent', 'Probable', 'Remote','Extremely Remote', 'Extremely Improbable'])
+    annot_font = fontsize
     hazard_likelihoods = {hazard:"" for hazard in hazards}; hazard_severities={hazard:"" for hazard in hazards}
     for hazard in hazards:
         hazard_likelihoods[hazard] = curr_likelihoods[hazard]
