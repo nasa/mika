@@ -302,7 +302,11 @@ class FMEA():
                 self.data_df[col] = self.raw_df[col].tolist()
         temp_grouped_df = self.data_df.copy()
         #group reports by category/mission type/phase
-        temp_grouped_df['cluster'] = self.raw_df[grouping_col].tolist()
+        clusters = []
+        for id in temp_grouped_df[self.id_col].tolist(): #could instead reindex so ids in raw are ids in data_df
+            cluster = self.raw_df.loc[self.raw_df[self.id_col]==id].reset_index(drop=True).at[0,grouping_col]
+            clusters.append(cluster)
+        temp_grouped_df['cluster'] = clusters#self.raw_df[grouping_col].tolist()
         #cluster = self.raw_df[grouping_col].tolist()
         agg_dict = {'CAU': lambda x: '; '.join([i for i in x if i!="" and type(i)==str]),
                     'MOD': lambda x: '; '.join([i for i in x if i!="" and type(i)==str]),
