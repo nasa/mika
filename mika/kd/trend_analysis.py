@@ -1676,7 +1676,7 @@ def plot_USFS_risk_matrix(likelihoods, severities, figsize=(9,5), save=False, re
         plt.savefig(results_path+".pdf", bbox_inches="tight")
     plt.show()
 
-def plot_risk_matrix(likelihoods, severities, figsize=(9,5), save=False, results_path="", fontsize=12, max_chars=20):
+def plot_risk_matrix(likelihoods, severities, figsize=(9,5), save=False, results_path="", fontsize=12, max_chars=20, annot_font=12):
     """
     plots a FAA risk matrix from likelihood and severity categories
 
@@ -1698,8 +1698,8 @@ def plot_risk_matrix(likelihoods, severities, figsize=(9,5), save=False, results
         maximum characters per line in a cell of the risk matrix.
         used to improve readability and ensure hazard names are contained in a cell.
         The default is 20.
-    title : boolean, optional
-        Dtrue to show title. The default is False.
+    annot_font : int, optional
+        figure annotation fontsize. The default is 12.
 
     Returns
     -------
@@ -1712,7 +1712,6 @@ def plot_risk_matrix(likelihoods, severities, figsize=(9,5), save=False, results
     annotation_df = pd.DataFrame([["" for i in range(5)] for j in range(5)],
                          columns=['Minimal Impact', 'Minor Impact', 'Major Impact', 'Hazardous Impact', 'Catastrophic Impact'],
                           index=['Frequent', 'Probable', 'Remote','Extremely Remote', 'Extremely Improbable'])
-    annot_font = fontsize
     hazard_likelihoods = {hazard:"" for hazard in hazards}; hazard_severities={hazard:"" for hazard in hazards}
     for hazard in hazards:
         hazard_likelihoods[hazard] = curr_likelihoods[hazard]
