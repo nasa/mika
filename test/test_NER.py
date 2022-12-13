@@ -171,7 +171,7 @@ class test_NER(unittest.TestCase):
                                                                                                      ['O','U-adj', 'O','O','O','O','O','O','O']
                                                                                                      ]
         
-        test_sentence_df = split_docs_to_sentances(text_df, id_col='id', tags=True)
+        test_sentence_df = split_docs_to_sentences(text_df, id_col='id', tags=True)
         for col in test_sentence_df.columns:
             if col != 'sentence':
                 self.assertEqual(test_sentence_df[col].to_list(), sentence_df[col].to_list())

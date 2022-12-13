@@ -1033,7 +1033,7 @@ def plot_metric_time_series(metric_data, metric_name, line_styles=[], markers=[]
         i += 1
     if legend: 
         plt.legend(bbox_to_anchor=(1, 1.1), loc='upper left', fontsize=fontsize-2)
-    plt.xticks(ticks=[int(time_vals[ind]) for ind in range(0, int(len(time_vals))+1, xtick_freq)],rotation=45,  labels=[str(time_vals[ind]) for ind in range(0, int(len(time_vals))+1, xtick_freq)])
+    plt.xticks(ticks=[int(time_vals[ind]) for ind in range(0, int(len(time_vals)), xtick_freq)],rotation=45,  labels=[str(time_vals[ind]) for ind in range(0, int(len(time_vals)), xtick_freq)])
     plt.margins(x=0.05)
     plt.tick_params(labelsize=fontsize)
     if save == True:

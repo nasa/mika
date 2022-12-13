@@ -557,13 +557,13 @@ def graph_ICS_time_series(time_of_occurence_days, time_of_occurence_pct_containe
         otto_pct_title = ""
         frequency_title = ""
         total_frequency_title = ""
-    plot_metric_time_series(metric_data=time_of_occurence_days, metric_name='OTTO (Days)', line_styles=line_styles, markers=markers, title=otto_days_title, time_name="Year", scaled=False, xtick_freq=1, show_std=std_dev, save=save, dataset_name=results_path+"/ICS_OTTO_days", yscale=None, fontsize=fontsize, figsize=figsize)
+    plot_metric_time_series(metric_data=time_of_occurence_days, metric_name='OTTO (Days)', line_styles=line_styles, markers=markers, title=otto_days_title, time_name="Year", scaled=False, xtick_freq=1, show_std=std_dev, save=save, results_path=results_path, yscale=None, fontsize=fontsize, figsize=figsize)
     #plot pct contained
-    plot_metric_time_series(metric_data=time_of_occurence_pct_contained, metric_name='OTTO (% Containment)', line_styles=line_styles, markers=markers, title=otto_pct_title, time_name="Year", scaled=False, xtick_freq=1, show_std=std_dev, save=save, dataset_name=results_path+"/ICS_OTTO_pct", yscale=None, fontsize=fontsize, figsize=figsize)
+    plot_metric_time_series(metric_data=time_of_occurence_pct_contained, metric_name='OTTO (% Containment)', line_styles=line_styles, markers=markers, title=otto_pct_title, time_name="Year", scaled=False, xtick_freq=1, show_std=std_dev, save=save, results_path=results_path, yscale=None, fontsize=fontsize, figsize=figsize)
     #plot total frequency
-    plot_frequency_time_series(frequency, metric_name='Frequency', line_styles=line_styles, markers=markers, title=total_frequency_title, time_name="Year", xtick_freq=1, scale=False, save=save, dataset_name=results_path+"/ICS_total_frequency", fontsize=fontsize, figsize=figsize)
+    plot_frequency_time_series(frequency, metric_name='Frequency', line_styles=line_styles, markers=markers, title=total_frequency_title, time_name="Year", xtick_freq=1, scale=False, save=save, results_path=results_path, fontsize=fontsize, figsize=figsize)
     #plot fire frequency
-    plot_frequency_time_series(frequency_fires, metric_name='Frequency', line_styles=line_styles, markers=markers, title=frequency_title, time_name="Year", xtick_freq=1, scale=False, save=save, dataset_name=results_path+"/ICS_fire_frequency", fontsize=fontsize, figsize=figsize)
+    plot_frequency_time_series(frequency_fires, metric_name='Frequency', line_styles=line_styles, markers=markers, title=frequency_title, time_name="Year", xtick_freq=1, scale=False, save=save, results_path=results_path, fontsize=fontsize, figsize=figsize)
     #plot severity
     
 def get_likelihood_ICS_USFS(rates):
