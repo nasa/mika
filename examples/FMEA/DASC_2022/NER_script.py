@@ -8,7 +8,6 @@ requires CUDA GPU set up
 """
 
 import pandas as pd
-import os
 from spacy.training import offsets_to_biluo_tags
 import spacy
 import numpy as np
@@ -17,7 +16,9 @@ from transformers import TrainingArguments, Trainer
 from torch import cuda, FloatTensor
 from torch.nn import CrossEntropyLoss
 from datasets import Dataset
-
+import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)),"..","..", "..", ".."))
 from mika.kd.NER import read_doccano_annots, clean_doccano_annots, split_docs_to_sentences, check_doc_to_sentence_split, tokenize_and_align_labels, compute_metrics, compute_classification_report, build_confusion_matrix, plot_eval_results
 
 #set up GPU
@@ -29,8 +30,8 @@ print(device)
 nlp = spacy.load("en_core_web_trf")
 nlp.add_pipe("sentencizer")
 
-file = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)), 'data','doccano','annotations','srandrad_safecom_v2.jsonl')
-LLIS_folder = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)), 'data','doccano','annotations')
+file = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir, os.pardir)), 'data','doccano','annotations','srandrad_safecom_v2.jsonl')
+LLIS_folder = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir, os.pardir)), 'data','doccano','annotations')
 #read in doccano annotations
 df = read_doccano_annots(file)
 text_df = df[['data', 'label', 'Tracking #']] #"Lesson ID"]]
@@ -73,11 +74,15 @@ llis_df['tags'] = [offsets_to_biluo_tags(llis_df.at[i,'docs'], llis_df.at[i,'lab
 #check for tags with issues
 inds_with_issues = [i for i in range(len(text_df)) if '-' in text_df.iloc[i]['tags']]
 text_df_issues = text_df.iloc[inds_with_issues][:].reset_index(drop=True)
-if len(text_df_issues)>0: print("error: there are documents with invalid tags")
+if len(text_df_issues)>0: 
+    print("error: there are documents with invalid tags")
+    print(text_df_issues)
 
 inds_with_issues = [i for i in range(len(llis_df)) if '-' in llis_df.iloc[i]['tags']]
 llis_df_issues = llis_df.iloc[inds_with_issues][:].reset_index(drop=True)
-if len(llis_df_issues)>0: print("error: there are documents with invalid tags")
+if len(llis_df_issues)>0: 
+    print("error: there are documents with invalid tags")
+    print(llis_df_issues)
 
 #set up labels
 total_tags= pd.DataFrame({'tags':[t for tag in llis_df['tags'] for t in tag]})
@@ -115,7 +120,7 @@ sentence_df['tokens'] = [[tok.orth_ for tok in sentence_df.iloc[i]['sentence']] 
 llis_sentence_df['tokens'] = [[tok.orth_ for tok in llis_sentence_df.iloc[i]['sentence']] for i in range(len(llis_sentence_df))]
 
 #model_checkpoint = "bert-base-uncased"
-model_checkpoint = os.path.join("models","Pre-trained-BERT","checkpoint-318766")
+model_checkpoint = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir, os.pardir)),"models","Pre-trained-BERT","checkpoint-318766")
 tokenizer = AutoTokenizer.from_pretrained(model_checkpoint)
 
 train_size = 0.8
@@ -166,7 +171,7 @@ model =BertForTokenClassification.from_pretrained( #AutoModelForTokenClassificat
 #training setup
 data_collator = DataCollatorForTokenClassification(tokenizer=tokenizer)
 args = TrainingArguments(
-    os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)), "models/FMEA-ner-model"),
+    os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir, os.pardir)), "models/FMEA-ner-model"),
     evaluation_strategy="steps",
     save_strategy="epoch",
     learning_rate=2e-5,
@@ -242,11 +247,11 @@ preds, label_ids, pred_metric = trainer.predict(safecom_data)
 labels = safecom_data['labels']
 y_pred = np.argmax(preds, axis=1)
 print(compute_classification_report(labels, preds, label_ids, ids_to_labels))
-build_confusion_matrix(labels, preds, label_ids, ids_to_labels, save=True, savepath="examples/FMEA/DASC_2022/safecom_")
+build_confusion_matrix(labels, preds, label_ids, ids_to_labels, save=True, savepath="examples/KD/FMEA/DASC_2022/safecom_")
 #"""
 #"""
 num_steps = trainer.state.max_steps
-filename = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)),"models", "FMEA-ner-model", "checkpoint-"+str(num_steps), "trainer_state.json")
-plot_eval_results(filename, save=True, savepath='examples/FMEA/DASC_2022/')
+filename = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir, os.pardir)),"models", "FMEA-ner-model", "checkpoint-"+str(num_steps), "trainer_state.json")
+plot_eval_results(filename, save=True, savepath='examples/KD/FMEA/DASC_2022/')
 trainer.save_model()
 #"""

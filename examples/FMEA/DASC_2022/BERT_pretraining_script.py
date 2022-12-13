@@ -7,10 +7,8 @@ Created on Thu Apr 21 09:34:34 2022
 
 import pandas as pd
 import os
-from spacy.training import offsets_to_biluo_tags
-import spacy
 import numpy as np
-from transformers import AutoTokenizer, AutoModelForMaskedLM, DataCollatorForLanguageModeling, AutoModelForTokenClassification, DataCollatorForTokenClassification
+from transformers import AutoTokenizer, AutoModelForMaskedLM, DataCollatorForLanguageModeling
 from transformers import TrainingArguments, Trainer
 from torch import cuda
 from datasets import Dataset, concatenate_datasets
@@ -20,8 +18,8 @@ cuda.empty_cache()
 print(device)
 
 #load training data: LLIS, all of SAFECOM
-safecom = pd.read_csv(os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)),'data/SAFECOM/SAFECOM_data.csv'))
-llis = pd.read_excel(os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)),'data/LLIS/lessons_learned_2021-12-10.xlsx'))
+safecom = pd.read_csv(os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir, os.pardir)),'data/SAFECOM/SAFECOM_data.csv'))
+llis = pd.read_excel(os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir, os.pardir)),'data/LLIS/lessons_learned_2021-12-10.xlsx'))
 print(len(llis), len(safecom))
 safecom_text = safecom[['Narrative', 'Corrective Action']]
 llis_text = llis[['Recommendation(s)', 'Lesson(s) Learned', 'Driving Event']]
@@ -75,7 +73,7 @@ model = model.to(device)
 #data_collator = DataCollatorForTokenClassification(tokenizer=tokenizer)#
 data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer)
 args = TrainingArguments(
-    os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)),"models/Pre-trained-BERT"),
+    os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir, os.pardir)),"models/Pre-trained-BERT"),
     evaluation_strategy="steps",
     save_strategy="epoch",
     learning_rate=2e-5,
