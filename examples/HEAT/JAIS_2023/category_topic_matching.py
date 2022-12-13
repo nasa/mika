@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import sys
 import os
-sys.path.append(os.path.join("..", "..", ".."))
+sys.path.append(os.path.join("..", "..", "..", ".."))
 from mika.kd.trend_analysis import get_results_info, get_topics_per_doc
 from mika.utils import Data
 #read in topic model results

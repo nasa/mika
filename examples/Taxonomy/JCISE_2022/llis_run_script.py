@@ -5,7 +5,7 @@ Created on Wed Feb 24 16:40:39 2021
 @author: srandrad
 """
 import sys, os
-sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)),"..","..",".."))
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)),"..","..","..", ".."))
 from mika.kd import Topic_Model_plus
 from mika.utils import Data
 
@@ -17,7 +17,7 @@ database_name = 'LLIS' # optional, used at beginning of folder for identificatio
 num_topics ={'Lesson(s) Learned':75, 'Driving Event':75, 'Recommendation(s)':75} # for lda only
 
 # data file input
-filename = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)), 'data','LLIS','useable_LL_combined.csv')
+filename = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir, os.pardir)), 'data','LLIS','useable_LL_combined.csv')
 #for raw data
 #llis_data = Data()
 #llis_data.load(filename, preprocessed=False, text_columns=text_columns, id_col=document_id_col, name=database_name)

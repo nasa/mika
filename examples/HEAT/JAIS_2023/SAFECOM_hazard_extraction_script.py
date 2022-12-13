@@ -11,7 +11,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 import tomotopy as tp
 import sys
 import os
-sys.path.append(os.path.join("..", "..", ".."))
+sys.path.append(os.path.join("..", "..", "..", ".."))
 from mika.kd import Topic_Model_plus
 from mika.utils import Data
 
@@ -19,7 +19,7 @@ from mika.utils import Data
 text_columns = ['Narrative']
 
 id_col = 'Tracking #'
-csv_file_name = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir)), 'data','SAFECOM','SAFECOM_data.csv')
+csv_file_name = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir, os.pardir)), 'data','SAFECOM','SAFECOM_data.csv')
 name = os.path.join('safecom')
 #""" #Preprocess data
 safecom_data = Data()
