@@ -482,7 +482,7 @@ def set_up_docs_per_hazard_vars(preprocessed_df, id_field, hazards, time_field):
     docs : list
         list of document ids.
     frequency : Dict
-        dictionary used to store hazard frequencies. Keys are hazards and values are ints.
+        Nested dictionary used to store hazard frequencies. Keys are hazards and inner dict keys are years, values are ints.
     docs_per_hazard : Dict
         nested dictionary used to store documents per hazard. Keys are hazards 
         and value is an inner dict. Inner dict has keys as time variables (e.g., years) and 
@@ -685,7 +685,7 @@ def record_hazard_doc_info(hazard_name, year, docs_per_hazard, id_, frequency, h
     id_ : string
         id of the specified document
     frequency : Dict
-        dictionary used to store hazard frequencies. Keys are hazards and values are ints.
+        Nested dictionary used to store hazard frequencies. Keys are hazards and inner dict keys are years, values are ints.
     hazard_words_per_doc : Dict
         used to store the hazard words per document. keys are hazards and values are lists
         with an element for each document.
@@ -701,7 +701,7 @@ def record_hazard_doc_info(hazard_name, year, docs_per_hazard, id_, frequency, h
         and value is an inner dict. Inner dict has keys as time variables (e.g., years) and 
         values are lists.
     frequency : Dict
-        dictionary used to store hazard frequencies. Keys are hazards and values are ints.
+        Nested dictionary used to store hazard frequencies. Keys are hazards and inner dict keys are years, values are ints.
     hazard_words_per_doc : Dict
         used to store the hazard words per document. keys are hazards and values are lists
         with an element for each document.
@@ -829,7 +829,7 @@ def identify_docs_per_hazard(hazard_file, preprocessed_df, results_file, text_fi
     Returns
     -------
     frequency : Dict
-        dictionary used to store hazard frequencies. Keys are hazards and values are ints.
+        Nested dictionary used to store hazard frequencies. Keys are hazards and inner dict keys are years, values are ints.
     docs_per_hazard : Dict
         nested dictionary used to store documents per hazard. Keys are hazards 
         and value is an inner dict. Inner dict has keys as time variables (e.g., years) and 
@@ -891,7 +891,7 @@ def identify_docs_per_fmea_row(df, grouping_col, year_col, id_col):
     Returns
     -------
     frequency : Dict
-        dictionary used to store hazard frequencies. Keys are hazards and values are ints.
+        Nested dictionary used to store hazard frequencies. Keys are hazards and inner dict keys are years, values are ints.
     docs_per_row : Dict
         nested dictionary used to store documents per hazard. Keys are hazards 
         and value is an inner dict. Inner dict has keys as time variables (e.g., years) and 
@@ -945,6 +945,24 @@ def calc_severity_per_hazard(docs, df, id_field, metric='average'):
     elif metric == 'max':
         total_severities_hazard = {hazard: max([sev for year in severities[hazard] for sev in severities[hazard][year]]) for hazard in severities}
     return severities, total_severities_hazard
+
+def calc_rate(frequency):
+    """Calculates the average rate of occurrence for a hazard from the frequency per year
+
+    Parameters
+    ----------
+    frequency : Dict
+        Nested dictionary used to store hazard frequencies. Keys are hazards and inner dict keys are years, values are ints.
+    
+    Returns
+    -------
+    rates : dict
+        dictionary with hazard name as keys and a rate as a value
+    """
+    total_hazard_freq = {hazard: sum(frequency[hazard].values()) for hazard in frequency}
+    time_period = max([len(frequency[hazard].keys()) for hazard in frequency])
+    rates = {hazard: round(total_hazard_freq[hazard]/time_period, 3) for hazard in total_hazard_freq}
+    return rates
 
 def plot_metric_time_series(metric_data, metric_name, line_styles=[], markers=[], title="", 
                             time_name="Year", scaled=False, xtick_freq=5, show_std=True, 
