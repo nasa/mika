@@ -23,10 +23,9 @@ smart_nlp (main project directory)
 
 # Quick Start
 
-There is a separate run script for each database available for analysis. Please run whichever script is desired.
+There is a separate run script for each dataset available for analysis. Please run whichever script is desired.
 
 # To Do
 
 - trigram function shuffles word order
-- can the remove pct of words test file be decommissioned?
 - add tests

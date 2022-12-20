@@ -59,6 +59,7 @@ packaging==21.3
 pandas==1.5.1
 pathy==0.6.2
 Pillow==9.3.0
+pingouin==0.5.2
 plotly==5.11.0
 preshed==3.0.8
 pyaml==21.10.1
