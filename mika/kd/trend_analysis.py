@@ -193,7 +193,7 @@ def multiple_reg_feature_importance(predictors, hazards, correlation_mat_total, 
         regr = linear_model.LinearRegression()
         regr.fit(X,y)
         y_pred = regr.predict(X)
-        model_score = r2_score(y, y_pred)#regr.score(X,y)
+        model_score = r2_score(y, y_pred)
         full_model_score.append(round(model_score,3))
         model_MSE = mean_squared_error(y_pred,y)
         full_model_MSE.append(round(model_MSE,3))
@@ -243,7 +243,7 @@ def multiple_reg_feature_importance(predictors, hazards, correlation_mat_total, 
     for hazard in importance_data:
         plt.bar((width*i), full_model_score[hazards.index(hazard)], width, label=hazard.replace("total ",""), color=colors[i-1])
         i+=1
-    plt.xticks([width*i for i in range(1,num_bars+1)],hazards, rotation=90)#(width*np.ceil(num_bars/2)), ["Full Model"], rotation=70)
+    plt.xticks([width*i for i in range(1,num_bars+1)],hazards, rotation=90)
     plt.tick_params(labelsize=r2_fontsize)
     plt.xlabel("Hazards", fontsize=r2_fontsize)
     plt.ylabel("R2", fontsize=r2_fontsize)
@@ -256,7 +256,7 @@ def multiple_reg_feature_importance(predictors, hazards, correlation_mat_total, 
     width = 1/(num_bars+2)
     i=1
     colors = cm.tab20(np.linspace(0, 1, num_bars))
-    plt.figure(figsize=predictor_import_figsize)#(len(hazards),4))
+    plt.figure(figsize=predictor_import_figsize)
     for hazard in importance_data:
         plt.bar(X_axis+(width*i), importance_data[hazard], width, label=hazard.replace("total ",""), color=colors[i-1])
         i+=1
