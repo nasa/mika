@@ -26,7 +26,7 @@ import os
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 #load training data: ASRS, NTSB
-ASRS_file = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),'data/ASRS/ASRS_1988_2022.csv')
+ASRS_file = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),'data/ASRS/ASRS_1988_2022_cleaned.csv')
 ASRS_id_col = 'ACN'
 ASRS_text_cols = ['Report 1', 'Report 1.1', 'Report 2',	'Report 2.1', 'Report 1.2']
 ASRS = Data()
@@ -99,7 +99,7 @@ print(model.device)
 #training set up
 data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer)
 args = TrainingArguments(
-    os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),"models/SafeAeroBERT"),
+    os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),"models/SafeAeroBERT_v2"),
     #evaluation_strategy="steps",
     save_strategy="steps",
     learning_rate=1e-5,
