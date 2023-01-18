@@ -21,6 +21,7 @@ import seaborn as sn
 from tqdm import tqdm
 import pingouin as pg
 import random
+from sklearn.utils import resample
 
 def minmax_scale(data_list):
     """Performs minmax scaling on a single data list in order to normalize the data.
@@ -588,7 +589,7 @@ def get_hazard_doc_ids(nums, results, results_text_field, docs, doc_topic_distri
         for id_ in ids_:
             #check that topic prob> thres for at least one num
             id_df = doc_topic_distribution.loc[doc_topic_distribution['document number']==id_].reset_index(drop=True)
-            probs = [float(id_df.iloc[0][text_field].strip("[]").split(" ")[num].strip("\n")) for num in nums]
+            probs = [float(id_df.iloc[0][results_text_field].strip("[]").split(" ")[num].strip("\n")) for num in nums]
             max_prob = max(probs)
             if max_prob > topic_thresh:
                 new_ids.append(id_)
@@ -760,7 +761,8 @@ def get_doc_text(id_, temp_df, id_field, text_field):
 
     """
     text = temp_df.loc[temp_df[id_field]==id_][text_field].values[0]
-    text = " ".join(text)
+    if type(text) == list:
+        text = " ".join(text)
     return text 
 
 def check_if_word_contained_in_other_word():
@@ -860,7 +862,7 @@ def identify_docs_per_hazard(hazard_file, preprocessed_df, results_file, text_fi
         hazard_words = get_hazard_words(hazard_df)
         negation_words = get_negation_words(hazard_df)
         for id_ in ids:
-            text = get_doc_text(id_, temp_df, id_field, text_field)
+            text = get_doc_text(id_, temp_df, id_field, text_field).lower()
             hazard_found = False
             for h_word in hazard_words:
                 hazard_found = check_for_hazard_words(h_word, text)
@@ -967,9 +969,15 @@ def calc_rate(frequency):
 def plot_metric_time_series(metric_data, metric_name, line_styles=[], markers=[], title="", 
                             time_name="Year", scaled=False, xtick_freq=5, show_std=True, 
                             save=False, results_path="", yscale=None, legend=True, figsize=(6,4),
-                            fontsize=16):
+                            fontsize=16, bootstrap=False, bootstrap_kwargs={'metric_percentages':1, 'num_means':1000, 'CI_interval':95}):
     """
     plots a time series for specified metrics for all hazards (i.e., line chart)
+    Idea:  get a confidence interval and mean from sampling the metric percentage from the original dataset. 
+    Since we know theres some error in the original labels, we can use this as a proxy for the original population.
+
+    Issue: how do we get this per year? do we take the full set of docs then sample that, or sample for each year?? -> try full set then reduce back to years
+
+    std dev: of the 1000 averages
 
     Parameters
     ----------
@@ -1014,8 +1022,16 @@ def plot_metric_time_series(metric_data, metric_name, line_styles=[], markers=[]
     time_vals.sort()
     #scaled -> scaled the averages, how to scale stddev?
     if scaled: metric_data = {hazard: minmax_scale(metric_data[hazard]) for hazard in metric_data}
-    averages = {hazard: [np.average(metric_data[hazard][year]) for year in time_vals] for hazard in metric_data}
-    stddevs = {hazard: [np.std(metric_data[hazard][year]) for year in time_vals] for hazard in metric_data}
+    if bootstrap == True:
+        averages, stddevs = bootstrap_metric(metric_data, time_vals, **bootstrap_kwargs)
+        #get stddevs in error bar format
+        stddevs = {hazard:[[abs(averages[hazard][i] - stddevs[hazard][0][i]) for i in range(len(stddevs[hazard][0]))],\
+                            [abs(stddevs[hazard][1][i] - averages[hazard][i]) for i in range(len(stddevs[hazard][1]))]
+                            ] for hazard in stddevs}
+        show_std = True
+    else:
+        averages = {hazard: [np.average(metric_data[hazard][year]) for year in time_vals] for hazard in metric_data}
+        stddevs = {hazard: [np.std(metric_data[hazard][year]) for year in time_vals] for hazard in metric_data}
     colors = cm.tab20(np.linspace(0, 1, len(averages)))
     plt.figure(figsize=figsize)
     plt.title(title, fontsize=fontsize)
@@ -1038,11 +1054,19 @@ def plot_metric_time_series(metric_data, metric_name, line_styles=[], markers=[]
             if ind != 0:
                 temp_time_vals.pop(ind-num_removed)
                 hazard_avs.pop(ind-num_removed)
-                hazard_stddev.pop(ind-num_removed)
+                if np.shape(hazard_stddev)[0] == 2:
+                    hazard_stddev[0].pop(ind-num_removed)
+                    hazard_stddev[1].pop(ind-num_removed)
+                else:
+                    hazard_stddev.pop(ind-num_removed)
                 num_removed+=1
             else:
                 hazard_avs[0] = 0
-                hazard_stddev[0] = 0
+                if np.shape(hazard_stddev)[0] == 2:
+                    hazard_stddev[0][0] = 0
+                    hazard_stddev[1][0] = 0
+                else:
+                    hazard_stddev[0] = 0
         temp_time_vals = [int(t) for t in temp_time_vals]
         if show_std == True:
             plt.errorbar(temp_time_vals, hazard_avs, yerr=hazard_stddev, color=colors[i], marker=markers[i], linestyle=line_styles[i], label=hazard, capsize=5, markeredgewidth=1)
@@ -1061,9 +1085,76 @@ def plot_metric_time_series(metric_data, metric_name, line_styles=[], markers=[]
             save_path = 'hazard_'+metric_name+'.pdf'
         plt.savefig(save_path, bbox_inches="tight") 
     plt.show()
-    
-def plot_metric_averages(metric_data, metric_name, show_std=True, title="", save=False, results_path="", legend=True,
-                         figsize=(6,4), fontsize=16):
+
+def calc_CI(bootstrapped_means, CI_interval=95):
+    """calculates a confidence interval from a list of means generated using bootstrapping
+
+    Parameters
+    ----------
+    bootstrapped_means : dictionary
+        nested dictionary with hazards as keys, inner dictionary with years as keys and a list of bootstrapped means as the value.
+    CI_interval : int, optional
+        level of confidence for the interval, by default 95
+
+    Returns
+    -------
+    CI : dictionary
+        dictionary with hazards as keys and value is a (2,n) array where n is the number of years of data.
+    """
+    tail_perc = (100-CI_interval)/2
+    CI = {}
+    for hazard in bootstrapped_means:
+        lower = []
+        upper = []
+        for year in bootstrapped_means[hazard]:
+            lower_bound = np.percentile(bootstrapped_means[hazard][year], tail_perc)
+            upper_bound = np.percentile(bootstrapped_means[hazard][year],  100-tail_perc)
+            lower.append(lower_bound)
+            upper.append(upper_bound)
+        CI[hazard] = [lower, upper]
+    return CI
+
+def bootstrap_metric(metric_data, time_vals, metric_percentages, num_means=1000, CI_interval=95):
+    """performs bootstrapping to better estimate the true metric value given a metric percentage (i.e., hazard extraction accuracy)
+
+    Parameters
+    ----------
+    metric_data : dict
+        nested dict where keys are hazards. inner dict has time value (usually years) as keys
+        and list of metrics for values.
+    time_vals : list
+        list of time values in the time series. generated in plot metric time series.
+    metric_percentages : dictionary
+        dict with hazards as keys and values as the percentage to be sampled for each bootstrap. 
+        this can be input as the hazard extraction accuracy to try to better capture the true populate mean.
+    num_means : int, optional
+        the number of means calculated via bootstrapping, by default 1000
+    CI_interval : int, optional
+        level of confidence for the interval, by default 95
+
+    Returns
+    -------
+    averages : dictionary
+        dictionary with hazards as keys and the value is a list of metric averages with one average per year in the time series.
+    CI : dictionary
+        dictionary with hazards as keys and value is a (2,n) array where n is the number of years of data.
+    """
+    if type(metric_percentages) != dict:
+        metric_percentages = {hazard:metric_percentages for hazard in metric_data}
+    bootstrapped_means = {hazard:{year:[] for year in time_vals} for hazard in metric_data}
+    for hazard in metric_data:
+        for year in time_vals:
+            data = metric_data[hazard][year]
+            for n in range(num_means):
+                boot = resample(data, replace=True, n_samples=round(metric_percentages[hazard]*len(data)), random_state=n)
+                mean = np.average(boot)
+                bootstrapped_means[hazard][year].append(mean)
+    averages = {hazard: [np.average(bootstrapped_means[hazard][year]) for year in time_vals] for hazard in metric_data}
+    CI = calc_CI(bootstrapped_means, CI_interval=CI_interval) #shape is going to be 2 rows with num years per row
+    return averages, CI
+
+def plot_metric_averages(metric_data, metric_name, show_std=True, title="", save=False, results_path="", yscale=None,
+                        legend=True, figsize=(6,4), fontsize=16, error_bars='stddev'):
     """
     plots metric averages as a barchart
 
@@ -1082,12 +1173,16 @@ def plot_metric_averages(metric_data, metric_name, show_std=True, title="", save
         true to save the plot as a pdf. The default is False.
     results_path : string, optional
         path to save figure to. The default is "".
+    yscale : string, optional
+        yscale parameter, can be used to change scaling to log. The default is None.
     legend : boolean, optional
         true to show legend, false to hide legend. The default is True.
     figsize : tuple, optional
         size of the plot in inches. The default is (6,4).
     fontsize : int, optional
         fontsize for the plot. The default is 16.
+    error_bars : string
+        type of error bars to use, can be 'stddev' or 'CI'. The default is 'stddev'.
 
     Returns
     -------
@@ -1096,13 +1191,22 @@ def plot_metric_averages(metric_data, metric_name, show_std=True, title="", save
     """
     import textwrap
     avg = {hazard: np.average([m for year in metric_data[hazard] for m in metric_data[hazard][year]]) for hazard in metric_data}
-    stddev = {hazard: np.std([m for year in metric_data[hazard] for m in metric_data[hazard][year]]) for hazard in metric_data}
+    if error_bars == 'stddev':
+        stddev = {hazard: np.std([m for year in metric_data[hazard] for m in metric_data[hazard][year]]) for hazard in metric_data}
+        stddev = stddev.values()
+    elif error_bars =='CI':
+        total_data = {hazard: [m for year in metric_data[hazard] for m in metric_data[hazard][year]] for hazard in metric_data}
+        lower_bounds = [abs(avg[hazard] - np.percentile(total_data[hazard], 2.5)) for hazard in total_data]
+        upper_bounds = [abs(np.percentile(total_data[hazard], 97.5) - avg[hazard]) for hazard in total_data]
+        stddev = [lower_bounds, upper_bounds]
     x_pos = np.arange(len(metric_data))
     fig, ax = plt.subplots(figsize=figsize)
     colors = cm.tab20(np.linspace(0, 1, len(metric_data)))
     labels = [key for key in metric_data.keys()]
+    if yscale == 'log':
+        plt.yscale('symlog')
     if show_std == True:
-        ax.bar(x_pos, avg.values(), yerr=stddev.values(), align='center', ecolor='black', capsize=10, color=colors)
+        ax.bar(x_pos, avg.values(), yerr=stddev, align='center', ecolor='black', capsize=10, color=colors)
     else:
         ax.bar(x_pos, avg.values(), align='center', color=colors)
     plt.xlabel("Hazard", fontsize=fontsize)
@@ -1124,7 +1228,7 @@ def plot_metric_averages(metric_data, metric_name, show_std=True, title="", save
         if results_path != "":
                 save_path = os.path.join(results_path, 'hazard_bar_'+metric_name+'.pdf')
         else:
-            save_path = 'hazard_'+metric_name+'.pdf'
+            save_path = 'hazard_bar_'+metric_name+'.pdf'
         plt.savefig(save_path, bbox_inches="tight") 
     plt.show()
     
@@ -1260,7 +1364,7 @@ def make_pie_chart(docs, data, predictor, hazards, id_field, predictor_label=Non
             if float(txt.get_text().strip("%"))<3.0:
                 txt.set_visible(False)
                 
-        ax.set_title(hazard, fontdict={'fontsize': fontsize})
+        ax.set_title(hazard, fontdict={'fontsize': fontsize}, pad='10.0')
     axes[0,0].legend(bbox_to_anchor=(-0.2, 1),fontsize=fontsize, title=predictor_label,title_fontsize=fontsize)
     fig.tight_layout(pad=padding)
     if save == True:
@@ -1651,21 +1755,14 @@ def plot_USFS_risk_matrix(likelihoods, severities, figsize=(9,5), save=False, re
         new_annot = annotation_df.at[curr_likelihoods[hazard], curr_severities[hazard]]
         if new_annot != "": new_annot += ", "
         hazard_annot = hazard.split(" ")
-        #if line>20 then new line
-        if len(hazard_annot)>1 and len(new_annot.split("\n")[-1]) + len(hazard_annot[0]) +len(hazard_annot[1]) < max_chars:
-            new_annot += hazard_annot[0] + " "+ hazard_annot[1] 
-            annot_ind = 2
-        elif len(new_annot.split("\n")[-1]) + len(hazard_annot[0]) < max_chars:
-            new_annot += hazard_annot[0]
-            annot_ind = 1
-        elif len(hazard_annot)>1 and len(hazard_annot[1]) + len(hazard_annot[0]) < max_chars:
-            new_annot += "\n" + hazard_annot[0] + " " + hazard_annot[1]
-            annot_ind = 2
-        else:
-            new_annot += "\n" + hazard_annot[0]
-            annot_ind = 1
-        if len(hazard_annot)>1 and annot_ind<len(hazard_annot):
-            new_annot += "\n"+" ".join(hazard_annot[annot_ind:])
+        #if line>max_chars then new line
+        #TO DO: hazard annots with multiple words
+        #need a while or a for loop
+        for i in range(len(hazard_annot)):
+            if len(hazard_annot[i]) + len(new_annot.split("\n")[-1]) < max_chars:
+                new_annot += " " + hazard_annot[i]
+            else:
+                new_annot += "\n" + hazard_annot[i]
         annotation_df.at[curr_likelihoods[hazard], curr_severities[hazard]] = new_annot #+= (str(hazard_annot))
     
     df = pd.DataFrame([[2, 3, 4, 4], [2, 3, 4, 4], [1, 2, 3, 4], [1, 2, 2, 3], [1, 2, 2, 2]],
