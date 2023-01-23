@@ -1235,7 +1235,8 @@ def plot_metric_averages(metric_data, metric_name, show_std=True, title="", save
 def plot_frequency_time_series(metric_data, metric_name='Frequency', line_styles=[], 
                                markers=[], title="", time_name="Year", xtick_freq=5, 
                                scale=True, save=False, results_path="",  yscale=None, 
-                               legend=True, figsize=(6,4), fontsize=16):
+                               legend=True, figsize=(6,4), fontsize=16, interval=False, 
+                               interval_kwargs={'false_pos_rate':0.05, 'false_neg_rate':0.05}):
     """
     plots hazard frequency over time. 
     different from plot metric time series because of input data.
@@ -1271,6 +1272,10 @@ def plot_frequency_time_series(metric_data, metric_name='Frequency', line_styles
         size of the plot in inches. The default is (6,4).
     fontsize : int, optional
         fontsize for the plot. The default is 16.
+    interval : bool, optional
+        true to contstruct an interval for the metric based on false pos/neg rate. The default is False.
+    interval_kwargs : dict, optional
+        dictionary to pass in the false positive and false negative rate for each hazard. The default is {'false_pos_rate':0.05, 'false_neg_rate':0.05}.
 
     Returns
     -------
@@ -1286,6 +1291,17 @@ def plot_frequency_time_series(metric_data, metric_name='Frequency', line_styles
     else:
         hazard_freqs_scaled = frequencies
         y_label = metric_name
+    if interval == True:
+        if type(interval_kwargs['false_pos_rate']) == float:
+            false_pos_rate = {hazard: interval_kwargs['false_pos_rate'] for hazard in hazard_freqs_scaled}
+        else:
+            false_pos_rate = interval_kwargs['false_pos_rate']
+        if type(interval_kwargs['false_neg_rate']) == float:
+            false_neg_rate = {hazard: interval_kwargs['false_neg_rate'] for hazard in hazard_freqs_scaled}
+        else:
+            false_neg_rate = interval_kwargs['false_neg_rate']
+        lower_bounds = {hazard:[hazard_freqs_scaled[hazard][i]-((1-false_pos_rate[hazard])*hazard_freqs_scaled[hazard][i]) for i in range(len(hazard_freqs_scaled[hazard]))] for hazard in hazard_freqs_scaled}
+        upper_bounds = {hazard:[((1+false_neg_rate[hazard])*hazard_freqs_scaled[hazard][i])-hazard_freqs_scaled[hazard][i] for i in range(len(hazard_freqs_scaled[hazard]))] for hazard in hazard_freqs_scaled}
     if markers == []:
         markers = ['.' for i in range(len(hazard_freqs_scaled))]
     if line_styles == []:
@@ -1299,7 +1315,10 @@ def plot_frequency_time_series(metric_data, metric_name='Frequency', line_styles
         plt.yscale('symlog')
     i = 0
     for hazard in hazard_freqs_scaled:
-        plt.plot(time_vals, hazard_freqs_scaled[hazard], color=colors[i], label=hazard, marker=markers[i], linestyle=line_styles[i])
+        if interval == True:
+            plt.errorbar(time_vals, hazard_freqs_scaled[hazard], yerr=[lower_bounds[hazard], upper_bounds[hazard]], color=colors[i], marker=markers[i], linestyle=line_styles[i], label=hazard, capsize=5, markeredgewidth=1)
+        else:
+            plt.plot(time_vals, hazard_freqs_scaled[hazard], color=colors[i], label=hazard, marker=markers[i], linestyle=line_styles[i])
         i += 1
     if legend: 
         plt.legend(bbox_to_anchor=(1, 1.1), loc='upper left', fontsize=fontsize-2)
