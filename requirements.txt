@@ -6,15 +6,9 @@ bertopic==0.12.0
 blis==0.7.9
 brotlipy==0.7.0
 catalogue==2.0.8
-certifi @ file:///croot/certifi_1665076670883/work/certifi
-cffi @ file:///tmp/abs_98z5h56wf8/croots/recipe/cffi_1659598650955/work
-charset-normalizer @ file:///tmp/build/80754af9/charset-normalizer_1630003229654/work
 click==8.1.3
-conda==22.9.0
-conda-package-handling @ file:///croot/conda-package-handling_1666940373510/work
 confection==0.0.3
 contourpy==1.0.6
-cryptography @ file:///croot/cryptography_1665612644927/work
 cycler==0.11.0
 cymem==2.0.7
 Cython==0.29.32
@@ -31,7 +25,6 @@ future==0.18.2
 gensim==4.2.0
 hdbscan==0.8.29
 huggingface-hub==0.10.1
-idna @ file:///croot/idna_1666125576474/work
 importlib-metadata==5.0.0
 itsdangerous==2.1.2
 Jinja2==3.1.2
@@ -65,20 +58,15 @@ preshed==3.0.8
 pyaml==21.10.1
 pyarrow==10.0.0
 pycosat==0.6.3
-pycparser @ file:///tmp/build/80754af9/pycparser_1636541352034/work
 pydantic==1.10.2
 pyLDAvis==3.3.1
 pynndescent==0.5.8
-pyOpenSSL @ file:///opt/conda/conda-bld/pyopenssl_1643788558760/work
 pyparsing==3.0.9
-PySocks @ file:///tmp/build/80754af9/pysocks_1605305812635/work
 python-dateutil==2.8.2
 pytz==2022.6
 PyYAML==5.4.1
 regex==2022.10.31
-requests @ file:///opt/conda/conda-bld/requests_1657734628632/work
 responses==0.18.0
-ruamel-yaml-conda @ file:///tmp/build/80754af9/ruamel_yaml_1616016711199/work
 scikit-learn==0.24.2
 scikit-optimize==0.9.0
 scipy==1.9.3
@@ -98,15 +86,12 @@ thinc==8.1.5
 threadpoolctl==3.1.0
 tokenizers==0.13.1
 tomotopy==0.12.3
-toolz @ file:///tmp/build/80754af9/toolz_1636545406491/work
 torch==1.13.0
 torchvision==0.14.0
-tqdm @ file:///opt/conda/conda-bld/tqdm_1664392687731/work
 transformers==4.24.0
 typer==0.4.2
 typing_extensions==4.4.0
 umap-learn==0.5.3
-urllib3 @ file:///croot/urllib3_1666298941550/work
 wasabi==0.10.1
 Werkzeug==2.2.2
 wordcloud==1.8.2.2
