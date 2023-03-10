@@ -11,8 +11,8 @@ from sklearn.feature_extraction.text import CountVectorizer
 from torch import cuda
 from sentence_transformers import SentenceTransformer
 
-asrs_filepath_original = os.path.join("examples","fishbone_example","ASRS_DBOnline.csv")
-asrs_filepath_edit = os.path.join("examples","fishbone_example","ASRS_DBOnline_edit.csv")
+asrs_filepath_original = os.path.join("examples","fishbone_example","ASRS_DBOnline_v2.csv")
+asrs_filepath_edit = os.path.join("examples","fishbone_example","ASRS_DBOnline_v2_edit.csv")
 
 # preprocess - merge first two rows to get column names
 asrs_df = pd.read_csv(asrs_filepath_original, header=[0,1])
@@ -22,7 +22,7 @@ asrs_df.to_csv(asrs_filepath_edit)
 
 # load into Data()
 asrs_data = Data()
-asrs_text_columns = ['Report 1 Narrative', 'Report 2 Narrative']
+asrs_text_columns = ['Report 1 Narrative']
 asrs_document_id_col = 'ACN'
 asrs_database_name = 'ASRS UAS Reports'
 asrs_data.load(asrs_filepath_edit, preprocessed=False, text_columns=asrs_text_columns, name=asrs_database_name, load_kwargs={'dtype':str})
@@ -45,21 +45,35 @@ ir_asrs = search(asrs_data, model)
 embeddings_path = os.path.join('data', 'asrs_sentence_embeddings_finetune.npy')
 ir_asrs.get_sentence_embeddings(embeddings_path)
 
-queries = ['what happens when uas goes out of bounds', 'what are the risks of battery operated uas', 'what if uas flies over people on ground']
+queries = [
+    'do bird strikes affect uas',
+    'are there issues with drones landing on certain surfaces',
+    'do drones ever collide with aircraft',
+    'do drones ever interfere with landing',
+    'do drones interfere with weather balloons',
+    'is evasive action required when a drone flies near an aircraft',
+    'what near misses have happened with uas',
+    'when there are waivers for drones, are there additional risks to the mission',
+    'are drones a risk to helicopters',
+    'what happens when there is a lost link with a drone',
+    'is drone battery reliable for the mission',
+    'what if there is a lost link with a drone',
+    'what if a pilot loses contact with a drone'
+    ]
 for query in queries:
     print(ir_asrs.run_search(query,return_k=5))
 
 # NER
 # NER for FMEA
-model_checkpoint = os.path.join("models", "FMEA-ner-model", "checkpoint-1424")
-device = 'cuda' if cuda.is_available() else 'cpu'
-cuda.empty_cache()
+# model_checkpoint = os.path.join("models", "FMEA-ner-model", "checkpoint-1424")
+# device = 'cuda' if cuda.is_available() else 'cpu'
+# cuda.empty_cache()
 
-fmea = FMEA()
-fmea.load_model(model_checkpoint)
-input_data = fmea.load_data('Report 1 Narrative', asrs_document_id_col, filepath=asrs_filepath_edit, formatted=False)
+# fmea = FMEA()
+# fmea.load_model(model_checkpoint)
+# input_data = fmea.load_data('Report 1 Narrative', asrs_document_id_col, filepath=asrs_filepath_edit, formatted=False)
 
-preds = fmea.predict()
-df = fmea.get_entities_per_doc()
-fmea.group_docs_with_meta(grouping_col='Events Anomaly')
-fmea.grouped_df.to_csv(os.path.join(os.getcwd(),"asrs_fmea.csv"))
+# preds = fmea.predict()
+# df = fmea.get_entities_per_doc()
+# fmea.group_docs_with_meta(grouping_col='Events Anomaly')
+# fmea.grouped_df.to_csv(os.path.join(os.getcwd(),"asrs_fmea.csv"))
