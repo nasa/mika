@@ -58,7 +58,12 @@ queries = [
     'what happens when there is a lost link with a drone',
     'is drone battery reliable for the mission',
     'what if there is a lost link with a drone',
-    'what if a pilot loses contact with a drone'
+    'what if a pilot loses contact with a drone',
+    'do drones interfere with takeoff',
+    'do drones fly above 400 feet above ground level',
+    'do drones fly in restricted areas',
+    'do drones collid with terrain',
+    'do drones fly without waivers when a waiver is required'
     ]
 for query in queries:
     print(ir_asrs.run_search(query,return_k=5))
