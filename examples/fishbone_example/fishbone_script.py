@@ -62,11 +62,11 @@ queries = [
     'do drones interfere with takeoff',
     'do drones fly above 400 feet above ground level',
     'do drones fly in restricted areas',
-    'do drones collid with terrain',
+    'do drones collide with terrain',
     'do drones fly without waivers when a waiver is required'
     ]
 for query in queries:
-    print(ir_asrs.run_search(query,return_k=5))
+    print(ir_asrs.run_search(query,return_k=10))
 
 # NER
 # NER for FMEA
