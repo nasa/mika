@@ -29,15 +29,15 @@ asrs_data.load(asrs_filepath_edit, preprocessed=False, text_columns=asrs_text_co
 asrs_data.prepare_data(create_ids=True, combine_columns=asrs_text_columns, remove_incomplete_rows=False)
 
 # bert topics - might be good for identifying general categories to use as branches
-tm = Topic_Model_plus(text_columns=asrs_text_columns, data=asrs_data)
-vectorizer_model = CountVectorizer(ngram_range=(1, 3), stop_words="english") #removes stopwords
-tm.bert_topic(sentence_transformer_model=None, umap=None, hdbscan=None, count_vectorizor=vectorizer_model, ngram_range=(1,3), BERTkwargs={}, from_probs=False, thresh=0.01)
-tm.save_bert_model()
+# tm = Topic_Model_plus(text_columns=asrs_text_columns, data=asrs_data)
+# vectorizer_model = CountVectorizer(ngram_range=(1, 3), stop_words="english") #removes stopwords
+# tm.bert_topic(sentence_transformer_model=None, umap=None, hdbscan=None, count_vectorizor=vectorizer_model, ngram_range=(1,3), BERTkwargs={}, from_probs=False, thresh=0.01)
+# tm.save_bert_model()
 
-BERTkwargs={"top_n_words": 10, 'min_topic_size':5}
-tm.bert_topic(count_vectorizor=vectorizer_model, BERTkwargs=BERTkwargs, from_probs=True)
-tm.save_bert_results(from_probs=True)
-tm.save_bert_taxonomy()
+# BERTkwargs={"top_n_words": 10, 'min_topic_size':5}
+# tm.bert_topic(count_vectorizor=vectorizer_model, BERTkwargs=BERTkwargs, from_probs=True)
+# tm.save_bert_results(from_probs=True)
+# tm.save_bert_taxonomy()
 
 # IR - might be good for filling out branches once you have an idea of general categories
 model = SentenceTransformer('all-distilroberta-v1')
@@ -65,8 +65,13 @@ queries = [
     'do drones collide with terrain',
     'do drones fly without waivers when a waiver is required'
     ]
+search_result = pd.DataFrame()
 for query in queries:
-    print(ir_asrs.run_search(query,return_k=10))
+    new_search_result = ir_asrs.run_search(query,return_k=10)
+    query_row = pd.DataFrame([query], columns=['query'])
+    new_search_result = pd.concat([query_row, new_search_result], axis=0)
+    search_result = pd.concat([search_result, new_search_result], axis=0)
+search_result.to_csv('IR_result.csv')
 
 # NER
 # NER for FMEA
