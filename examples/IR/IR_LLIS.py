@@ -5,6 +5,7 @@ hswalsh
 import sys, os
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)),"..",".."))
 from sentence_transformers import SentenceTransformer
+from sentence_transformers.cross_encoder import CrossEncoder
 from mika.ir.search import search
 from mika.utils import Data
 from datetime import datetime as dt
@@ -23,11 +24,12 @@ database_name = 'LLIS'
 data.load(filepath, preprocessed=False, text_columns=text_columns, name=database_name,preprocessed_kwargs={'dtype':str}, id_col = document_id_col)
 data.prepare_data(create_ids=False, combine_columns=text_columns, remove_incomplete_rows=False)
 
-model = SentenceTransformer('sentence-transformers/msmarco-roberta-base-v3')
+retrieval_model = SentenceTransformer('sentence-transformers/msmarco-roberta-base-v3')
+reranker_model = CrossEncoder('cross-encoder/ms-marco-TinyBERT-L-2')
 
-query = 'Mars rover'
+query = 'what controls issues have happened with mars rovers'
 
-ir_llis = search('Combined Text', data, model)
+ir_llis = search('Combined Text', data, retrieval_model, reranker_model)
 ir_llis.get_sentence_embeddings(os.path.join('results'))
-search_result = ir_llis.run_search(query,return_k=10)
+search_result = ir_llis.run_search(query,return_k=5, use_passages=False)
 print(search_result)
