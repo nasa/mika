@@ -126,7 +126,7 @@ class search():
         ranked_hits = pd.DataFrame(ranked_data)
         return ranked_hits
     
-    def run_search(self, query, return_k=1, use_passages=False):
+    def run_search(self, query, rank_k=1, return_k=1, use_passages=False):
         """
         Run the search using a query and loaded corpus embeddings.
         
@@ -134,8 +134,10 @@ class search():
         ----------
         query : str
             Query to search
+        rank_k : int
+            Number of results to rank in semantic search
         return_k : int
-            Number of results to return
+            Number of results to return (must be less than or equal to rank_k)
         
         RETURNS
         -------
@@ -143,7 +145,7 @@ class search():
             Doc ID, scores, and text of top k hits, structured in a DataFrame
         """
 
-        top_hits = self.__semantic_search(query, return_k)
-        ranked_hits = self.__rerank(query, top_hits, use_passages)
+        top_hits = self.__semantic_search(query, rank_k)
+        ranked_hits = self.__rerank(query, top_hits[0:return_k], use_passages)
 
         return ranked_hits
