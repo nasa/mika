@@ -6,6 +6,7 @@ To do:
     - speed up functions: flatten nested functions
 @author: srandrad
 """
+
 import pandas as pd
 import numpy as np
 from time import time, sleep
@@ -22,6 +23,30 @@ import pkg_resources
 import re
 
 class Data():
+    """ Data utility
+
+    Utility for loading and preprocessing datasets to be used in MIKA analyses. Data should be loaded 
+    and processed as needed using this class before using methods from KD and IR classes. 
+    
+    Attributes
+    ----------
+    name : string, optional
+        name of the dataset. The default is "".
+    
+    Methods
+    -------
+    load
+
+    save
+
+    prepare_data
+
+    sentence_tokenization
+
+    preprocess_data
+    
+    """
+
     def __init__(self, name=""):
         """
         initializes a data object
@@ -36,6 +61,7 @@ class Data():
         None.
 
         """
+
         self.name = name
         self.text_columns = []
         self.data_df = None
@@ -52,6 +78,7 @@ class Data():
         None.
 
         """
+
         self.doc_ids = self.data_df[self.id_col].tolist()
     
     def __set_id_col_to_index(self):
@@ -63,6 +90,7 @@ class Data():
         None.
 
         """
+
         self.id_col = 'index'
         self.data_df['index'] = self.data_df.index
         
@@ -122,6 +150,7 @@ class Data():
         None.
 
         """
+
         if ".csv" in filename: 
             self.data_df = pd.read_csv(open(filename,encoding='utf8',errors='ignore'), **kwargs)
         else: 
@@ -156,6 +185,7 @@ class Data():
         None.
 
         """
+
         self.text_columns = text_columns
         self.name = name
         self.id_col = id_col
@@ -181,6 +211,7 @@ class Data():
         None.
 
         """
+
         if results_path == "":
             results_path = "preprocessed_data.csv"
         if ".csv" not in results_path:
@@ -202,6 +233,7 @@ class Data():
         None.
 
         """
+
         combined_text = []
         for i in tqdm(range(0, len(self.data_df)), "Combining Columns…"):
             text = ""
@@ -224,6 +256,7 @@ class Data():
         None.
 
         """
+
         rows_to_drop = []
         for i in tqdm(range(0, len(self.data_df)), "Removing Incomplete Rows…"):
             for col in self.text_columns:
@@ -241,6 +274,7 @@ class Data():
         None.
 
         """
+
         unique_ids = []
         prev_id = None
         j = 0
@@ -276,6 +310,7 @@ class Data():
         None.
 
         """
+
         start_time = time()
         if combine_columns != []: 
             self.__combine_columns(combine_columns)
@@ -296,6 +331,7 @@ class Data():
         None.
 
         """
+
         dfs = []
         for i in tqdm(range(len(self.data_df)), "Sentence Tokenization…"):
             sentences_for_doc = {col:[] for col in self.text_columns}
@@ -336,6 +372,7 @@ class Data():
             list of words in list format.
 
         """
+
         word_list = word_list.strip("[]").split(", ")
         word_list = [w.replace("'","") for w in word_list]
         return word_list
@@ -354,6 +391,7 @@ class Data():
         None.
 
         """
+
         self.data_df = self.data_df.iloc[self.data_df.astype(str).drop_duplicates(subset=cols, keep='first').index,:].reset_index(drop=True)
         
     def __drop_short_docs(self, thres=3):
@@ -370,6 +408,7 @@ class Data():
         None.
 
         """
+
         indx_to_drop = []
         for i in range(len(self.data_df)):
             for col in self.text_columns:
@@ -399,6 +438,7 @@ class Data():
             list of tokenized doucment texts.
 
         """
+
         texts = [simple_tokenize(text) for text in texts if not isinstance(text,float)]
         texts = [[word for word in text if len(word)>min_word_len and len(word)<max_word_len] for text in texts if not isinstance(text,float)]
         return texts
@@ -418,6 +458,7 @@ class Data():
             list of doucment texts with all letters lowercase.
 
         """
+
         texts = [[word.lower() for word in text] for text in texts]
         return texts
     
@@ -435,6 +476,7 @@ class Data():
         None.
 
         """
+
         tag = pos_tag([word])[0][1][0].upper()
         tag_dict = {"J": wordnet.ADJ,"N": wordnet.NOUN,"V": wordnet.VERB,"R": wordnet.ADV}
         if tag not in ['I','D','M','T','C','P']:return tag_dict.get(tag,wordnet.NOUN)
@@ -455,6 +497,7 @@ class Data():
             list of lemmatized doucment texts.
 
         """
+
         #why is this so slow?
         lemmatizer = WordNetLemmatizer()
         texts = [[lemmatizer.lemmatize(w, self.__get_wordnet_pos(w)) for w in text if self.__get_wordnet_pos(w)!="unnecessary word"] for text in texts if not isinstance(text,float)]
@@ -477,6 +520,7 @@ class Data():
             list of doucment texts with stopwords removed.
 
         """
+
         all_stopwords = stopwords.words('english') + domain_stopwords
         all_stopwords = [word.lower() for word in all_stopwords]
         texts = [[w for w in text if not w in all_stopwords] for text in texts if not isinstance(text,float)]
@@ -498,6 +542,7 @@ class Data():
             word with 'quot' removed.
 
         """
+
         if word not in self.__english_vocab:
             w_tmp = word.replace('quot','')
             if w_tmp in self.__english_vocab:
@@ -519,6 +564,7 @@ class Data():
             list of doucment texts with 'quot' removed from words.
 
         """
+
         texts = [[self.__quot_replace(word) for word in text] for text in texts if not isinstance(text,float)]
         return texts
     
@@ -541,6 +587,7 @@ class Data():
             DESCRIPTION.
 
         """
+
         if word not in self.__english_vocab and not word.isupper() and not sum(1 for c in word if c.isupper()) > 1:
             suggestions = sym_spell.lookup(word,Verbosity.CLOSEST,           max_edit_distance=2,include_unknown=True,transfer_casing=True)
             correction = suggestions[0].term
@@ -565,6 +612,7 @@ class Data():
             list of doucment texts with mispelled words corrected.
 
         """
+
         sym_spell = SymSpell()
         dictionary_path = pkg_resources.resource_filename("symspellpy", "frequency_dictionary_en_82_765.txt")
         sym_spell.load_dictionary(dictionary_path, term_index=0, count_index=1)
@@ -590,6 +638,7 @@ class Data():
             list of tokens in a text with words segmented.
 
         """
+
         for word in text:
             if word not in self.__english_vocab and not word.isupper():
                 segmented_word = sym_spell.word_segmentation(word).corrected_string
@@ -617,6 +666,7 @@ class Data():
             list of doucment texts with words segmented.
 
         """
+
         sym_spell = SymSpell()
         dictionary_path = pkg_resources.resource_filename("symspellpy", "frequency_dictionary_en_82_765.txt")
         sym_spell.load_dictionary(dictionary_path, term_index=0, count_index=1)
@@ -644,6 +694,7 @@ class Data():
             list of document texts as ngrams.
 
         """
+
         #NEEDS WORK - could probably replace with a BERT tokenizer
         #very slow
         # changes word order!
@@ -791,6 +842,7 @@ class Data():
             self.data_df updated with frequent words removed.
 
         """
+
         num_docs = len(data_df)
         pct = np.round(pct_*num_docs)
         indicies_to_drop = []
