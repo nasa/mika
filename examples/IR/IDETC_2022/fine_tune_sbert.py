@@ -5,12 +5,8 @@
 import sys, os
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)),"..","..",".."))
 import pandas as pd
-import numpy as np
-from sentence_transformers import SentenceTransformer, losses, InputExample, util, evaluation
-import torch
+from sentence_transformers import SentenceTransformer, losses, InputExample, evaluation
 from torch.utils.data import DataLoader
-from nltk.tokenize import sent_tokenize
-import tensorflow as tf
 import time
 from math import floor
 
