@@ -7,7 +7,7 @@ import torch
 
 class search():
     """
-    Class to perform information retrieval using semantic search.
+    Class to perform information retrieval using semantic search and an optional reranker.
     
     PARAMETERS
     ----------
@@ -15,12 +15,13 @@ class search():
         Data object loaded using mika.utils.Data
     column_to_search : str
         name of column to search - use "Combined Text" if it is desired to search all text columns (must first be defined in Data object)
-    retrieval_model :
-    reranker_model :
-        
+    retrieval_model : SentenceTransformer model
+        a sentence transformer model defined according to: https://www.sbert.net/examples/applications/computing-embeddings/README.html?highlight=sentencetransformer#sentence_transformers.SentenceTransformer 
+    reranker_model (optional) : CrossEncoder model
+        a cross encoder model defined according to: https://www.sbert.net/docs/package_reference/cross_encoder.html?highlight=crossencoder#sentence_transformers.cross_encoder.CrossEncoder 
     """
 
-    def __init__(self, column_to_search, data=None, retrieval_model='', reranker_model=''):
+    def __init__(self, column_to_search, data, retrieval_model, use_reranker=False, reranker_model=None):
         self.retrieval_model = retrieval_model
         self.reranker_model = reranker_model
         self.doc_ids = data.data_df[data.id_col]
@@ -62,7 +63,7 @@ class search():
         PARAMETERS
         ----------
         savepath : str
-            Filepath to save sentence embeddings
+            Path to save sentence embeddings
         
         RETURNS
         -------
@@ -81,7 +82,7 @@ class search():
         PARAMETERS
         ----------
         filepath : str
-            Path to saved sentence embeddings
+            Path to previously saved sentence embeddings
             
         RETURNS
         -------
@@ -128,7 +129,7 @@ class search():
     
     def run_search(self, query, rank_k=1, return_k=1, use_passages=False):
         """
-        Run the search using a query and loaded corpus embeddings.
+        Run the search using a query and loaded corpus embeddings. 
         
         PARAMETERS
         ----------
@@ -146,6 +147,8 @@ class search():
         """
 
         top_hits = self.__semantic_search(query, rank_k)
-        ranked_hits = self.__rerank(query, top_hits[0:return_k], use_passages)
-
+        if self.reranker_model == None:
+            ranked_hits = top_hits[0:return_k]
+        else:
+            ranked_hits = self.__rerank(query, top_hits[0:return_k], use_passages)
         return ranked_hits
