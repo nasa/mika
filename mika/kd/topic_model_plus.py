@@ -4,6 +4,7 @@ Created on Fri Feb 19 11:10:28 2021
 TopicModel+ class definition
 @author: srandrad, hswalsh
 """
+
 import pandas as pd
 import tomotopy as tp
 import numpy as np
@@ -21,8 +22,9 @@ from gensim.models.coherencemodel import CoherenceModel
 from octis.evaluation_metrics.diversity_metrics import TopicDiversity
 
 class Topic_Model_plus():
-    """
-    A class for topic modeling for aviation safety
+    """ Topic model plus
+
+    A class for topic modeling for aviation safety.
     
     Attributes
     ----------
@@ -49,93 +51,14 @@ class Topic_Model_plus():
     results_path : string
         destentation to create results folder in
         
-    
-    Methods
-    -------
-    get_bert_coherence(self, coh_method='u_mass', from_probs=False):
-        gets coherence for bert models and saves it in a dictionary
-    calc_bert_coherence(self, docs, topics, topic_model, method='u_mass', num_words=10):
-        calculates coherence for a bertopic model using gensim coherence models
-    save_bert_model(self, embedding_model=True):
-        saves a BERTopic model
-    save_bert_coherence(self, return_df=False, coh_method='u_mass', from_probs=False):
-        saves the coherence scores for a bertopic model
-    get_bert_topic_diversity(self, topk=10):
-        gets topic diversity scores for a BERTopic model
-    save_bert_topic_diversity(self, topk=10, return_df=False):
-        saves topic diversity score for a bertopic model
-    bert_topic(self, sentence_transformer_model=None, umap=None, hdbscan=None, count_vectorizor=None, ngram_range=(1,3), BERTkwargs={}, from_probs=True, thresh=0.01):
-        function to train a bertopic model
-    reduce_bert_topics(self, num=30, from_probs=True, thresh=0.01):
-        reduces the number of topics in a trained bertopic model to the specified number.
-    save_bert_topics(self, return_df=False, p_thres=0.0001, coherence=False, coh_method='u_mass', from_probs=False):
-        saves bert topics results to file
-    save_bert_topics_from_probs(self, thresh=0.01, return_df=False, coherence=False, coh_method='u_mass', from_probs=True):
-        saves bertopic model results if using probability threshold
-    get_bert_topics_from_probs(self, topic_df, thresh=0.01, coherence=False):
-        saves topic model results including each topic number, words, number of words,
-        and best document when document topics are defined by a probabilty threshold
-    save_bert_taxonomy(self, return_df=False, p_thres=0.0001):
-        saves a taxonomy of topics from bertopic model
-    save_bert_document_topic_distribution(self, return_df=False):
-        saves the document topic distribution
-    save_bert_results(self, coherence=False, coh_method='u_mass', from_probs=True, thresh=0.01, topk=10):
-        saves the taxonomy, coherence, and document topic distribution in one excel file
-    save_bert_vis(self):
-        saves the bertopic visualization and hierarchy visualization
-    hdp(self, training_iterations=1000, iteration_step=10, to_lda=True, kwargs={}, topic_threshold=0.0):
-       performs HDP topic modeling which is useful when the number of topics is not known
-    coherence_scores(self, mdl, lda_or_hlda, measure='c_v'):
-        computes and returns coherence scores
-    lda(self, num_topics={}, training_iterations=1000, iteration_step=10, remove_pct=0.3, **kwargs)
-        performs lda topic modeling
-    save_lda_results(self):
-        saves the taxonomy, coherence, and document topic distribution in one excel file
-    save_lda_models(self)
-        saves lda models to file
-    save_lda_document_topic_distribution(self)
-        saves lda document topic distribution to file
-    save_lda_coherence(self)
-        saves lda coherence to file
-    save_lda_taxonomy(self)
-        saves lda taxonomy to file
-    lda_extract_models(self, file_path)
-        gets lda models from file
-    lda_visual(self, col)
-        saves pyLDAvis output from lda to file
-    label_lda_topics(self, extractor_min_cf=5, extractor_min_df=3, extractor_max_len=5, extractor_max_cand=5000, labeler_min_df=5, labeler_smoothing=1e-2, labeler_mu=0.25, label_top_n=3):
-        Uses tomotopy's auto topic labeling tool to label topics. Stores labels in class; after running this function, a flag can be used to use labels or not in taxonomy saving functions.
-    label_hlda_topics(self, extractor_min_cf=5, extractor_min_df=3, extractor_max_len=5, extractor_max_cand=5000, labeler_min_df=5, labeler_smoothing=1e-2, labeler_mu=0.25, label_top_n=3):
-        Uses tomotopy's auto topic labeling tool to label topics. Stores labels in class; after running this function, a flag can be used to use labels or not in taxonomy saving functions.
-    save_mixed_taxonomy(self,use_labels=False):
-        A custom mixed lda/hlda model taxonomy. Must run lda and hlda with desired parameters first.
-    hlda(self, levels=3, training_iterations=1000, iteration_step=10, remove_pct=0.3, **kwargs)
-        performs hlda topic modeling
-    save_hlda_results(self):
-        saves the taxonomy, level 1 taxonomy, raw topics coherence, and document topic distribution in one excel file
-    save_hlda_document_topic_distribution(self)
-        saves hlda document topic distribution to file
-    save_hlda_models(self)
-        saves hlda models to file
-    save_hlda_topics(self)
-        saves hlda topics to file
-    save_hlda_coherence(self)
-        saves hlda coherence to file
-    save_hlda_taxonomy(self)
-        saves hlda taxonomy to file
-    save_hlda_level_n_taxonomy(self, lev=1)
-        saves hlda taxonomy at level n
-    hlda_extract_models(self, file_path)
-        gets hlda models from file
-    hlda_display(self, col, num_words = 5, display_options={"level 1": 1, "level 2": 6}, colors='bupu')
-        saves graphviz visualization of hlda tree structure
     """
 
 #   TO DO:
 #   add hyper parameter tuning for lda (alpha and beta and k/number of topics) and hlda (eta, alpha, gamma)
     
     def __init__(self, text_columns=[], data=None, ngrams=None, results_path=''):
-        """
+        """ 
+
         CLASS CONSTRUCTORS
         ------------------
         text_columns: list
@@ -181,7 +104,7 @@ class Topic_Model_plus():
     
     def get_bert_coherence(self, coh_method='u_mass', from_probs=False):
         """
-        gets coherence for bert models and saves it in a dictionary
+        Gets coherence for bert models and saves it in a dictionary.
 
         Parameters
         ----------
@@ -199,6 +122,7 @@ class Topic_Model_plus():
         None.
 
         """
+
         self.BERT_coherence = {}
         for col in self.text_columns:
             if from_probs == False: #each document only has one topic
@@ -216,7 +140,7 @@ class Topic_Model_plus():
 
     def calc_bert_coherence(self, docs, topics, topic_model, method='u_mass', num_words=10):
         """
-        calculates coherence for a bertopic model using gensim coherence models
+        Calculates coherence for a bertopic model using gensim coherence models.
 
         Parameters
         ----------
@@ -238,6 +162,7 @@ class Topic_Model_plus():
             List of coherence scores for each topic.
 
         """
+
         # Preprocess Documents
         documents = pd.DataFrame({"Document": docs,
                                   "ID": range(len(docs)),
@@ -269,7 +194,7 @@ class Topic_Model_plus():
     
     def save_bert_model(self, embedding_model=True):
         """
-        saves a BERTopic model
+        Saves a BERTopic model.
 
         Parameters
         ----------
@@ -281,6 +206,7 @@ class Topic_Model_plus():
         None.
 
         """
+
         self.__create_folder()
         for col in self.text_columns:
             path = "_BERT_model_object.bin"
@@ -290,7 +216,7 @@ class Topic_Model_plus():
     
     def load_bert_model(self, file_path, reduced=False, from_probs=False, thresh=0.01):
         """
-        Loads trained bertopic model(s)
+        Loads trained bertopic model(s).
 
         Parameters
         ----------
@@ -305,6 +231,7 @@ class Topic_Model_plus():
         thresh : float, optional
             probability threshold used when from_probs=True, by default 0.01
         """
+
         self.BERT_models = {}
         self.BERT_model_topics_per_doc = {}
         self.BERT_model_probs={}
@@ -325,7 +252,7 @@ class Topic_Model_plus():
 
     def save_bert_coherence(self, return_df=False, coh_method='u_mass', from_probs=False):
         """
-        saves the coherence scores for a bertopic model
+        Saves the coherence scores for a bertopic model.
 
         Parameters
         ----------
@@ -346,6 +273,7 @@ class Topic_Model_plus():
             Dataframe with each row a topic, column has coherence scores.
 
         """
+
         self.get_bert_coherence(coh_method, from_probs)
         self.__create_folder()
         max_topics = max([len(set(self.BERT_models[col].topics_))-1 for col in self.BERT_models])
@@ -370,7 +298,7 @@ class Topic_Model_plus():
     
     def get_bert_topic_diversity(self, topk=10):
         """
-        gets topic diversity scores for a BERTopic model
+        Gets topic diversity scores for a BERTopic model.
 
         Parameters
         ----------
@@ -382,6 +310,7 @@ class Topic_Model_plus():
         None.
 
         """
+
         topic_diversity = TopicDiversity(topk=topk)
         self.diversity = {col: [] for col in self.text_columns}
         for col in self.text_columns:
@@ -394,7 +323,7 @@ class Topic_Model_plus():
     
     def save_bert_topic_diversity(self, topk=10, return_df=False):
         """
-        saves topic diversity score for a bertopic model
+        Saves topic diversity score for a bertopic model.
         
         Parameters
         ----------
@@ -409,6 +338,7 @@ class Topic_Model_plus():
             Dataframe with topic diversity score.
 
         """
+
         self.get_bert_topic_diversity(topk=10)
         diversity_df = pd.DataFrame(self.diversity)
         if return_df == True:
@@ -419,7 +349,7 @@ class Topic_Model_plus():
         
     def bert_topic(self, sentence_transformer_model=None, umap=None, hdbscan=None, count_vectorizor=None, ngram_range=(1,3), BERTkwargs={}, from_probs=True, thresh=0.01):
         """
-        function to train a bertopic model
+        Train a bertopic model.
 
         Parameters
         ----------
@@ -446,6 +376,7 @@ class Topic_Model_plus():
         None.
 
         """
+
         self.sentence_models = {}; self.embeddings = {}; self.BERT_models = {}
         self.BERT_model_topics_per_doc = {}; self.BERT_model_probs={}; self.BERT_model_all_topics_per_doc={}
         for col in self.text_columns:
@@ -476,6 +407,7 @@ class Topic_Model_plus():
     def __get_all_topics_for_doc(self, col, probs, thresh, topics):
         """
         Helper function that gets all the topics for every document based on a probability threshold
+        
         Parameters
         ----------
         col : string
@@ -487,6 +419,7 @@ class Topic_Model_plus():
         topics : list
             list of topics
         """
+
         self.BERT_model_all_topics_per_doc[col] = [[] for i in range(len(probs))]
         for i in range(len(probs)):
             topic_probs = probs[i]#.strip("[]").split(" ")
@@ -501,7 +434,7 @@ class Topic_Model_plus():
     
     def reduce_bert_topics(self, num=30, from_probs=False, thresh=0.01):
         """
-        reduces the number of topics in a trained bertopic model to the specified number.
+        Reduces the number of topics in a trained bertopic model to the specified number.
 
         Parameters
         ----------
@@ -518,6 +451,7 @@ class Topic_Model_plus():
         None.
 
         """
+
         self.reduced = True
         for col in self.text_columns:
             corpus = self.data_df[col]
@@ -534,7 +468,7 @@ class Topic_Model_plus():
             
     def save_bert_topics(self, return_df=False, p_thres=0.0001, coherence=False, coh_method='u_mass', from_probs=False):
         """
-        saves bert topics results to file
+        Saves bert topics results to file.
 
         Parameters
         ----------
@@ -559,6 +493,7 @@ class Topic_Model_plus():
             topic model results
 
         """
+
         self.__create_folder()
         dfs = {}
         for col in self.text_columns:
@@ -601,7 +536,7 @@ class Topic_Model_plus():
     
     def save_bert_topics_from_probs(self, thresh=0.01, return_df=False, coherence=False, coh_method='u_mass', from_probs=True):
         """
-        saves bertopic model results if using probability threshold
+        Saves bertopic model results if using probability threshold.
 
         Parameters
         ----------
@@ -625,6 +560,7 @@ class Topic_Model_plus():
             topic model results
 
         """
+        
         topic_dfs = self.save_bert_topics(return_df=True, coherence=coherence, coh_method=coh_method, from_probs=True)
         topic_prob_dfs = self.get_bert_topics_from_probs(topic_dfs, thresh, coherence)
         if return_df == False:
@@ -639,8 +575,8 @@ class Topic_Model_plus():
         
     def get_bert_topics_from_probs(self, topic_df, thresh=0.01, coherence=False):
         """
-        saves topic model results including each topic number, words, number of words,
-        and best document when document topics are defined by a probabilty threshold
+        Saves topic model results including each topic number, words, number of words,
+        and best document when document topics are defined by a probabilty threshold.
 
         Parameters
         ----------
@@ -659,6 +595,7 @@ class Topic_Model_plus():
             topic model results
 
         """
+
         cols = ['topic number', 'topic words', 'number of words', 'best documents']
         if coherence == True: cols += ['coherence']
         new_topic_dfs = {col:topic_df[col][cols] for col in self.text_columns}
@@ -676,7 +613,7 @@ class Topic_Model_plus():
         
     def save_bert_taxonomy(self, return_df=False, p_thres=0.0001):
         """
-        saves a taxonomy of topics from bertopic model
+        Saves a taxonomy of topics from bertopic model.
 
         Parameters
         ----------
@@ -693,6 +630,7 @@ class Topic_Model_plus():
             unique combination of topics found in the documents
 
         """
+
         self.__create_folder()
         taxonomy_data = {col:[] for col in self.text_columns}
         for col in self.text_columns:
@@ -730,7 +668,7 @@ class Topic_Model_plus():
     
     def save_bert_document_topic_distribution(self, return_df=False):
         """
-        saves the document topic distribution 
+        Saves the document topic distribution.
 
         Parameters
         ----------
@@ -743,6 +681,7 @@ class Topic_Model_plus():
             dataframe with a row for each document and the probability for each topic 
 
         """
+
         self.__create_folder()
         doc_data = {col: [] for col in self.text_columns}
         doc_data['document number'] = self.doc_ids
@@ -759,7 +698,7 @@ class Topic_Model_plus():
         
     def save_bert_results(self, coherence=False, coh_method='u_mass', from_probs=False, thresh=0.01, topk=10):
         """
-        saves the taxonomy, coherence, and document topic distribution in one excel file
+        Saves the taxonomy, coherence, and document topic distribution in one excel file.
 
         Parameters
         ----------
@@ -781,7 +720,6 @@ class Topic_Model_plus():
         None.
 
         """
-        
         
         self.__create_folder()
         data = {}
@@ -808,13 +746,14 @@ class Topic_Model_plus():
     
     def save_bert_vis(self):
         """
-        saves the bertopic visualization and hierarchy visualization
+        Saves the bertopic visualization and hierarchy visualization.
 
         Returns
         -------
         None.
 
         """
+
         self.__create_folder()
         if self.reduced:
             file = os.path.join(self.folder_path, 'Reduced')
@@ -829,7 +768,7 @@ class Topic_Model_plus():
     
     def hdp(self, training_iterations=1000, iteration_step=10, to_lda=True, kwargs={}, topic_threshold=0.0):
         """
-        performs HDP topic modeling which is useful when the number of topics is not known
+        Performs HDP topic modeling which is useful when the number of topics is not known.
 
         Parameters
         ----------
@@ -849,6 +788,7 @@ class Topic_Model_plus():
         None.
 
         """
+
         start = time()
         self.hdp_models = {}
         self.hdp_coherence = {}
@@ -878,7 +818,7 @@ class Topic_Model_plus():
         
     def coherence_scores(self, mdl, lda_or_hlda, measure='c_v'):
         """
-        computes and returns coherence scores for lda and hlda modelos
+        Computes and returns coherence scores for lda and hlda models.
 
         Parameters
         ----------
@@ -915,7 +855,7 @@ class Topic_Model_plus():
     
     def __create_corpus_of_ngrams(self, texts):
         """
-        creates ngrams for a corpus using tomotopy 
+        Creates ngrams for a corpus using tomotopy.
 
         Parameters
         ----------
@@ -928,6 +868,7 @@ class Topic_Model_plus():
             tomotopy corpus object with ngrams
 
         """
+
         corpus = tp.utils.Corpus()
         for text in texts:
             corpus.add_doc(text)
@@ -938,7 +879,7 @@ class Topic_Model_plus():
         return corpus
     
     def __find_optimized_lda_topic_num(self, col, max_topics, training_iterations=1000, iteration_step=10, coh_thres = 0.005, **kwargs):
-        """
+        """ 
         Under development. Used to automate the elbow method for finding the ideal
         number of topics in lda models
 
@@ -965,6 +906,7 @@ class Topic_Model_plus():
         None.
 
         """
+
         coherence = []
         LL = []
         perplexity = []
@@ -1034,7 +976,7 @@ class Topic_Model_plus():
         
     def __lda_optimization(self, max_topics=200,training_iterations=1000, iteration_step=10, thres = 0.005, **kwargs):
         """
-        runs the lda optimization for all text columns 
+        Runs the lda optimization for all text columns.
 
         Parameters
         ----------
@@ -1067,7 +1009,7 @@ class Topic_Model_plus():
     
     def lda(self, num_topics={}, training_iterations=1000, iteration_step=10, max_topics=0, **kwargs):
         """
-        
+        Performs LDA topic modeling.
 
         Parameters
         ----------
@@ -1088,6 +1030,7 @@ class Topic_Model_plus():
         None.
 
         """
+
         start = time()
         self.lda_models = {}
         self.lda_coherence = {}
@@ -1115,13 +1058,14 @@ class Topic_Model_plus():
         
     def save_lda_models(self):
         """
-        saves lda models to file
+        Saves lda models to file.
 
         Returns
         -------
         None.
 
         """
+
         self.__create_folder()
         for col in self.text_columns:
             mdl = self.lda_models[col]
@@ -1130,7 +1074,7 @@ class Topic_Model_plus():
     
     def save_lda_document_topic_distribution(self, return_df=False):
         """
-        saves lda document topic distribution to file or returns the dataframe to another function
+        Saves lda document topic distribution to file or returns the dataframe to another function.
 
         Parameters
         ----------
@@ -1160,7 +1104,7 @@ class Topic_Model_plus():
     
     def save_lda_coherence(self, return_df=False):
         """
-        saves lda coherence to file or returns the dataframe to another functio
+        Saves lda coherence to file or returns the dataframe to another function.
 
         Parameters
         ----------
@@ -1195,7 +1139,7 @@ class Topic_Model_plus():
     
     def save_lda_topics(self, return_df=False, p_thres=0.001):
         """
-        saves lda topics to file
+        Saves lda topics to file.
 
         Parameters
         ----------
@@ -1257,7 +1201,7 @@ class Topic_Model_plus():
     
     def save_lda_taxonomy(self, return_df=False, use_labels=False, num_words=10):
         """
-        saves lda taxonomy to file or returns the dataframe to another function
+        Saves lda taxonomy to file or returns the dataframe to another function.
 
         Parameters
         ----------
@@ -1315,13 +1259,14 @@ class Topic_Model_plus():
     
     def save_lda_results(self):
         """
-        saves the taxonomy, coherence, and document topic distribution in one excel file
+        Saves the taxonomy, coherence, and document topic distribution in one excel file.
 
         Returns
         -------
         None.
 
         """
+
         self.__create_folder()
         data = {}
         topics_dict = self.save_lda_topics(return_df=True)
@@ -1336,7 +1281,7 @@ class Topic_Model_plus():
         
     def lda_extract_models(self, file_path):
         """
-        gets lda models from file
+        Loads lda models from file.
 
         Parameters
         ----------
@@ -1348,6 +1293,7 @@ class Topic_Model_plus():
         None.
 
         """
+
         self.lda_num_topics = {}
         self.lda_coherence = {}
         self.lda_models = {}
@@ -1362,7 +1308,7 @@ class Topic_Model_plus():
         
     def lda_visual(self, col):
         """
-        saves pyLDAvis output from lda to file
+        Saves pyLDAvis output from lda to file.
 
         Parameters
         ----------
@@ -1374,6 +1320,7 @@ class Topic_Model_plus():
         None.
 
         """
+
         self.__create_folder()
         mdl = self.lda_models[col]
         topic_term_dists = np.stack([mdl.get_topic_word_dist(k) for k in range(mdl.k)])
@@ -1393,7 +1340,7 @@ class Topic_Model_plus():
     
     def hlda_visual(self, col):
         """
-        saves pyLDAvis output from hlda to file
+        Saves pyLDAvis output from hlda to file.
 
         Parameters
         ----------
@@ -1405,6 +1352,7 @@ class Topic_Model_plus():
         None.
 
         """
+
         self.__create_folder()
         mdl = self.hlda_models[col]
         topics = [k for k in range(mdl.k) if mdl.is_live_topic(k)]
@@ -1519,6 +1467,7 @@ class Topic_Model_plus():
         None.
 
         """
+
         col_for_lda = [self.text_columns[i] for i in [0,2]]
         col_for_hlda = self.text_columns[1]
         
@@ -1584,7 +1533,7 @@ class Topic_Model_plus():
     
     def hlda(self, levels=3, training_iterations=1000, iteration_step=10, **kwargs):
         """
-        performs hlda topic modeling
+        Performs hlda topic modeling.
 
         Parameters
         ----------
@@ -1602,6 +1551,7 @@ class Topic_Model_plus():
         None.
 
         """
+
         start = time()
         self.hlda_models = {}
         self.hlda_coherence = {}
@@ -1627,7 +1577,7 @@ class Topic_Model_plus():
     
     def save_hlda_document_topic_distribution(self, return_df=False):
         """
-        saves hlda document topic distribution to file
+        Saves hlda document topic distribution to file.
 
         Parameters
         ----------
@@ -1656,13 +1606,14 @@ class Topic_Model_plus():
     
     def save_hlda_models(self):
         """
-        saves hlda models to file
+        Saves hlda models to file.
         
         Returns
         -------
         None.
 
         """
+
         self.__create_folder()
         for col in self.text_columns:
             mdl = self.hlda_models[col]
@@ -1671,8 +1622,8 @@ class Topic_Model_plus():
         self.data.save(results_path=os.path.join(self.folder_path,"preprocessed_data.csv"))
         
     def save_hlda_topics(self, return_df=False, p_thres=0.001):
-        """
-        saves hlda topics to file
+        """ 
+        Saves hlda topics to file.
 
         Parameters
         ----------
@@ -1689,6 +1640,7 @@ class Topic_Model_plus():
             topic model results
 
         """
+
         #saving raw topics with coherence
         self.__create_folder()
         dfs = {}
@@ -1738,7 +1690,7 @@ class Topic_Model_plus():
             
     def save_hlda_coherence(self, return_df=False):
         """
-        saves hlda coherence to file
+        Saves hlda coherence to file.
 
         Parameters
         ----------
@@ -1751,6 +1703,7 @@ class Topic_Model_plus():
             Dataframe with each row a topic, column has coherence scores.
 
         """
+
         self.__create_folder()
         coherence_data = {}
         for col in self.text_columns:
@@ -1770,8 +1723,8 @@ class Topic_Model_plus():
         #print("hLDA coherence scores saved to: ",self.folder_path+"/"+"hlda_coherence.csv")
     
     def save_hlda_taxonomy(self, return_df=False, use_labels=False, num_words=10):
-        """
-        saves hlda taxonomy to file
+        """ 
+        Saves hlda taxonomy to file.
 
         Parameters
         ----------
@@ -1828,7 +1781,7 @@ class Topic_Model_plus():
     
     def save_hlda_level_n_taxonomy(self, lev=1, return_df=False):
         """
-        aves hlda taxonomy at level n
+        Saves hlda taxonomy at level n.
 
         Parameters
         ----------
@@ -1875,14 +1828,14 @@ class Topic_Model_plus():
     
     def save_hlda_results(self):
         """
-        saves the taxonomy, level 1 taxonomy, raw topics coherence, and document topic distribution in one excel file
-        
+        Saves the taxonomy, level 1 taxonomy, raw topics coherence, and document topic distribution in one excel file.
 
         Returns
         -------
         None.
 
         """
+
         self.__create_folder()
         data = {}
         data["taxonomy"] = self.save_hlda_taxonomy(return_df=True)
@@ -1898,7 +1851,7 @@ class Topic_Model_plus():
     
     def hlda_extract_models(self, file_path):
         """
-        gets hlda models from file
+        Gets hlda models from file.
 
         Parameters
         ----------
@@ -1910,6 +1863,7 @@ class Topic_Model_plus():
         None.
 
         """
+
         self.hlda_models = {}
         self.hlda_coherence = {}
         for col in self.text_columns:
@@ -1926,7 +1880,7 @@ class Topic_Model_plus():
         
     def hlda_display(self, col, num_words = 5, display_options={"level 1": 1, "level 2": 6}, colors='bupu', filename=''):
         """
-        saves graphviz visualization of hlda tree structure
+        Saves graphviz visualization of hlda tree structure.
 
         Parameters
         ----------
@@ -1951,6 +1905,7 @@ class Topic_Model_plus():
         None.
 
         """
+        
         try:
             from graphviz import Digraph
         except ImportError as error:

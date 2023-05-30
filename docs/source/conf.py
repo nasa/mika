@@ -19,6 +19,8 @@ release = '1.0.0'
 
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.napoleon', 'nbsphinx', 'myst_parser']
 
+source_suffix = ['.rst', '.md']
+
 napoleon_google_docstring = False
 napoleon_numpy_docstring = True
 napoleon_use_param = False

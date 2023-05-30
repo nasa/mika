@@ -4,7 +4,7 @@ Created on Thu Aug 18 15:30:38 2022
 To do: 
     - remove correction list variable? 
     - speed up functions: flatten nested functions
-@author: srandrad
+@author: srandrad, hswalsh
 """
 
 import pandas as pd
@@ -23,44 +23,19 @@ import pkg_resources
 import re
 
 class Data():
-    """ Data utility
-
+    """ 
     Utility for loading and preprocessing datasets to be used in MIKA analyses. Data should be loaded 
     and processed as needed using this class before using methods from KD and IR classes. 
     
     Attributes
     ----------
     name : string, optional
-        name of the dataset. The default is "".
-    
-    Methods
-    -------
-    load
-
-    save
-
-    prepare_data
-
-    sentence_tokenization
-
-    preprocess_data
+        name of the dataset (default is "")
     
     """
 
     def __init__(self, name=""):
-        """
-        initializes a data object
-
-        Parameters
-        ----------
-        name : string, optional
-            name of the dataset. The default is "".
-
-        Returns
-        -------
-        None.
-
-        """
+        # initializes a data object
 
         self.name = name
         self.text_columns = []
@@ -70,33 +45,19 @@ class Data():
         self.__english_vocab = set([w.lower() for w in words.words()])
     
     def __update_ids(self):
-        """
-        updates the document ids variable
-
-        Returns
-        -------
-        None.
-
-        """
+        # updates the document ids variable
 
         self.doc_ids = self.data_df[self.id_col].tolist()
     
     def __set_id_col_to_index(self):
-        """
-        sets the document id column to the dataframe index
-
-        Returns
-        -------
-        None.
-
-        """
+        # sets the document id column to the dataframe index
 
         self.id_col = 'index'
         self.data_df['index'] = self.data_df.index
         
     def __load_preprocessed(self, filename, drop_short_docs=True, drop_short_docs_thres=3, drop_duplicates=True, id_in_dups=True, tokenized=True):
         """
-        uses previously saved preprocessed data
+        Uses previously saved preprocessed data from filename.
 
         Parameters
         ----------
@@ -135,21 +96,7 @@ class Data():
         #print("Preprocessed data extracted from: ", file_name)
     
     def __load_raw(self, filename, kwargs):
-        """
-        loads data from a raw files (.csv or .xlsx)
-
-        Parameters
-        ----------
-        filename : string
-            filename for where the data is stored.
-        kwargs : dict
-            any kwargs for reading in the file.
-
-        Returns
-        -------
-        None.
-
-        """
+        # loads data from a raw files (.csv or .xlsx), where filename (str) is where the data is stored; also takes kwargs for reading the file
 
         if ".csv" in filename: 
             self.data_df = pd.read_csv(open(filename,encoding='utf8',errors='ignore'), **kwargs)
@@ -161,7 +108,7 @@ class Data():
     
     def load(self, filename, preprocessed=False, id_col=None, text_columns=[], name='', load_kwargs={}, preprocessed_kwargs={}):
         """
-        loads in data, either preprocessed or raw
+        Loads in data, either preprocessed or raw.
 
         Parameters
         ----------
@@ -198,8 +145,8 @@ class Data():
         self.__update_ids()
     
     def save(self, results_path=""):
-        """
-        saves preprocessed data
+        """ 
+        Saves preprocessed data.
 
         Parameters
         ----------
@@ -220,19 +167,7 @@ class Data():
         #print("Preprocessed data saves to: ", results_path)
     
     def __combine_columns(self, combine_columns):
-        """
-        combines text columns into one combined text field
-
-        Parameters
-        ----------
-        combine_columns : list
-            list of columns to combine.
-
-        Returns
-        -------
-        None.
-
-        """
+        # combines text columns into one combined text field
 
         combined_text = []
         for i in tqdm(range(0, len(self.data_df)), "Combining Columns…"):
@@ -248,14 +183,7 @@ class Data():
         self.text_columns += self.combined_text_col
         
     def __remove_incomplete_rows(self):
-        """
-        removes incomplete rows
-
-        Returns
-        -------
-        None.
-
-        """
+        # removes incomplete rows
 
         rows_to_drop = []
         for i in tqdm(range(0, len(self.data_df)), "Removing Incomplete Rows…"):
@@ -266,14 +194,7 @@ class Data():
         self.data_df = self.data_df.reset_index(drop=True)
     
     def __create_unique_ids(self):
-        """
-        creates unique ids for datasets that may have multiple documents under the same id
-
-        Returns
-        -------
-        None.
-
-        """
+        # creates unique ids for datasets that may have multiple documents under the same id
 
         unique_ids = []
         prev_id = None
@@ -294,7 +215,7 @@ class Data():
         
     def prepare_data(self, combine_columns=[], remove_incomplete_rows=True, create_ids=False):
         """
-        Prepares data by creating unique ids, removing and combining rows/cols as defined by user
+        Prepares data by creating unique ids, removing and combining rows/cols as defined by user.
 
         Parameters
         ----------
@@ -323,8 +244,7 @@ class Data():
     
     def sentence_tokenization(self):
         """
-        tokenizes each document in the dataset into sentences. 
-        creates an updated data_df where each sentence has a separate row
+        Tokenizes each document in the dataset into sentences. Creates an updated data_df where each sentence has a separate row.
 
         Returns
         -------
@@ -358,56 +278,19 @@ class Data():
         return
     
     def __remove_quote_marks(self, word_list):
-        """
-        removes quotation marks and brackets from a string
-
-        Parameters
-        ----------
-        word_list : string
-            list of words in string format.
-
-        Returns
-        -------
-        word_list : list
-            list of words in list format.
-
-        """
+        # removes quotation marks and brackets from a string
 
         word_list = word_list.strip("[]").split(", ")
         word_list = [w.replace("'","") for w in word_list]
         return word_list
 
     def __drop_duplicate_docs(self, cols):
-        """
-        drops duplicate rows from a dataset
-
-        Parameters
-        ----------
-        cols : list
-            list of columns used for determining duplicate reports.
-
-        Returns
-        -------
-        None.
-
-        """
+        # drops duplicate rows from a dataset, where cols is list of columns used for determining duplicate reports.
 
         self.data_df = self.data_df.iloc[self.data_df.astype(str).drop_duplicates(subset=cols, keep='first').index,:].reset_index(drop=True)
         
     def __drop_short_docs(self, thres=3):
-        """
-        drops documents with len<thresh from the dataset
-
-        Parameters
-        ----------
-        thres : int, optional
-            threshold for length of a document. The default is 3.
-
-        Returns
-        -------
-        None.
-
-        """
+        # drops documents with len<thresh from the dataset, where thres is threshold for length of a document. The default is 3.
 
         indx_to_drop = []
         for i in range(len(self.data_df)):
@@ -420,62 +303,20 @@ class Data():
         self.data_df = self.data_df.drop(indx_to_drop).reset_index(drop=True)
     
     def __tokenize_texts(self, texts, min_word_len, max_word_len):
-        """
-        tokenizes texts
-
-        Parameters
-        ----------
-        texts : list
-            list of doucment texts.
-        min_word_len : int
-            minimum word length.
-        max_word_len : int
-            maximum word length.
-
-        Returns
-        -------
-        texts : list
-            list of tokenized doucment texts.
-
-        """
+        # tokenizes texts, where min_word_len is the minimum word length as an int and max_word_len is maximum word length as an int
 
         texts = [simple_tokenize(text) for text in texts if not isinstance(text,float)]
         texts = [[word for word in text if len(word)>min_word_len and len(word)<max_word_len] for text in texts if not isinstance(text,float)]
         return texts
         
     def __lowercase_texts(self,texts):
-        """
-        converts all text to lowercase
-
-        Parameters
-        ----------
-        texts : list
-            list of doucment texts.
-
-        Returns
-        -------
-        texts : list
-            list of doucment texts with all letters lowercase.
-
-        """
+        # converts all text to lowercase
 
         texts = [[word.lower() for word in text] for text in texts]
         return texts
     
     def __get_wordnet_pos(self, word):
-        """
-        returns the wordnet pos for a word
-
-        Parameters
-        ----------
-        word : string
-            a word.
-
-        Returns
-        -------
-        None.
-
-        """
+        # returns the wordnet pos for a word
 
         tag = pos_tag([word])[0][1][0].upper()
         tag_dict = {"J": wordnet.ADJ,"N": wordnet.NOUN,"V": wordnet.VERB,"R": wordnet.ADV}
@@ -483,20 +324,7 @@ class Data():
         else: return "unnecessary word"
         
     def __lemmatize_texts(self,texts): 
-        """
-        lemmatizes texts
-
-        Parameters
-        ----------
-        texts : list
-            list of doucment texts.
-
-        Returns
-        -------
-        texts : list
-            list of lemmatized doucment texts.
-
-        """
+        # lemmatizes texts
 
         #why is this so slow?
         lemmatizer = WordNetLemmatizer()
@@ -504,22 +332,7 @@ class Data():
         return texts
         
     def __remove_stopwords(self, texts, domain_stopwords):
-        """
-        removes stop words from texts
-
-        Parameters
-        ----------
-        texts : list
-            list of doucment texts.
-        domain_stopwords : list
-            list of domain specific stopwords.
-
-        Returns
-        -------
-        texts : list
-            list of doucment texts with stopwords removed.
-
-        """
+        # removes stop words from texts, where domain_stopwords is list of domain specific stopwords.
 
         all_stopwords = stopwords.words('english') + domain_stopwords
         all_stopwords = [word.lower() for word in all_stopwords]
@@ -528,20 +341,7 @@ class Data():
         return texts
     
     def __quot_replace(self, word):
-        """
-        replaces 'quot' in words
-
-        Parameters
-        ----------
-        word : string
-            word to be fixed.
-
-        Returns
-        -------
-        word : string
-            word with 'quot' removed.
-
-        """
+        # replaces 'quot' in words
 
         if word not in self.__english_vocab:
             w_tmp = word.replace('quot','')
@@ -550,43 +350,13 @@ class Data():
         return word
     
     def __quot_normalize(self, texts):
-        """
-        replaces 'quot' in words in a set of texts
-
-        Parameters
-        ----------
-        texts : list
-            list of doucment texts.
-
-        Returns
-        -------
-        texts : list
-            list of doucment texts with 'quot' removed from words.
-
-        """
+        # replaces 'quot' in words in a set of texts
 
         texts = [[self.__quot_replace(word) for word in text] for text in texts if not isinstance(text,float)]
         return texts
     
     def __spelling_replace(self, word, sym_spell, correction_list):
-        """
-        replaces a mispelled word with a corrected word
-
-        Parameters
-        ----------
-        word : string
-            word checkd for mispelling.
-        sym_spell : symspell object
-            object used for spell checking.
-        correction_list : list
-            list of mispelled words and their corrections.
-
-        Returns
-        -------
-        word : TYPE
-            DESCRIPTION.
-
-        """
+        # replaces a mispelled word with a corrected word, where sym_spell is a symspell object for spell checking and correction_list is a list of misspelled words and their corrections
 
         if word not in self.__english_vocab and not word.isupper() and not sum(1 for c in word if c.isupper()) > 1:
             suggestions = sym_spell.lookup(word,Verbosity.CLOSEST,           max_edit_distance=2,include_unknown=True,transfer_casing=True)
@@ -596,22 +366,7 @@ class Data():
         return word
     
     def __spellchecker(self, texts, correction_list):
-        """
-        replaces mispelled words with correct words in a collection of texts
-
-        Parameters
-        ----------
-        texts : list
-            list of doucment texts.
-        correction_list : list
-            list of mispelled words and their corrections.
-
-        Returns
-        -------
-        texts : list
-            list of doucment texts with mispelled words corrected.
-
-        """
+        # replaces mispelled words with correct words in a collection of texts, where correction_list is list of mispelled words and their corrections
 
         sym_spell = SymSpell()
         dictionary_path = pkg_resources.resource_filename("symspellpy", "frequency_dictionary_en_82_765.txt")
@@ -620,24 +375,7 @@ class Data():
         return texts
     
     def __segment_replace(self, text, sym_spell, correction_list):
-        """
-        replaces mispelled words joined together with corrected words in a text
-
-        Parameters
-        ----------
-        text : list
-            list of tokens in a text.
-        sym_spell : symspell object
-            object used for spell checking
-        correction_list : list
-            list of mispelled words and their corrections.
-
-        Returns
-        -------
-        text : list
-            list of tokens in a text with words segmented.
-
-        """
+        # replaces mispelled words joined together with corrected words in a text, where sym_spell is object used for spell checking and correction_list is list of mispelled words and their corrections.
 
         for word in text:
             if word not in self.__english_vocab and not word.isupper():
@@ -650,22 +388,7 @@ class Data():
         return text
     
     def __segment_text(self, texts, correction_list):
-        """
-        performs word segmentation on a collection of texts
-
-        Parameters
-        ----------
-        texts : list
-            list of doucment texts.
-        correction_list : list
-            list of mispelled words and their corrections.
-
-        Returns
-        -------
-        texts : list
-            list of doucment texts with words segmented.
-
-        """
+        # performs word segmentation on a collection of texts, where correction_list is list of misspelled words and their corrections
 
         sym_spell = SymSpell()
         dictionary_path = pkg_resources.resource_filename("symspellpy", "frequency_dictionary_en_82_765.txt")
@@ -674,26 +397,7 @@ class Data():
         return texts
         
     def __trigram_texts(self, texts, ngram_range, threshold, min_count):
-        """
-        generates ngrams from a corpus of texts
-
-        Parameters
-        ----------
-        texts : list
-            list of doucment texts.
-        ngram_range : int
-            highest level for ngrams, i.e. most number of words to be considered
-        threshold : int
-            threshold used in gensim phrases
-        min_count : int
-            minimum count an ngram must occur in the corpus to be considered an ngram
-
-        Returns
-        -------
-        ngrams : list
-            list of document texts as ngrams.
-
-        """
+        # generates ngrams from a corpus of texts, where ngram_range is highest level for ngrams, i.e. most number of words to be considered, threshold is threshold used in gensim phrases, and min_count is minimum count an ngram must occur in the corpus to be considered an ngram
 
         #NEEDS WORK - could probably replace with a BERT tokenizer
         #very slow
@@ -734,8 +438,9 @@ class Data():
                         min_count=5, quot_correction=False, spellcheck=False, segmentation=False, 
                         drop_short_docs_thres=3, percent=0.3, drop_na=False, save_words=[], drop_dups=False,
                         min_word_len=2, max_word_len=15):
-        """
-        performs data preprocessing steps as defined by user
+        """ Preprocess data
+        
+        Performs data preprocessing steps as defined by user.
 
         Parameters
         ----------
@@ -824,24 +529,7 @@ class Data():
             return correction_list
                 
     def __remove_words_in_pct_of_docs(self, data_df, pct_=0.3, save_words=[]):
-        """
-        
-
-        Parameters
-        ----------
-        data_df : pandas dataframe
-            dataframe of the dataset
-        pct_ : float, optional
-            removes words in greater than or equal to this percent of documents. The default is 0.3.
-        save_words : list, optional
-            list of words to save from frequent word removal. The default is [].
-
-        Returns
-        -------
-        pandas dataframe
-            self.data_df updated with frequent words removed.
-
-        """
+        # removes words in greater than or equal to pct_ percent of documents. The default is 0.3.
 
         num_docs = len(data_df)
         pct = np.round(pct_*num_docs)

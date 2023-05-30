@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Fri Mar 18 12:33:13 2022
+# Created on Fri Mar 18 12:33:13 2022
+# @author: srandrad
 
-Utility functions for training custom NER models
-
-@author: srandrad
 """
+Description: Utility functions for training custom NER models.       
+"""
+
 import pandas as pd
 import os
 import json
@@ -26,7 +26,7 @@ plt.rcParams["font.family"] = "Times New Roman"
 
 def read_doccano_annots(file, encoding=False):
     """
-    Reads in a .jsonl file containing annotations from doccano
+    Reads in a .jsonl file containing annotations from doccano.
     
     Parameters
     ----------
@@ -41,6 +41,7 @@ def read_doccano_annots(file, encoding=False):
         Dataframe of the annotated document set. 
 
     """
+
     if encoding == False: f = open(file, "r") #safecom 
     else: f = open(file, "r", encoding='utf-8', errors='ignore') #LLIS hannah annots
     list_of_str_jsons = f.read().split("\n")[:-1]#removing last item which is empty
@@ -50,7 +51,7 @@ def read_doccano_annots(file, encoding=False):
 
 def clean_doccano_annots(df):
     """
-    cleans annotated documents
+    Cleans annotated documents.
 
     Parameters
     ----------
@@ -63,6 +64,7 @@ def clean_doccano_annots(df):
         Dataframe of the cleaned annotated document set. 
 
     """
+
     for i in range(len(df)):
         text = df.iloc[i]['data']#.replace("  ", " ")
         label = df.iloc[i]['label']
@@ -73,9 +75,8 @@ def clean_doccano_annots(df):
 
 def clean_annots_from_str(df):
     """
-    
-    cleans annotated documents by removing excess symbols
-    use if the text is a string from a list of words
+    Cleans annotated documents by removing excess symbols.
+    Use if the text is a string from a list of words.
     
     Parameters
     ----------
@@ -88,6 +89,7 @@ def clean_annots_from_str(df):
         Dataframe of the cleaned annotated document set. 
 
     """
+
     cleaned_labels = []
     for label in df['label'].tolist():
         text_lists = []
@@ -103,9 +105,9 @@ def clean_annots_from_str(df):
 
 def clean_text_tags(text, labels): 
     """
-    cleans an individual text and label set by removing extra spaces or punctuation at
+    Cleans an individual text and label set by removing extra spaces or punctuation at
     the beginning or end of a string, fixing annotations that are missing a proceeding
-    or preceeding character, and adding spaces into text that is misisng a space
+    or preceeding character, and adding spaces into text that is misisng a space.
 
     Parameters
     ----------
@@ -124,6 +126,7 @@ def clean_text_tags(text, labels):
         cleaned string corresponding to the labels.
 
     """
+
     #input single text, list of labels [beg, end, tag]
     new_labels = []
     spaces_added = 0
@@ -192,6 +195,7 @@ def identify_bad_annotations(text_df):
         list of tokens that are invalid.
 
     """
+
     inds_with_issues = [i for i in range(len(text_df)) if '-' in text_df.iloc[i]['tags']]
     text_df_issues = text_df.iloc[inds_with_issues][:]
     bad_tokens = []
@@ -202,7 +206,7 @@ def identify_bad_annotations(text_df):
 
 def split_docs_to_sentences(text_df, id_col = 'Tracking #', tags=True): 
     """
-    splits a dataframe of documents into a new dataframe where each sentence from
+    Splits a dataframe of documents into a new dataframe where each sentence from
     each document is in its own row. This is useful for using BERT models with
     maximum character limits.
 
@@ -222,6 +226,7 @@ def split_docs_to_sentences(text_df, id_col = 'Tracking #', tags=True):
         New dataframe where each row is a sentence.
 
     """
+
     #split each document into one row per sentence
     sentence_tags_total = []
     sentences_in_list = []
@@ -248,7 +253,7 @@ def split_docs_to_sentences(text_df, id_col = 'Tracking #', tags=True):
 
 def check_doc_to_sentence_split(sentence_df):
     """
-    tests that tags are preserved during document to sentence split
+    Tests that tags are preserved during document to sentence split.
 
     Parameters
     ----------
@@ -260,6 +265,7 @@ def check_doc_to_sentence_split(sentence_df):
     None.
 
     """
+
     for i in range(len(sentence_df)):
         sent = sentence_df.iloc[i]['sentence']
         num_tokens = len([token.text for token in sent])
@@ -285,6 +291,7 @@ def align_labels_with_tokens(labels, word_ids):
         List of new labels with special token labels added.
 
     """
+
     new_labels = []
     current_word = None
     for word_id in word_ids:
@@ -307,7 +314,7 @@ def align_labels_with_tokens(labels, word_ids):
 
 def tokenize_and_align_labels(sentence_df, tokenizer, align_labels=True):
     """
-    tokenizes text and aligns with labels. Necessary due to subword tokenization with BERT.
+    Tokenizes text and aligns with labels. Necessary due to subword tokenization with BERT.
 
     Parameters
     ----------
@@ -324,6 +331,7 @@ def tokenize_and_align_labels(sentence_df, tokenizer, align_labels=True):
         Tokenized inputw with new labels alligned to corresponding tokens
 
     """
+
     tokenized_inputs = tokenizer(sentence_df["tokens"], is_split_into_words=True)#, padding=True, truncation=True)
     if align_labels==True:
         all_labels = sentence_df["ner_tags"]
@@ -339,6 +347,7 @@ def tokenize(sentence_df, tokenizer):
     """
     Tokenizer used during dataset creation when the input data has already been tokenized.
     Currently unused, can be used to get token ids.
+
     Parameters
     ----------
     sentence_df : pandas DataFrame
@@ -352,6 +361,7 @@ def tokenize(sentence_df, tokenizer):
         list of tokens with corresponding IDs from the tokenizer
 
     """
+
     tokenized_inputs = tokenizer(sentence_df["tokens"], is_split_into_words=True)
     return tokenized_inputs
 
@@ -371,6 +381,7 @@ def compute_metrics(eval_preds, id2label):
     Dict of metrics.
 
     """
+
     logits, labels = eval_preds
     predictions = np.argmax(logits, axis=-1)
     # Remove ignored index (special tokens) and convert to labels
@@ -393,7 +404,7 @@ def compute_metrics(eval_preds, id2label):
 
 def compute_classification_report(labels, preds, pred_labels, label_list):
     """
-    
+    Computes classification report.
 
     Parameters
     ----------
@@ -412,6 +423,7 @@ def compute_classification_report(labels, preds, pred_labels, label_list):
         Output of classification results
 
     """
+
     true_labels = [[label_list[l] for l in label if l != -100] for label in labels]
     predictions = np.argmax(preds, axis=-1)
     labels = pred_labels
@@ -437,6 +449,7 @@ def get_cleaned_label(label):
         Label with BILOU component removed.
 
     """
+
     if "-" in label:
         return label.split("-")[1]
     else:
@@ -444,7 +457,7 @@ def get_cleaned_label(label):
     
 def build_confusion_matrix(labels, preds, pred_labels, label_list, save=False, savepath=""):
     """
-    Creates confusion matrix for the muliclass NER classification
+    Creates confusion matrix for the muliclass NER classification.
 
     Parameters
     ----------
@@ -471,6 +484,7 @@ def build_confusion_matrix(labels, preds, pred_labels, label_list, save=False, s
         List of true labels
 
     """
+
     FONT=14
     true_labels = [get_cleaned_label(label_list[l]) for label in labels for l in label if l != -100 ]
     predictions = np.argmax(preds, axis=-1)
@@ -495,7 +509,7 @@ def build_confusion_matrix(labels, preds, pred_labels, label_list, save=False, s
 
 def read_trainer_logs(filepath, final_train_metrics, final_eval_metrics):
     """
-    Reads training logs stored at a checkpoint to get training metrics
+    Reads training logs stored at a checkpoint to get training metrics.
 
     Parameters
     ----------
@@ -514,6 +528,7 @@ def read_trainer_logs(filepath, final_train_metrics, final_eval_metrics):
         Dataframe of training metrics 
 
     """
+
     df = pd.read_json(filepath)
     eval_dicts = []
     training_dicts = []
@@ -536,7 +551,7 @@ def read_trainer_logs(filepath, final_train_metrics, final_eval_metrics):
 
 def plot_loss(eval_df, training_df, save, savepath):
     """
-    Plots the validation and training loss over training
+    Plots the validation and training loss over training.
 
     Parameters
     ----------
@@ -554,6 +569,7 @@ def plot_loss(eval_df, training_df, save, savepath):
     None.
 
     """
+
     eval_loss = eval_df['eval_loss']
     training_loss = training_df['loss']
     epochs = training_df['epoch'].tolist()
@@ -574,7 +590,7 @@ def plot_loss(eval_df, training_df, save, savepath):
 
 def plot_eval_metrics(eval_df, save, savepath):
     """
-    plots classification metrics on the evaluation set over training
+    Plots classification metrics on the evaluation set over training.
 
     Parameters
     ----------
@@ -590,6 +606,7 @@ def plot_eval_metrics(eval_df, save, savepath):
     None.
 
     """
+
     metrics = ["eval_accuracy", "eval_f1", "eval_precision", "eval_recall"]
     epochs = eval_df['epoch'].tolist()
     plt.figure(figsize=(15, 6))
@@ -609,7 +626,7 @@ def plot_eval_metrics(eval_df, save, savepath):
 
 def plot_eval_results(filepath, final_train_metrics={}, final_eval_metrics={}, save=False, savepath=None, loss=True, metrics=True):
     """
-    PLots evaluation and training metrics as specified using other funcitons.
+    Plots evaluation and training metrics as specified using other functions.
 
     Parameters
     ----------
@@ -633,6 +650,7 @@ def plot_eval_results(filepath, final_train_metrics={}, final_eval_metrics={}, s
     None.
 
     """
+    
     eval_df, training_df = read_trainer_logs(filepath, final_train_metrics, final_eval_metrics)
     if loss == True:
         plot_loss(eval_df, training_df, save, savepath)

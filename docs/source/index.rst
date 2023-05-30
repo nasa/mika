@@ -5,4 +5,4 @@ MIKA
    :maxdepth: 2
  
    readme
-   modules
+   components

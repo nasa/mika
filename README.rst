@@ -89,7 +89,7 @@ issues are present.
 Contributors
 ------------
 `Hannah Walsh <https://github.com/walshh>`_ : Semantic Search capability, Custom Information Retrieval 
-capability, Topic Model Plus, Data utility
+capability, Topic Model Plus, Data utility, Documentation
 
 `Sequoia Andrade <https://github.com/sequoiarose>`_ : FMEA capability, custom NER, Trend Analysis, Topic
 Model Plus, Data utilty, dataset-specific utilities, code review

@@ -9,7 +9,7 @@ class search():
     """
     Class to perform information retrieval using semantic search and an optional reranker.
     
-    PARAMETERS
+    Attributes
     ----------
     data : Data() object
         Data object loaded using mika.utils.Data
@@ -17,11 +17,12 @@ class search():
         name of column to search - use "Combined Text" if it is desired to search all text columns (must first be defined in Data object)
     retrieval_model : SentenceTransformer model
         a sentence transformer model defined according to: https://www.sbert.net/examples/applications/computing-embeddings/README.html?highlight=sentencetransformer#sentence_transformers.SentenceTransformer 
-    reranker_model (optional) : CrossEncoder model
+    reranker_model : CrossEncoder model [optional]
         a cross encoder model defined according to: https://www.sbert.net/docs/package_reference/cross_encoder.html?highlight=crossencoder#sentence_transformers.cross_encoder.CrossEncoder 
     """
 
     def __init__(self, column_to_search, data, retrieval_model, use_reranker=False, reranker_model=None):
+        # initialize search class
         self.retrieval_model = retrieval_model
         self.reranker_model = reranker_model
         self.doc_ids = data.data_df[data.id_col]
@@ -32,6 +33,7 @@ class search():
         return
     
     def __make_sentence_corpus(self):
+        # break down documents in corpus into lists of sentences
         self.sentence_corpus = []
         self.sentence_doc_idx = []
         i = 0
@@ -43,6 +45,7 @@ class search():
             i = i + 1
 
     def __make_passages(self, retrieved_docs, retrieved_doc_ids, passage_length=3):
+        # divide corpus into list of passages
         passage_corpus = []
         passage_doc_idx = []
         i = 0
@@ -60,12 +63,12 @@ class search():
         """
         Compute sentence embeddings for the corpus.
         
-        PARAMETERS
+        Parameters
         ----------
         savepath : str
             Path to save sentence embeddings
         
-        RETURNS
+        Returns
         -------
         None
         """
@@ -79,12 +82,12 @@ class search():
         """
         Load previously computed sentence embeddings.
         
-        PARAMETERS
+        Parameters
         ----------
         filepath : str
             Path to previously saved sentence embeddings
             
-        RETURNS
+        Returns
         -------
         None
         """
@@ -93,6 +96,7 @@ class search():
         self.sentence_corpus_embeddings = torch.from_numpy(embeddings_as_numpy)
     
     def __semantic_search(self, query, return_k=1):
+        # perform semantic search using sentence embeddings and query (also computes query embedding)
         k_range = range(0,return_k)
         query_embedding = self.retrieval_model.encode(query, convert_to_tensor=True)
         hits = util.semantic_search(query_embedding, self.sentence_corpus_embeddings, top_k=return_k)
@@ -106,6 +110,7 @@ class search():
         return top_hits
 
     def __rerank(self, query, top_hits, use_passages):
+        # rerank the semantic search results using a cross encoder
         if use_passages == True:
             rerank_corpus, rerank_doc_idx = self.__make_passages(top_hits['top_hit_text'], top_hits['top_hit_doc'], passage_length=3)
         else:
@@ -131,7 +136,7 @@ class search():
         """
         Run the search using a query and loaded corpus embeddings. 
         
-        PARAMETERS
+        Parameters
         ----------
         query : str
             Query to search
@@ -140,7 +145,7 @@ class search():
         return_k : int
             Number of results to return (must be less than or equal to rank_k)
         
-        RETURNS
+        Returns
         -------
         ranked_hits : DataFrame
             Doc ID, scores, and text of top k hits, structured in a DataFrame

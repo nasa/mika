@@ -2,11 +2,13 @@ kd package
 ==========
 
 .. autoclass:: kd.FMEA
+    :members:
 
-.. autoclass:: kd.NER
+.. autoclass:: kd.Topic_Model_plus
+    :members:
 
-.. autoclass:: kd.risk_matrix
+.. automodule:: kd.NER
+    :members:
 
-.. autoclass:: kd.topic_model_plus
-
-.. autoclass:: kd.trend_analysis
+.. automodule:: kd.trend_analysis
+    :members:
