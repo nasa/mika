@@ -14,6 +14,7 @@ import pandas as pd
 import numpy as np
 import sys, os
 from torch import cuda
+import pathlib
 sys.path.append(os.path.join(".."))
 from mika.utils import Data
 
@@ -21,14 +22,16 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 #os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 #os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
 
-contributing_factors = ['Human Factors', #'Weather', #'Software and Automation', 
-                        'Procedure', #'Airport', 'Airspace Structure', 
+contributing_factors = ['Human Factors', 
+                        'Weather', 
+                        'Procedure', 
                         'Aircraft' 
-                        ]#'Environment - Non Weather Related']
-checkpoint = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),"models", "SafeAeroBERT", "checkpoint-1000")
+                        ]
+checkpoint = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir)),"models", "SafeAeroBERT_v2", "checkpoint-13000")
 
-model_checkpoints = [#"allenai/scibert_scivocab_uncased", 
-                     "bert-base-uncased", checkpoint] #add safeaerbert
+model_checkpoints = ["allenai/scibert_scivocab_uncased", 
+                     "bert-base-uncased", 
+                     checkpoint] 
 
 def get_most_recent_checkpoint(save_name, contributing_factor):
     rootdir = os.path.join(os.getcwd(), f"{contributing_factor}-{save_name}-finetuned")
@@ -36,7 +39,7 @@ def get_most_recent_checkpoint(save_name, contributing_factor):
         return None
     checkpoints = []
     for subdir, dirs, files in os.walk(rootdir):
-        if 'checkpoint' in subdir: 
+        if 'checkpoint' in subdir and 'finetuned' not in subdir: 
             checkpoints.append(int(subdir.split("-")[-1]))
     if checkpoints == []:
         return None
@@ -46,6 +49,9 @@ def get_most_recent_checkpoint(save_name, contributing_factor):
     
 def train_classifier(tokenizer, model, encoded_dataset, contributing_factor, compute_metrics, model_name, batch_size=4):
     save_name = model_name.split("/")[-1]
+    if "checkpoint" in model_name:
+        path = pathlib.PurePath(model_name)
+        save_name = path.name
     args = TrainingArguments(
     f"{contributing_factor}-{save_name}-finetuned",
     evaluation_strategy = "epoch",
@@ -55,15 +61,14 @@ def train_classifier(tokenizer, model, encoded_dataset, contributing_factor, com
     per_device_eval_batch_size=2,
     num_train_epochs=2,
     weight_decay=0.01,
-    #push_to_hub=False,
-    #gradient_accumulation_steps=8,
-    #save_steps= 10,
-    #gradient_checkpointing=True,
-    #fp16=True,
-    #optim="adafactor",
+    push_to_hub=False,
+    gradient_accumulation_steps=8,
+    save_steps= 10,
+    gradient_checkpointing=True,
+    optim="adafactor",
     save_total_limit = 2 #saves only last 2 checkpoints
     )
-    
+
     trainer = Trainer(
     model,
     args,
@@ -102,8 +107,7 @@ def train_test_model(ASRS_df, contributing_factors, models, train_size, test_siz
             print(model_checkpoint, "-----", contributing_factor)
             cuda.empty_cache()
             encoded_dataset = prepare_data(X_train, y_train, X_val, y_val, X_test, y_test, contributing_factor, tokenizer)
-            print(encoded_dataset)
-            #classification_model.to('cuda')
+            classification_model.to('cuda')
             trainer = train_classifier(tokenizer, classification_model, encoded_dataset, contributing_factor, compute_metrics, model_checkpoint, batch_size=batch_size)
             precision, recall, fscore, accuracy = evaluate_test_set(trainer, encoded_dataset, data_type='test', average='weighted')
             test_results[model_checkpoint].append(accuracy)
@@ -225,12 +229,12 @@ def compute_metrics(eval_predictions):
             "accuracy": accuracy}
 if __name__ == '__main__':
     #load in data
-    ASRS_file = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),'data/ASRS/ASRS_1988_2022.csv')
+    ASRS_file = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir)),'data/ASRS/ASRS_1988_2022_cleaned.csv')
     ASRS_id_col = 'ACN'
     ASRS_text_cols = ['Report 1', 'Report 1.1', 'Report 2',	'Report 2.1', 'Report 1.2']
     ASRS = Data()
     ASRS.load(ASRS_file, id_col=ASRS_id_col, text_columns=ASRS_text_cols)
     ASRS.prepare_data(combine_columns=ASRS_text_cols, remove_incomplete_rows=False)
-    ASRS_df = ASRS.data_df
+    ASRS_df = ASRS.data_df.loc[ASRS.data_df["Combined Text"]!=""].reset_index(drop=True)
     
-    test_results_df, train_results_df, val_results_df, combined_results = train_test_model(ASRS_df, contributing_factors, model_checkpoints, train_size=100, test_size=50, val_size=50, compute_metrics=compute_metrics, save_results=True, batch_size=4)
+    test_results_df, train_results_df, val_results_df, combined_results = train_test_model(ASRS_df, contributing_factors, model_checkpoints, train_size=8000, test_size=1000, val_size=1000, compute_metrics=compute_metrics, save_results=True, batch_size=4)

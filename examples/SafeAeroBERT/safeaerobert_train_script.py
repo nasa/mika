@@ -27,14 +27,14 @@ import os
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 #load training data: ASRS, NTSB
-ASRS_file = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),'data/ASRS/ASRS_1988_2022_cleaned.csv')
+ASRS_file = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir)),'data/ASRS/ASRS_1988_2022_cleaned.csv')
 ASRS_id_col = 'ACN'
 ASRS_text_cols = ['Report 1', 'Report 1.1', 'Report 2',	'Report 2.1', 'Report 1.2']
 ASRS = Data()
 ASRS.load(ASRS_file, id_col=ASRS_id_col, text_columns=ASRS_text_cols)
 ASRS_df = ASRS.data_df
 
-NTSB_file = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),'data/NTSB/ntsb_full_narratives.csv')
+NTSB_file = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir)),'data/NTSB/ntsb_full_narratives.csv')
 NTSB_id_col = 'ev_id'
 NTSB_text_cols = ['narr_accp', 'narr_accf', 'narr_cause', 'narr_inc', 'REMARKS', 'CAUSE']
 NTSB = Data()
@@ -88,7 +88,7 @@ print(model.device)
 #training set up
 data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer)
 args = TrainingArguments(
-    os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),"models/SafeAeroBERT_v2"),
+    os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir)),"models/SafeAeroBERT_v2"),
     evaluation_strategy="no",
     save_strategy="steps",
     learning_rate=1e-5,
@@ -118,14 +118,14 @@ trainer = Trainer(
 
 def run_training():
     try:
-        rootdir = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),"models", "SafeAeroBERT_v2")
+        rootdir = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir)),"models", "SafeAeroBERT_v2")
         checkpoints = []
         for subdir, dirs, files in os.walk(rootdir):
             if 'checkpoint' in subdir: 
                 checkpoints.append(int(subdir.split("-")[-1]))
         if checkpoints != []:
             most_recent_checkpoint = str(max(checkpoints))
-            checkpoint = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),"models", "SafeAeroBERT_v2", "checkpoint-"+most_recent_checkpoint)
+            checkpoint = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir)),"models", "SafeAeroBERT_v2", "checkpoint-"+most_recent_checkpoint)
             train_result = trainer.train(checkpoint)
         else:
             train_result = trainer.train()
@@ -142,6 +142,6 @@ trainer.save_model()
 metrics=trainer.evaluate()
 #final_eval_metrics = metrics
 num_steps = trainer.state.max_steps
-filename = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),"models", "SafeAeroBERT", "checkpoint-"+str(num_steps), "trainer_state.json")
+filename = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir)),"models", "SafeAeroBERT", "checkpoint-"+str(num_steps), "trainer_state.json")
 plot_eval_results(filename, save=True, savepath="SafeAeroBERT_", #final_train_metrics=final_train_metrics, final_eval_metrics=final_eval_metrics, 
                 loss=True, metrics=False)
