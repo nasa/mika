@@ -12,17 +12,19 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/nasa/mika.git",
-    packages=find_packages(exclude=["test"]),
+    download_url="",
+    keywords=["Natural Language Processing", "Knowledge Management"],
+    packages=find_packages(exclude=["test", "examples", "docs", "data"]),
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: ",
-        "Operating System :: Linux and Windows",
+        "License :: NOSA",
+        "Operating System :: Linux, Window, and Mac",
         'Development Status :: 3 - Alpha'
         ],
-    python_requires='>=3',
+    python_requires='>=3.8',
     install_requires=[
         'BERTopic', 'datasets', 'gensim', 'matplotlib', 'nltk', 'numpy', 'octis', 'pandas',
         'pathlib', 'pingouin', 'pkg_resources', 'pyLDAvis', 'regex', 'scikit-learn', 'scipy', 'seaborn',
-        'sentence-transformers', 'spacy', 'symspellpy', 'tomotopy', 'torch', 'transformers', 'wordcloud'
+        'sentence-transformers', 'spacy', 'symspellpy', 'tomotopy', 'transformers', 'wordcloud'
         ]
 )

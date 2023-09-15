@@ -292,6 +292,8 @@ def create_table(docs, frequency, preprocessed_df, id_field, categories, subcate
                 severities[hazard][year].append(doc_df.at[0, 'severity']) #safecom_severity(doc_df.iloc[0]['Persons Onboard'], doc_df.iloc[0]['Injuries'], doc_df.iloc[0]['Damages']))
             rates[hazard][year] = frequency[hazard][year]/total_docs_per_year[year]
             total_hazard_freq[hazard] += frequency[hazard][year]
+            if severities[hazard][year]==[]:
+                severities[hazard][year] = [0]
         total_rates[hazard] = round(total_hazard_freq[hazard]/len(time_period), 3)
         total_severities_hazard[hazard] = round(np.average([sev for year in severities[hazard] for sev in severities[hazard][year]]),3)
     table["Frequency"] = [total_hazard_freq[hazard] for hazard in total_hazard_freq]

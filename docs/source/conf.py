@@ -4,22 +4,22 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
 import sys, os
-sys.path.insert(0, os.path.abspath('../../mika/'))
+sys.path.insert(0, os.path.abspath('../../'))
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'MIKA'
-copyright = '2023, Hannah Walsh and Sequoia Andrade'
+copyright = 'Copyright © 2023 United States Government as represented by the Administrator of the National Aeronautics and Space Administration. All Rights Reserved'
 author = 'Hannah Walsh and Sequoia Andrade'
 release = '1.0.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.napoleon', 'nbsphinx', 'myst_parser']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.napoleon', 'nbsphinx', 'myst_parser', 'nbsphinx_link']
 
-source_suffix = ['.rst', '.md']
+source_suffix = ['.rst', '.md', '.ipynb', '.nblink', '.py']
 
 napoleon_google_docstring = False
 napoleon_numpy_docstring = True

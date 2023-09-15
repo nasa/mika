@@ -222,7 +222,7 @@ class test_Data(unittest.TestCase):
         self.test_class.id_col = self.test_id_col
         temp_df = self.test_preprocessed_df.copy()
         for i in range(5):
-            temp_df = temp_df.append(self.test_preprocessed_df.iloc[0][:])
+            temp_df = pd.concat([temp_df, self.test_preprocessed_df.iloc[0:1][:]], axis = 0).reset_index(drop=True)
         self.test_class.data_df = temp_df
         self.test_class.text_columns = ["text"]
         texts = self.test_class.data_df["text"]
@@ -305,8 +305,8 @@ class test_Data(unittest.TestCase):
         pd.testing.assert_frame_equal(self.test_class.data_df, self.test_df)
         #add 2 dups, should drop them
         temp_df = self.test_df.copy()
-        temp_df = temp_df.append(self.test_df.iloc[0][:])
-        temp_df = temp_df.append(self.test_df.iloc[0][:])
+        temp_df = pd.concat([temp_df, self.test_df.iloc[0:1][:]], axis=0)
+        temp_df = pd.concat([temp_df, self.test_df.iloc[0:1][:]], axis=0).reset_index(drop=True)
         self.test_class.data_df = temp_df
         self.test_class._Data__drop_duplicate_docs(cols=self.test_text_cols)
         pd.testing.assert_frame_equal(self.test_class.data_df, self.test_df)

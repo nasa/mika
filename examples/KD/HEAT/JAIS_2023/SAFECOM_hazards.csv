@@ -2,24 +2,24 @@ Category,Subcategory,Hazards,Frequency,Rate,Severity
 Airspace,Intrusion,Intrusion,676,26.0,0.01
 Airspace,Intrusion,Airspace Control Hazards,732,28.154,0.078
 Hazard,Communications,Radio Malfunction,680,26.154,0.041
-Hazard,Communications,Jumper Operations Hazards,138,5.308,2.203
-Hazard,Mission Equipment,Prescribed Burn Operations Failure,311,11.962,0.186
-Hazard,Other,Load Limits Exceeded,193,7.423,0.145
+Hazard,Communications,Jumper Operations Hazards,138,5.308,2.171
+Hazard,Mission Equipment,Prescribed Burn Operations Failure,311,11.962,0.185
+Hazard,Other,Load Limits Exceeded,193,7.423,0.144
 Hazard,Other,Cargo Letdown Failure,626,24.077,0.28
 Hazard,Other,Door Failure,413,15.885,0.404
 Hazard,Pilot Action,Water Drop Bucket or Tank Failure,608,23.385,0.349
 Hazard,Pilot Action,In-flight Collision,707,27.192,0.748
-Hazard,Policy Deviation,Inadequate PPE,92,3.538,0.337
+Hazard,Policy Deviation,Inadequate PPE,92,3.538,0.333
 Hazard,Policy Deviation,Personnel Duty Hours Exceeded,225,8.654,0.102
-Hazard,Policy Deviation,Medivac,143,5.5,2.224
+Hazard,Policy Deviation,Medivac,143,5.5,2.178
 Hazard,Weather,Severe Weather,499,19.192,0.449
 Maintenance,Airframe,Structural Damage,505,19.423,0.626
 Maintenance,Chip Light,On-board Caution Light Illuminates,1809,69.577,0.109
-Maintenance,Electrical,Avionics Malfunction,214,8.231,0.15
+Maintenance,Electrical,Avionics Malfunction,214,8.231,0.148
 Maintenance,Electrical,Electrical Failure,727,27.962,0.118
 Maintenance,Engine,Water or Retardant Loading & Jettison Failure,427,16.423,0.18
 Maintenance,Engine,Engine Malfunction,2638,101.462,0.116
-Maintenance,Flight Controls,Control Surface Damage,195,7.5,0.338
+Maintenance,Flight Controls,Control Surface Damage,195,7.5,0.337
 Maintenance,Fuel,Fuel System Malfunction,577,22.192,0.085
 Maintenance,Hydraulic,Hydraulic Fluid Leaks and Malfunctions,449,17.269,0.131
 Maintenance,Landing Gear,Landing Gear Malfunction,519,19.962,0.366

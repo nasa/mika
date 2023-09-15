@@ -6,12 +6,12 @@ requires CUDA GPU set up for transformers and spacy
 
 @author: srandrad
 """
+
 import os
 import pandas as pd
 import numpy as np
 from transformers import Trainer, pipeline, TrainingArguments, AutoTokenizer, DataCollatorForTokenClassification, BertForTokenClassification
 from mika.kd.NER import build_confusion_matrix, compute_classification_report, split_docs_to_sentences, read_doccano_annots, clean_doccano_annots
-#from models import FMEA_NER
 from datasets import load_from_disk, Dataset
 from torch import cuda, tensor
 import torch
@@ -28,60 +28,31 @@ device = 'cuda' if cuda.is_available() else 'cpu'
 
 class FMEA():
     """
-    A class used for generated FMEAs from a data set of reports
+    A class used for generated FMEAs from a data set of reports.
     
     Attributes
-    -----------
+    ----------
     
-    Methods
-    -----------
-    load_model(self, model_checkpoint=None):
-        loads custom NER model
-    load_data(self, filepath='', df=None, formatted=False, text_col="Narrative", id_col="Tracking #", label_col="labels"):
-        loads are preprocesses data for NER
-    predict(self):
-        performs NER
-    get_entities_per_doc(self, pred=True):
-        gets all the entities for each document
-    group_docs_with_meta(self, grouping_col='UAS_cleaned', cluster_by=['CAU', 'MOD'], additional_cols=['Mission Type']):
-        groups docs into fmea rows using metadata. Under development.
-    group_docs_manual(self, filename='', grouping_col='Mode', additional_cols=['Mission Type'], sample=1):
-        groups docs into fmea rows according to a file manually defining which docs go in which row
-    post_process_fmea(self, rows_to_drop=[], id_name='SAFECOM', phase_name='Mission Type', max_words=20):
-        post processes fmea by including the operational phase, cleaning sub-word tokens, and truncating the number of words per cell in the FMEA
-    calc_frequency(self, year_col=''):
-        calculates the frequency for each FMEA row and assigns it a category
-    calc_severity(self, severity_func, from_file=False, file_name='', file_kwargs={}):
-        calculates the severity for each FMEA row
-    calc_risk(self):
-        calculates the risk for each FMEA row as the product of severity and frequency
-    build_fmea(self, severity_func, group_by, group_by_kwargs={}, post_process_kwargs={}):
-        builds FMEA using previous functions
-    display_doc(self, doc_id, save=True, output_path="", colors_path=None, pred=True):
-        displays an annotated document, either from NER outputs or manually labeled data.
     """
     
     __english_vocab = set([w.lower() for w in words.words()])
     
     def __init__(self):
-        """
-        initializes FMEA object
-
-        Returns
-        -------
-        None.
-
-        """
+        # initializes FMEA object
+        
         return
     
-    def load_model(self, model_checkpoint=None):
+    def load_model(self, model_checkpoint="NASA-AIML/MIKA_BERT_FMEA_NER", device=-1):
         """
-        Loads in a fine-tuned custom NER model trained to extract FMEA entities
-        If no checkpoint is passed, the custom model from MIKA is used
+        Loads in a fine-tuned custom NER model trained to extract FMEA entities. 
+        If no checkpoint is passed, the custom model from MIKA is used.
+
         Parameters
         ----------
         model_checkpoint : string, optional
             model check point, can be from huggingface or a path from personal device
+        device : int, optional
+            device to run model on. Default is -1 to run on cpu
 
         Returns
         -------
@@ -89,9 +60,9 @@ class FMEA():
 
         """
         if model_checkpoint:
-            self.token_classifier = pipeline("token-classification", model=model_checkpoint, aggregation_strategy="simple", device=-1)#sets model on cpu
-        #else:
-        #    self.token_classifier = FMEA_NER
+            self.token_classifier = pipeline("token-classification", model=model_checkpoint, aggregation_strategy="simple", device=device)
+
+
     def load_data(self, text_col, id_col, filepath='', df=None, formatted=False, label_col="labels"):
         """
         Loads data to prepare for FMEA extraction. 
@@ -100,6 +71,7 @@ class FMEA():
         Can also instead input a dataframe already loaded in.
         Can also instead input a huggingface dataset object location.
         Saves data formatted to input into the NER model.
+        Requires spacy en_core_web_trf downloaded.
 
         Parameters
         ----------
@@ -122,6 +94,7 @@ class FMEA():
         None.
 
         """
+
         self.id_col = id_col
         self.text_col = text_col
         if formatted == True:
@@ -165,21 +138,23 @@ class FMEA():
             
     def predict(self):
         """
-        Performs named entity recognition on the input data
+        Performs named entity recognition on the input data.
+
         Returns
         -------
         Preds: 
             Predicted entities per each document
 
         """
+
         self.preds = self.token_classifier(self.input_data)
         return self.preds
     
     def evaluate_preds(self, cm=True, class_report=True): 
-        """
-        
+        """ 
         Can only be used if the input data is labeled. 
         Evaluates the performance of the NER model against labeled data.
+
         Parameters
         ----------
         cm : Boolean, optional
@@ -193,6 +168,7 @@ class FMEA():
             Dict containing confusion matrix and classification report if specified.
 
         """
+
         #probably wont work with the pipeline... do this in training
         
         return_vals = {}
@@ -205,13 +181,6 @@ class FMEA():
         return return_vals
     
     def __update_entities_per_sentence(self):
-        """
-        
-        Returns
-        -------
-        None.
-
-        """
         #for each id: get len of text, add on to stop and start for each new sentence. 
         ids = self.raw_df[self.id_col].tolist()
         doc_ents = []
@@ -252,6 +221,7 @@ class FMEA():
             pandas DataFrame with documents as rows, entities as columns
 
         """
+
         if pred==True:
             self.data_df['predicted entities'] = self.preds
         else: 
@@ -297,6 +267,7 @@ class FMEA():
             The grouped FMEA dataframe
 
         """
+
         if additional_cols != []:
             for col in additional_cols:
                 self.data_df[col] = self.raw_df[col].tolist()
@@ -332,6 +303,7 @@ class FMEA():
         """
         Creates FMEA rows by grouping together documents according to values manually defined in a separate file.
         Loads in the file and then aggregates the data. Sample IDs for documents in each row are created as well.
+        
         Parameters
         ----------
         filename : string
@@ -349,6 +321,7 @@ class FMEA():
             The grouped FMEA dataframe
 
         """
+
         if '.xlsx' in filename: 
             manual_groups = pd.read_excel(filename)
         elif '.csv' in filename:
@@ -413,6 +386,7 @@ class FMEA():
             FMEA post processed DataFrame
 
         """
+
         #clean data in NER columns: remove duplicate words, form tokens from token pieces
         for i in self.grouped_df.index:
             for ent in ['CAU', 'MOD', 'EFF', 'CON', 'REC']:
@@ -476,6 +450,7 @@ class FMEA():
         None.
 
         """
+
         if config == '/':
             self.raw_df['Year'] = [self.raw_df.at[i,year_col].split('/')[-1].split(" ")[0] for i in range(len(self.raw_df))]
         elif config == 'id':
@@ -496,6 +471,7 @@ class FMEA():
             Grouped df with requency column added
 
         """
+
         #something is wrong with the frequency
         
         self.grouped_df[self.id_col]
@@ -553,6 +529,7 @@ class FMEA():
         None.
 
         """
+
         #severity func calculates the severity for each report in the raw df
         if from_file == False:
             self.raw_df = severity_func(self.raw_df)
@@ -576,15 +553,15 @@ class FMEA():
     
     def calc_risk(self):
         """
-        
         Calculates risk as the product of severity and frequency.
-        Adds risk column to the grouped df
+        Adds risk column to the grouped df.
 
         Returns
         -------
         None.
 
         """
+
         self.grouped_df['risk'] = self.grouped_df['severity'] * self.grouped_df['frequency']
         return
     
@@ -611,6 +588,7 @@ class FMEA():
         None.
 
         """
+
         self.get_entities_per_doc()
         if group_by == 'manual':
             self.group_docs_manual(**group_by_kwargs)
@@ -648,6 +626,7 @@ class FMEA():
             DESCRIPTION.
 
         """
+        
         #see https://spacy.io/usage/visualizers
         #doc = self.data_df.loc[self.data_df[self.id_col]==str(doc_id)].reset_index(drop=True)
         if pred == False:

@@ -227,6 +227,7 @@ def compute_metrics(eval_predictions):
             "recall": recall,
             "f1": fscore, 
             "accuracy": accuracy}
+
 if __name__ == '__main__':
     #load in data
     ASRS_file = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir)),'data/ASRS/ASRS_1988_2022_cleaned.csv')

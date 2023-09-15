@@ -149,7 +149,7 @@ class test_NER(unittest.TestCase):
                             [10, 15, 'adj'],
                             [16, 19, 'animal'],
                             [50, 55, 'adj']]
-        text_df = text_df.append(pd.DataFrame({'id':[11], 'data':[new_doc], 'label':[new_doc_labels]})).reset_index(drop=True)
+        text_df = pd.concat([text_df, pd.DataFrame({'id':[11], 'data':[new_doc], 'label':[new_doc_labels]})]).reset_index(drop=True)
         docs = text_df['data'].to_list()
         docs = [nlp(doc) for doc in docs]
         text_df['docs'] = docs
@@ -186,7 +186,7 @@ class test_NER(unittest.TestCase):
                             [10, 15, 'adj'],
                             [16, 19, 'animal'],
                             [50, 55, 'adj']]
-        text_df = text_df.append(pd.DataFrame({'id':[11], 'data':[new_doc], 'label':[new_doc_labels]})).reset_index(drop=True)
+        text_df = pd.concat([text_df,(pd.DataFrame({'id':[11], 'data':[new_doc], 'label':[new_doc_labels]}))]).reset_index(drop=True)
         docs = text_df['data'].to_list()
         docs = [nlp(doc) for doc in docs]
         text_df['docs'] = docs

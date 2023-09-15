@@ -1,5 +1,7 @@
 ir package
 ==========
 
-.. autoclass:: ir.search
+mika.ir.search
+---------------
+.. autoclass:: mika.ir.search
     :members:

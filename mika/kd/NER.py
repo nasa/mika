@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 import copy
 import matplotlib.cm as cm 
 import matplotlib
-matplotlib.style.use("seaborn")
+matplotlib.style.use("seaborn-v0_8")
 plt.rcParams["font.family"] = "Times New Roman"
 
 #device = 'cuda' if cuda.is_available() else 'cpu'
@@ -47,6 +47,7 @@ def read_doccano_annots(file, encoding=False):
     list_of_str_jsons = f.read().split("\n")[:-1]#removing last item which is empty
     list_of_dict_jsons = [json.loads(data) for data in list_of_str_jsons]
     df = pd.DataFrame(list_of_dict_jsons)
+    f.close()
     return df
 
 def clean_doccano_annots(df):

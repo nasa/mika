@@ -1,0 +1,9 @@
+﻿topic number,number of documents in topic,topic words,total number of words,number of words,best document,coherence,documents
+0,218,"jettison, crash, crash rescue, jettison load, rescue, jettison retardant, …",1585,250,00-1147,0.805071926,"['97-0077', '98-0027', '98-0116', '98-0154',…]"
+1,80,"silver city, silver, trouble shot, shot, city, trouble, technician, crux, radio technician, …",444,222,00-0267,0.825701749,"['95-0036', '95-0206', '95-0262', '97-0206',,…]"
+2,857,"taxi, ramp, parking, runway, park, taxiway, stop, pit, brake, wing, left, right, …",9772,330,08-0457,0.764096785,"['95-0006', '95-0024', '95-0035', '95-0216', …]"
+3,2692,"tree, bucket, water, dip, site, drop, top, line, dip site, damage, water drop, …",38772,276,12-0768,0.696187669,"['95-0002', '95-0013', '95-0039', '95-0042', …]"
+4,153,"spring, hot spring, nothing ordinary, ordinary, warm, warm spring, …",866,282,02-0834,0.846775067,"['95-0028', '95-0029', '95-0236', '97-0192',…]"
+5,332,"caution, master caution, master, illuminate, light, light illuminate, caution light, …",2696,158,12-0501,0.843005717,"['97-0075', '98-0144', '98-0206', '98-0471', …]"
+6,157,"ppe, wear, helmet, flight helmet, glove, nomex, suit, flight suit, proper ppe, …",1255,253,12-0593,0.87565009,"['95-0039', '95-0118', '95-0123', '95-0142',…]"
+7,1162,"tfr, intrusion, fly, drone, agl, south, law, air, enforcement, area, air attack, …",14831,293,03-0231,0.66449779,"['95-0002', '95-0007', '95-0014', '95-0163',…]"

@@ -57,20 +57,20 @@ class test_topic_modeling_methods(unittest.TestCase):
             test_lda.lda_visual(col)
         file_path = test_lda.folder_path #path from saved
         
-        doc_topics1 = pd.read_csv(os.path.join(file_path,"lda_topic_dist_per_doc.csv"))#.applymap(str)
-        tax1 = pd.read_csv(os.path.join(file_path,"lda_taxonomy.csv")).applymap(str)
-        coherence_1 = pd.read_csv(os.path.join(file_path,"lda_coherence.csv")).round(3).applymap(str)
+        doc_topics1 = pd.read_csv(os.path.join(file_path,"lda_topic_dist_per_doc.csv"), index_col=0)#.applymap(str)
+        tax1 = pd.read_csv(os.path.join(file_path,"lda_taxonomy.csv"), index_col=0).applymap(str)
+        coherence_1 = pd.read_csv(os.path.join(file_path,"lda_coherence.csv"), index_col=0).round(3).applymap(str)
         results1 = pd.read_excel(os.path.join(file_path,"lda_results.xlsx"), sheet_name=None)
         topics1 = {}
         for attr in self.test_data.text_columns:
-            topics1[attr] = pd.read_csv(os.path.join(file_path,attr+"_lda_topics.csv")).round(3).applymap(str)
+            topics1[attr] = pd.read_csv(os.path.join(file_path,attr+"_lda_topics.csv"), index_col=0).round(3).applymap(str)
 
         #testing results sheets are correct
-        pd.testing.assert_frame_equal(results1['taxonomy'].applymap(str), tax1.drop(['Unnamed: 0'], axis=1))
-        pd.testing.assert_frame_equal(results1['coherence'].round(3).applymap(str), coherence_1.drop(['Unnamed: 0'], axis=1))
-        pd.testing.assert_frame_equal(results1['document topic distribution'], doc_topics1.drop(['Unnamed: 0'], axis=1))
+        pd.testing.assert_frame_equal(results1['taxonomy'].applymap(str), tax1)
+        pd.testing.assert_frame_equal(results1['coherence'].round(3).applymap(str), coherence_1)
+        pd.testing.assert_frame_equal(results1['document topic distribution'], doc_topics1)
         for attr in self.test_data.text_columns:
-            pd.testing.assert_frame_equal(results1[attr].round(3).applymap(str), topics1[attr].drop(['Unnamed: 0'], axis=1)[results1[attr].columns])
+            pd.testing.assert_frame_equal(results1[attr].round(3).applymap(str), topics1[attr][results1[attr].columns])
         
         #testing functions from bin
         test_lda.lda_extract_models(file_path)
@@ -82,13 +82,13 @@ class test_topic_modeling_methods(unittest.TestCase):
         for col in self.test_data.text_columns:
             test_lda.lda_visual(col)
 
-        doc_topics2 = pd.read_csv(os.path.join(file_path,"lda_topic_dist_per_doc.csv"))#.applymap(str)
-        tax2 = pd.read_csv(os.path.join(file_path,"lda_taxonomy.csv")).applymap(str)
-        coherence_2 = pd.read_csv(os.path.join(file_path,"lda_coherence.csv")).round(3).applymap(str)
+        doc_topics2 = pd.read_csv(os.path.join(file_path,"lda_topic_dist_per_doc.csv"), index_col=0)#.applymap(str)
+        tax2 = pd.read_csv(os.path.join(file_path,"lda_taxonomy.csv"), index_col=0).applymap(str)
+        coherence_2 = pd.read_csv(os.path.join(file_path,"lda_coherence.csv"), index_col=0).round(3).applymap(str)
         results2 = pd.read_excel(os.path.join(file_path,"lda_results.xlsx"), sheet_name=None)
         topics2 = {}
         for attr in self.test_data.text_columns:
-            topics2[attr] = pd.read_csv(os.path.join(file_path,attr+"_lda_topics.csv")).round(3).applymap(str)
+            topics2[attr] = pd.read_csv(os.path.join(file_path,attr+"_lda_topics.csv"), index_col=0).round(3).applymap(str)
 
         #delete test folder/everything in it
         for root, dirs, files in os.walk(file_path):
@@ -106,7 +106,7 @@ class test_topic_modeling_methods(unittest.TestCase):
                 
         #checking we get the same output when using a bin object
         pd.testing.assert_frame_equal(doc_topics1.round(3), doc_topics2.round(3), atol=0.5)
-        self.assertEqual(tax1.equals(tax2), True)
+        self.assertEqual(tax1.equals(tax2), True, (tax1, tax2))
         self.assertEqual(coherence_1.equals(coherence_2), True)
         for attr in self.test_data.text_columns:
             self.assertEqual(topics1[attr].equals(topics2[attr]), True, attr) #this sometimes gives an failed test with the best document
@@ -136,21 +136,21 @@ class test_topic_modeling_methods(unittest.TestCase):
             test_hlda.hlda_visual(col)
         file_path = test_hlda.folder_path
         
-        doc_topics1 = pd.read_csv(os.path.join(file_path,"hlda_topic_dist_per_doc.csv"))#.applymap(str)
-        tax1 = pd.read_csv(os.path.join(file_path,"hlda_taxonomy.csv")).applymap(str)
+        doc_topics1 = pd.read_csv(os.path.join(file_path,"hlda_topic_dist_per_doc.csv"), index_col=0)#.applymap(str)
+        tax1 = pd.read_csv(os.path.join(file_path,"hlda_taxonomy.csv"), index_col=0).applymap(str)
         coherence_1 = pd.read_csv(os.path.join(file_path,"hlda_coherence.csv")).round(3).applymap(str)
-        level_1_tax1 = pd.read_csv(os.path.join(file_path,"hlda_level1_taxonomy.csv")).applymap(str)
+        level_1_tax1 = pd.read_csv(os.path.join(file_path,"hlda_level1_taxonomy.csv"), index_col=0).applymap(str)
         topics1 = {}
         for attr in self.test_data.text_columns:
-            topics1[attr] = pd.read_csv(os.path.join(file_path,attr+"_hlda_topics.csv")).round(3).applymap(str)
+            topics1[attr] = pd.read_csv(os.path.join(file_path,attr+"_hlda_topics.csv"), index_col=0).round(3).applymap(str)
         results1 = pd.read_excel(os.path.join(file_path,"hlda_results.xlsx"), sheet_name=None)
         
         #testing results sheets are correct
-        pd.testing.assert_frame_equal(results1['taxonomy'].applymap(str), tax1.drop(['Unnamed: 0'], axis=1))
-        pd.testing.assert_frame_equal(results1['coherence'].round(3).applymap(str), coherence_1.drop(['Unnamed: 0'], axis=1))
-        pd.testing.assert_frame_equal(results1['document topic distribution'], doc_topics1.drop(['Unnamed: 0'], axis=1))
+        pd.testing.assert_frame_equal(results1['taxonomy'].applymap(str), tax1)
+        pd.testing.assert_frame_equal(results1['coherence'].round(3).applymap(str), coherence_1.drop(["Unnamed: 0"], axis=1))
+        pd.testing.assert_frame_equal(results1['document topic distribution'], doc_topics1)
         for attr in self.test_data.text_columns:
-            pd.testing.assert_frame_equal(results1[attr].round(3).applymap(str), topics1[attr].drop(['Unnamed: 0'], axis=1)[results1[attr].columns])
+            pd.testing.assert_frame_equal(results1[attr].round(3).applymap(str), topics1[attr][results1[attr].columns])
         
         #testing functions from bin
         file_path = test_hlda.folder_path 
@@ -165,13 +165,13 @@ class test_topic_modeling_methods(unittest.TestCase):
             test_hlda.hlda_display(col)
             test_hlda.hlda_visual(col)
         
-        doc_topics2 = pd.read_csv(os.path.join(file_path,"hlda_topic_dist_per_doc.csv"))#.applymap(str)
-        tax2 = pd.read_csv(os.path.join(file_path,"hlda_taxonomy.csv")).applymap(str)
+        doc_topics2 = pd.read_csv(os.path.join(file_path,"hlda_topic_dist_per_doc.csv"), index_col=0)#.applymap(str)
+        tax2 = pd.read_csv(os.path.join(file_path,"hlda_taxonomy.csv"), index_col=0).applymap(str)
         coherence_2 = pd.read_csv(os.path.join(file_path,"hlda_coherence.csv")).round(3).applymap(str)
-        level_1_tax2 = pd.read_csv(os.path.join(file_path,"hlda_level1_taxonomy.csv")).applymap(str)
+        level_1_tax2 = pd.read_csv(os.path.join(file_path,"hlda_level1_taxonomy.csv"), index_col=0).applymap(str)
         topics2 = {}
         for attr in self.test_data.text_columns:
-            topics2[attr] = pd.read_csv(os.path.join(file_path,attr+"_hlda_topics.csv")).round(3).applymap(str)
+            topics2[attr] = pd.read_csv(os.path.join(file_path,attr+"_hlda_topics.csv"), index_col=0).round(3).applymap(str)
         results2 = pd.read_excel(os.path.join(file_path,"hlda_results.xlsx"), sheet_name=None)
         
         #delete test folder/everything in it
@@ -191,7 +191,7 @@ class test_topic_modeling_methods(unittest.TestCase):
         #checking we get the same output when using a bin object
         pd.testing.assert_frame_equal(doc_topics1.round(3), doc_topics2.round(3), atol=0.5)
         self.assertEqual(tax1.equals(tax2), True)
-        self.assertEqual(coherence_1.equals(coherence_2), True)
+        self.assertEqual(coherence_1.drop(["Unnamed: 0"], axis=1).equals(coherence_2.drop(["Unnamed: 0"], axis=1)), True)
         self.assertEqual(level_1_tax1.equals(level_1_tax2), True)
         for attr in self.test_data.text_columns:
             self.assertEqual(topics1[attr].equals(topics2[attr]), True, attr) #this sometimes gives an failed test with the best document
@@ -220,30 +220,30 @@ class test_topic_modeling_methods(unittest.TestCase):
         #test_bert.save_bert_vis() #too few topics for visualization?
         file_path = test_bert.folder_path
         # load original results
-        doc_topics1 = pd.read_csv(os.path.join(file_path,"BERT_topic_dist_per_doc.csv"))#.applymap(str)
-        coherence1 = pd.read_csv(os.path.join(file_path,"BERT_coherence_u_mass.csv")).round(3).applymap(str)
+        doc_topics1 = pd.read_csv(os.path.join(file_path,"BERT_topic_dist_per_doc.csv"), index_col=0)#.applymap(str)
+        coherence1 = pd.read_csv(os.path.join(file_path,"BERT_coherence_u_mass.csv"), index_col=0).round(3).applymap(str)
         topics1 = {}
         topics_from_probs1 = {}
         for attr in self.raw_test_data.text_columns:
-            topics1[attr] = pd.read_csv(os.path.join(file_path,attr+"_BERT_topics.csv")).round(3).applymap(str)
-            topics_from_probs1[attr] = pd.read_csv(os.path.join(file_path,attr+"_BERT_topics_modified.csv")).applymap(str)
+            topics1[attr] = pd.read_csv(os.path.join(file_path,attr+"_BERT_topics.csv"), index_col=0).round(3).applymap(str)
+            topics_from_probs1[attr] = pd.read_csv(os.path.join(file_path,attr+"_BERT_topics_modified.csv"), index_col=0).applymap(str)
             #check that the number of documents per topic is correct when using from_probs
             total_docs = clean_list(topics_from_probs1[attr], 'documents')
             number_of_docs = [int(i) for i in topics_from_probs1[attr]['number of documents in topic'].tolist()]
             for i in range(len(topics_from_probs1[attr])):
                 self.assertEqual(len(total_docs[i]), number_of_docs[i])
             
-        tax1 = pd.read_csv(os.path.join(file_path,"BERT_taxonomy.csv")).applymap(str)
-        diversity1 =  pd.read_csv(os.path.join(file_path,"BERT_diversity.csv")).round(3).applymap(str)
+        tax1 = pd.read_csv(os.path.join(file_path,"BERT_taxonomy.csv"), index_col=0).applymap(str)
+        diversity1 =  pd.read_csv(os.path.join(file_path,"BERT_diversity.csv"), index_col=0).round(3).applymap(str)
         results1 =  pd.read_excel(os.path.join(file_path,"BERTopic_results.xlsx"), sheet_name=None)
         
         #testing results sheets are correct
-        pd.testing.assert_frame_equal(results1['taxonomy'].applymap(str), tax1.drop(['Unnamed: 0'], axis=1))
-        pd.testing.assert_frame_equal(results1['coherence'].round(3).applymap(str), coherence1.drop(['Unnamed: 0'], axis=1))
-        pd.testing.assert_frame_equal(results1['document topic distribution'], doc_topics1.drop(['Unnamed: 0'], axis=1))
-        pd.testing.assert_frame_equal(results1['topic diversity'].round(3).applymap(str), diversity1.drop(['Unnamed: 0'], axis=1))
+        pd.testing.assert_frame_equal(results1['taxonomy'].applymap(str), tax1)
+        pd.testing.assert_frame_equal(results1['coherence'].round(3).applymap(str), coherence1)
+        pd.testing.assert_frame_equal(results1['document topic distribution'], doc_topics1)
+        pd.testing.assert_frame_equal(results1['topic diversity'].round(3).applymap(str), diversity1)
         for attr in self.raw_test_data.text_columns:
-            pd.testing.assert_frame_equal(results1[attr].round(3).applymap(str), topics1[attr].drop(['Unnamed: 0'], axis=1)[results1[attr].columns])
+            pd.testing.assert_frame_equal(results1[attr].round(3).applymap(str), topics1[attr][results1[attr].columns])
         
         #reduced topics
         test_bert.reduce_bert_topics(num=3, from_probs=True) #some kind of interaction between from probs and coherence????
@@ -258,27 +258,27 @@ class test_topic_modeling_methods(unittest.TestCase):
         #test_bert.save_bert_vis() #too few topics for visualization?
         
         # load reduced results
-        doc_topics_reduced1 = pd.read_csv(os.path.join(file_path,"Reduced_BERT_topic_dist_per_doc.csv"))
-        coherence_reduced1 = pd.read_csv(os.path.join(file_path,"Reduced_BERT_coherence_u_mass.csv")).round(3).applymap(str)
+        doc_topics_reduced1 = pd.read_csv(os.path.join(file_path,"Reduced_BERT_topic_dist_per_doc.csv"), index_col=0)
+        coherence_reduced1 = pd.read_csv(os.path.join(file_path,"Reduced_BERT_coherence_u_mass.csv"), index_col=0).round(3).applymap(str)
         topics_reduced1 = {}
         topics_from_probs_reduced1 = {}
         for attr in self.raw_test_data.text_columns:
-            topics_reduced1[attr] = pd.read_csv(os.path.join(file_path,attr+"_Reduced_BERT_topics.csv")).round(3).applymap(str)
-            topics_from_probs_reduced1[attr] = pd.read_csv(os.path.join(file_path,attr+"_reduced_BERT_topics_modified.csv")).round(3).applymap(str)
+            topics_reduced1[attr] = pd.read_csv(os.path.join(file_path,attr+"_Reduced_BERT_topics.csv"), index_col=0).round(3).applymap(str)
+            topics_from_probs_reduced1[attr] = pd.read_csv(os.path.join(file_path,attr+"_reduced_BERT_topics_modified.csv"), index_col=0).round(3).applymap(str)
             #check that the number of documents per topic is correct when using from_probs
             total_docs = clean_list(topics_from_probs_reduced1[attr], 'documents')
             number_of_docs = [int(i) for i in topics_from_probs_reduced1[attr]['number of documents in topic'].tolist()]
             for i in range(len(topics_from_probs_reduced1[attr])):
                 self.assertEqual(len(total_docs[i]), number_of_docs[i])
             
-        tax_reduced1 = pd.read_csv(os.path.join(file_path,"Reduced_BERT_taxonomy.csv")).applymap(str)
-        diversity_reduced1 =  pd.read_csv(os.path.join(file_path,"Reduced_BERT_diversity.csv")).round(3).applymap(str)
+        tax_reduced1 = pd.read_csv(os.path.join(file_path,"Reduced_BERT_taxonomy.csv"), index_col=0).applymap(str)
+        diversity_reduced1 =  pd.read_csv(os.path.join(file_path,"Reduced_BERT_diversity.csv"), index_col=0).round(3).applymap(str)
         results_reduced1 =  pd.read_excel(os.path.join(file_path,"Reduced_BERTopic_results.xlsx"), sheet_name=None)
         #testing results sheets are correct
-        pd.testing.assert_frame_equal(results_reduced1['taxonomy'].applymap(str), tax_reduced1.drop(['Unnamed: 0'], axis=1))
-        pd.testing.assert_frame_equal(results_reduced1['coherence'].round(3).applymap(str), coherence_reduced1.drop(['Unnamed: 0'], axis=1))
-        pd.testing.assert_frame_equal(results_reduced1['document topic distribution'], doc_topics_reduced1.drop(['Unnamed: 0'], axis=1))
-        pd.testing.assert_frame_equal(results_reduced1['topic diversity'].round(3).applymap(str), diversity_reduced1.drop(['Unnamed: 0'], axis=1))
+        pd.testing.assert_frame_equal(results_reduced1['taxonomy'].applymap(str), tax_reduced1)
+        pd.testing.assert_frame_equal(results_reduced1['coherence'].round(3).applymap(str), coherence_reduced1)
+        pd.testing.assert_frame_equal(results_reduced1['document topic distribution'], doc_topics_reduced1)
+        pd.testing.assert_frame_equal(results_reduced1['topic diversity'].round(3).applymap(str), diversity_reduced1)
         for attr in self.raw_test_data.text_columns:
             pd.testing.assert_frame_equal(results_reduced1[attr].round(3).applymap(str), topics_reduced1[attr][results_reduced1[attr].columns])
         
@@ -294,15 +294,15 @@ class test_topic_modeling_methods(unittest.TestCase):
         test_bert.save_bert_results()
         #test_bert.save_bert_vis() #too few topics for visualization?
         # load original results
-        doc_topics2 = pd.read_csv(os.path.join(file_path,"BERT_topic_dist_per_doc.csv"))#.applymap(str)
-        coherence2 = pd.read_csv(os.path.join(file_path,"BERT_coherence_u_mass.csv")).round(3).applymap(str)
+        doc_topics2 = pd.read_csv(os.path.join(file_path,"BERT_topic_dist_per_doc.csv"), index_col=0)#.applymap(str)
+        coherence2 = pd.read_csv(os.path.join(file_path,"BERT_coherence_u_mass.csv"), index_col=0).round(3).applymap(str)
         topics2 = {}
         topics_from_probs2 = {}
         for attr in self.raw_test_data.text_columns:
-            topics2[attr] = pd.read_csv(os.path.join(file_path,attr+"_BERT_topics.csv")).round(3).applymap(str)
-            topics_from_probs2[attr] = pd.read_csv(os.path.join(file_path,attr+"_BERT_topics_modified.csv")).applymap(str)
-        tax2 = pd.read_csv(os.path.join(file_path,"BERT_taxonomy.csv")).applymap(str)
-        diversity2 =  pd.read_csv(os.path.join(file_path,"BERT_diversity.csv")).round(3).applymap(str)
+            topics2[attr] = pd.read_csv(os.path.join(file_path,attr+"_BERT_topics.csv"), index_col=0).round(3).applymap(str)
+            topics_from_probs2[attr] = pd.read_csv(os.path.join(file_path,attr+"_BERT_topics_modified.csv"), index_col=0).applymap(str)
+        tax2 = pd.read_csv(os.path.join(file_path,"BERT_taxonomy.csv"), index_col=0).applymap(str)
+        diversity2 =  pd.read_csv(os.path.join(file_path,"BERT_diversity.csv"), index_col=0).round(3).applymap(str)
         results2 =  pd.read_excel(os.path.join(file_path,"BERTopic_results.xlsx"), sheet_name=None)
         
         #reduced model
@@ -316,15 +316,15 @@ class test_topic_modeling_methods(unittest.TestCase):
         test_bert.save_bert_results(coherence=True)
         #test_bert.save_bert_vis() #too few topics for visualization?
         # load reduced reuslts
-        doc_topics_reduced2 = pd.read_csv(os.path.join(file_path,"Reduced_BERT_topic_dist_per_doc.csv"))#.applymap(str)
-        coherence_reduced2 = pd.read_csv(os.path.join(file_path,"Reduced_BERT_coherence_u_mass.csv")).round(3).applymap(str)
+        doc_topics_reduced2 = pd.read_csv(os.path.join(file_path,"Reduced_BERT_topic_dist_per_doc.csv"), index_col=0)#.applymap(str)
+        coherence_reduced2 = pd.read_csv(os.path.join(file_path,"Reduced_BERT_coherence_u_mass.csv"), index_col=0).round(3).applymap(str)
         topics_reduced2 = {}
         topics_from_probs_reduced2 = {}
         for attr in self.raw_test_data.text_columns:
-            topics_reduced2[attr] = pd.read_csv(os.path.join(file_path,attr+"_Reduced_BERT_topics.csv")).round(3).applymap(str)
-            topics_from_probs_reduced2[attr] = pd.read_csv(os.path.join(file_path,attr+"_reduced_BERT_topics_modified.csv")).round(3).applymap(str)
-        tax_reduced2 = pd.read_csv(os.path.join(file_path,"Reduced_BERT_taxonomy.csv")).applymap(str)
-        diversity_reduced2 =  pd.read_csv(os.path.join(file_path,"Reduced_BERT_diversity.csv")).round(3).applymap(str)
+            topics_reduced2[attr] = pd.read_csv(os.path.join(file_path,attr+"_Reduced_BERT_topics.csv"), index_col=0).round(3).applymap(str)
+            topics_from_probs_reduced2[attr] = pd.read_csv(os.path.join(file_path,attr+"_reduced_BERT_topics_modified.csv"), index_col=0).round(3).applymap(str)
+        tax_reduced2 = pd.read_csv(os.path.join(file_path,"Reduced_BERT_taxonomy.csv"), index_col=0).applymap(str)
+        diversity_reduced2 =  pd.read_csv(os.path.join(file_path,"Reduced_BERT_diversity.csv"), index_col=0).round(3).applymap(str)
         results_reduced2 =  pd.read_excel(os.path.join(file_path,"Reduced_BERTopic_results.xlsx"), sheet_name=None)
 
         #delete test folder/everything in it

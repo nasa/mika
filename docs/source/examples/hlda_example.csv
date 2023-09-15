@@ -1,0 +1,14 @@
+,topic level,topic number,parent,number of documents in topic,topic words,number of words,best lesson,coherence
+0,0,0,-1,1639,"time, flight, require, control, problem, perform, component, failure, data, however",67747,2496,0.626159891
+1,1,8,0,248,"base reliability, prefer, reliability, implementation method, technical, test benefit, reliability prefer, rationale, benefit, technical rationale",11052,547,0.761625791
+2,1,9,0,103,"tunnel, transonic, aerodynamic, test mach, tunnel blade, transonic tunnel, mach, deflection, blade, vane",719,1264,0.940507549
+3,1,10,0,296,"management, project, lack, formal, manager, organization, contractor, request, risk, development",5382,1368,0.767053002
+4,1,11,0,206,"ssme, oxidizer, pump, liquid, fuel, propellant, shape, erosion, ring, space shuttle",3176,113,0.812935519
+5,1,12,0,301,"valve, tank, pressure, leak, supply, line, vent, nitrogen, vent line, water",4261,745,0.782795066
+6,1,13,0,74,"state microgravity, first united, microgravity, injury, fire occur, damage, first shift, ignite, united, mile",895,1710,0.869355899
+7,1,14,0,62,"breaker, effective maintainability benefit, base maintainability, recommend technique, circuit breaker, cost saving, technique number, effective maintainability, fault, saving",659,1208,0.871555471
+8,1,15,0,172,"orbiter, brake, fall, position, hydraulic fluid, mast, pull, operator, smoke, thermal protection system",1252,861,0.856068957
+9,2,16,8,19,"follow recommendation, torque analog, base legacy, need great hinge, necessary torque include, great hinge, redesign accommodate, system redesign digital, redesign digital, flight pegasus",1083,1609,0.999997592
+10,2,17,9,3,"shaker, random vibration, sine burst, open loop, random, quasi, fixturing, sine, impart, random vibration test",240,6196,0.926993883
+11,2,18,10,55,"lander, exploration rover, rover, land, martian, additional word, exploration, entry descent land, entry, entry descent",2513,1615,0.879423398
+12,2,19,8,11,"optic, spherical, aberration, lens, spie, optical, focal, plane, beam, mirror",1174,718,0.888498485

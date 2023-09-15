@@ -4,6 +4,8 @@ Overview
 **MIKA** (Manager for Intelligent Knowledge Access) is a toolkit intended to assist design-time risk 
 analysis and safety assurance via advanced natural language processing capabilities. 
 
+The full documentation is available at: https://nasa.github.io/mika/ 
+
 State-of-the-art natural language processing (NLP) techniques enable new ways to access safety-relevant 
 knowledge available in text-based documents. MIKA packages advanced NLP techniques and uses models 
 specially trained for engineering applications to allow engineers to better tap into knowledge available in
@@ -43,13 +45,25 @@ Installation
 ---------------
 The latest version of MIKA is currently available via the NASA github and can be downloaded from the MIKA 
 github page using:
-:: 
+
+.. code-block:: python 
+
     git clone https://github.com/nasa/mika.git
 
 Prerequisites
 -------------
-MIKA uses Python 3 and requires the following packages and their dependencies outlined in requirements.txt:
-::
+MIKA uses Python 3 and has been tested on python>=3.8. We recommend installing pytorch via anaconda first and configuring it for GPU use if desired. 
+
+MIKA can be installed via PyPi using 
+
+.. code-block:: python
+
+    pip install mika
+
+Alternatively, you can manually clone MIKA and install the requirements. MIKA requires the following packages and their dependencies outlined in requirements.txt:
+
+.. code-block:: python
+
     BERTopic
     datasets
     gensim
@@ -74,8 +88,12 @@ MIKA uses Python 3 and requires the following packages and their dependencies ou
     transformers
     wordcloud
 
+These can be installed with pip.
+
 Additional packages that should be downloaded for optional functions include:
-::
+
+.. code-block:: python
+    
     graphvis #(to plot hierarchical topic models)
     pickle   #(to save results)
     jupyter notebook #(to view examples in the repository)
@@ -92,7 +110,7 @@ Contributors
 capability, Topic Model Plus, Data utility, Documentation
 
 `Sequoia Andrade <https://github.com/sequoiarose>`_ : FMEA capability, custom NER, Trend Analysis, Topic
-Model Plus, Data utilty, dataset-specific utilities, code review
+Model Plus, Data utilty, Dataset-specific utilities, Code Review, Documentation
 
 
 Notices

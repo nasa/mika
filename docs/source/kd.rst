@@ -1,14 +1,24 @@
 kd package
 ==========
 
-.. autoclass:: kd.FMEA
+mika.kd.FMEA
+------------
+.. autoclass:: mika.kd.FMEA
     :members:
 
-.. autoclass:: kd.Topic_Model_plus
+mika.kd.Topic_Model_plus
+-------------------------
+.. autoclass:: mika.kd.Topic_Model_plus
     :members:
 
-.. automodule:: kd.NER
+mika.kd.NER
+------------
+.. automodule:: mika.kd.NER
     :members:
+    :show-inheritance:
 
-.. automodule:: kd.trend_analysis
+mika.kd.trend_analysis
+-----------------------
+.. automodule:: mika.kd.trend_analysis
     :members:
+    :show-inheritance:

@@ -80,7 +80,7 @@ class Data():
 
         """
         
-        self.data_df = pd.read_csv(filename)
+        self.data_df = pd.read_csv(filename, dtype=str)
         self.data_df = self.data_df.fillna('')
         if tokenized == True:
             self.data_df[self.text_columns] = self.data_df[self.text_columns].applymap(lambda y: self.__remove_quote_marks(y))
@@ -99,7 +99,7 @@ class Data():
         # loads data from a raw files (.csv or .xlsx), where filename (str) is where the data is stored; also takes kwargs for reading the file
 
         if ".csv" in filename: 
-            self.data_df = pd.read_csv(open(filename,encoding='utf8',errors='ignore'), **kwargs)
+            self.data_df = pd.read_csv(filename, encoding='utf8', encoding_errors='ignore', **kwargs)
         else: 
             self.data_df = pd.read_excel(filename, **kwargs)
         cols_to_drop = [col for col in self.data_df.columns if "Unnamed" in col]
@@ -169,16 +169,7 @@ class Data():
     def __combine_columns(self, combine_columns):
         # combines text columns into one combined text field
 
-        combined_text = []
-        for i in tqdm(range(0, len(self.data_df)), "Combining Columns…"):
-            text = ""
-            for col in combine_columns:
-                if text != "":
-                    text += ". " 
-                #col_text = self.data_df.at[i, col]
-                text += str(self.data_df.at[i, col])
-            combined_text.append(text)
-        self.data_df["Combined Text"] = combined_text
+        self.data_df["Combined Text"] = self.data_df[combine_columns].apply(lambda x: '. '.join(x), axis=1)
         self.combined_text_col = ["Combined Text"]
         self.text_columns += self.combined_text_col
         

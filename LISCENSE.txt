@@ -1,0 +1,9 @@
+MIKA version 1.0
+---------------------------
+Released under the NASA Open Source Agreement Version 1.3, see
+NASA_Open_Source_Agreement_MIKA.pdf for full details.
+
+Copyright © 2023 United States Government as represented by the Administrator
+of the National Aeronautics and Space Administration.  All Rights Reserved.
+
+---------------------------

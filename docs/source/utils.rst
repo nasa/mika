@@ -1,5 +1,7 @@
 utils package
 =============
 
-.. autoclass:: utils.Data
+mika.utils.Data
+---------------
+.. autoclass:: mika.utils.Data
     :members:

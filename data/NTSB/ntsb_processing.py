@@ -11,8 +11,8 @@ import pandas as pd
 
 def get_phase_mishap_from_occurrence_code(occurrence_code, occurrence_dict):
     occurrence_code = str(occurrence_code)
-    phase_code = "xxx" + occurrence_code[3:]
-    mishap_code = occurrence_code[0:3] + "xxx"
+    mishap_code = "xxx" + occurrence_code[3:]
+    phase_code = occurrence_code[0:3] + "xxx"
     if mishap_code not in occurrence_dict or phase_code not in occurrence_dict:
         return None, None
     else:
@@ -47,7 +47,7 @@ def add_list_of_phases_mishaps(df, occurrence_dict, from_occurrence_code, phase_
         phases.append(phase)
         mishaps.append(mishap)
     df['Phase'] = phases
-    df['Mishap Category'] = mishap
+    df['Mishap Category'] = mishaps
     df = df.drop(ind_to_drop).reset_index(drop=True)
     return df
 
@@ -172,7 +172,7 @@ ntsb_from_occurrences = pd.concat(dfs).drop_duplicates().reset_index(drop=True)
 ntsb_from_occurrences = add_list_of_phases_mishaps(ntsb_from_occurrences, occurrence_dict, False, phase_dict) #need to make different occurrence dicts
 ntsb_from_occurrences = ntsb_from_occurrences.drop(['Occurrence_Code', 'Phase_of_Flight'], axis=1)
 ntsb = pd.concat([ntsb_from_events, ntsb_from_occurrences]).reset_index(drop=True)
-#ntsb.to_csv("ntsb_full.csv")
+ntsb.to_csv("ntsb_full.csv")
 print("Size of NTSB:", len(ntsb))
 
 dfs = []

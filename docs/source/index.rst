@@ -6,3 +6,6 @@ MIKA
  
    readme
    components
+   data
+   models
+   examples
