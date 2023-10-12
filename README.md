@@ -53,12 +53,7 @@ Prerequisites
 -------------
 MIKA uses Python 3 and has been tested on python>=3.8. We recommend installing pytorch via anaconda first and configuring it for GPU use if desired. 
 
-MIKA can be installed via PyPi using 
-
-
-    pip install mika
-
-Alternatively, you can manually clone MIKA and install the requirements. MIKA requires the following packages and their dependencies outlined in requirements.txt:
+Currently, you can manually clone MIKA and install the requirements. MIKA requires the following packages and their dependencies outlined in requirements.txt:
 
 
     BERTopic
