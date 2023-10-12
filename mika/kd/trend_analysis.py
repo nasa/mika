@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
+# Created on Fri Apr 23 12:14:51 2021
+# @author: srandrad
 """
-Created on Fri Apr 23 12:14:51 2021
+Description: Trend analysis functions.
+"""
 
-@author: srandrad
-"""
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -24,7 +25,9 @@ import random
 from sklearn.utils import resample
 
 def minmax_scale(data_list):
-    """Performs minmax scaling on a single data list in order to normalize the data.
+    """ Minmax scale
+    
+    Performs minmax scaling on a single data list in order to normalize the data.
     normalization is required prior to regression and ML.
     Also it is used for graphing multiple time series on the same axes.
 
@@ -38,6 +41,7 @@ def minmax_scale(data_list):
     scaled_list : list
         list of data scaled between 0-1
     """
+
     max_ = max(data_list)
     min_ = min(data_list)
     scaled_list = []
@@ -47,7 +51,9 @@ def minmax_scale(data_list):
     return scaled_list
 
 def corr_sig(df=None):
-    """returns the probability matrix for a correlation matrix
+    """ Correlation signature
+    
+    Returns the probability matrix for a correlation matrix.
 
     Parameters
     ----------
@@ -60,6 +66,7 @@ def corr_sig(df=None):
     p_matrix : numpy array
         numpy array with p_values for corresponding dataframe entries
     """
+
     p_matrix = np.zeros(shape=(df.shape[1],df.shape[1]))
     for col in df.columns:
         for col2 in df.drop(col,axis=1).columns:
@@ -68,8 +75,9 @@ def corr_sig(df=None):
     return p_matrix
 
 def regression_feature_importance(predictors, hazards, correlation_mat_total):
-    """
-    Performs feature importance for a set of linear regression analyses
+    """ Regression feature importance
+
+    Performs feature importance for a set of linear regression analyses.
 
     Parameters
     ----------
@@ -86,6 +94,7 @@ def regression_feature_importance(predictors, hazards, correlation_mat_total):
         dataframe containing both the mse and r2 scores for the model
 
     """
+
     data = correlation_mat_total
     predictors = predictors
     full_model_score = []
@@ -143,9 +152,11 @@ def regression_feature_importance(predictors, hazards, correlation_mat_total):
 
 def multiple_reg_feature_importance(predictors, hazards, correlation_mat_total, save=False, results_path="", 
                                     r2_fontsize=10, r2_figsize=(3.5,4), predictor_import_fontsize=10, predictor_import_figsize=(7,4)):
-    """builds multiple regression model for hazrd frequency given the predictors.
-    also performs predictor importance to identify which predictors are most relevant to the hazards frequency
-    predictors and hazards must be values from the correlation_mat_total
+    """ Multiple regression feature importance
+    
+    Builds multiple regression model for hazrd frequency given the predictors.
+    Also performs predictor importance to identify which predictors are most relevant to the hazards frequency.
+    Predictors and hazards must be values from the correlation_mat_total.
 
     Parameters
     ----------
@@ -274,8 +285,9 @@ def multiple_reg_feature_importance(predictors, hazards, correlation_mat_total, 
     return results_df, delta_df, coefficient_df
 
 def remove_outliers(data, threshold=1.5, rm_outliers=True):
-    """
-    removes outliers from the dataset using inter quartile range
+    """ Remove outliers
+
+    Removes outliers from the dataset using inter quartile range.
 
     Parameters
     ----------
@@ -292,6 +304,7 @@ def remove_outliers(data, threshold=1.5, rm_outliers=True):
         list of the data points with outliers removed
 
     """
+
     if data == [] or rm_outliers == False:
         return data
     Q1 = np.quantile(data,0.25)
@@ -301,8 +314,9 @@ def remove_outliers(data, threshold=1.5, rm_outliers=True):
     return new_data
 
 def check_for_hazard_words(h_word, text):
-    """
-    checks to see if a section of text contains a hazard word
+    """ Check for hazard words
+
+    Checks to see if a section of text contains a hazard word.
 
     Parameters
     ----------
@@ -317,15 +331,17 @@ def check_for_hazard_words(h_word, text):
         true if hazard word appears in text, false if not.
 
     """
+
     hazard_found = False
     if h_word in text:
             hazard_found = True
     return hazard_found
 
 def check_for_negation_words(negation_words, text, h_word):
-    """
-    checks to see if any negation words appear within 3 words of a hazard word in a 
-    specified section of text
+    """ Check for negation words
+
+    Checks to see if any negation words appear within 3 words of a hazard word in a 
+    specified section of text.
 
     Parameters
     ----------
@@ -343,6 +359,7 @@ def check_for_negation_words(negation_words, text, h_word):
         i.e., a negation word is present.
 
     """
+
     hazard_found = True
     for word in negation_words:#.split(", "):#removes texts that have negation words
         if word in text:
@@ -361,8 +378,9 @@ def check_for_negation_words(negation_words, text, h_word):
     return hazard_found
 
 def get_topics_per_doc(docs, results, results_text_field, hazards): 
-    """
-    finds the topics accosiated with each document    
+    """ Get topics per document
+
+    Finds the topics associated with each document.
     
     Parameters
     ----------
@@ -384,6 +402,7 @@ def get_topics_per_doc(docs, results, results_text_field, hazards):
         and values as a list of topics
 
     """
+
     ##TODO: Speed up
     topics_per_doc = {doc:[] for doc in docs}
     for i in range(len(results[results_text_field])):
@@ -394,8 +413,9 @@ def get_topics_per_doc(docs, results, results_text_field, hazards):
     return topics_per_doc, hazard_topics_per_doc
 
 def get_hazard_info(hazard_file):
-    """
-    pulls hazard information from hazard spreadsheet
+    """ Get hazard information
+
+    Loads hazard information from hazard spreadsheet.
 
     Parameters
     ----------
@@ -410,14 +430,16 @@ def get_hazard_info(hazard_file):
         list of hazard names
 
     """
+
     hazard_info = pd.read_excel(hazard_file, sheet_name=['topic-focused'])
     hazards = hazard_info['topic-focused']['Hazard name'].tolist()#list(set(hazard_info['topic-focused']['Hazard name'].tolist()))
     hazards = [hazard for hazard in hazards if isinstance(hazard,str)]
     return hazard_info, hazards
 
 def get_results_info(results_file, results_text_field, text_field, doc_topic_dist_field):
-    """
-    pulls topic modeling results from results spreadsheet generated with topic model plus
+    """ Get results information
+
+    Pulls topic modeling results from results spreadsheet generated with topic model plus.
 
     Parameters
     ----------
@@ -445,6 +467,7 @@ def get_results_info(results_file, results_text_field, text_field, doc_topic_dis
         the cluster of documents not belonging to a topic. 0 otherwise.
 
     """
+
     if results_text_field == None:
         results_text_field = text_field
     if '.csv' in results_file: #note CSV is recommended because Excel has limited spaec
@@ -464,8 +487,9 @@ def get_results_info(results_file, results_text_field, text_field, doc_topic_dis
     return  results, results_text_field, doc_topic_distribution, begin_nums
 
 def set_up_docs_per_hazard_vars(preprocessed_df, id_field, hazards, time_field):
-    """
-    instaintiates variables used to find the documents per hazard
+    """ Set up documents per hazard variables
+
+    Instantiates variables used to find the documents per hazard.
 
     Parameters
     ----------
@@ -493,6 +517,7 @@ def set_up_docs_per_hazard_vars(preprocessed_df, id_field, hazards, time_field):
         with an element for each document.
 
     """
+
     docs = preprocessed_df[id_field].tolist()
     hazard_words_per_doc = {hazard:['none' for doc in docs] for hazard in hazards}
     time_period = preprocessed_df[time_field].unique()
@@ -501,8 +526,9 @@ def set_up_docs_per_hazard_vars(preprocessed_df, id_field, hazards, time_field):
     return docs, frequency, docs_per_hazard, hazard_words_per_doc
 
 def get_hazard_df(hazard_info, hazards, i):
-    """
-    gets hazard information for a specified hazard
+    """ Get hazard dataframe
+
+    Gets hazard information for a specified hazard.
 
     Parameters
     ----------
@@ -521,13 +547,15 @@ def get_hazard_df(hazard_info, hazards, i):
         name of the specified hazard
 
     """
+
     hazard_name = hazards[i]
     hazard_df = hazard_info['topic-focused'].loc[hazard_info['topic-focused']['Hazard name'] == hazard_name].reset_index(drop=True)
     return hazard_df, hazard_name
 
 def get_hazard_topics(hazard_df, begin_nums):
-    """
-    gets topic numbers for a hazard from the hazard df
+    """ Get hazard topics
+
+    Gets topic numbers for a hazard from the hazard dataframe.
 
     Parameters
     ----------
@@ -543,12 +571,14 @@ def get_hazard_topics(hazard_df, begin_nums):
         list of topic numbers associated with the hazard
 
     """
+
     nums = [int(i)+begin_nums for nums in hazard_df['Topic Number'] for i in str(nums).split(", ")]#identifies all topics related to this hazard
     return nums
 
 def get_hazard_doc_ids(nums, results, results_text_field, docs, doc_topic_distribution, text_field, topic_thresh, preprocessed_df, id_field):
-    """
-    Gets the document ids associated with a specified hazard
+    """ Get hazard document IDs
+
+    Gets the document ids associated with a specified hazard.
 
     Parameters
     ----------
@@ -580,6 +610,7 @@ def get_hazard_doc_ids(nums, results, results_text_field, docs, doc_topic_distri
         list of document ids associated with the specified hazard
 
     """
+
     ids_df = results[results_text_field].loc[nums]
     ids_ = "; ".join(ids_df['documents'].to_list())
     ids_ = [id_ for id_ in docs if id_ in ids_]   
@@ -598,8 +629,9 @@ def get_hazard_doc_ids(nums, results, results_text_field, docs, doc_topic_distri
     return temp_df, ids_
 
 def get_hazard_topics_per_doc(ids, topics_per_doc, hazard_topics_per_doc, hazard_name, nums, begin_nums):
-    """
-    gets the topics per document that are associated with a specied hazard
+    """ Get hazard topics per document
+
+    Gets the topics per document that are associated with a specied hazard.
 
     Parameters
     ----------
@@ -625,14 +657,16 @@ def get_hazard_topics_per_doc(ids, topics_per_doc, hazard_topics_per_doc, hazard
         and values as a list of topics
 
     """
+
     #get hazard_topics
     for doc in ids:
         hazard_topics_per_doc[doc][hazard_name] = [num-begin_nums for num in nums if num-begin_nums in topics_per_doc[doc]]
     return hazard_topics_per_doc
 
 def get_hazard_words(hazard_df):
-    """
-    gets the hazard words for a specified hazard df
+    """ Get hazard words
+
+    Gets the hazard words for a specified hazard dataframe.
 
     Parameters
     ----------
@@ -645,13 +679,15 @@ def get_hazard_words(hazard_df):
         list of hazard words
 
     """
+
     hazard_words = hazard_df['Relevant hazard words'].to_list()
     hazard_words = [word for words in hazard_words for word in words.split(", ")]
     return hazard_words
 
 def get_negation_words(hazard_df):
-    """
-    gets the negation words for a specified hazard df
+    """ Get negation words
+
+    Gets the negation words for a specified hazard dataframe
 
     Parameters
     ----------
@@ -664,14 +700,16 @@ def get_negation_words(hazard_df):
         list of negation words
 
     """
+
     negation_words = hazard_df['Negation words'].to_list()
     negation_words = [word for word in negation_words if isinstance(word, str)]
     negation_words = [word for neg_words in negation_words for word in neg_words.split(", ")]
     return negation_words
 
 def record_hazard_doc_info(hazard_name, year, docs_per_hazard, id_, frequency, hazard_words_per_doc, docs, h_word):
-    """
-    saves the information for a specified document that contains a specified hazard
+    """ Record hazard document information
+
+    Saves the information for a specified document that contains a specified hazard.
 
     Parameters
     ----------
@@ -708,14 +746,16 @@ def record_hazard_doc_info(hazard_name, year, docs_per_hazard, id_, frequency, h
         with an element for each document.
 
     """
+
     docs_per_hazard[hazard_name][str(year)].append(id_)
     frequency[hazard_name][str(year)] += 1
     hazard_words_per_doc[hazard_name][docs.index(id_)] = h_word
     return docs_per_hazard, frequency, hazard_words_per_doc
 
 def get_doc_time(id_, temp_df, id_field, time_field):
-    """
-    gets the time value for a document. usually the year of the report, but could
+    """ Get document time
+
+    Gets the time value for a document. usually the year of the report, but could
     also be month or any other time value.
 
     Parameters
@@ -735,12 +775,14 @@ def get_doc_time(id_, temp_df, id_field, time_field):
         the time value for the specified document, usually a year
 
     """
+
     year = temp_df.loc[temp_df[id_field]==id_][time_field].values[0]
     return year
 
 def get_doc_text(id_, temp_df, id_field, text_field):
-    """
-    gets the text for a document
+    """ Get document text
+
+    Gets the text for a document.
 
     Parameters
     ----------
@@ -760,49 +802,50 @@ def get_doc_text(id_, temp_df, id_field, text_field):
         the document text
 
     """
+
     text = temp_df.loc[temp_df[id_field]==id_][text_field].values[0]
     if type(text) == list:
         text = " ".join(text)
     return text 
 
-def check_if_word_contained_in_other_word():
+#def check_if_word_contained_in_other_word():
     #UNDER DEVELOPMENT
     #intended function is to identify words contained in other words, e.g., rain is contained in terrain
     #so document text with "terrain" is not actually "rain"
-    """
-    if len(h_word.split(" ")) == 1:
-        word_ind = text[end_ind:].find(h_word)
-        start_ind = max([s_ind for s_ind in [0, text[:word_ind].rfind(" ")]+[text[:word_ind].rfind(p) for p in punctuation] if s_ind!=-1])
-        next_punctuation = [s_ind for s_ind in [text[start_ind:].find(" ")+start_ind]+[text[start_ind:].find(p)+start_ind for p in punctuation] if s_ind > start_ind]
-        print(word_ind, start_ind, next_punctuation)
-        if next_punctuation == []:
-            next_punctuation = -1
-        else:
-            next_punctuation = min(next_punctuation)
-            #print(word_ind, next_punctuation)
-            print(word_ind, start_ind, next_punctuation)
+    # if len(h_word.split(" ")) == 1:
+    #     word_ind = text[end_ind:].find(h_word)
+    #     start_ind = max([s_ind for s_ind in [0, text[:word_ind].rfind(" ")]+[text[:word_ind].rfind(p) for p in punctuation] if s_ind!=-1])
+    #     next_punctuation = [s_ind for s_ind in [text[start_ind:].find(" ")+start_ind]+[text[start_ind:].find(p)+start_ind for p in punctuation] if s_ind > start_ind]
+    #     print(word_ind, start_ind, next_punctuation)
+    #     if next_punctuation == []:
+    #         next_punctuation = -1
+    #     else:
+    #         next_punctuation = min(next_punctuation)
+    #         #print(word_ind, next_punctuation)
+    #         print(word_ind, start_ind, next_punctuation)
         
-        end_ind = max(next_punctuation, word_ind)
-        full_word = text[start_ind:end_ind].strip(" .,'")
-        print(full_word, h_word)
-        #full_word = text[text[:word_ind].rfind(" "):text[word_ind:].find(" ")] #what about words ending in punctuation????? beginning after punctuation?
-        if len(full_word) > len(h_word):
-            #check to see if different words - stem both
-            if stemmer.stem(full_word) == stemmer.stem(h_word):
-                hazard_found = True
-            elif full_word not in english_words: #likely two conjoined words, split them
-                word_split_ind = full_word.find(h_word)
-                word_split = [full_word[:word_split_ind], full_word[word_split_ind:]]
-                if word_split[0] in english_words and word_split[1] in english_words:
-                    hazard_found = True
-        elif len(full_word) == len(h_word):
-            hazard_found = True
-    else:
-        hazard_found = True"""
+    #     end_ind = max(next_punctuation, word_ind)
+    #     full_word = text[start_ind:end_ind].strip(" .,'")
+    #     print(full_word, h_word)
+    #     #full_word = text[text[:word_ind].rfind(" "):text[word_ind:].find(" ")] #what about words ending in punctuation????? beginning after punctuation?
+    #     if len(full_word) > len(h_word):
+    #         #check to see if different words - stem both
+    #         if stemmer.stem(full_word) == stemmer.stem(h_word):
+    #             hazard_found = True
+    #         elif full_word not in english_words: #likely two conjoined words, split them
+    #             word_split_ind = full_word.find(h_word)
+    #             word_split = [full_word[:word_split_ind], full_word[word_split_ind:]]
+    #             if word_split[0] in english_words and word_split[1] in english_words:
+    #                 hazard_found = True
+    #     elif len(full_word) == len(h_word):
+    #         hazard_found = True
+    # else:
+    #     hazard_found = True
 
 def identify_docs_per_hazard(hazard_file, preprocessed_df, results_file, text_field, time_field, id_field, results_text_field=None, doc_topic_dist_field=None, topic_thresh=0.0): 
-    """
-    function that uses all above functions to output the documents per hazard.
+    """ Identify documents per hazard
+
+    Outputs the documents per hazard.
 
     Parameters
     ----------
@@ -846,6 +889,7 @@ def identify_docs_per_hazard(hazard_file, preprocessed_df, results_file, text_fi
         and values as a list of topics
 
     """
+
     #read in hazard_info
     hazard_info, hazards = get_hazard_info(hazard_file)
     #read in results_info
@@ -878,7 +922,9 @@ def identify_docs_per_hazard(hazard_file, preprocessed_df, results_file, text_fi
     return frequency, docs_per_hazard, hazard_words_per_doc, topics_per_doc, hazard_topics_per_doc
 
 def identify_docs_per_fmea_row(df, grouping_col, year_col, id_col):
-    """ identifies the documents corresponding to each row in an fmea
+    """ Identify documents per FMEA row
+    
+    Identifies the documents corresponding to each row in an FMEA.
 
     Parameters
     ----------
@@ -912,7 +958,9 @@ def identify_docs_per_fmea_row(df, grouping_col, year_col, id_col):
     return frequency, docs_per_row
 
 def calc_severity_per_hazard(docs, df, id_field, metric='average'):
-    """used to calculate the severity for each hazard occurrence, as well as the average severity
+    """ Calculate severity per hazard
+    
+    Used to calculate the severity for each hazard occurrence, as well as the average severity.
 
     Parameters
     ----------
@@ -949,7 +997,9 @@ def calc_severity_per_hazard(docs, df, id_field, metric='average'):
     return severities, total_severities_hazard
 
 def calc_rate(frequency):
-    """Calculates the average rate of occurrence for a hazard from the frequency per year
+    """ Calculate rate of occurrence of hazard
+    
+    Calculates the average rate of occurrence for a hazard from the frequency per year.
 
     Parameters
     ----------
@@ -971,14 +1021,9 @@ def plot_metric_time_series(metric_data, metric_name, line_styles=[], markers=[]
                             save=False, results_path="", yscale=None, legend=True, figsize=(6,4),
                             fontsize=16, bootstrap=False, bootstrap_kwargs={'metric_percentages':1, 'num_means':1000, 'CI_interval':95},
                             legend_kwargs={}):
-    """
-    plots a time series for specified metrics for all hazards (i.e., line chart)
-    Idea:  get a confidence interval and mean from sampling the metric percentage from the original dataset. 
-    Since we know theres some error in the original labels, we can use this as a proxy for the original population.
-
-    Issue: how do we get this per year? do we take the full set of docs then sample that, or sample for each year?? -> try full set then reduce back to years
-
-    std dev: of the 1000 averages
+    """ Plot metric time series
+    
+    Plots a time series for specified metrics for all hazards (i.e., line chart).
 
     Parameters
     ----------
@@ -1024,6 +1069,7 @@ def plot_metric_time_series(metric_data, metric_name, line_styles=[], markers=[]
     None.
 
     """
+
     time_vals = list(set([year for hazard in metric_data for year in metric_data[hazard]]))
     time_vals.sort()
     #scaled -> scaled the averages, how to scale stddev?
@@ -1095,7 +1141,9 @@ def plot_metric_time_series(metric_data, metric_name, line_styles=[], markers=[]
     plt.show()
 
 def calc_CI(bootstrapped_means, CI_interval=95):
-    """calculates a confidence interval from a list of means generated using bootstrapping
+    """ Calculate confidence interval
+    
+    Calculates a confidence interval from a list of means generated using bootstrapping.
 
     Parameters
     ----------
@@ -1123,7 +1171,9 @@ def calc_CI(bootstrapped_means, CI_interval=95):
     return CI
 
 def bootstrap_metric(metric_data, time_vals, metric_percentages, num_means=1000, CI_interval=95):
-    """performs bootstrapping to better estimate the true metric value given a metric percentage (i.e., hazard extraction accuracy)
+    """ Bootstrap metric
+    
+    Performs bootstrapping to better estimate the true metric value given a metric percentage (i.e., hazard extraction accuracy).
 
     Parameters
     ----------
@@ -1163,8 +1213,9 @@ def bootstrap_metric(metric_data, time_vals, metric_percentages, num_means=1000,
 
 def plot_metric_averages(metric_data, metric_name, show_std=True, title="", save=False, results_path="", yscale=None,
                         legend=True, figsize=(6,4), fontsize=16, error_bars='stddev'):
-    """
-    plots metric averages as a barchart
+    """ Plot metric averages
+
+    Plots metric averages as a barchart.
 
     Parameters
     ----------
@@ -1197,6 +1248,7 @@ def plot_metric_averages(metric_data, metric_name, show_std=True, title="", save
     None.
 
     """
+
     import textwrap
     avg = {hazard: np.average([m for year in metric_data[hazard] for m in metric_data[hazard][year]]) for hazard in metric_data}
     if error_bars == 'stddev':
@@ -1247,8 +1299,10 @@ def plot_frequency_time_series(metric_data, metric_name='Frequency', line_styles
                                interval_kwargs={'false_pos_rate':0.05, 'false_neg_rate':0.05},
                                legend_kwargs={}):
     """
-    plots hazard frequency over time. 
-    different from plot metric time series because of input data.
+    Plot frequency time series
+    
+    Plots hazard frequency over time. 
+    Different from plot metric time series because of input data
 
     Parameters
     ----------
@@ -1292,6 +1346,7 @@ def plot_frequency_time_series(metric_data, metric_name='Frequency', line_styles
     None.
 
     """
+
     time_vals = list(set([year for hazard in metric_data for year in metric_data[hazard]]))
     time_vals.sort()
     frequencies = {hazard: [metric_data[hazard][year] for year in time_vals] for hazard in metric_data}
@@ -1346,7 +1401,9 @@ def plot_frequency_time_series(metric_data, metric_name='Frequency', line_styles
     plt.show()
 
 def make_pie_chart(docs, data, predictor, hazards, id_field, predictor_label=None, save=True, results_path="", pie_kwargs={}, fontsize=16, figsize=(17,9), padding=5, legend_kwargs={}):
-    """makes a set of pie charts, with one pie chart per hazard showing the distribution of the categorical predictor variable specified.
+    """Make pie chart
+    
+    Makes a set of pie charts, with one pie chart per hazard showing the distribution of the categorical predictor variable specified.
 
     Parameters
     ----------
@@ -1418,7 +1475,9 @@ def make_pie_chart(docs, data, predictor, hazards, id_field, predictor_label=Non
     plt.show()
 
 def add_hazards_to_docs(preprocessed_df, id_field, docs):
-    """add hazard values to preprocessed_df for running chi-squared tests
+    """ Add hazards to documents
+    
+    Add hazard values to preprocessed_df for running chi-squared tests
 
     Parameters
     ----------
@@ -1436,6 +1495,7 @@ def add_hazards_to_docs(preprocessed_df, id_field, docs):
     preprocessed_df : pandas DataFrame
         pandas datframe containing documents.
     """
+
     hazards_col = ["None" for i in range(len(preprocessed_df))]
     hazards_for_df = {hazard:[0 for i in range(len(preprocessed_df))] for hazard in docs}
     for hazard in docs:
@@ -1451,7 +1511,9 @@ def add_hazards_to_docs(preprocessed_df, id_field, docs):
     return preprocessed_df
 
 def chi_squared_tests(preprocessed_df, hazards, predictors, pred_dict={}): 
-    """ Performs chi-squared test for each predictor to determine if there is a statistically
+    """ Chi squared tests
+    
+    Performs chi-squared test for each predictor to determine if there is a statistically
     significant difference in the counts of the predictor between reports with  and without each hazard
 
     Parameters
@@ -1472,6 +1534,7 @@ def chi_squared_tests(preprocessed_df, hazards, predictors, pred_dict={}):
     count_dfs : Dict
         dictionary of pandas dataframes containing the counts for each predictor and hazard
     """
+
     count_dfs = {}
     if pred_dict == None:
         pred_dict = {predictor: predictor for predictor in predictors}
@@ -1497,9 +1560,10 @@ def chi_squared_tests(preprocessed_df, hazards, predictors, pred_dict={}):
     return stats_df, count_dfs
 
 def create_correlation_matrix(predictors_scaled, frequencies_scaled, graph=True, mask_vals=False, figsize=(6,4), fontsize=12, save=False, results_path="", title=False):
-    """
-    creates the correlation matrix between all predictors and all hazard frequencies
-    all arguments are outputs from create_metrics_time_series
+    """ Create correlation matrix
+
+    Creates the correlation matrix between all predictors and all hazard frequencies. 
+    All arguments are outputs from create_metrics_time_series.
 
     Parameters
     ----------
@@ -1572,10 +1636,11 @@ def create_correlation_matrix(predictors_scaled, frequencies_scaled, graph=True,
     return corrMatrix, correlation_mat_total, p_values
 
 def reshape_correlation_matrix(corrMatrix, p_values, predictors, hazards, figsize=(8,8.025), fontsize=16):
-    """
-    reshapes the correlation matrix between all predictors and all hazard frequencies
-    columns are predictors and rows are hazards
-    arguments are outputs from create_correlation_matrix
+    """ Reshape correlation matrix
+
+    Reshapes the correlation matrix between all predictors and all hazard frequencies.
+    Columns are predictors and rows are hazards.
+    Arguments are outputs from create_correlation_matrix.
 
     Parameters
     ----------
@@ -1640,11 +1705,12 @@ def reshape_correlation_matrix(corrMatrix, p_values, predictors, hazards, figsiz
     plt.show()
 
 def hazard_accuracy(docs_per_hazard, num, results_path, hazard_words_per_doc, preprocessed_df, text_col, id_col, seed=0):
-    """
-    creates a data sheet to calculate hazard extraction acccuracy by randomly sampling documents for each hazard.
-    this method actually is calculating precision at k, k=num.
-    note that this method is not the prefered method to evaluate hazard accuracy,
-    instead a user should use the classification metrics and label a validation set.
+    """ Hazard accuracy
+
+    Creates a data sheet to calculate hazard extraction acccuracy by randomly sampling documents for each hazard.
+    This method actually is calculating precision at k, k=num.
+    Note that this method is not the prefered method to evaluate hazard accuracy,
+    Instead a user should use the classification metrics and label a validation set.
 
     Parameters
     ----------
@@ -1676,6 +1742,7 @@ def hazard_accuracy(docs_per_hazard, num, results_path, hazard_words_per_doc, pr
         list of all the ids of documents belonging to any hazard
 
     """
+
     hazards = [hazard for hazard in docs_per_hazard]
     sampled_hazard_ids = {hazard:[] for hazard in docs_per_hazard}
     num_total_ids = {hazard:0 for hazard in docs_per_hazard}
@@ -1726,8 +1793,9 @@ def hazard_accuracy(docs_per_hazard, num, results_path, hazard_words_per_doc, pr
     return sampled_hazard_ids, total_ids
 
 def get_likelihood_FAA(rates):
-    """
-    converts hazard rate of occurrence to an FAA likelihood category
+    """ FAA likelihood
+
+    Converts hazard rate of occurrence to an FAA likelihood category.
 
     Parameters
     ----------
@@ -1740,6 +1808,7 @@ def get_likelihood_FAA(rates):
         dictionary with hazard name as keys and a likelihood category as a value
 
     """
+
     curr_likelihoods = {hazard:0 for hazard in rates}
     for hazard in rates:
         r = rates[hazard]
@@ -1757,8 +1826,9 @@ def get_likelihood_FAA(rates):
     return curr_likelihoods
 
 def get_likelihood_USFS(rates):
-    """
-    converts hazard rate of occurrence to an USFS likelihood category
+    """ USFS likelihood
+
+    Converts hazard rate of occurrence to an USFS likelihood category.
 
     Parameters
     ----------
@@ -1771,6 +1841,7 @@ def get_likelihood_USFS(rates):
         dictionary with hazard name as keys and a likelihood category as a value
 
     """
+
     curr_likelihoods = {hazard:0 for hazard in rates}
     for hazard in rates:
         r = rates[hazard]
@@ -1788,8 +1859,9 @@ def get_likelihood_USFS(rates):
     return curr_likelihoods
 
 def plot_USFS_risk_matrix(likelihoods, severities, figsize=(9,5), save=False, results_path="", fontsize=12, max_chars=20, title=False):
-    """
-    plots a USFS risk matrix from likelihood and severity categories
+    """ Plot USFS risk matrix
+
+    Plots a USFS risk matrix from likelihood and severity categories.
 
     Parameters
     ----------
@@ -1817,6 +1889,7 @@ def plot_USFS_risk_matrix(likelihoods, severities, figsize=(9,5), save=False, re
     None.
 
     """
+
     hazards = [h for h in likelihoods]
     curr_likelihoods = likelihoods
     curr_severities = severities
@@ -1868,8 +1941,9 @@ def plot_USFS_risk_matrix(likelihoods, severities, figsize=(9,5), save=False, re
     plt.show()
 
 def plot_risk_matrix(likelihoods, severities, figsize=(9,5), save=False, results_path="", fontsize=12, max_chars=20, annot_font=12):
-    """
-    plots a FAA risk matrix from likelihood and severity categories
+    """ Plot risk matrix
+
+    Plots a FAA risk matrix from likelihood and severity categories.
 
     Parameters
     ----------
@@ -1897,6 +1971,7 @@ def plot_risk_matrix(likelihoods, severities, figsize=(9,5), save=False, results
     None.
 
     """
+
     hazards = [h for h in likelihoods]
     curr_likelihoods = likelihoods
     curr_severities = severities
@@ -1950,8 +2025,9 @@ def plot_risk_matrix(likelihoods, severities, figsize=(9,5), save=False, results
     plt.show()
 
 def sample_for_accuracy(preprocessed_df, id_col, text_col, hazards, save_path, num_sample=100): ##TODO: rename
-    """
-    generates a spreadsheet of randomly sampled documents to analyze the quality of hazard extraction
+    """ Sample for accuracy
+
+    Generates a spreadsheet of randomly sampled documents to analyze the quality of hazard extraction.
 
     Parameters
     ----------
@@ -1974,6 +2050,7 @@ def sample_for_accuracy(preprocessed_df, id_col, text_col, hazards, save_path, n
         dataframe of sampled documents
 
     """
+
     text = []
     hazards_dict = {hazard:[0 for t in range(num_sample)] for hazard in hazards}
     total_ids = preprocessed_df[id_col].to_list()
@@ -1989,9 +2066,10 @@ def sample_for_accuracy(preprocessed_df, id_col, text_col, hazards, save_path, n
     return sampled_df
 
 def calc_classification_metrics(labeled_file, docs_per_hazard, id_col):
-    """
-    calculates classification metrics where the true lables come from a file and
-    the predicted labels are from the hazard extraction process
+    """ Calculate classification metrics
+
+    Calculates classification metrics where the true lables come from a file and
+    the predicted labels are from the hazard extraction process.
 
     Parameters
     ----------
@@ -2014,6 +2092,7 @@ def calc_classification_metrics(labeled_file, docs_per_hazard, id_col):
         dataframe of the HEAT labled docs
 
     """
+
     labeled_docs = pd.read_csv(labeled_file)
     labeled_doc_ids = labeled_docs[id_col].tolist()
     hazards = docs_per_hazard.keys()
@@ -2041,8 +2120,9 @@ def calc_classification_metrics(labeled_file, docs_per_hazard, id_col):
     return metrics_df, labeled_docs, HEAT_labeled_docs
 
 def examine_hazard_extraction_mismatches(preprocessed_df, true, pred, hazards, hazard_words_per_doc, topics_per_doc, hazard_topics_per_doc, id_col, text_col, results_path):
-    """
-    used to examine which documents are mislabled by HEAT. used iteratively to refine hazard extraction.
+    """ Examine hazard extraction mismatches
+
+    Used to examine which documents are mislabled by HEAT. used iteratively to refine hazard extraction.
 
     Parameters
     ----------
@@ -2075,6 +2155,7 @@ def examine_hazard_extraction_mismatches(preprocessed_df, true, pred, hazards, h
         dictionary with keys as hazards and values as pandas dataframes storing document mismatches
 
     """
+
     dfs = {}
     docs = preprocessed_df[id_col].tolist()
     for hazard in hazards:
@@ -2106,8 +2187,9 @@ def examine_hazard_extraction_mismatches(preprocessed_df, true, pred, hazards, h
     return dfs
 
 def get_word_frequencies(hazard_words_per_doc, hazards_sorted=None):
-    """
+    """ Word frequencies
     
+    Calculate word frequencies.
 
     Parameters
     ----------
@@ -2130,8 +2212,9 @@ def get_word_frequencies(hazard_words_per_doc, hazards_sorted=None):
     return word_frequencies
 
 def build_word_clouds(word_frequencies, nrows, ncols, figsize=(8, 4), cmap=None, save=False, save_path=None, fontsize=10, wordcloud_kwargs={}):
-    """
-    builds a word cloud for each hazard
+    """ Word clouds
+
+    Builds a word cloud for each hazard.
 
     Parameters
     ----------
@@ -2159,6 +2242,7 @@ def build_word_clouds(word_frequencies, nrows, ncols, figsize=(8, 4), cmap=None,
     None
 
     """
+
     fig, axs = plt.subplots(nrows = nrows,
                             ncols = ncols,
                             figsize = figsize)
@@ -2193,7 +2277,9 @@ def build_word_clouds(word_frequencies, nrows, ncols, figsize=(8, 4), cmap=None,
 
 def plot_predictors(predictors, predictor_labels, time, time_label='Year', title="", totals=True, averages=True, scaled=True, figsize=(12, 5), axs=[], fig=None, show=False, legend=True, legend_kwargs={}):
     """
-    function for plotting predictor timeseries
+    Plot predictors
+
+    Plots predictor timeseries.
 
     Parameters
     ----------
@@ -2233,6 +2319,7 @@ def plot_predictors(predictors, predictor_labels, time, time_label='Year', title
         axs object
 
     """
+
     if axs == []:
         fig, axs = plt.subplots(1,1, sharex=True, sharey=True, figsize=figsize)
     if totals:
@@ -2246,15 +2333,16 @@ def plot_predictors(predictors, predictor_labels, time, time_label='Year', title
     axs.set_title(title)
     for i in range(len(predictors)):
         axs.plot(time, predictors[i], label=predictor_labels[i])
-    if legend: axs.legend(**l_kwargs)
+    if legend: axs.legend(**legend_kwargs)
     if show:
         plt.show()
     return fig, axs
 
 def proposed_topics(lists=[]):
-    """
-    experimental function to identify topics that may be relevent to specified hazards
-    based on manually labeled data
+    """ Proposed topics
+
+    Experimental function to identify topics that may be relevent to specified hazards
+    based on manually labeled data.
 
     Parameters
     ----------
@@ -2268,6 +2356,7 @@ def proposed_topics(lists=[]):
         list of proposed new topics.
 
     """
+    
     total_nums = [l for li in lists for l in li]
     topics, counts = np.unique(total_nums, return_counts=True)
     proposed_topics = [topics[i] for i in range(len(counts)) if counts[i]>=(len(lists)/3)]
