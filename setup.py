@@ -13,7 +13,7 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/nasa/mika.git",
     download_url="",
-    keywords=["Natural Language Processing", "Knowledge Management"],
+    keywords=["Natural Language Processing", "Knowledge Management", "Topic Modeling"],
     packages=find_packages(exclude=["test", "examples", "docs", "data"]),
     classifiers=[
         "Programming Language :: Python :: 3",
