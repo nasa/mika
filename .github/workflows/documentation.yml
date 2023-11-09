@@ -14,8 +14,8 @@ jobs:
         with:
           python-version: '3.8'
           
-      - name: Install pandoc
-        run: apt-get update && apt-get install -y pandoc
+      - uses: nikeee/setup-pandoc@v1
+      
       - name: Update pip
         run: |
           pip install --upgrade pip
