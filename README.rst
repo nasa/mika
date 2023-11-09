@@ -43,22 +43,40 @@ or passages according to their query. This includes:
 
 Installation
 ---------------
-The latest version of MIKA is currently available via the NASA github and can be downloaded from the MIKA 
-github page using:
 
-.. code-block:: python 
+MIKA is available on PyPI and can be installed with:
 
+.. code-block:: python
+    pip install nasa-mika
+
+After installing mika, initialize nltk by running the following in python:
+
+.. code-block:: python
+    import nltk
+    nltk.download('words')
+
+Now you can import anything in MIKA:
+.. code-block:: python
+    from mika.kd import FMEA
+    from mika.kd import Topic_Model_plus
+    from mika.kd.trend_analysis import *
+    from mika.kd.NER import *
+    from mika.ir import search
+
+    from mika.utils import Data
+    from mika.utils.SAFECOM import *
+    from mika.utils.SAFENET import *
+    from mika.utils.LLIS import *
+    from mika.utils.ICS import *
+
+The latest version of MIKA is also available via the NASA github page using:
+
+.. code-block:: python
     git clone https://github.com/nasa/mika.git
 
 Prerequisites
 -------------
-MIKA uses Python 3 and has been tested on python>=3.8. We recommend installing pytorch via anaconda first and configuring it for GPU use if desired. 
-
-MIKA can be installed via PyPi using 
-
-.. code-block:: python
-
-    pip install mika
+MIKA uses Python 3 and has been tested on python>=3.8. We recommend installing pytorch via anaconda first and configuring it for GPU use if desired. If installing via pip, all prerequesits are included.
 
 Alternatively, you can manually clone MIKA and install the requirements. MIKA requires the following packages and their dependencies outlined in requirements.txt:
 
