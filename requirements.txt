@@ -1,6 +1,5 @@
 BERTopic
 datasets
-gensim
 matplotlib
 nltk
 numpy
