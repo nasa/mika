@@ -18,9 +18,9 @@ jobs:
         run: |
           pip install --upgrade pip
           
-      - name: Install dependencies
+      - name: Install sphinx dependencies
         run: |
-          pip install sphinx sphinx_rtd_theme myst_parser nbsphinx
+          pip install sphinx sphinx_rtd_theme myst_parser nbsphinx nbsphinx_link
         
       - name: Install requirements
         run: python -m pip install -r ./requirements.txt
