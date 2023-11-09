@@ -13,9 +13,9 @@ jobs:
       - uses: actions/setup-python@v3
         with:
           python-version: '3.8'
-          pre-build-command: >-
-            apt-get update && apt-get install -y pandoc
           
+      - name: Install pandoc
+        run: apt-get update && apt-get install -y pandoc
       - name: Update pip
         run: |
           pip install --upgrade pip
