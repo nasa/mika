@@ -21,7 +21,10 @@ jobs:
       - name: Install dependencies
         run: |
           pip install sphinx sphinx_rtd_theme myst_parser nbsphinx
-      
+
+      - name: Install gensim
+        run: pip install --upgrade gensim
+        
       - name: Install requirements
         run: python -m pip install -r ./requirements.txt
         
