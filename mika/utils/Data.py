@@ -19,7 +19,7 @@ from nltk import pos_tag
 from gensim.utils import simple_tokenize
 from gensim.models import Phrases
 from symspellpy import SymSpell, Verbosity
-import pkg_resources
+import importlib_resources
 import re
 
 class Data():
@@ -360,8 +360,9 @@ class Data():
         # replaces mispelled words with correct words in a collection of texts, where correction_list is list of mispelled words and their corrections
 
         sym_spell = SymSpell()
-        dictionary_path = pkg_resources.resource_filename("symspellpy", "frequency_dictionary_en_82_765.txt")
-        sym_spell.load_dictionary(dictionary_path, term_index=0, count_index=1)
+        ref = importlib_resources.files("symspellpy") / "frequency_dictionary_en_82_765.txt"
+        with importlib_resources.as_file(ref) as dictionary_path:
+            sym_spell.load_dictionary(dictionary_path, term_index=0, count_index=1)
         texts = [[self.__spelling_replace(word, sym_spell, correction_list) for word in text] for text in texts if not isinstance(text,float)]
         return texts
     
@@ -382,8 +383,9 @@ class Data():
         # performs word segmentation on a collection of texts, where correction_list is list of misspelled words and their corrections
 
         sym_spell = SymSpell()
-        dictionary_path = pkg_resources.resource_filename("symspellpy", "frequency_dictionary_en_82_765.txt")
-        sym_spell.load_dictionary(dictionary_path, term_index=0, count_index=1)
+        ref = importlib_resources.files("symspellpy") / "frequency_dictionary_en_82_765.txt"
+        with importlib_resources.as_file(ref) as dictionary_path:
+            sym_spell.load_dictionary(dictionary_path, term_index=0, count_index=1)
         texts = [self.__segment_replace(text, sym_spell, correction_list) for text in texts if not isinstance(text,float)]
         return texts
         
