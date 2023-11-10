@@ -12,22 +12,27 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
         with:
-          python-version: '3.11'
+          python-version: '3.8'
           
+      - uses: nikeee/setup-pandoc@v1
+      
       - name: Update pip
         run: |
           pip install --upgrade pip
           
-      - name: Install dependencies
+      - name: Install sphinx dependencies
         run: |
-          pip install sphinx sphinx_rtd_theme myst_parser nbsphinx
-      
+          pip install sphinx sphinx_rtd_theme myst_parser nbsphinx nbsphinx_link pypandoc_binary
+        
       - name: Install requirements
         run: python -m pip install -r ./requirements.txt
+
+      - name: Download nltk words
+        run: python -m nltk.downloader words
         
       - name: Sphinx build
         run: |
-          docs/make html
+          sphinx-build docs/source docs/build
           
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
@@ -35,5 +40,5 @@ jobs:
         with:
           publish_branch: gh-pages
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: _build/
+          publish_dir: docs/build
           force_orphan: true
