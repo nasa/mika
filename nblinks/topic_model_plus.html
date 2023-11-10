@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Topic Model Plus Example &mdash; MIKA 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/nbsphinx-code-cells.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=af2ce170"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Topic Modeling Results" href="../results/topic_modeling_results.html" />
+    <link rel="prev" title="Search" href="ir_example.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            MIKA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../components.html">MIKA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">Models</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../examples.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#utils">Utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#ir">IR</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../examples.html#kd">KD</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Topic Model Plus Example</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Data-Preparation-for-BERTopic">Data Preparation for BERTopic</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Data-Preparation-for-LDA-and-hLDA">Data Preparation for LDA and hLDA</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Initiate-topic-model-plus-object">Initiate topic model plus object</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#BERTopic">BERTopic</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#LDA-Topic-Modeling">LDA Topic Modeling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hLDA-Topic-Modeling">hLDA Topic Modeling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Loading-existing-models">Loading existing models</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../results/topic_modeling_results.html">Topic Modeling Results</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../results/taxonomy_results.html">Taxonomy Results</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fmea_example.html">FMEA Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../results/fmea_results.html">FMEA Results</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ics_heat.html">Hazard Extraction and Analysis of Trends (HEAT): ICS-209-PLUS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="safecom_heat.html">Hazard Extraction and Analysis of Trends (HEAT): SAFECOM</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#ntsb-case-study">NTSB Case Study</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MIKA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../examples.html">Examples</a></li>
+      <li class="breadcrumb-item active">Topic Model Plus Example</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/nblinks/topic_model_plus.nblink.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Topic-Model-Plus-Example">
+<h1>Topic Model Plus Example<a class="headerlink" href="#Topic-Model-Plus-Example" title="Permalink to this heading"></a></h1>
+<p>This example goes over topic model plus and includes steps for performing:</p>
+<ul class="simple">
+<li><p>LDA topic modeling</p></li>
+<li><p>hLDA topic modeling</p></li>
+<li><p>BERTopic modeling</p></li>
+</ul>
+<p>First, we load our data, in this case the ICS-209-PLUS data set, filter it, then set up our topic models</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import sys
+import os
+sys.path.append(os.path.join(&quot;..&quot;,&quot;..&quot;))
+
+from mika.kd import Topic_Model_plus
+from mika.utils import Data
+from mika.utils.stopwords.ICS_stop_words import stop_words
+from sklearn.feature_extraction.text import CountVectorizer
+from bertopic import BERTopic
+import os
+import pandas as pd
+
+ICS_stop_words = stop_words
+</pre></div>
+</div>
+</div>
+<section id="Data-Preparation-for-BERTopic">
+<h2>Data Preparation for BERTopic<a class="headerlink" href="#Data-Preparation-for-BERTopic" title="Permalink to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># load data for BERTopic
+ICS_data = Data()
+file_name = os.path.join(&#39;..&#39;,&#39;..&#39;,&#39;data&#39;,&#39;ICS&#39;,&#39;ics209-plus-wf_sitreps_1999to2014.csv&#39;)
+text_columns = [&quot;REMARKS&quot;, &quot;SIGNIF_EVENTS_SUMMARY&quot;, &quot;MAJOR_PROBLEMS&quot;]
+document_id_col = &quot;INCIDENT_ID&quot;
+ICS_data.load(file_name, id_col=document_id_col, text_columns=text_columns, load_kwargs={&#39;dtype&#39;:str})
+ICS_data.prepare_data(create_ids=True, combine_columns=text_columns, remove_incomplete_rows=True)
+ICS_data.text_columns = [&#39;Combined Text&#39;]
+save_words = [&#39;jurisdictions&#39;, &#39;team&#39;, &#39;command&#39;, &#39;organization&#39;, &#39;type&#39;, &#39;involved&#39;, &#39;transition&#39;, &#39;transfer&#39;, &#39;impact&#39;, &#39;concern&#39;, &#39;site&#39;, &#39;nation&#39;, &#39;political&#39;, &#39;social&#39;, &#39;adjacent&#39;, &#39;community&#39;, &#39;cultural&#39;, &#39;tribal&#39;, &#39;monument&#39;, &#39;archeaological&#39;, &#39;highway&#39;, &#39;traffic&#39;, &#39;road&#39;, &#39;travel&#39;, &#39;interstate&#39;, &#39;closure&#39;, &#39;remain&#39;, &#39;remains&#39;, &#39;close&#39;, &#39;block&#39;, &#39;continue&#39;, &#39;impact&#39;, &#39;access&#39;, &#39;limit&#39;, &#39;limited&#39;, &#39;terrain&#39;, &#39;rollout&#39;, &#39;snag&#39;, &#39;steep&#39;, &#39;debris&#39;, &#39;access&#39;, &#39;terrian&#39;, &#39;concern&#39;, &#39;hazardous&#39;, &#39;pose&#39;, &#39;heavy&#39;, &#39;rugged&#39;, &#39;difficult&#39;, &#39;steep&#39;, &#39;narrow&#39;, &#39;violation&#39;, &#39;notification&#39;, &#39;respond&#39;, &#39;law&#39;, &#39;patrol&#39;, &#39;cattle&#39;, &#39;buffalo&#39;, &#39;grow&#39;, &#39;allotment&#39;, &#39;ranch&#39;, &#39;sheep&#39;, &#39;livestock&#39;, &#39;grazing&#39;, &#39;pasture&#39;, &#39;threaten&#39;, &#39;concern&#39;, &#39;risk&#39;, &#39;threat&#39;, &#39;evacuation&#39;, &#39;evacuate&#39;, &#39; threaten&#39;, &#39;threat&#39;, &#39;resident&#39;, &#39; residence&#39;, &#39;level&#39;, &#39;notice&#39;, &#39;community&#39;, &#39;structure&#39;, &#39;subdivision&#39;, &#39;mandatory&#39;, &#39;order&#39;, &#39;effect&#39;, &#39;remain&#39;, &#39;continue&#39;, &#39;issued&#39;, &#39;issue&#39;, &#39;injury&#39;, &#39;hospital&#39;, &#39;injured&#39;, &#39;accident&#39;, &#39;treatment&#39;, &#39;laceration&#39;, &#39;firefighter&#39;, &#39;treated&#39;, &#39;minor&#39;, &#39;report&#39;, &#39;transport&#39;, &#39;heat&#39;, &#39;shoulder&#39;, &#39;ankle&#39;, &#39;medical&#39;, &#39;released&#39;, &#39;military&#39;, &#39;unexploded&#39;, &#39;national&#39;, &#39;training&#39;, &#39;present&#39;, &#39;ordinance&#39;, &#39;guard&#39;, &#39;infrastructure&#39;, &#39;utility&#39;, &#39;powerline&#39;, &#39;water&#39;, &#39;electric&#39;, &#39;pipeline&#39;, &#39;powerlines&#39;, &#39;watershed&#39;, &#39;pole&#39;, &#39;power&#39;, &#39;gas&#39;, &#39;concern&#39;, &#39;near&#39;, &#39;hazard&#39;, &#39;critical&#39;, &#39;threaten&#39;, &#39;threat&#39;, &#39;off&#39;, &#39;weather&#39;, &#39;behavior&#39;, &#39;wind&#39;, &#39;thunderstorm&#39;, &#39;storm&#39;, &#39;gusty&#39;, &#39;lightning&#39;, &#39;flag&#39;, &#39;unpredictable&#39;, &#39;extreme&#39;, &#39;erratic&#39;, &#39;strong&#39;, &#39;red&#39;, &#39;warning&#39;, &#39;species&#39;, &#39;specie&#39;, &#39;habitat&#39;, &#39;animal&#39;, &#39;plant&#39;, &#39;conservation&#39;, &#39;threaten&#39;, &#39;endanger&#39;, &#39;threat&#39;, &#39;sensitive&#39;, &#39;threatened&#39;, &#39;endangered&#39;, &#39;risk&#39;, &#39;loss&#39;, &#39;impacts&#39;, &#39;unstaffed&#39;, &#39;resources&#39;, &#39;support&#39;, &#39;crew&#39;, &#39;aircraft&#39;, &#39;helicopter&#39;, &#39;engines&#39;, &#39;staffing&#39;, &#39;staff&#39;, &#39;lack&#39;, &#39;need&#39;, &#39;shortage&#39;, &#39;minimal&#39;, &#39;share&#39;, &#39;necessary&#39;, &#39;limited&#39;, &#39;limit&#39;, &#39;fatigue&#39;, &#39;flood&#39;, &#39;flashflood&#39;, &#39;flash&#39;, &#39;risk&#39;, &#39;potential&#39;, &#39;mapping&#39;, &#39;map&#39;, &#39;reflect&#39;, &#39;accurate&#39;, &#39;adjustment&#39;, &#39;change&#39;, &#39;reflect&#39;, &#39;aircraft&#39;, &#39;heli&#39;, &#39;helicopter&#39;, &#39;aerial&#39;, &#39;tanker&#39;, &#39;copter&#39;, &#39;grounded&#39;, &#39;ground&#39;, &#39;suspended&#39;, &#39;suspend&#39;, &#39;smoke&#39;, &#39;impact&#39;, &#39;hazard&#39;, &#39;windy&#39;, &#39;humidity&#39;, &#39;moisture&#39;, &#39;hot&#39;, &#39;drought&#39;, &#39;low&#39;, &#39;dry&#39;, &#39;prolonged&#39;]
+# filter data
+file = os.path.join(&#39;..&#39;,&#39;..&#39;,&#39;data&#39;,&#39;ICS&#39;,&#39;summary_reports_cleaned.csv&#39;)
+filtered_df = pd.read_csv(file, dtype=str)
+filtered_ids = filtered_df[&#39;INCIDENT_ID&#39;].unique()
+ICS_data.data_df = ICS_data.data_df.loc[ICS_data.data_df[&#39;INCIDENT_ID&#39;].isin(filtered_ids)].reset_index(drop=True)
+ICS_data.doc_ids = ICS_data.data_df[&#39;Unique IDs&#39;].tolist()
+# save raw text for bertopic
+raw_text = ICS_data.data_df[ICS_data.text_columns]
+ICS_data.sentence_tokenization()
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Removing Incomplete Rows…: 100%|██████████| 120804/120804 [01:22&lt;00:00, 1462.63it/s]
+Creating Unique IDs…: 100%|██████████| 37350/37350 [00:01&lt;00:00, 20368.50it/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+data preparation:  1.43 minutes
+
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Sentence Tokenization…: 100%|██████████| 26397/26397 [00:37&lt;00:00, 703.36it/s]
+</pre></div></div>
+</div>
+</section>
+<section id="Data-Preparation-for-LDA-and-hLDA">
+<h2>Data Preparation for LDA and hLDA<a class="headerlink" href="#Data-Preparation-for-LDA-and-hLDA" title="Permalink to this heading"></a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># load data for LDA/hLDA
+
+file = os.path.join(&#39;..&#39;,&#39;..&#39;,&#39;data&#39;,&#39;ICS&#39;,&#39;ICS_filtered_preprocessed_combined_data.csv&#39;)
+ICS_data_processed = Data()
+ICS_data_processed.load(file, preprocessed=True, id_col=&#39;Unique IDs&#39;, text_columns=[&#39;Combined Text&#39;], name=&#39;ICS&#39;)
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Initiate-topic-model-plus-object">
+<h2>Initiate topic model plus object<a class="headerlink" href="#Initiate-topic-model-plus-object" title="Permalink to this heading"></a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>ICS_tm = Topic_Model_plus(text_columns=[&#39;Combined Text Sentences&#39;], data=ICS_data)
+</pre></div>
+</div>
+</div>
+</section>
+<section id="BERTopic">
+<h2>BERTopic<a class="headerlink" href="#BERTopic" title="Permalink to this heading"></a></h2>
+<p>To use BERTopic in MIKA, you can define:</p>
+<ul class="simple">
+<li><p>a vectorizor model, which creates ngrams while excluding stopwords</p></li>
+<li><p>seed topics</p></li>
+</ul>
+<p>One key difference between MIKA and the base BERTopic is that MIKA has a from_probs argument that allows users to assign topics to documents based on a probability threshold, whereas traditional BERTopic only assigns one topic to each document.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from nltk.corpus import stopwords
+total_stopwords = stopwords.words(&#39;english&#39;)+ICS_stop_words
+vectorizer_model = CountVectorizer(ngram_range=(1, 3), stop_words=total_stopwords) #removes stopwords
+seed_topic_list = [[&#39;highway&#39;, &#39;traffic&#39;, &#39;road&#39;, &#39;travel&#39;, &#39;interstate&#39;, &#39;closure&#39;, &#39;remain&#39;, &#39;remains&#39;, &#39;close&#39;, &#39;block&#39;, &#39;impact&#39;, &#39;access&#39;, &#39;limit&#39;, &#39;limited&#39;],
+                    [&#39;transition&#39;, &#39;transfer&#39;],
+                    [&#39;evacuation&#39;, &#39;evacuate&#39;,],
+                    [&#39;mapping&#39;, &#39;map&#39;, &#39;reflect&#39;, &#39;accurate&#39;, &#39;adjustment&#39;, &#39;change&#39;, &#39;reflect&#39;, &#39;inaccurate&#39;],
+                    [&#39;aerial&#39;,&#39;inversion&#39;, &#39;suspend&#39;, &#39;suspendsion&#39;, &#39;prohibit&#39;, &#39;delay&#39;, &#39;hamper&#39;, &#39;unable&#39;, &#39;cancel&#39;, &#39;inability&#39;, &#39;loss&#39;, &#39;curtail&#39;, &#39;challenge&#39;, &#39;smoke&#39;],
+                    [&#39;unstaffed&#39;, &#39;resource&#39;, &#39;lack&#39;, &#39;need&#39;, &#39;shortage&#39;, &#39;minimal&#39;, &#39;share&#39;, &#39;necessary&#39;, &#39;limited&#39;, &#39;limit&#39;, &#39;fatigue&#39;],
+                    [&#39;injury&#39;, &#39;hospital&#39;, &#39;injured&#39;, &#39;accident&#39;, &#39;treatment&#39;, &#39;laceration&#39;, &#39;firefighter&#39;, &#39;treat&#39;, &#39;minor&#39;, &#39;report&#39;, &#39;transport&#39;, &#39;heat&#39;, &#39;shoulder&#39;, &#39;ankle&#39;, &#39;medical&#39;, &#39;release&#39;],
+                    [&#39;cultural&#39;, &#39;tribal&#39;, &#39;monument&#39;, &#39;archaeological&#39;, &#39;heritage&#39;, &#39;site&#39;, &#39;nation&#39;, &#39;political&#39;, &#39;social&#39;, &#39;adjacent&#39;, &#39;community&#39;],
+                    [&#39;cattle&#39;, &#39;buffalo&#39;, &#39;allotment&#39;, &#39;ranch&#39;, &#39;sheep&#39;, &#39;livestock&#39;, &#39;grazing&#39;, &#39;pasture&#39;, &#39;threaten&#39;, &#39;concern&#39;, &#39;risk&#39;, &#39;threat&#39;, &#39;private&#39;, &#39;area&#39;, &#39;evacuate&#39;, &#39;evacuation&#39;, &#39;order&#39;],
+                    [&#39;violation&#39;, &#39;arson&#39;, &#39;notification&#39;, &#39;respond&#39;, &#39;law&#39;],
+                    [&#39;military&#39;, &#39;unexploded&#39;, &#39;training&#39;, &#39;present&#39;, &#39;ordinance&#39;, &#39;proximity&#39;, &#39;activity&#39;, &#39;active&#39;, &#39;base&#39;, &#39;area&#39;],
+                    [&#39;infrastructure&#39;, &#39;utility&#39;, &#39;powerline&#39;, &#39;water&#39;, &#39;electric&#39;, &#39;pipeline&#39;, &#39;powerlines&#39;, &#39;watershed&#39;, &#39;pole&#39;, &#39;power&#39;, &#39;gas&#39;],
+                    [&#39;weather&#39;, &#39;behavior&#39;, &#39;wind&#39;, &#39;thunderstorm&#39;, &#39;storm&#39;, &#39;gusty&#39;, &#39;lightning&#39;, &#39;flag&#39;, &#39;unpredictable&#39;, &#39;extreme&#39;, &#39;erratic&#39;, &#39;strong&#39;, &#39;red&#39;, &#39;warning&#39;, &#39;warn&#39;],
+                    [&#39;species&#39;, &#39;habitat&#39;, &#39;animal&#39;, &#39;plant&#39;, &#39;conservation&#39;, &#39;threaten&#39;, &#39;endanger&#39;, &#39;threat&#39;, &#39;sensitive&#39;, &#39;risk&#39;, &#39;loss&#39;, &#39;impact&#39;],
+                    [&#39;terrain&#39;, &#39;rollout&#39;, &#39;snag&#39;, &#39;steep&#39;, &#39;debris&#39;, &#39;access&#39;, &#39;concern&#39;, &#39;hazardous&#39;, &#39;pose&#39;, &#39;heavy&#39;, &#39;rugged&#39;, &#39;difficult&#39;, &#39;steep&#39;, &#39;narrow&#39;],
+                    [&#39;humidity&#39;, &#39;moisture&#39;, &#39;hot&#39;, &#39;drought&#39;, &#39;low&#39;, &#39;dry&#39;, &#39;prolong&#39;]]
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>BERTkwargs={&quot;seed_topic_list&quot;:seed_topic_list,
+            &quot;top_n_words&quot;: 20,
+            &#39;min_topic_size&#39;:150}
+ICS_tm.bert_topic(count_vectorizor=vectorizer_model, BERTkwargs=BERTkwargs, from_probs=True)
+ICS_tm.save_bert_results(from_probs=True) #warning: saving in excel can result in missing data when char limit is reached
+ICS_tm.save_bert_topics_from_probs()
+#get coherence
+ICS_tm.save_bert_coherence(coh_method=&#39;c_v&#39;)
+ICS_tm.save_bert_coherence(coh_method=&#39;c_npmi&#39;)
+ICS_tm.save_bert_vis()
+ICS_tm.save_bert_model()
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "1a6b5f33bc7743d5b4d52b714f9401b2", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2023-09-19 09:11:58,268 - BERTopic - Transformed documents to Embeddings
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "0e047d3d3b184c29b04eca7f2f397423", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2023-09-19 09:23:08,908 - BERTopic - Reduced dimensionality
+2023-09-19 09:26:58,891 - BERTopic - Clustered reduced embeddings
+</pre></div></div>
+</div>
+</section>
+<section id="LDA-Topic-Modeling">
+<h2>LDA Topic Modeling<a class="headerlink" href="#LDA-Topic-Modeling" title="Permalink to this heading"></a></h2>
+<p>LDA topic modeling is a wrapper for tomotopy (<a class="reference external" href="https://bab2min.github.io/tomotopy/v/en/">https://bab2min.github.io/tomotopy/v/en/</a>) and requires preprocessed text. Users must specify the number of topics, while other arguments are optional.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>ICS_tm = Topic_Model_plus(text_columns=[&#39;Combined Text&#39;], data=ICS_data_processed)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>text_columns = [&quot;Combined Text&quot;]
+num_topics = {attr:50 for attr in text_columns}
+ICS_tm.lda(min_cf=1, num_topics=num_topics, min_df=1, alpha=1, eta=0.0001)
+ICS_tm.save_lda_results()
+ICS_tm.save_lda_models()
+for attr in text_columns:
+    ICS_tm.lda_visual(attr)
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Combined Text LDA…: 100%|██████████| 100/100 [01:40&lt;00:00,  1.01s/it]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+LDA:  1.7821103811264039  minutes
+</pre></div></div>
+</div>
+</section>
+<section id="hLDA-Topic-Modeling">
+<h2>hLDA Topic Modeling<a class="headerlink" href="#hLDA-Topic-Modeling" title="Permalink to this heading"></a></h2>
+<p>hLDA topic modeling is a wrapper for tomotopy (<a class="reference external" href="https://bab2min.github.io/tomotopy/v/en/">https://bab2min.github.io/tomotopy/v/en/</a>) and requires preprocessed text. Users must specify the number of levels in the hierarchical model, while other arguments are optional.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>ICS_tm.hlda(levels=3, eta=0.50, min_cf=1, min_df=1)
+ICS_tm.save_hlda_models()
+ICS_tm.save_hlda_results()
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Combined Text hLDA…: 100%|██████████| 100/100 [1:32:36&lt;00:00, 55.57s/it]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+hLDA:  92.72793128490449  minutes
+</pre></div></div>
+</div>
+</section>
+<section id="Loading-existing-models">
+<h2>Loading existing models<a class="headerlink" href="#Loading-existing-models" title="Permalink to this heading"></a></h2>
+<section id="id1">
+<h3>BERTopic<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
+<p>Previously trained models can be loaded back into topic model plus for new inference or further training, using BERTopics load feature</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>model_path = os.path.join(r&quot;C:\Users\srandrad\smart_nlp\examples\KD\topic_model_resultsSep-19-2023&quot;)
+ICS_tm = Topic_Model_plus(text_columns=[&#39;Combined Text Sentences&#39;], data=ICS_data)
+ICS_tm.load_bert_model(model_path, reduced=False, from_probs=True)
+ICS_tm.save_bert_results()
+</pre></div>
+</div>
+</div>
+</section>
+<section id="hLDA/LDA">
+<h3>hLDA/LDA<a class="headerlink" href="#hLDA/LDA" title="Permalink to this heading"></a></h3>
+<p>Similarly, previously trained hLDA and LDA models can be loaded back into topic model plus</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>text_columns = [&quot;Combined Text&quot;]
+ICS_tm = Topic_Model_plus(text_columns=text_columns, data=ICS_data)
+ICS_tm.combine_cols = True
+filepath = os.path.join(&quot;topic_model_results&quot;)
+ICS_tm.hlda_extract_models(filepath)
+ICS_tm.save_hlda_results()
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ir_example.html" class="btn btn-neutral float-left" title="Search" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../results/topic_modeling_results.html" class="btn btn-neutral float-right" title="Topic Modeling Results" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright © 2023 United States Government as represented by the Administrator of the National Aeronautics and Space Administration. All Rights Reserved.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

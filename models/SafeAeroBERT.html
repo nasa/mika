@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SafeAeroBERT &mdash; MIKA 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=af2ce170"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Custom Information Retrieval" href="CustomIR.html" />
+    <link rel="prev" title="Models" href="../models.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            MIKA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../components.html">MIKA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data.html">Datasets</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../models.html">Models</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">SafeAeroBERT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="CustomIR.html">Custom Information Retrieval</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FMEA.html">Custom Named-Entity Recognition</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MIKA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../models.html">Models</a></li>
+      <li class="breadcrumb-item active">SafeAeroBERT</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/models/SafeAeroBERT.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="safeaerobert">
+<h1>SafeAeroBERT<a class="headerlink" href="#safeaerobert" title="Permalink to this heading"></a></h1>
+<p>SafeAeroBERT: A Safety-Informed Aviation-Specific Langauge Model</p>
+<p>Available at: <a class="reference external" href="https://huggingface.co/NASA-AIML/MIKA_SafeAeroBERT">https://huggingface.co/NASA-AIML/MIKA_SafeAeroBERT</a></p>
+<p>base-bert-uncased model first further pre-trained on the set of Aviation Safety Reporting System (ASRS) documents up to November of 2022 and National Trasportation Safety Board (NTSB) accident reports up to November 2022. A total of 2,283,435 narrative sections are split 90/10 for training and validation, with 1,052,207,104 tokens from over 350,000 NTSB and ASRS documents used for pre-training.</p>
+<p>The model was trained on two epochs using <cite>AutoModelForMaskedLM.from_pretrained</cite> with a <cite>learning_rate=1e-5</cite>, and total batch size of 128 for just over 32100 training steps.</p>
+<p>An earlier version of the model was evaluted on a downstream binary document classification task by fine-tuning the model with <cite>AutoModelForSequenceClassification.from_pretrained</cite>. SafeAeroBERT was compared to SciBERT and base-BERT on this task, with the following performance:</p>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Classification Metrics</span><a class="headerlink" href="#id1" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Contributing Factor</p></th>
+<th class="head"><p>Metric</p></th>
+<th class="head"><p>BERT</p></th>
+<th class="head"><p>SciBERT</p></th>
+<th class="head"><p>SafeAeroBERT</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Aircraft</p></td>
+<td><p>Accuracy</p></td>
+<td><p><strong>0.747</strong></p></td>
+<td><p>0.726</p></td>
+<td><p>0.740</p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Precision</p></td>
+<td><p><strong>0.716</strong></p></td>
+<td><p>0.691 -</p></td>
+<td><p>0.548</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Recall</p></td>
+<td><p><strong>0.747</strong></p></td>
+<td><p>0.726</p></td>
+<td><p>0.740</p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>F-1</p></td>
+<td><p><strong>0.719</strong></p></td>
+<td><p>0.699</p></td>
+<td><p>0.629</p></td>
+</tr>
+<tr class="row-even"><td><p>Human Factors</p></td>
+<td><p>Accuracy</p></td>
+<td><p><strong>0.608</strong></p></td>
+<td><p>0.557</p></td>
+<td><p>0.549</p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Precision</p></td>
+<td><p><strong>0.618</strong></p></td>
+<td><p>0.586</p></td>
+<td><p>0.527</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Recall</p></td>
+<td><p><strong>0.608</strong></p></td>
+<td><p>0.557</p></td>
+<td><p>0.549</p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>F-1</p></td>
+<td><p><strong>0.572*</strong></p></td>
+<td><p>0.426</p></td>
+<td><p>0.400</p></td>
+</tr>
+<tr class="row-even"><td><p>Procedure</p></td>
+<td><p>Accuracy</p></td>
+<td><p>0.766</p></td>
+<td><p>0.755</p></td>
+<td><p><strong>0.845</strong></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Precision</p></td>
+<td><p><strong>0.766</strong></p></td>
+<td><p>0.762</p></td>
+<td><p>0.742</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Recall</p></td>
+<td><p>0.766</p></td>
+<td><p>0.755</p></td>
+<td><p><strong>0.845</strong></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>F-1</p></td>
+<td><p>0.766</p></td>
+<td><p>0.758</p></td>
+<td><p><strong>0.784</strong></p></td>
+</tr>
+<tr class="row-even"><td><p>Weather</p></td>
+<td><p>Accuracy</p></td>
+<td><p>0.807</p></td>
+<td><p>0.808</p></td>
+<td><p><strong>0.871</strong></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Precision</p></td>
+<td><p><strong>0.803</strong></p></td>
+<td><p>0.769</p></td>
+<td><p>0.759</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Recall</p></td>
+<td><p>0.807</p></td>
+<td><p>0.808</p></td>
+<td><p><strong>0.871</strong></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>F-1</p></td>
+<td><p>0.805</p></td>
+<td><p>0.788</p></td>
+<td><p><strong>0.811</strong></p></td>
+</tr>
+</tbody>
+</table>
+<p>More infomation on training data, evaluation, and intended use can be found in the original publication</p>
+<p>Citation: Sequoia R. Andrade and Hannah S. Walsh. “SafeAeroBERT: Towards a Safety-Informed Aerospace-Specific Language Model,” AIAA 2023-3437. AIAA AVIATION 2023 Forum. June 2023.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../models.html" class="btn btn-neutral float-left" title="Models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="CustomIR.html" class="btn btn-neutral float-right" title="Custom Information Retrieval" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright © 2023 United States Government as represented by the Administrator of the National Aeronautics and Space Administration. All Rights Reserved.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

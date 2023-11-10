@@ -1,0 +1,3334 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hazard Extraction and Analysis of Trends (HEAT): SAFECOM &mdash; MIKA 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/nbsphinx-code-cells.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=af2ce170"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Case Study: NTSB Reports" href="ntsb.html" />
+    <link rel="prev" title="Hazard Extraction and Analysis of Trends (HEAT): ICS-209-PLUS" href="ics_heat.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            MIKA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../components.html">MIKA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">Models</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../examples.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#utils">Utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#ir">IR</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../examples.html#kd">KD</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="topic_model_plus.html">Topic Model Plus Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../results/topic_modeling_results.html">Topic Modeling Results</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../results/taxonomy_results.html">Taxonomy Results</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fmea_example.html">FMEA Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../results/fmea_results.html">FMEA Results</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ics_heat.html">Hazard Extraction and Analysis of Trends (HEAT): ICS-209-PLUS</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Hazard Extraction and Analysis of Trends (HEAT): SAFECOM</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#SAFECOM-Data">SAFECOM Data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Hazard-Extraction-and-Primary-Analysis">Hazard Extraction and Primary Analysis</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Graphic-Analysis">Graphic Analysis</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Secondary-Analysis">Secondary Analysis</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Situation-Specific-Risk-Matrices">Situation Specific Risk Matrices</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#ntsb-case-study">NTSB Case Study</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MIKA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../examples.html">Examples</a></li>
+      <li class="breadcrumb-item active">Hazard Extraction and Analysis of Trends (HEAT): SAFECOM</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/nblinks/safecom_heat.nblink.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Hazard-Extraction-and-Analysis-of-Trends-(HEAT):-SAFECOM">
+<h1>Hazard Extraction and Analysis of Trends (HEAT): SAFECOM<a class="headerlink" href="#Hazard-Extraction-and-Analysis-of-Trends-(HEAT):-SAFECOM" title="Permalink to this heading"></a></h1>
+<p>This notebook provides an example of the trend analysis portion of the Hazard Extraction and Analysis of Trends framework. Trend analysis is applied the the SAFECOM dataset of wildfire aviation mishaps, available here: <a class="reference external" href="https://www.safecom.gov/">https://www.safecom.gov/</a></p>
+<p>This example uses the trend analysis module from MIKA’s knowledge discovery toolkit, as well as the Data utility and SAFECOM utilities.</p>
+<p>Prior to this analysis, hazard extraction is performed using the topic model plus module.</p>
+<section id="Imports">
+<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this heading"></a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import pandas as pd
+import numpy as np
+%matplotlib inline
+import matplotlib.style
+matplotlib.style.use(&quot;seaborn-v0_8&quot;)
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+import textwrap
+import seaborn as sn
+sn.color_palette(&quot;hls&quot;, 17)
+import scipy.stats as st
+import math
+from sklearn.metrics import cohen_kappa_score
+import pingouin as pg
+plt.rcParams[&quot;font.family&quot;] = &quot;Times New Roman&quot;
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import sys
+import os
+sys.path.append(os.path.join(&quot;..&quot;, &quot;..&quot;, &quot;..&quot;, &quot;..&quot;))
+
+from mika.kd.trend_analysis import *
+from mika.utils import Data
+from mika.utils.SAFECOM import *
+</pre></div>
+</div>
+</div>
+</section>
+<section id="SAFECOM-Data">
+<h2>SAFECOM Data<a class="headerlink" href="#SAFECOM-Data" title="Permalink to this heading"></a></h2>
+<p>Prior to performing HEAT, the SAFECOM dataset needs to be loaded in and cleaned.</p>
+<p>The MIKA Data class is used for loading in the preprocessed data.</p>
+<p>Additional cleaning includes: - identifying event occurrence year - removing non-fire reports - correcting regions</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>list_of_attributes = [&#39;Narrative&#39;]
+extra_cols = [&#39;Agency&#39;, &#39;Region&#39;, &#39;Location&#39;, &#39;Date&#39;, &#39;Date Submitted&#39;, &#39;Tracking #&#39;,
+              &#39;Mission Type&#39;, &#39;Persons Onboard&#39;, &#39;Departure Point&#39;, &#39;Destination&#39;,
+              &#39;Special Use&#39;, &#39;Damages&#39;, &#39;Injuries&#39;, &#39;Hazardous Materials&#39;, &#39;Other Mission Type&#39;,
+              &#39;Type&#39;, &#39;Manufacturer&#39;, &#39;Model&#39;, &#39;Hazard&#39;, &#39;Incident Management&#39;,
+              &#39;UAS&#39;, &#39;Accident&#39;, &#39;Airspace&#39;, &#39;Maintenance&#39;, &#39;Mishap Prevention&#39;
+              ]
+document_id_col = &#39;Tracking #&#39;
+
+file = os.path.join(&#39;topic_model_results&#39;,&#39;preprocessed_data.csv&#39;)
+safecom = Data()
+safecom.load(file, preprocessed=True, id_col=document_id_col, text_columns=list_of_attributes)
+preprocessed_df = safecom.data_df
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>#extract event occurrence year
+preprocessed_df[&#39;Year&#39;] = [preprocessed_df.at[i,&#39;Date&#39;].split(&#39;/&#39;)[-1] for i in range(len(preprocessed_df))]
+preprocessed_df[&#39;Day&#39;] = [preprocessed_df.at[i,&#39;Date&#39;].split(&#39;/&#39;)[1] for i in range(len(preprocessed_df))]
+preprocessed_df[&#39;Month&#39;] = [preprocessed_df.at[i,&#39;Date&#39;].split(&#39;/&#39;)[0] for i in range(len(preprocessed_df))]
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>preprocessed_df = preprocessed_df.loc[(preprocessed_df[&#39;Year&#39;].astype(int)&lt;2021) &amp; (preprocessed_df[&#39;Year&#39;].astype(int)&gt;1994)].reset_index(drop=True)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>#remove ids from results file and preprocessed_df if the mission is non-fire
+non_fire_missions = [mission for mission in list(preprocessed_df[&#39;Mission Type&#39;]) if type(mission) is str and &#39;non-fire&#39; in mission.lower()]
+ids_to_drop = preprocessed_df.loc[preprocessed_df[&#39;Mission Type&#39;].isin(non_fire_missions)][&#39;Tracking #&#39;].tolist()
+preprocessed_df = preprocessed_df.loc[~preprocessed_df[&#39;Tracking #&#39;].isin(ids_to_drop)].reset_index(drop=True)
+print(len(ids_to_drop))
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+1983
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>#correct regions to match corresponding USFS regions
+preprocessed_df = correct_regions(preprocessed_df)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>preprocessed_df
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Agency</th>
+      <th>Region</th>
+      <th>Location</th>
+      <th>Date</th>
+      <th>Date Submitted</th>
+      <th>Tracking #</th>
+      <th>Mission Type</th>
+      <th>Persons Onboard</th>
+      <th>Departure Point</th>
+      <th>Destination</th>
+      <th>...</th>
+      <th>UAS</th>
+      <th>Accident</th>
+      <th>Airspace</th>
+      <th>Maintenance</th>
+      <th>Mishap Prevention</th>
+      <th>Raw_Narrative</th>
+      <th>Year</th>
+      <th>Day</th>
+      <th>Month</th>
+      <th>region_corrected</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Bureau of Land Management (BLM)</td>
+      <td>Alaska State Office</td>
+      <td>Fairbanks</td>
+      <td>05/10/1995</td>
+      <td></td>
+      <td>95-0002</td>
+      <td>Fire, Smokejumper</td>
+      <td>1.0</td>
+      <td>Fairbanks</td>
+      <td></td>
+      <td>...</td>
+      <td></td>
+      <td></td>
+      <td>Intrusion</td>
+      <td></td>
+      <td></td>
+      <td>On a practice parachute jump a single engine a...</td>
+      <td>1995</td>
+      <td>10</td>
+      <td>05</td>
+      <td>Region 10 Alaska Region</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Bureau of Land Management (BLM)</td>
+      <td>Alaska State Office</td>
+      <td>Fort Wainwright</td>
+      <td>05/10/1995</td>
+      <td></td>
+      <td>95-0003</td>
+      <td>Fire, Smokejumper</td>
+      <td>4.0</td>
+      <td>Birch Hill</td>
+      <td></td>
+      <td>...</td>
+      <td></td>
+      <td></td>
+      <td>Intrusion</td>
+      <td></td>
+      <td></td>
+      <td>NXXXXX  5-10-95      A small airplane flew thr...</td>
+      <td>1995</td>
+      <td>10</td>
+      <td>05</td>
+      <td>Region 10 Alaska Region</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Bureau of Land Management (BLM)</td>
+      <td>Alaska State Office</td>
+      <td>Fort Wainwright</td>
+      <td>05/09/1995</td>
+      <td></td>
+      <td>95-0004</td>
+      <td>Fire, Air Attack</td>
+      <td>2.0</td>
+      <td>Fort Wainwright</td>
+      <td></td>
+      <td>...</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>Electrical</td>
+      <td></td>
+      <td>After takeoff from Ft. Wainwight, left generat...</td>
+      <td>1995</td>
+      <td>09</td>
+      <td>05</td>
+      <td>Region 10 Alaska Region</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Bureau of Land Management (BLM)</td>
+      <td>California State Office</td>
+      <td>BFL</td>
+      <td>07/28/1995</td>
+      <td></td>
+      <td>95-0006</td>
+      <td>Fire, Air Attack</td>
+      <td>2.0</td>
+      <td>BFL  CA.</td>
+      <td></td>
+      <td>...</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>Hydraulic</td>
+      <td></td>
+      <td>Firewall fitting cracked - leaking hydraulic f...</td>
+      <td>1995</td>
+      <td>28</td>
+      <td>07</td>
+      <td>Region 05 Pacific Southwest Region</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Bureau of Land Management (BLM)</td>
+      <td>Alaska State Office</td>
+      <td>Fire B307</td>
+      <td>06/14/1995</td>
+      <td></td>
+      <td>95-0009</td>
+      <td>Fire, Leadplane</td>
+      <td>1.0</td>
+      <td>Fire B307</td>
+      <td></td>
+      <td>...</td>
+      <td></td>
+      <td></td>
+      <td>Intrusion</td>
+      <td></td>
+      <td></td>
+      <td>While working fire B307 as a lead/air attack w...</td>
+      <td>1995</td>
+      <td>14</td>
+      <td>06</td>
+      <td>Region 10 Alaska Region</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>12546</th>
+      <td>Fish &amp; Wildlife Service (FWS)</td>
+      <td>R4-Southeast Regional Office</td>
+      <td>Haines City</td>
+      <td>11/18/2020</td>
+      <td></td>
+      <td>21-0138</td>
+      <td>Fire, Other</td>
+      <td>0.0</td>
+      <td>Everglades Headwaters NWR Complex - Hatchineha...</td>
+      <td>Everglades Headwaters NWR Complex - Hatchineha...</td>
+      <td>...</td>
+      <td>Fleet Operation, Loss of Link, Loss of GPS</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>The Parrot Anafi was flying an autonomous mapp...</td>
+      <td>2020</td>
+      <td>18</td>
+      <td>11</td>
+      <td>Region 08 Southern Area Region</td>
+    </tr>
+    <tr>
+      <th>12547</th>
+      <td>State</td>
+      <td>California</td>
+      <td>McClellan Reload Base</td>
+      <td>12/20/2020</td>
+      <td></td>
+      <td>21-0151</td>
+      <td>Fire, Leadplane</td>
+      <td>0.0</td>
+      <td></td>
+      <td></td>
+      <td>...</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>Prior to pilots' preflight, ATS noticed eviden...</td>
+      <td>2020</td>
+      <td>20</td>
+      <td>12</td>
+      <td>Region 05 Pacific Southwest Region</td>
+    </tr>
+    <tr>
+      <th>12548</th>
+      <td>State</td>
+      <td>California</td>
+      <td>Hemet Airport</td>
+      <td>12/24/2020</td>
+      <td></td>
+      <td>21-0152</td>
+      <td>Fire, Retardant Drop (Airtanker)</td>
+      <td>1.0</td>
+      <td>KHMT</td>
+      <td>KRNM</td>
+      <td>...</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>While fueling at Ramona AAB after 2.5 hour fue...</td>
+      <td>2020</td>
+      <td>24</td>
+      <td>12</td>
+      <td>Region 05 Pacific Southwest Region</td>
+    </tr>
+    <tr>
+      <th>12549</th>
+      <td>State</td>
+      <td>California</td>
+      <td>Camp Pendleton</td>
+      <td>12/24/2020</td>
+      <td></td>
+      <td>21-0154</td>
+      <td>Fire, Water Drop (Helicopter Fixed-Tank)</td>
+      <td>3.0</td>
+      <td>KCRQ</td>
+      <td>Creek Fire Camp Pendleton</td>
+      <td>...</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>While engaged in a water dropping mission HT-7...</td>
+      <td>2020</td>
+      <td>24</td>
+      <td>12</td>
+      <td>Region 05 Pacific Southwest Region</td>
+    </tr>
+    <tr>
+      <th>12550</th>
+      <td>State</td>
+      <td>California</td>
+      <td>Chico Airport</td>
+      <td>10/23/2020</td>
+      <td></td>
+      <td>21-0205</td>
+      <td>Fire, Air Attack</td>
+      <td>2.0</td>
+      <td>Chico</td>
+      <td>Chico</td>
+      <td>...</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>I was returning to Chico Airport from a fire d...</td>
+      <td>2020</td>
+      <td>23</td>
+      <td>10</td>
+      <td>Region 05 Pacific Southwest Region</td>
+    </tr>
+  </tbody>
+</table>
+<p>12551 rows × 30 columns</p>
+</div></div>
+</div>
+</section>
+<section id="Hazard-Extraction-and-Primary-Analysis">
+<h2>Hazard Extraction and Primary Analysis<a class="headerlink" href="#Hazard-Extraction-and-Primary-Analysis" title="Permalink to this heading"></a></h2>
+<p>First hazards are identified in documents using LDA topic modeling results and a hazard interptretation spreed sheet created from the topics.</p>
+<p>The hazard file and LDA results file are specified here:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>hazard_file = os.path.join(&#39;topic_model_results&#39;, &#39;hazard_interpretation_SAFECOM_Final.xlsx&#39;)
+results_file = os.path.join(&#39;topic_model_results&#39;,&#39;lda_results.xlsx&#39;)
+</pre></div>
+</div>
+</div>
+<p>Next, the hazard and results file are passed into the identify_docs_per_hazard function, which returns the frequency and documents associated with each hazard in addition to the hazard words and topics per each document:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>frequency, docs, hazard_words_per_doc, topics_per_doc, hazard_topics_per_doc = identify_docs_per_hazard(hazard_file, preprocessed_df, results_file, &#39;Raw_Narrative&#39;, &#39;Year&#39;, &quot;Tracking #&quot;, &#39;Narrative&#39;, doc_topic_dist_field=&#39;document topic distribution&#39;, topic_thresh=0.0)#,  ids_to_drop= ids_to_drop)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+100%|██████████| 26/26 [04:05&lt;00:00,  9.44s/it]
+</pre></div></div>
+</div>
+<p>Then a severity fucntion is defined to calculate hazard severity. We define severity in this case using the function below:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def safecom_severity(passengers, injury, damage):
+    key_dict = {&quot;No&quot;:0, &quot;Yes&quot;:1}
+    if passengers == &#39;&#39;:
+        passengers = 0
+    severity = float(passengers)*(key_dict[injury] + key_dict[damage])
+    if np.isnan(severity):
+        severity=0
+    return severity
+</pre></div>
+</div>
+</div>
+<p>Severity is calculated for each document using the defined function:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>preprocessed_df[&#39;severity&#39;] = [safecom_severity(preprocessed_df.iloc[i][&#39;Persons Onboard&#39;], preprocessed_df.iloc[i][&#39;Injuries&#39;], preprocessed_df.iloc[i][&#39;Damages&#39;]) for i in range(len(preprocessed_df))]
+</pre></div>
+</div>
+</div>
+<p>Now we create the primary results table. The category and subcategory for each hazard is identified from the documents using the get_categories_from_docs function. Finally, the table is created using the create_table function.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>hazards = frequency.keys()
+categories, sub_categories = get_categories_from_docs(docs, preprocessed_df, &quot;Tracking #&quot;)
+categories = categories.values()
+subcategories = sub_categories.values()
+table, severities, rates = create_table(docs, frequency, preprocessed_df, &quot;Tracking #&quot;, categories, subcategories, hazards, &#39;Year&#39;)
+</pre></div>
+</div>
+</div>
+<p>For display purposes, the table is re-indexed by hazard category and subcategory:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>table = table.sort_values([&#39;Category&#39;, &#39;Subcategory&#39;], axis=0).reset_index(drop=True)
+df = table[[&#39;Category&#39;, &#39;Subcategory&#39;]]
+ind = pd.MultiIndex.from_frame(df)
+table.index = ind
+table = table.drop([&#39;Category&#39;, &#39;Subcategory&#39;], axis=1)
+</pre></div>
+</div>
+</div>
+<p>The resulting primary results table:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>table
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>Hazards</th>
+      <th>Frequency</th>
+      <th>Rate</th>
+      <th>Severity</th>
+    </tr>
+    <tr>
+      <th>Category</th>
+      <th>Subcategory</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="2" valign="top">Airspace</th>
+      <th>Intrusion</th>
+      <td>Intrusion</td>
+      <td>676</td>
+      <td>26.000</td>
+      <td>0.010</td>
+    </tr>
+    <tr>
+      <th>Intrusion</th>
+      <td>Airspace Control Hazards</td>
+      <td>732</td>
+      <td>28.154</td>
+      <td>0.078</td>
+    </tr>
+    <tr>
+      <th rowspan="12" valign="top">Hazard</th>
+      <th>Communications</th>
+      <td>Radio Malfunction</td>
+      <td>680</td>
+      <td>26.154</td>
+      <td>0.041</td>
+    </tr>
+    <tr>
+      <th>Communications</th>
+      <td>Jumper Operations Hazards</td>
+      <td>138</td>
+      <td>5.308</td>
+      <td>2.171</td>
+    </tr>
+    <tr>
+      <th>Mission Equipment</th>
+      <td>Prescribed Burn Operations Failure</td>
+      <td>311</td>
+      <td>11.962</td>
+      <td>0.185</td>
+    </tr>
+    <tr>
+      <th>Other</th>
+      <td>Load Limits Exceeded</td>
+      <td>193</td>
+      <td>7.423</td>
+      <td>0.144</td>
+    </tr>
+    <tr>
+      <th>Other</th>
+      <td>Cargo Letdown Failure</td>
+      <td>626</td>
+      <td>24.077</td>
+      <td>0.280</td>
+    </tr>
+    <tr>
+      <th>Other</th>
+      <td>Door Failure</td>
+      <td>413</td>
+      <td>15.885</td>
+      <td>0.404</td>
+    </tr>
+    <tr>
+      <th>Pilot Action</th>
+      <td>Water Drop Bucket or Tank Failure</td>
+      <td>608</td>
+      <td>23.385</td>
+      <td>0.349</td>
+    </tr>
+    <tr>
+      <th>Pilot Action</th>
+      <td>In-flight Collision</td>
+      <td>707</td>
+      <td>27.192</td>
+      <td>0.748</td>
+    </tr>
+    <tr>
+      <th>Policy Deviation</th>
+      <td>Inadequate PPE</td>
+      <td>92</td>
+      <td>3.538</td>
+      <td>0.333</td>
+    </tr>
+    <tr>
+      <th>Policy Deviation</th>
+      <td>Personnel Duty Hours Exceeded</td>
+      <td>225</td>
+      <td>8.654</td>
+      <td>0.102</td>
+    </tr>
+    <tr>
+      <th>Policy Deviation</th>
+      <td>Medivac</td>
+      <td>143</td>
+      <td>5.500</td>
+      <td>2.178</td>
+    </tr>
+    <tr>
+      <th>Weather</th>
+      <td>Severe Weather</td>
+      <td>499</td>
+      <td>19.192</td>
+      <td>0.449</td>
+    </tr>
+    <tr>
+      <th rowspan="12" valign="top">Maintenance</th>
+      <th>Airframe</th>
+      <td>Structural Damage</td>
+      <td>505</td>
+      <td>19.423</td>
+      <td>0.626</td>
+    </tr>
+    <tr>
+      <th>Chip Light</th>
+      <td>On-board Caution Light Illuminates</td>
+      <td>1809</td>
+      <td>69.577</td>
+      <td>0.109</td>
+    </tr>
+    <tr>
+      <th>Electrical</th>
+      <td>Avionics Malfunction</td>
+      <td>214</td>
+      <td>8.231</td>
+      <td>0.148</td>
+    </tr>
+    <tr>
+      <th>Electrical</th>
+      <td>Electrical Failure</td>
+      <td>727</td>
+      <td>27.962</td>
+      <td>0.118</td>
+    </tr>
+    <tr>
+      <th>Engine</th>
+      <td>Water or Retardant Loading &amp; Jettison Failure</td>
+      <td>427</td>
+      <td>16.423</td>
+      <td>0.180</td>
+    </tr>
+    <tr>
+      <th>Engine</th>
+      <td>Engine Malfunction</td>
+      <td>2638</td>
+      <td>101.462</td>
+      <td>0.116</td>
+    </tr>
+    <tr>
+      <th>Flight Controls</th>
+      <td>Control Surface Damage</td>
+      <td>195</td>
+      <td>7.500</td>
+      <td>0.337</td>
+    </tr>
+    <tr>
+      <th>Fuel</th>
+      <td>Fuel System Malfunction</td>
+      <td>577</td>
+      <td>22.192</td>
+      <td>0.085</td>
+    </tr>
+    <tr>
+      <th>Hydraulic</th>
+      <td>Hydraulic Fluid Leaks and Malfunctions</td>
+      <td>449</td>
+      <td>17.269</td>
+      <td>0.131</td>
+    </tr>
+    <tr>
+      <th>Landing Gear</th>
+      <td>Landing Gear Malfunction</td>
+      <td>519</td>
+      <td>19.962</td>
+      <td>0.366</td>
+    </tr>
+    <tr>
+      <th>Oil</th>
+      <td>Oil Malfunction</td>
+      <td>560</td>
+      <td>21.538</td>
+      <td>0.055</td>
+    </tr>
+    <tr>
+      <th>Rotor (Tail)</th>
+      <td>Rotor &amp; Propeller Damage</td>
+      <td>498</td>
+      <td>19.154</td>
+      <td>0.460</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>id_field = &#39;Tracking #&#39;
+category_fields = [&#39;Hazard&#39;, &#39;UAS&#39;, &#39;Accident&#39;, &#39;Airspace&#39;, &#39;Maintenance&#39;, &#39;Mishap Prevention&#39;]
+categories = {hazard: [] for hazard in docs}
+sub_categories = {hazard: [] for hazard in docs}
+for hazard in docs:
+    ids = [id_ for year in docs[hazard] for id_ in docs[hazard][year]]
+    hazard_df = preprocessed_df.loc[preprocessed_df[id_field].isin(ids)].reset_index(drop=True)
+    #main category is the category with the most reports
+    cat_counts = {}
+    for cat in category_fields:
+        cat_counts[cat] = len(hazard_df.loc[hazard_df[cat]!=&quot;&quot;])
+    main_category = max(cat_counts, key=cat_counts.get)
+    categories[hazard] = main_category
+    #subcategories are the most common value in that catgeory
+    if len(hazard_df[main_category].value_counts()) == 0:
+        sub_categories[hazard] = &quot;&quot;
+    else:
+        sub_cats = hazard_df[main_category].tolist()
+        sub_cats = [cat for sub_cat in sub_cats for cat in str(sub_cat).split(&quot;, &quot;)]
+        sub_cats =[cat for cat in sub_cats if cat != &#39;&#39;]
+        sub_cat_series = pd.Series(sub_cats).dropna()
+        if hazard == &#39;Airspace Control Hazards&#39;:
+            print(sub_cat_series.value_counts())
+        sub_categories[hazard] = sub_cat_series.value_counts().idxmax(axis = 0)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Intrusion          114
+Conflict           100
+Near Mid-Air        70
+Procedures          66
+Congestion          38
+Other               25
+UAS                 15
+Route Deviation     10
+dtype: int64
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>table.to_csv(&#39;SAFECOM_hazards.csv&#39;)
+</pre></div>
+</div>
+</div>
+<p>To evaluate the quality of the hazard extraction, we recommend randomly sampling 1000 documents to manually label as containing or not containing each hazard. This can be done using the sample_for_accuracy function.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>#uncomment this code to create a random sample of 1000 documents for manual labeling
+#sample_for_accuracy(preprocessed_df, id_col=&#39;Tracking #&#39;, text_col=&#39;Raw_Narrative&#39;, hazards=hazards, save_path=os.path.join(os.getcwd(), &#39;hazard_validation.csv&#39;), num_sample=1000)
+</pre></div>
+</div>
+</div>
+<p>The 1000 document set should be split into a validation set and a test set. The validation set can be used to refine the hazard extraction. For example, you can add/remove topics and hazard words from the hazard interpretation spreadsheet based on the validation set. The test set is not used to tune the hazard extraction, and thus serves as a measure of generalizability.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>#uncomment this code to split the full labeled dataset into a validation and test set
+# val = pd.read_csv(&#39;hazard_validation.csv&#39;, index_col=0)
+# test = val.sample(n=500).reset_index(drop=True)
+# val = val[~val[&#39;Tracking #&#39;].isin(test[&#39;Tracking #&#39;].tolist())].reset_index(drop=True)
+# test.to_csv(&#39;labeled_hazards_val.csv&#39;)
+# val.to_csv(&#39;labeled_hazards_test.csv&#39;)
+</pre></div>
+</div>
+</div>
+<p>Classification metrics (f1, recall, precision, and accuracy) are calculated for the test and validation set to evaluate the quality of the hazard extraction.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>metrics, true, pred = calc_classification_metrics(&#39;labeled_hazards_val.csv&#39;, docs_per_hazard=docs, id_col=&#39;Tracking #&#39;)
+hazards_for_mismatch = metrics[metrics[&#39;F1&#39;]&lt;0.7].index
+_ = examine_hazard_extraction_mismatches(preprocessed_df, true, pred, hazards, hazard_words_per_doc=hazard_words_per_doc, topics_per_doc=topics_per_doc, hazard_topics_per_doc=hazard_topics_per_doc, results_path=&#39;topic_model_results&#39;, id_col=&#39;Tracking #&#39;, text_col=&#39;Raw_Narrative&#39;)
+test_metrics, _, _ = calc_classification_metrics(&#39;labeled_hazards_test.csv&#39;, docs_per_hazard=docs, id_col=&#39;Tracking #&#39;)
+hazards_sorted = table[&#39;Hazards&#39;].tolist()
+hazard_extraction = pd.concat([metrics,test_metrics],axis=1,keys=[&#39;Validation&#39;,&#39;Test&#39;]).reindex(hazards_sorted)
+</pre></div>
+</div>
+</div>
+<p>We output the validation and test classification metrics as a table:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>hazard_extraction
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="5" halign="left">Validation</th>
+      <th colspan="5" halign="left">Test</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>Recall</th>
+      <th>Precision</th>
+      <th>F1</th>
+      <th>Accuracy</th>
+      <th>Support</th>
+      <th>Recall</th>
+      <th>Precision</th>
+      <th>F1</th>
+      <th>Accuracy</th>
+      <th>Support</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Intrusion</th>
+      <td>0.846</td>
+      <td>0.880</td>
+      <td>0.863</td>
+      <td>0.986</td>
+      <td>26</td>
+      <td>0.727</td>
+      <td>0.889</td>
+      <td>0.800</td>
+      <td>0.976</td>
+      <td>33</td>
+    </tr>
+    <tr>
+      <th>Airspace Control Hazards</th>
+      <td>0.742</td>
+      <td>0.742</td>
+      <td>0.742</td>
+      <td>0.968</td>
+      <td>31</td>
+      <td>0.386</td>
+      <td>0.500</td>
+      <td>0.436</td>
+      <td>0.912</td>
+      <td>44</td>
+    </tr>
+    <tr>
+      <th>Radio Malfunction</th>
+      <td>0.824</td>
+      <td>0.800</td>
+      <td>0.812</td>
+      <td>0.974</td>
+      <td>34</td>
+      <td>0.435</td>
+      <td>0.303</td>
+      <td>0.357</td>
+      <td>0.928</td>
+      <td>23</td>
+    </tr>
+    <tr>
+      <th>Jumper Operations Hazards</th>
+      <td>0.857</td>
+      <td>0.857</td>
+      <td>0.857</td>
+      <td>0.996</td>
+      <td>7</td>
+      <td>0.667</td>
+      <td>0.333</td>
+      <td>0.444</td>
+      <td>0.990</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>Prescribed Burn Operations Failure</th>
+      <td>1.000</td>
+      <td>1.000</td>
+      <td>1.000</td>
+      <td>1.000</td>
+      <td>11</td>
+      <td>1.000</td>
+      <td>0.625</td>
+      <td>0.769</td>
+      <td>0.994</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>Load Limits Exceeded</th>
+      <td>1.000</td>
+      <td>0.571</td>
+      <td>0.727</td>
+      <td>0.994</td>
+      <td>4</td>
+      <td>0.250</td>
+      <td>0.200</td>
+      <td>0.222</td>
+      <td>0.986</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>Cargo Letdown Failure</th>
+      <td>1.000</td>
+      <td>0.826</td>
+      <td>0.905</td>
+      <td>0.992</td>
+      <td>19</td>
+      <td>0.600</td>
+      <td>0.571</td>
+      <td>0.585</td>
+      <td>0.966</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <th>Door Failure</th>
+      <td>1.000</td>
+      <td>1.000</td>
+      <td>1.000</td>
+      <td>1.000</td>
+      <td>12</td>
+      <td>0.389</td>
+      <td>0.538</td>
+      <td>0.452</td>
+      <td>0.966</td>
+      <td>18</td>
+    </tr>
+    <tr>
+      <th>Water Drop Bucket or Tank Failure</th>
+      <td>0.786</td>
+      <td>0.880</td>
+      <td>0.830</td>
+      <td>0.982</td>
+      <td>28</td>
+      <td>0.636</td>
+      <td>0.700</td>
+      <td>0.667</td>
+      <td>0.958</td>
+      <td>33</td>
+    </tr>
+    <tr>
+      <th>In-flight Collision</th>
+      <td>0.900</td>
+      <td>0.720</td>
+      <td>0.800</td>
+      <td>0.982</td>
+      <td>20</td>
+      <td>0.750</td>
+      <td>0.517</td>
+      <td>0.612</td>
+      <td>0.962</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <th>Inadequate PPE</th>
+      <td>1.000</td>
+      <td>0.500</td>
+      <td>0.667</td>
+      <td>0.998</td>
+      <td>1</td>
+      <td>0.750</td>
+      <td>1.000</td>
+      <td>0.857</td>
+      <td>0.998</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>Personnel Duty Hours Exceeded</th>
+      <td>1.000</td>
+      <td>1.000</td>
+      <td>1.000</td>
+      <td>1.000</td>
+      <td>4</td>
+      <td>0.500</td>
+      <td>0.400</td>
+      <td>0.444</td>
+      <td>0.980</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>Medivac</th>
+      <td>0.875</td>
+      <td>0.875</td>
+      <td>0.875</td>
+      <td>0.996</td>
+      <td>8</td>
+      <td>0.667</td>
+      <td>0.600</td>
+      <td>0.632</td>
+      <td>0.986</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>Severe Weather</th>
+      <td>0.840</td>
+      <td>0.778</td>
+      <td>0.808</td>
+      <td>0.980</td>
+      <td>25</td>
+      <td>0.440</td>
+      <td>0.478</td>
+      <td>0.458</td>
+      <td>0.948</td>
+      <td>25</td>
+    </tr>
+    <tr>
+      <th>Structural Damage</th>
+      <td>0.923</td>
+      <td>0.750</td>
+      <td>0.828</td>
+      <td>0.990</td>
+      <td>13</td>
+      <td>0.556</td>
+      <td>0.476</td>
+      <td>0.513</td>
+      <td>0.962</td>
+      <td>18</td>
+    </tr>
+    <tr>
+      <th>On-board Caution Light Illuminates</th>
+      <td>0.926</td>
+      <td>0.714</td>
+      <td>0.806</td>
+      <td>0.952</td>
+      <td>54</td>
+      <td>0.903</td>
+      <td>0.823</td>
+      <td>0.861</td>
+      <td>0.958</td>
+      <td>72</td>
+    </tr>
+    <tr>
+      <th>Avionics Malfunction</th>
+      <td>0.750</td>
+      <td>0.600</td>
+      <td>0.667</td>
+      <td>0.994</td>
+      <td>4</td>
+      <td>0.385</td>
+      <td>0.625</td>
+      <td>0.476</td>
+      <td>0.978</td>
+      <td>13</td>
+    </tr>
+    <tr>
+      <th>Electrical Failure</th>
+      <td>0.962</td>
+      <td>0.893</td>
+      <td>0.926</td>
+      <td>0.992</td>
+      <td>26</td>
+      <td>0.750</td>
+      <td>0.706</td>
+      <td>0.727</td>
+      <td>0.964</td>
+      <td>32</td>
+    </tr>
+    <tr>
+      <th>Water or Retardant Loading &amp; Jettison Failure</th>
+      <td>0.667</td>
+      <td>1.000</td>
+      <td>0.800</td>
+      <td>0.988</td>
+      <td>18</td>
+      <td>0.472</td>
+      <td>0.895</td>
+      <td>0.618</td>
+      <td>0.958</td>
+      <td>36</td>
+    </tr>
+    <tr>
+      <th>Engine Malfunction</th>
+      <td>0.857</td>
+      <td>0.783</td>
+      <td>0.818</td>
+      <td>0.936</td>
+      <td>84</td>
+      <td>0.860</td>
+      <td>0.748</td>
+      <td>0.800</td>
+      <td>0.920</td>
+      <td>93</td>
+    </tr>
+    <tr>
+      <th>Control Surface Damage</th>
+      <td>1.000</td>
+      <td>0.714</td>
+      <td>0.833</td>
+      <td>0.996</td>
+      <td>5</td>
+      <td>0.429</td>
+      <td>0.600</td>
+      <td>0.500</td>
+      <td>0.988</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>Fuel System Malfunction</th>
+      <td>0.808</td>
+      <td>0.875</td>
+      <td>0.840</td>
+      <td>0.984</td>
+      <td>26</td>
+      <td>0.591</td>
+      <td>0.812</td>
+      <td>0.684</td>
+      <td>0.976</td>
+      <td>22</td>
+    </tr>
+    <tr>
+      <th>Hydraulic Fluid Leaks and Malfunctions</th>
+      <td>0.889</td>
+      <td>0.889</td>
+      <td>0.889</td>
+      <td>0.992</td>
+      <td>18</td>
+      <td>0.800</td>
+      <td>0.706</td>
+      <td>0.750</td>
+      <td>0.984</td>
+      <td>15</td>
+    </tr>
+    <tr>
+      <th>Landing Gear Malfunction</th>
+      <td>1.000</td>
+      <td>1.000</td>
+      <td>1.000</td>
+      <td>1.000</td>
+      <td>15</td>
+      <td>0.643</td>
+      <td>0.529</td>
+      <td>0.581</td>
+      <td>0.974</td>
+      <td>14</td>
+    </tr>
+    <tr>
+      <th>Oil Malfunction</th>
+      <td>1.000</td>
+      <td>0.923</td>
+      <td>0.960</td>
+      <td>0.998</td>
+      <td>12</td>
+      <td>0.821</td>
+      <td>0.920</td>
+      <td>0.868</td>
+      <td>0.986</td>
+      <td>28</td>
+    </tr>
+    <tr>
+      <th>Rotor &amp; Propeller Damage</th>
+      <td>1.000</td>
+      <td>0.875</td>
+      <td>0.933</td>
+      <td>0.996</td>
+      <td>14</td>
+      <td>0.600</td>
+      <td>0.545</td>
+      <td>0.571</td>
+      <td>0.964</td>
+      <td>20</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>For the final results, we calculate the classification metrics on the full labeled set and include the hazard definitions in a table:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>full_metrics, _, _ = calc_classification_metrics(&#39;hazard_validation.csv&#39;, docs_per_hazard=docs, id_col=&#39;Tracking #&#39;)
+full_metrics[&#39;Definition&#39;] = pd.read_excel(hazard_file, sheet_name=&#39;topic-focused&#39;)[&#39;Definition&#39;].tolist()
+full_metrics = full_metrics[[&#39;Definition&#39;, &#39;Recall&#39;, &#39;Precision&#39;, &#39;F1&#39;, &#39;Accuracy&#39;, &#39;Support&#39;]]
+full_metrics = full_metrics.reindex(hazards_sorted)
+avg = {}; stddev = {}
+for col in full_metrics:
+    if col == &#39;Definition&#39;:
+        avg[col] = &#39;n/a&#39;
+        stddev[col] = &#39;n/a&#39;
+    else:
+        avg[col] = round(np.average(full_metrics[col].tolist()),3)
+        stddev[col] = round(np.std(full_metrics[col].tolist()), 3)
+avg = pd.Series(avg.values(), avg.keys(), name=&#39;Average&#39;)
+stddev = pd.Series(stddev.values(), stddev.keys(), name=&#39;Std Dev&#39;)
+full_metrics = full_metrics.append(avg)
+full_metrics = full_metrics.append(stddev)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>full_metrics
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Definition</th>
+      <th>Recall</th>
+      <th>Precision</th>
+      <th>F1</th>
+      <th>Accuracy</th>
+      <th>Support</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Intrusion</th>
+      <td>Airspace intrusion by unknown or known aircraft</td>
+      <td>0.780</td>
+      <td>0.885</td>
+      <td>0.829</td>
+      <td>0.981</td>
+      <td>59.000</td>
+    </tr>
+    <tr>
+      <th>Airspace Control Hazards</th>
+      <td>Hazards arising from the complex airspace, inc...</td>
+      <td>0.533</td>
+      <td>0.615</td>
+      <td>0.571</td>
+      <td>0.940</td>
+      <td>75.000</td>
+    </tr>
+    <tr>
+      <th>Radio Malfunction</th>
+      <td>Radio malfunctions, including receiving and tr...</td>
+      <td>0.667</td>
+      <td>0.559</td>
+      <td>0.608</td>
+      <td>0.951</td>
+      <td>57.000</td>
+    </tr>
+    <tr>
+      <th>Jumper Operations Hazards</th>
+      <td>Hazards arising from smoke jumper operations, ...</td>
+      <td>0.800</td>
+      <td>0.615</td>
+      <td>0.696</td>
+      <td>0.993</td>
+      <td>10.000</td>
+    </tr>
+    <tr>
+      <th>Prescribed Burn Operations Failure</th>
+      <td>Failures occuring during prescribed burn opera...</td>
+      <td>1.000</td>
+      <td>0.842</td>
+      <td>0.914</td>
+      <td>0.997</td>
+      <td>16.000</td>
+    </tr>
+    <tr>
+      <th>Load Limits Exceeded</th>
+      <td>Exceeded or overloaded aircraft, including bot...</td>
+      <td>0.625</td>
+      <td>0.417</td>
+      <td>0.500</td>
+      <td>0.990</td>
+      <td>8.000</td>
+    </tr>
+    <tr>
+      <th>Cargo Letdown Failure</th>
+      <td>Unintentional cargo release, lost cargo during...</td>
+      <td>0.795</td>
+      <td>0.705</td>
+      <td>0.747</td>
+      <td>0.979</td>
+      <td>39.000</td>
+    </tr>
+    <tr>
+      <th>Door Failure</th>
+      <td>Failure of aircraft or retardant/tank doors, i...</td>
+      <td>0.633</td>
+      <td>0.760</td>
+      <td>0.691</td>
+      <td>0.983</td>
+      <td>30.000</td>
+    </tr>
+    <tr>
+      <th>Water Drop Bucket or Tank Failure</th>
+      <td>Equipment issues with water drop bucket and lo...</td>
+      <td>0.705</td>
+      <td>0.782</td>
+      <td>0.741</td>
+      <td>0.970</td>
+      <td>61.000</td>
+    </tr>
+    <tr>
+      <th>In-flight Collision</th>
+      <td>In-flight collision, predominantley with non-a...</td>
+      <td>0.825</td>
+      <td>0.611</td>
+      <td>0.702</td>
+      <td>0.972</td>
+      <td>40.000</td>
+    </tr>
+    <tr>
+      <th>Inadequate PPE</th>
+      <td>Missing or innappropriate protection gear.</td>
+      <td>0.800</td>
+      <td>0.800</td>
+      <td>0.800</td>
+      <td>0.998</td>
+      <td>5.000</td>
+    </tr>
+    <tr>
+      <th>Personnel Duty Hours Exceeded</th>
+      <td>Personnel working over contracted hours and fa...</td>
+      <td>0.667</td>
+      <td>0.571</td>
+      <td>0.615</td>
+      <td>0.990</td>
+      <td>12.000</td>
+    </tr>
+    <tr>
+      <th>Medivac</th>
+      <td>Medical evacuation via air ambulence for both ...</td>
+      <td>0.765</td>
+      <td>0.722</td>
+      <td>0.743</td>
+      <td>0.991</td>
+      <td>17.000</td>
+    </tr>
+    <tr>
+      <th>Severe Weather</th>
+      <td>Severe weather, including fire-produced smoke ...</td>
+      <td>0.640</td>
+      <td>0.640</td>
+      <td>0.640</td>
+      <td>0.964</td>
+      <td>50.000</td>
+    </tr>
+    <tr>
+      <th>Structural Damage</th>
+      <td>Damage to structure of aircraft, including cra...</td>
+      <td>0.710</td>
+      <td>0.595</td>
+      <td>0.647</td>
+      <td>0.976</td>
+      <td>31.000</td>
+    </tr>
+    <tr>
+      <th>On-board Caution Light Illuminates</th>
+      <td>Any on-board maintenance light illuminates, in...</td>
+      <td>0.913</td>
+      <td>0.772</td>
+      <td>0.836</td>
+      <td>0.955</td>
+      <td>126.000</td>
+    </tr>
+    <tr>
+      <th>Avionics Malfunction</th>
+      <td>Malfunctions with specific software and avioni...</td>
+      <td>0.471</td>
+      <td>0.615</td>
+      <td>0.533</td>
+      <td>0.986</td>
+      <td>17.000</td>
+    </tr>
+    <tr>
+      <th>Electrical Failure</th>
+      <td>Failure with general electrical comonents, suc...</td>
+      <td>0.845</td>
+      <td>0.790</td>
+      <td>0.817</td>
+      <td>0.978</td>
+      <td>58.000</td>
+    </tr>
+    <tr>
+      <th>Water or Retardant Loading &amp; Jettison Failure</th>
+      <td>Includes premature jettison of retardant and w...</td>
+      <td>0.537</td>
+      <td>0.935</td>
+      <td>0.682</td>
+      <td>0.973</td>
+      <td>54.000</td>
+    </tr>
+    <tr>
+      <th>Engine Malfunction</th>
+      <td>General engine malfunction, chip light indicat...</td>
+      <td>0.859</td>
+      <td>0.764</td>
+      <td>0.809</td>
+      <td>0.928</td>
+      <td>177.000</td>
+    </tr>
+    <tr>
+      <th>Control Surface Damage</th>
+      <td>Damage or failure of a control surface or sont...</td>
+      <td>0.667</td>
+      <td>0.667</td>
+      <td>0.667</td>
+      <td>0.992</td>
+      <td>12.000</td>
+    </tr>
+    <tr>
+      <th>Fuel System Malfunction</th>
+      <td>Any malfunction in the fuel system, including ...</td>
+      <td>0.708</td>
+      <td>0.850</td>
+      <td>0.773</td>
+      <td>0.980</td>
+      <td>48.000</td>
+    </tr>
+    <tr>
+      <th>Hydraulic Fluid Leaks and Malfunctions</th>
+      <td>Leaks and failures with hydraulic systems, inc...</td>
+      <td>0.848</td>
+      <td>0.800</td>
+      <td>0.824</td>
+      <td>0.988</td>
+      <td>33.000</td>
+    </tr>
+    <tr>
+      <th>Landing Gear Malfunction</th>
+      <td>Failure of gear to retract or extend, damage t...</td>
+      <td>0.828</td>
+      <td>0.750</td>
+      <td>0.787</td>
+      <td>0.987</td>
+      <td>29.000</td>
+    </tr>
+    <tr>
+      <th>Oil Malfunction</th>
+      <td>Any malfunction in the oil system, including t...</td>
+      <td>0.875</td>
+      <td>0.921</td>
+      <td>0.897</td>
+      <td>0.992</td>
+      <td>40.000</td>
+    </tr>
+    <tr>
+      <th>Rotor &amp; Propeller Damage</th>
+      <td>Damage to rotor or propellor blades, include c...</td>
+      <td>0.765</td>
+      <td>0.684</td>
+      <td>0.722</td>
+      <td>0.980</td>
+      <td>34.000</td>
+    </tr>
+    <tr>
+      <th>Average</th>
+      <td>n/a</td>
+      <td>0.741</td>
+      <td>0.718</td>
+      <td>0.723</td>
+      <td>0.977</td>
+      <td>43.769</td>
+    </tr>
+    <tr>
+      <th>Std Dev</th>
+      <td>n/a</td>
+      <td>0.123</td>
+      <td>0.122</td>
+      <td>0.105</td>
+      <td>0.017</td>
+      <td>36.969</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<section id="Annotator-agreement">
+<h3>Annotator agreement<a class="headerlink" href="#Annotator-agreement" title="Permalink to this heading"></a></h3>
+<p>Since the annotations of the validation/test data was split 75/25% between two annotators, we calculate annotator agreement on a subset of 50 documents.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>#interrater agreement
+file = os.path.join(os.getcwd(), &quot;interrater_agreement_v2.xlsx&quot;)
+r1 = pd.read_excel(file, sheet_name=&#39;SA&#39;)
+r2 = pd.read_excel(file, sheet_name=&#39;HW&#39;)
+disagreements = {}
+agreement = {}
+for col in r1.columns[3:]:
+    if (sum(r1[col])+sum((r2[col]))&gt;0):
+        agreement[col] = cohen_kappa_score(r1[col],r2[col])
+        disagreements[col] = [r1.at[ind, &#39;Tracking #&#39;] for ind in range(len(r1[col])) if r1[col][ind]!=r2[col][ind]]
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>pd.DataFrame.from_dict(disagreements, orient=&#39;index&#39;).transpose().to_csv(&quot;annotater_disagreement_v2.csv&quot;)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>np.average([float(v) for v in agreement.values() if not np.isnan(v)])
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0.7383031494420794
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>agreement
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;Hydraulic Fluid Leaks and Malfunctions&#39;: 1.0,
+ &#39;Intrusion&#39;: 1.0,
+ &#39;Water Drop Bucket or Tank Failure&#39;: 1.0,
+ &#39;Water or Retardant Loading &amp; Jettison Failure&#39;: 0.48453608247422675,
+ &#39;Radio Malfunction&#39;: 1.0,
+ &#39;On-board Caution Light Illuminates&#39;: 1.0,
+ &#39;Inadequate PPE&#39;: 0.0,
+ &#39;Electrical Failure&#39;: 0.6575342465753424,
+ &#39;Severe Weather&#39;: 0.8780487804878049,
+ &#39;In-flight Collision&#39;: 1.0,
+ &#39;Airspace Control Hazards&#39;: 0.8780487804878049,
+ &#39;Prescribed Burn Operations Failure&#39;: 1.0,
+ &#39;Engine Malfunction&#39;: 1.0,
+ &#39;Oil Malfunction&#39;: 1.0,
+ &#39;Load Limits Exceeded&#39;: -0.020408163265306145,
+ &#39;Cargo Letdown Failure&#39;: 1.0,
+ &#39;Door Failure&#39;: 1.0,
+ &#39;Medivac&#39;: 0.0,
+ &#39;Fuel System Malfunction&#39;: 0.48453608247422675,
+ &#39;Structural Damage&#39;: 0.48453608247422675,
+ &#39;Avionics Malfunction&#39;: 0.6575342465753424}
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="Graphic-Analysis">
+<h2>Graphic Analysis<a class="headerlink" href="#Graphic-Analysis" title="Permalink to this heading"></a></h2>
+<p>The graphic analysis includes: - severity graphs: - time series of hazard severity - barchart of average hazard severity - Frequency graphs: - time series of hazard frequency - time series of hazard rate - Pie charts: - distribution of region accross hazards - distribution of aircraft type accross hazards</p>
+<p>For readability, we define a subset of nine hazards for the graphic analysis.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>hazards_for_analysis = [&#39;Hydraulic Fluid Leaks and Malfunctions&#39;, &#39;Intrusion&#39;, &#39;Water Drop Bucket or Tank Failure&#39;,&#39;Radio Malfunction&#39;,
+                       &#39;Jumper Operations Hazards&#39;, &#39;Water or Retardant Loading &amp; Jettison Failure&#39;, &#39;Prescribed Burn Operations Failure&#39;,
+                       &#39;Cargo Letdown Failure&#39;, &#39;Severe Weather&#39;]
+</pre></div>
+</div>
+</div>
+<p>The corresponding frequency, docs, severities, rates, and hazard variables are updated according to the hazards of interest:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>#update: frequency, docs, severities, rates, hazards
+frequency = {hazard: frequency[hazard] for hazard in hazards_for_analysis}
+docs = {hazard: docs[hazard] for hazard in hazards_for_analysis}
+severities = {hazard: severities[hazard] for hazard in hazards_for_analysis}
+rates = {hazard: rates[hazard] for hazard in hazards_for_analysis}
+hazards = hazards_for_analysis
+</pre></div>
+</div>
+</div>
+<p>To graph the time series, we first define a list of markers and linestyles to use for the hazards:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>markers = [&#39;.&#39;,&#39;.&#39;,&#39;.&#39;, &#39;v&#39;, &#39;v&#39;,&#39;v&#39;, &#39;x&#39;, &#39;x&#39;, &#39;x&#39;]
+line_styles = [&#39;--&#39;, &#39;:&#39;,&#39;-.&#39;,&#39;--&#39;, &#39;:&#39;,&#39;-.&#39;,&#39;--&#39;, &#39;:&#39;,&#39;-.&#39;]
+</pre></div>
+</div>
+</div>
+<section id="Severity-Graphs">
+<h3>Severity Graphs<a class="headerlink" href="#Severity-Graphs" title="Permalink to this heading"></a></h3>
+<p>Here we graph the severity time series using a logarithmic scale:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># legend_kwargs = dict(bbox_to_anchor=(0.5,-0.85), loc=&quot;lower center&quot;, #mode=&quot;expand&quot;,# borderaxespad=0,
+#                       ncol=3, fontsize=26)
+legend_kwargs = {}
+plot_metric_time_series(metric_data=severities, metric_name=&quot;Severity&quot;, fontsize=18, line_styles=line_styles, markers=markers, title=&quot;&quot;, yscale=&#39;log&#39;, time_name=&#39;Year&#39;, show_std=False, save=True, legend=False, legend_kwargs=legend_kwargs, figsize=(6,4))
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_safecom_heat_53_0.png" src="../_images/nblinks_safecom_heat_53_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>metric_percentage = {hazard: full_metrics.at[hazard, &#39;F1&#39;] for hazard in hazards_for_analysis}
+bootstrap_kwargs={&#39;metric_percentages&#39;:metric_percentage, &#39;num_means&#39;:1000, &#39;CI_interval&#39;:95}
+plot_metric_time_series(metric_data=severities, metric_name=&quot;Severity&quot;, line_styles=line_styles, markers=markers, title=&quot;&quot;, yscale=&#39;log&#39;, time_name=&#39;Year&#39;, show_std=False, save=False, bootstrap=True, bootstrap_kwargs=bootstrap_kwargs)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_safecom_heat_54_0.png" src="../_images/nblinks_safecom_heat_54_0.png" />
+</div>
+</div>
+<p>next, we graph the average severity over the years:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plot_metric_averages(metric_data=severities, metric_name=&quot;Severity&quot;, show_std=True, title=&quot;&quot;, save=False, yscale=&quot;log&quot;, legend=False, fontsize=12, error_bars=&#39;CI&#39;)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_safecom_heat_56_0.png" src="../_images/nblinks_safecom_heat_56_0.png" />
+</div>
+</div>
+</section>
+<section id="Frequency-Graphs">
+<h3>Frequency Graphs<a class="headerlink" href="#Frequency-Graphs" title="Permalink to this heading"></a></h3>
+<p>Now we graph the time series of hazard frequency:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plot_frequency_time_series(frequency, metric_name=&#39;Frequency&#39;, line_styles=line_styles, markers=markers, title=&quot;Frequency from 1995-2020&quot;, time_name=&quot;Year&quot;, scale=False, save=False, legend=False)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_safecom_heat_59_0.png" src="../_images/nblinks_safecom_heat_59_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>false_pos = {hazard: 1-full_metrics.at[hazard, &#39;Precision&#39;] for hazard in hazards_for_analysis}
+false_neg= {hazard: 1-full_metrics.at[hazard, &#39;Recall&#39;] for hazard in hazards_for_analysis}
+#interval_kwargs = {&#39;false_pos_rate&#39;:false_pos, &#39;false_neg_rate&#39;:false_neg}
+plot_frequency_time_series(frequency, metric_name=&#39;Frequency&#39;, line_styles=line_styles, markers=markers, title=&quot;Frequency from 1995-2020&quot;, time_name=&quot;Year&quot;, scale=False, save=False, legend=False, interval=True)#, interval_kwargs=interval_kwargs)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_safecom_heat_60_0.png" src="../_images/nblinks_safecom_heat_60_0.png" />
+</div>
+</div>
+<p>As a comparison, we also graph the rate:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plot_frequency_time_series(rates, metric_name=&#39;Rate&#39;, line_styles=line_styles, fontsize=18, markers=markers, title=&quot;&quot;, time_name=&quot;Year&quot;, scale=False, save=True, legend=False, legend_kwargs=legend_kwargs, figsize=(6,4))
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_safecom_heat_62_0.png" src="../_images/nblinks_safecom_heat_62_0.png" />
+</div>
+</div>
+</section>
+<section id="Pie-Charts">
+<h3>Pie Charts<a class="headerlink" href="#Pie-Charts" title="Permalink to this heading"></a></h3>
+<p>pie charts are graphed for the region and aircraft type categorical variables. Other variables of interest could include ‘Manufacturer’, ‘Model’, and ‘Mission Type’.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>predictors = [&#39;region_corrected&#39;, &#39;Type&#39;]
+pie_kwargs = {&#39;pctdistance&#39;:1.2}
+
+for predictor in predictors:
+    if predictor == &#39;region_corrected&#39;:
+        predictor_label=&#39;Region&#39;
+        padding = 1
+        legend_kwargs = dict(bbox_to_anchor=(0.5,-0.2), loc=&quot;lower center&quot;, ncol=3)
+    else:
+        predictor_label = None
+        padding = 0
+        legend_kwargs = dict(bbox_to_anchor=(0.5,-0.15), loc=&quot;lower center&quot;, ncol=3)
+    make_pie_chart(docs, preprocessed_df, predictor, hazards, &#39;Tracking #&#39;, predictor_label, save=True, fontsize=22, padding=padding, pie_kwargs=pie_kwargs, legend_kwargs=legend_kwargs)
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_safecom_heat_64_0.png" src="../_images/nblinks_safecom_heat_64_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_safecom_heat_64_1.png" src="../_images/nblinks_safecom_heat_64_1.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="Secondary-Analysis">
+<h2>Secondary Analysis<a class="headerlink" href="#Secondary-Analysis" title="Permalink to this heading"></a></h2>
+<p>The secondary analysis is performed to determine if trends in the graphic analysis are statistically significant. Additionally a risk matrix is produced in this part of the analysis. This step includes: - chi-squared analysis - ANOVA - Risk matrix</p>
+<section id="Chi-Squared-Analysis">
+<h3>Chi-Squared Analysis<a class="headerlink" href="#Chi-Squared-Analysis" title="Permalink to this heading"></a></h3>
+<p>The chi-squared analysis determines if the distribution of a categorical variable, such as region, is dependent on another variable, such as the presence of a hazard. Essentially this test can determine if a hazard occurs more or less often in a certain categorical variable condition (e.g., a specific region) when compared to the complete dataset. Here we run the chi-squared test for region and aircraft type over each hazard.</p>
+<p>To do this, we must first add hazard occurrence to the preprocessed dataframe:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>#add hazard values to preprocessed_df
+preprocessed_df = add_hazards_to_docs(preprocessed_df, &quot;Tracking #&quot;, docs)
+</pre></div>
+</div>
+</div>
+<p>Now we run the chi-squared tests, which out put a statistics dataframe and a counts dataframe</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>pred_dict = {&#39;region_corrected&#39;:&#39;Region&#39;, &#39;Type&#39;: &quot;Aircraft Type&quot;, &#39;Agency&#39;:&#39;Agency&#39;}
+stats_df, count_dfs = chi_squared_tests(preprocessed_df, hazards, predictors, pred_dict)
+</pre></div>
+</div>
+</div>
+<p>The resulting stats_df contains the chi-squared statistic an p-value for each hazard and predictor. A significant p-value indicates the distribution of the predictor across reports with the hazard is different than the distribution of the predictor accross reports without the hazard.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>stats_df
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th>Predictor</th>
+      <th colspan="2" halign="left">Region</th>
+      <th colspan="2" halign="left">Aircraft Type</th>
+    </tr>
+    <tr>
+      <th>Measure</th>
+      <th>p-val</th>
+      <th>chi-squared</th>
+      <th>p-val</th>
+      <th>chi-squared</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Hydraulic Fluid Leaks and Malfunctions</th>
+      <td>0.001</td>
+      <td>28.908</td>
+      <td>0.0</td>
+      <td>134.778</td>
+    </tr>
+    <tr>
+      <th>Intrusion</th>
+      <td>0.004</td>
+      <td>24.521</td>
+      <td>0.0</td>
+      <td>1136.508</td>
+    </tr>
+    <tr>
+      <th>Water Drop Bucket or Tank Failure</th>
+      <td>0.002</td>
+      <td>26.431</td>
+      <td>0.0</td>
+      <td>462.073</td>
+    </tr>
+    <tr>
+      <th>Radio Malfunction</th>
+      <td>0.018</td>
+      <td>19.994</td>
+      <td>0.0</td>
+      <td>194.557</td>
+    </tr>
+    <tr>
+      <th>Jumper Operations Hazards</th>
+      <td>0.000</td>
+      <td>116.608</td>
+      <td>0.0</td>
+      <td>249.196</td>
+    </tr>
+    <tr>
+      <th>Water or Retardant Loading &amp; Jettison Failure</th>
+      <td>0.000</td>
+      <td>50.256</td>
+      <td>0.0</td>
+      <td>936.333</td>
+    </tr>
+    <tr>
+      <th>Prescribed Burn Operations Failure</th>
+      <td>0.000</td>
+      <td>467.884</td>
+      <td>0.0</td>
+      <td>194.023</td>
+    </tr>
+    <tr>
+      <th>Cargo Letdown Failure</th>
+      <td>0.000</td>
+      <td>53.263</td>
+      <td>0.0</td>
+      <td>391.816</td>
+    </tr>
+    <tr>
+      <th>Severe Weather</th>
+      <td>0.009</td>
+      <td>22.069</td>
+      <td>0.0</td>
+      <td>27.198</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>To futher examine these differences, we display the counts df. Negative count values indicate the condition occurs less there than expected, whereas positive values have the condition occur more. For example, there are more reports with hydraulic fluid leaks in region 5 than expected.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>for df in count_dfs:
+    display(count_dfs[df])
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>Region 05 Pacific Southwest Region</th>
+      <th>Region 04 Intermountain Region</th>
+      <th>Region 06 Pacific Northwest Region</th>
+      <th>Region 03 Southwest Region</th>
+      <th>Region 01 Northern Rockies Region</th>
+      <th>Region 02 Rocky Mountain Region</th>
+      <th>Region 08 Southern Area Region</th>
+      <th></th>
+      <th>Region 10 Alaska Region</th>
+      <th>Region 09 Eastern Area Region</th>
+    </tr>
+    <tr>
+      <th>Hazard</th>
+      <th>Present</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="2" valign="top">Hydraulic Fluid Leaks and Malfunctions</th>
+      <th>0</th>
+      <td>-10.638116</td>
+      <td>-12.806310</td>
+      <td>-5.569277</td>
+      <td>-12.981197</td>
+      <td>1.322365</td>
+      <td>-0.045415</td>
+      <td>11.523624</td>
+      <td>15.625926</td>
+      <td>9.416939</td>
+      <td>4.151462</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>10.638116</td>
+      <td>12.806310</td>
+      <td>5.569277</td>
+      <td>12.981197</td>
+      <td>-1.322365</td>
+      <td>0.045415</td>
+      <td>-11.523624</td>
+      <td>-15.625926</td>
+      <td>-9.416939</td>
+      <td>-4.151462</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Intrusion</th>
+      <th>0</th>
+      <td>9.034818</td>
+      <td>-13.801928</td>
+      <td>33.510398</td>
+      <td>-17.671022</td>
+      <td>-1.775237</td>
+      <td>7.637638</td>
+      <td>-7.516772</td>
+      <td>-10.879452</td>
+      <td>-1.294319</td>
+      <td>2.755876</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-9.034818</td>
+      <td>13.801928</td>
+      <td>-33.510398</td>
+      <td>17.671022</td>
+      <td>1.775237</td>
+      <td>-7.637638</td>
+      <td>7.516772</td>
+      <td>10.879452</td>
+      <td>1.294319</td>
+      <td>-2.755876</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Water Drop Bucket or Tank Failure</th>
+      <th>0</th>
+      <td>-25.347383</td>
+      <td>17.113059</td>
+      <td>11.601068</td>
+      <td>8.147956</td>
+      <td>-8.336308</td>
+      <td>0.040953</td>
+      <td>-1.896741</td>
+      <td>-14.820572</td>
+      <td>12.522269</td>
+      <td>0.975699</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>25.347383</td>
+      <td>-17.113059</td>
+      <td>-11.601068</td>
+      <td>-8.147956</td>
+      <td>8.336308</td>
+      <td>-0.040953</td>
+      <td>1.896741</td>
+      <td>14.820572</td>
+      <td>-12.522269</td>
+      <td>-0.975699</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Radio Malfunction</th>
+      <th>0</th>
+      <td>28.822006</td>
+      <td>-15.149869</td>
+      <td>7.093299</td>
+      <td>-5.189786</td>
+      <td>-1.389292</td>
+      <td>-2.033145</td>
+      <td>-0.200303</td>
+      <td>-16.588798</td>
+      <td>7.834117</td>
+      <td>-3.198231</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-28.822006</td>
+      <td>15.149869</td>
+      <td>-7.093299</td>
+      <td>5.189786</td>
+      <td>1.389292</td>
+      <td>2.033145</td>
+      <td>0.200303</td>
+      <td>16.588798</td>
+      <td>-7.834117</td>
+      <td>3.198231</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Jumper Operations Hazards</th>
+      <th>0</th>
+      <td>16.157995</td>
+      <td>-20.503944</td>
+      <td>-7.889889</td>
+      <td>10.602661</td>
+      <td>-6.684886</td>
+      <td>4.357979</td>
+      <td>10.918174</td>
+      <td>7.027568</td>
+      <td>-15.568959</td>
+      <td>1.583300</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-16.157995</td>
+      <td>20.503944</td>
+      <td>7.889889</td>
+      <td>-10.602661</td>
+      <td>6.684886</td>
+      <td>-4.357979</td>
+      <td>-10.918174</td>
+      <td>-7.027568</td>
+      <td>15.568959</td>
+      <td>-1.583300</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Water or Retardant Loading &amp; Jettison Failure</th>
+      <th>0</th>
+      <td>-4.967652</td>
+      <td>-15.392638</td>
+      <td>10.224763</td>
+      <td>-18.627998</td>
+      <td>-4.800335</td>
+      <td>-13.856107</td>
+      <td>21.783045</td>
+      <td>10.027328</td>
+      <td>11.710541</td>
+      <td>3.899052</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>4.967652</td>
+      <td>15.392638</td>
+      <td>-10.224763</td>
+      <td>18.627998</td>
+      <td>4.800335</td>
+      <td>13.856107</td>
+      <td>-21.783045</td>
+      <td>-10.027328</td>
+      <td>-11.710541</td>
+      <td>-3.899052</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Prescribed Burn Operations Failure</th>
+      <th>0</th>
+      <td>47.203888</td>
+      <td>19.697634</td>
+      <td>24.320612</td>
+      <td>11.416142</td>
+      <td>8.007250</td>
+      <td>3.596606</td>
+      <td>-81.394550</td>
+      <td>-12.401641</td>
+      <td>-0.014102</td>
+      <td>-20.431838</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-47.203888</td>
+      <td>-19.697634</td>
+      <td>-24.320612</td>
+      <td>-11.416142</td>
+      <td>-8.007250</td>
+      <td>-3.596606</td>
+      <td>81.394550</td>
+      <td>12.401641</td>
+      <td>0.014102</td>
+      <td>20.431838</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Cargo Letdown Failure</th>
+      <th>0</th>
+      <td>6.194965</td>
+      <td>-10.952673</td>
+      <td>-24.775874</td>
+      <td>24.313521</td>
+      <td>-16.599554</td>
+      <td>14.522428</td>
+      <td>26.527368</td>
+      <td>-9.512628</td>
+      <td>-12.899769</td>
+      <td>3.182217</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-6.194965</td>
+      <td>10.952673</td>
+      <td>24.775874</td>
+      <td>-24.313521</td>
+      <td>16.599554</td>
+      <td>-14.522428</td>
+      <td>-26.527368</td>
+      <td>9.512628</td>
+      <td>12.899769</td>
+      <td>-3.182217</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Severe Weather</th>
+      <th>0</th>
+      <td>11.201737</td>
+      <td>-4.655565</td>
+      <td>5.716995</td>
+      <td>3.034260</td>
+      <td>4.146682</td>
+      <td>-25.930205</td>
+      <td>-0.520516</td>
+      <td>0.259103</td>
+      <td>4.022389</td>
+      <td>2.725122</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-11.201737</td>
+      <td>4.655565</td>
+      <td>-5.716995</td>
+      <td>-3.034260</td>
+      <td>-4.146682</td>
+      <td>25.930205</td>
+      <td>0.520516</td>
+      <td>-0.259103</td>
+      <td>-4.022389</td>
+      <td>-2.725122</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>Helicopter</th>
+      <th>Airplane</th>
+      <th>Airtanker (Multi-Engine)</th>
+      <th>Airtanker (SEAT)</th>
+      <th>Helitanker</th>
+      <th></th>
+      <th>Unmanned Aircraft System (UAS)</th>
+    </tr>
+    <tr>
+      <th>Hazard</th>
+      <th>Present</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="2" valign="top">Hydraulic Fluid Leaks and Malfunctions</th>
+      <th>0</th>
+      <td>51.354075</td>
+      <td>15.874432</td>
+      <td>-48.860489</td>
+      <td>3.288901</td>
+      <td>-34.007330</td>
+      <td>9.416939</td>
+      <td>2.933471</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-51.354075</td>
+      <td>-15.874432</td>
+      <td>48.860489</td>
+      <td>-3.288901</td>
+      <td>34.007330</td>
+      <td>-9.416939</td>
+      <td>-2.933471</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Intrusion</th>
+      <th>0</th>
+      <td>180.330412</td>
+      <td>-218.654530</td>
+      <td>78.555255</td>
+      <td>30.063023</td>
+      <td>16.583619</td>
+      <td>-41.294319</td>
+      <td>-45.583459</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-180.330412</td>
+      <td>218.654530</td>
+      <td>-78.555255</td>
+      <td>-30.063023</td>
+      <td>-16.583619</td>
+      <td>41.294319</td>
+      <td>45.583459</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Water Drop Bucket or Tank Failure</th>
+      <th>0</th>
+      <td>-207.010517</td>
+      <td>124.825512</td>
+      <td>79.144371</td>
+      <td>28.535973</td>
+      <td>-40.989881</td>
+      <td>11.522269</td>
+      <td>3.972273</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>207.010517</td>
+      <td>-124.825512</td>
+      <td>-79.144371</td>
+      <td>-28.535973</td>
+      <td>40.989881</td>
+      <td>-11.522269</td>
+      <td>-3.972273</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Radio Malfunction</th>
+      <th>0</th>
+      <td>41.409290</td>
+      <td>-72.800414</td>
+      <td>60.108836</td>
+      <td>-10.729504</td>
+      <td>19.735001</td>
+      <td>-42.165883</td>
+      <td>4.442674</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-41.409290</td>
+      <td>72.800414</td>
+      <td>-60.108836</td>
+      <td>10.729504</td>
+      <td>-19.735001</td>
+      <td>42.165883</td>
+      <td>-4.442674</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Jumper Operations Hazards</th>
+      <th>0</th>
+      <td>48.721297</td>
+      <td>-58.533025</td>
+      <td>18.098558</td>
+      <td>5.157836</td>
+      <td>5.222691</td>
+      <td>-17.568959</td>
+      <td>-1.098399</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-48.721297</td>
+      <td>58.533025</td>
+      <td>-18.098558</td>
+      <td>-5.157836</td>
+      <td>-5.222691</td>
+      <td>17.568959</td>
+      <td>1.098399</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Water or Retardant Loading &amp; Jettison Failure</th>
+      <th>0</th>
+      <td>132.920245</td>
+      <td>87.176799</td>
+      <td>-177.905187</td>
+      <td>-64.852203</td>
+      <td>11.160067</td>
+      <td>8.710541</td>
+      <td>2.789738</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-132.920245</td>
+      <td>-87.176799</td>
+      <td>177.905187</td>
+      <td>64.852203</td>
+      <td>-11.160067</td>
+      <td>-8.710541</td>
+      <td>-2.789738</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Prescribed Burn Operations Failure</th>
+      <th>0</th>
+      <td>-115.367222</td>
+      <td>55.407458</td>
+      <td>39.040953</td>
+      <td>12.131065</td>
+      <td>11.769978</td>
+      <td>-0.014102</td>
+      <td>-2.968130</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>115.367222</td>
+      <td>-55.407458</td>
+      <td>-39.040953</td>
+      <td>-12.131065</td>
+      <td>-11.769978</td>
+      <td>0.014102</td>
+      <td>2.968130</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Cargo Letdown Failure</th>
+      <th>0</th>
+      <td>-239.655565</td>
+      <td>111.669030</td>
+      <td>78.635487</td>
+      <td>17.469604</td>
+      <td>17.691339</td>
+      <td>11.100231</td>
+      <td>3.089873</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>239.655565</td>
+      <td>-111.669030</td>
+      <td>-78.635487</td>
+      <td>-17.469604</td>
+      <td>-17.691339</td>
+      <td>-11.100231</td>
+      <td>-3.089873</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Severe Weather</th>
+      <th>0</th>
+      <td>-10.659947</td>
+      <td>7.550872</td>
+      <td>26.059278</td>
+      <td>-12.117680</td>
+      <td>-7.115051</td>
+      <td>1.022389</td>
+      <td>-4.739861</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>10.659947</td>
+      <td>-7.550872</td>
+      <td>-26.059278</td>
+      <td>12.117680</td>
+      <td>7.115051</td>
+      <td>-1.022389</td>
+      <td>4.739861</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="ANOVA">
+<h3>ANOVA<a class="headerlink" href="#ANOVA" title="Permalink to this heading"></a></h3>
+<p>An ANOVA is performed to determine if there is a statistically siginificant difference in severity between the hazards.</p>
+<p>To perform this, we first format the data into an AOV_df, which allows us to easily run the test.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>severities_dict = {hazard:[] for hazard in hazards}
+AOV_df = {&#39;hazard&#39;:[], &#39;severity&#39;:[]}
+for hazard in hazards:
+    hazard_df = preprocessed_df.loc[preprocessed_df[hazard] == 1]
+    sevs = hazard_df[&#39;severity&#39;].tolist()
+    severities_dict[hazard] = sevs
+    for sev in sevs:
+        AOV_df[&#39;hazard&#39;].append(hazard)
+        AOV_df[&#39;severity&#39;].append(sev)
+AOV_df = pd.DataFrame(AOV_df)
+</pre></div>
+</div>
+</div>
+<p>Now that the data is formatted, we run the test. The Welch ANOVA is chosen because the data does not meet the criteria for a conventional ANOVA (same variances/sample sizes). The first ANOVA test we run checks if the severity between hazard and non-hazard documents is different for each hazard and the anova result is displayed.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[43]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>anovas = []
+for hazard in hazards:
+    aov = pg.welch_anova(dv=&#39;severity&#39;, between=hazard, data=preprocessed_df).round(3)
+    anovas.append(aov)
+anova_results = pd.concat(anovas)
+anova_results
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[43]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Source</th>
+      <th>ddof1</th>
+      <th>ddof2</th>
+      <th>F</th>
+      <th>p-unc</th>
+      <th>np2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Hydraulic Fluid Leaks and Malfunctions</td>
+      <td>1</td>
+      <td>478.828</td>
+      <td>2.661</td>
+      <td>0.103</td>
+      <td>0.000</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>Intrusion</td>
+      <td>1</td>
+      <td>5701.889</td>
+      <td>358.199</td>
+      <td>0.000</td>
+      <td>0.002</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>Water Drop Bucket or Tank Failure</td>
+      <td>1</td>
+      <td>699.347</td>
+      <td>17.853</td>
+      <td>0.000</td>
+      <td>0.001</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>Radio Malfunction</td>
+      <td>1</td>
+      <td>1487.105</td>
+      <td>120.882</td>
+      <td>0.000</td>
+      <td>0.002</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>Jumper Operations Hazards</td>
+      <td>1</td>
+      <td>137.102</td>
+      <td>26.684</td>
+      <td>0.000</td>
+      <td>0.045</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>Water or Retardant Loading &amp; Jettison Failure</td>
+      <td>1</td>
+      <td>503.159</td>
+      <td>0.870</td>
+      <td>0.351</td>
+      <td>0.000</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>Prescribed Burn Operations Failure</td>
+      <td>1</td>
+      <td>336.694</td>
+      <td>0.272</td>
+      <td>0.602</td>
+      <td>0.000</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>Cargo Letdown Failure</td>
+      <td>1</td>
+      <td>739.366</td>
+      <td>5.336</td>
+      <td>0.021</td>
+      <td>0.000</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>Severe Weather</td>
+      <td>1</td>
+      <td>512.122</td>
+      <td>11.595</td>
+      <td>0.001</td>
+      <td>0.002</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>Next we run an anova between all of the hazards, resulting in one F value. This test determines if there is a difference in severity between any of the hazards.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[44]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>aov = pg.welch_anova(dv=&#39;severity&#39;, between=&#39;hazard&#39;, data=AOV_df).round(3)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[45]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>aov
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[45]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Source</th>
+      <th>ddof1</th>
+      <th>ddof2</th>
+      <th>F</th>
+      <th>p-unc</th>
+      <th>np2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>hazard</td>
+      <td>8</td>
+      <td>1266.871</td>
+      <td>33.264</td>
+      <td>0.0</td>
+      <td>0.096</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>Since the ANOVA yeiled a significant result, we want to further determine which hazards are more severe than others. We do this using pairwise testing, in this case the gameshowell test.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[46]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>post_hoc = pg.pairwise_gameshowell(dv=&#39;severity&#39;, between=&#39;hazard&#39;,  data=AOV_df).round(3)
+</pre></div>
+</div>
+</div>
+<p>To simplify the results output, we filter out the results to only show hazard pairs that have a significant difference in severity</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[47]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>post_hoc = post_hoc.loc[post_hoc[&#39;pval&#39;]&lt;0.05].reset_index(drop=True)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[48]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>post_hoc = post_hoc[[&#39;A&#39;, &#39;B&#39;, &#39;df&#39;, &#39;T&#39;, &#39;pval&#39;, &#39;hedges&#39;]]
+post_hoc.index = post_hoc[&#39;A&#39;]
+post_hoc = post_hoc.drop([&#39;A&#39;], axis=1)
+post_hoc
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[48]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>B</th>
+      <th>df</th>
+      <th>T</th>
+      <th>pval</th>
+      <th>hedges</th>
+    </tr>
+    <tr>
+      <th>A</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Cargo Letdown Failure</th>
+      <td>Intrusion</td>
+      <td>674.026</td>
+      <td>8.586</td>
+      <td>0.000</td>
+      <td>0.493</td>
+    </tr>
+    <tr>
+      <th>Cargo Letdown Failure</th>
+      <td>Jumper Operations Hazards</td>
+      <td>138.706</td>
+      <td>-4.914</td>
+      <td>0.000</td>
+      <td>-0.931</td>
+    </tr>
+    <tr>
+      <th>Cargo Letdown Failure</th>
+      <td>Radio Malfunction</td>
+      <td>850.972</td>
+      <td>7.120</td>
+      <td>0.000</td>
+      <td>0.405</td>
+    </tr>
+    <tr>
+      <th>Hydraulic Fluid Leaks and Malfunctions</th>
+      <td>Jumper Operations Hazards</td>
+      <td>141.275</td>
+      <td>-5.268</td>
+      <td>0.000</td>
+      <td>-0.864</td>
+    </tr>
+    <tr>
+      <th>Hydraulic Fluid Leaks and Malfunctions</th>
+      <td>Severe Weather</td>
+      <td>852.553</td>
+      <td>-3.627</td>
+      <td>0.009</td>
+      <td>-0.230</td>
+    </tr>
+    <tr>
+      <th>Hydraulic Fluid Leaks and Malfunctions</th>
+      <td>Water Drop Bucket or Tank Failure</td>
+      <td>835.475</td>
+      <td>-3.681</td>
+      <td>0.008</td>
+      <td>-0.236</td>
+    </tr>
+    <tr>
+      <th>Intrusion</th>
+      <td>Jumper Operations Hazards</td>
+      <td>137.067</td>
+      <td>-5.619</td>
+      <td>0.000</td>
+      <td>-1.160</td>
+    </tr>
+    <tr>
+      <th>Intrusion</th>
+      <td>Prescribed Burn Operations Failure</td>
+      <td>322.167</td>
+      <td>-4.002</td>
+      <td>0.003</td>
+      <td>-0.390</td>
+    </tr>
+    <tr>
+      <th>Intrusion</th>
+      <td>Severe Weather</td>
+      <td>504.976</td>
+      <td>-6.002</td>
+      <td>0.000</td>
+      <td>-0.411</td>
+    </tr>
+    <tr>
+      <th>Intrusion</th>
+      <td>Water Drop Bucket or Tank Failure</td>
+      <td>647.167</td>
+      <td>-9.938</td>
+      <td>0.000</td>
+      <td>-0.583</td>
+    </tr>
+    <tr>
+      <th>Intrusion</th>
+      <td>Water or Retardant Loading &amp; Jettison Failure</td>
+      <td>459.811</td>
+      <td>-5.436</td>
+      <td>0.000</td>
+      <td>-0.411</td>
+    </tr>
+    <tr>
+      <th>Jumper Operations Hazards</th>
+      <td>Prescribed Burn Operations Failure</td>
+      <td>140.431</td>
+      <td>5.136</td>
+      <td>0.000</td>
+      <td>0.769</td>
+    </tr>
+    <tr>
+      <th>Jumper Operations Hazards</th>
+      <td>Radio Malfunction</td>
+      <td>137.315</td>
+      <td>5.537</td>
+      <td>0.000</td>
+      <td>1.134</td>
+    </tr>
+    <tr>
+      <th>Jumper Operations Hazards</th>
+      <td>Severe Weather</td>
+      <td>146.659</td>
+      <td>4.419</td>
+      <td>0.001</td>
+      <td>0.682</td>
+    </tr>
+    <tr>
+      <th>Jumper Operations Hazards</th>
+      <td>Water Drop Bucket or Tank Failure</td>
+      <td>139.025</td>
+      <td>4.735</td>
+      <td>0.000</td>
+      <td>0.881</td>
+    </tr>
+    <tr>
+      <th>Jumper Operations Hazards</th>
+      <td>Water or Retardant Loading &amp; Jettison Failure</td>
+      <td>138.697</td>
+      <td>5.168</td>
+      <td>0.000</td>
+      <td>0.868</td>
+    </tr>
+    <tr>
+      <th>Prescribed Burn Operations Failure</th>
+      <td>Radio Malfunction</td>
+      <td>368.341</td>
+      <td>3.190</td>
+      <td>0.041</td>
+      <td>0.281</td>
+    </tr>
+    <tr>
+      <th>Radio Malfunction</th>
+      <td>Severe Weather</td>
+      <td>531.014</td>
+      <td>-5.509</td>
+      <td>0.000</td>
+      <td>-0.374</td>
+    </tr>
+    <tr>
+      <th>Radio Malfunction</th>
+      <td>Water Drop Bucket or Tank Failure</td>
+      <td>793.955</td>
+      <td>-8.538</td>
+      <td>0.000</td>
+      <td>-0.495</td>
+    </tr>
+    <tr>
+      <th>Radio Malfunction</th>
+      <td>Water or Retardant Loading &amp; Jettison Failure</td>
+      <td>586.598</td>
+      <td>-4.166</td>
+      <td>0.001</td>
+      <td>-0.291</td>
+    </tr>
+    <tr>
+      <th>Severe Weather</th>
+      <td>Water or Retardant Loading &amp; Jettison Failure</td>
+      <td>665.899</td>
+      <td>3.399</td>
+      <td>0.020</td>
+      <td>0.211</td>
+    </tr>
+    <tr>
+      <th>Water Drop Bucket or Tank Failure</th>
+      <td>Water or Retardant Loading &amp; Jettison Failure</td>
+      <td>1024.937</td>
+      <td>3.707</td>
+      <td>0.007</td>
+      <td>0.224</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="Risk-Matrix">
+<h3>Risk Matrix<a class="headerlink" href="#Risk-Matrix" title="Permalink to this heading"></a></h3>
+<p>To display this infomation in an accessible format, we place the hazards on a risk matrix according to USFS guidelines.</p>
+<p>First, configure the plotting parameters:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[49]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import matplotlib as mpl
+mpl.rcParams.update(mpl.rcParamsDefault)
+plt.rcParams[&quot;font.family&quot;] = &quot;Times New Roman&quot;
+</pre></div>
+</div>
+</div>
+<p>Next, assign likelihood and severity categories using the numeric hazard severity and rate values previously calculated:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[50]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>severities = table[&#39;Severity&#39;]
+severities.index = table[&#39;Hazards&#39;]
+severities_raw = severities[hazards]
+severities_raw = severities_raw.to_dict()
+#severities = get_SAFECOM_severity_FAA(severities_raw)
+rates = table[&#39;Rate&#39;]
+rates.index = table[&#39;Hazards&#39;]
+rates = rates[hazards]
+rates = rates.to_dict()
+#likelihood = get_likelihood_FAA(rates)
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[51]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>severities_USFS = get_SAFECOM_severity_USFS(severities_raw)
+likelihood = get_likelihood_USFS(rates)
+</pre></div>
+</div>
+</div>
+<p>Now we can plot the risk matrix using the defined categories:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[52]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plot_USFS_risk_matrix(likelihood, severities_USFS, figsize=(9,9), save=False, results_path=&quot;SAFECOM_JAIS_USFS_risk_matrix&quot;, fontsize=10, max_chars=30, title=False)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_safecom_heat_95_0.png" src="../_images/nblinks_safecom_heat_95_0.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="Situation-Specific-Risk-Matrices">
+<h2>Situation Specific Risk Matrices<a class="headerlink" href="#Situation-Specific-Risk-Matrices" title="Permalink to this heading"></a></h2>
+<p>To demonstrate the usefulness of this framework, we present a case study of situation specific risk matrices developed from SAFECOM reports.</p>
+<p>Here we define the functions needed to create these risk matrices. They include filtering the dataframe based on a set of conditions, then recalculating the hazard rate and severity for each hazard.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[53]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def filter_df(df, filters):
+    for col in filters:
+        df = df.dropna(subset=[col])
+        df = df[df[col].apply(lambda x: filters[col] in x)].reset_index(drop=True)
+    return df
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[54]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def get_custom_rm(df, filters, hazard_file, results_file, keep_hazards=[], save=False):
+    preprocessed_df = filter_df(df, filters)
+    frequency, docs, hazard_words_per_doc, topics_per_doc, hazard_topics_per_doc = identify_docs_per_hazard(hazard_file, preprocessed_df, results_file, &#39;Narrative&#39;, &#39;Year&#39;, &quot;Tracking #&quot;, &#39;Narrative&#39;, doc_topic_dist_field=&#39;document topic distribution&#39;, topic_thresh=0.2)
+    rates = calc_rate(frequency)
+    _, severities = calc_severity_per_hazard(docs, preprocessed_df, id_field=&#39;Tracking #&#39;)
+    #replace nans with 0
+    severities = {hazard:severities[hazard] if (not np.isnan(severities[hazard])) else 0 for hazard in severities}
+    if keep_hazards == []:
+        keep_hazards = [hazard for hazard in docs]
+    #rm extra hazards
+    severities = {hazard: severities[hazard] for hazard in severities if hazard in keep_hazards}
+    rates = {hazard: rates[hazard] for hazard in rates if hazard in keep_hazards}
+    severities_USFS = get_SAFECOM_severity_USFS(severities)
+    likelihood = get_likelihood_USFS(rates)
+    filters_string = &quot;&quot;
+    for key in filters:
+        filters_string += key.replace(&quot; &quot;, &quot;_&quot;)
+        filters_string += filters[key].replace(&quot; &quot;, &quot;_&quot;)
+    results_path = &#39;risk_matrix_&#39;+filters_string+&#39;.pdf&#39;
+    plot_USFS_risk_matrix(likelihood, severities_USFS, figsize=(9,7), save=save, results_path=results_path, fontsize=10, max_chars=28, title=False)
+</pre></div>
+</div>
+</div>
+<section id="Example-1:-Aerial-commander-flying-an-Aero-Commander-airplane-in-California">
+<h3>Example 1: Aerial commander flying an Aero Commander airplane in California<a class="headerlink" href="#Example-1:-Aerial-commander-flying-an-Aero-Commander-airplane-in-California" title="Permalink to this heading"></a></h3>
+<p>We define the hazards to include on the custom risk matrix:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[55]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>keep_hazards = [&#39;Hydraulic Fluid Leaks and Malfunctions&#39;,&#39;Intrusion&#39;,&#39;Airspace Control Hazards&#39;,&#39;Radio Malfunction&#39;,&#39;Jumper Operations Hazards&#39;,
+                &#39;Cargo Letdown Failure&#39;,&#39;Severe Weather&#39;,
+               &#39;Fuel System Malfunction&#39;, &#39;Landing Gear Malfunction&#39;, &#39;Engine Malfunction&#39;, &#39;Oil Malfunction&#39;, &#39;Control Surface Damage&#39;,
+               &#39;In-flight Collision&#39;, &#39;Door Failure&#39;]
+</pre></div>
+</div>
+</div>
+<p>Next we specify the featues that define the scenario and get the custom risk matrix:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[56]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>filters ={&quot;Mission Type&quot;:&#39;Fire, Air Attack&#39;,
+          &quot;Type&quot;:&#39;Airplane&#39;,
+         &quot;Manufacturer&quot;:&#39;Aero Commander&#39;,
+         &quot;region_corrected&quot;:&#39;Region 05 Pacific Southwest Region&#39;}
+get_custom_rm(preprocessed_df, filters, hazard_file, results_file, keep_hazards)
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+100%|██████████| 26/26 [00:02&lt;00:00,  9.31it/s]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_safecom_heat_104_1.png" src="../_images/nblinks_safecom_heat_104_1.png" />
+</div>
+</div>
+</section>
+<section id="Example-2:-Air-Tanker-flying-a-redardant-drop-mission-with-a-Lockheed-multi-engine-in-Oregon">
+<h3>Example 2: Air Tanker flying a redardant drop mission with a Lockheed multi-engine in Oregon<a class="headerlink" href="#Example-2:-Air-Tanker-flying-a-redardant-drop-mission-with-a-Lockheed-multi-engine-in-Oregon" title="Permalink to this heading"></a></h3>
+<p>Again, specify the filters that define the scenario then get the risk matrix:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[57]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>filters ={&quot;Mission Type&quot;:&#39;Fire, Retardant Drop (Airtanker)&#39;,
+         &quot;Type&quot;:&#39;Airtanker (Multi-Engine)&#39;,
+          &quot;Manufacturer&quot;: &quot;Lockheed&quot;,
+         &#39;region_corrected&#39;:&#39;Region 06 Pacific Northwest Region&#39;}
+keep_hazards = [&#39;Hydraulic Fluid Leaks and Malfunctions&#39;,&#39;Intrusion&#39;,&#39;Water Drop Bucket or Tank Failure&#39;,&#39;Radio Malfunction&#39;,&#39;Jumper Operations Hazards&#39;,
+                &#39;Water or Retardant Loading &amp; Jettison Failure&#39;, &#39;Cargo Letdown Failure&#39;,&#39;Severe Weather&#39;,
+               &#39;Fuel System Malfunction&#39;, &#39;Landing Gear Malfunction&#39;, &#39;Engine Malfunction&#39;, &#39;Oil Malfunction&#39;, &#39;Control Surface Damage&#39;,
+               &#39;In-flight Collision&#39;, &#39;Door Failure&#39;]
+get_custom_rm(preprocessed_df, filters, hazard_file, results_file, keep_hazards)
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+100%|██████████| 26/26 [00:01&lt;00:00, 17.33it/s]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_safecom_heat_107_1.png" src="../_images/nblinks_safecom_heat_107_1.png" />
+</div>
+</div>
+</section>
+<section id="Example-3:-Pilot-flying-a-Bell-Helicopter-for-reconnaisance-in-Texas">
+<h3>Example 3: Pilot flying a Bell Helicopter for reconnaisance in Texas<a class="headerlink" href="#Example-3:-Pilot-flying-a-Bell-Helicopter-for-reconnaisance-in-Texas" title="Permalink to this heading"></a></h3>
+<p>In addition to specifying the filters, for this risk matrix we also define a new list of hazards that are more relevant to this scenario:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[58]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>filters ={&quot;Mission Type&quot;:&#39;Fire, Reconnaissance&#39;,
+         &quot;Type&quot;:&#39;Helicopter&#39;,
+          &quot;Manufacturer&quot;: &quot;Bell&quot;,
+          #&quot;Model&quot;:&quot;600&quot;,#includes 600
+          &#39;region_corrected&#39;:&#39;Region 08 Southern Area Region&#39;}
+keep_hazards = [&#39;Hydraulic Fluid Leaks and Malfunctions&#39;,&#39;Intrusion&#39;, &#39;Radio Malfunction&#39;,&#39;Jumper Operations Hazards&#39;,
+                &#39;Cargo Letdown Failure&#39;,&#39;Severe Weather&#39;,
+               &#39;Fuel System Malfunction&#39;, &#39;Engine Malfunction&#39;, &#39;Oil Malfunction&#39;, &#39;Control Surface Damage&#39;,
+               &#39;In-flight Collision&#39;, &#39;Door Failure&#39;]
+get_custom_rm(preprocessed_df, filters, hazard_file, results_file, keep_hazards)
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+100%|██████████| 26/26 [00:01&lt;00:00, 21.08it/s]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_safecom_heat_110_1.png" src="../_images/nblinks_safecom_heat_110_1.png" />
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ics_heat.html" class="btn btn-neutral float-left" title="Hazard Extraction and Analysis of Trends (HEAT): ICS-209-PLUS" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ntsb.html" class="btn btn-neutral float-right" title="Case Study: NTSB Reports" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright © 2023 United States Government as represented by the Administrator of the National Aeronautics and Space Administration. All Rights Reserved.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

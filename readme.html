@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Overview &mdash; MIKA 1.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=af2ce170"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="MIKA" href="components.html" />
+    <link rel="prev" title="MIKA" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            MIKA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#key-features">Key Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#support">Support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#contributors">Contributors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#notices">Notices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#disclaimers">Disclaimers</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="components.html">MIKA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MIKA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Overview</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="overview">
+<h1>Overview<a class="headerlink" href="#overview" title="Permalink to this heading"></a></h1>
+<p><strong>MIKA</strong> (Manager for Intelligent Knowledge Access) is a toolkit intended to assist design-time risk
+analysis and safety assurance via advanced natural language processing capabilities.</p>
+<p>The full documentation is available at: <a class="reference external" href="https://nasa.github.io/mika/">https://nasa.github.io/mika/</a></p>
+<p>State-of-the-art natural language processing (NLP) techniques enable new ways to access safety-relevant
+knowledge available in text-based documents. MIKA packages advanced NLP techniques and uses models
+specially trained for engineering applications to allow engineers to better tap into knowledge available in
+safety reports, accident reports, incident reports, lessons learned documents, and other engineering
+docuements.</p>
+<p>To this end, the MIKA open-source toolkit has been developed for the following uses:</p>
+<ol class="arabic simple">
+<li><p>Enabling rapid exploration of a set of text-based engineering text documents</p></li>
+<li><p>Analyzing large, unstructured datasets, or exploiting structure in data when it is available
+(flexibility)</p></li>
+<li><p>Increasing the value of engineering documents through adding metadata, analyses, and summaries</p></li>
+</ol>
+<section id="key-features">
+<h2>Key Features<a class="headerlink" href="#key-features" title="Permalink to this heading"></a></h2>
+<p>MIKA includes two key capabilties, Knowledge Discovery and Information Retrieval, for exploring text-based
+repositories. Both use BERT models as a backbone for multiple functions.</p>
+<p>Knowledge Discovery (KD) enables the user to extract useful, meaningful information from narrative-based
+engineering documents. This includes both supervised and unsupervised methods, such as:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>A variety of topic modeling methods</p></li>
+<li><p>Custom named-entity recognition extraction of a Failure Modes and Effect Analysis (FMEA)-style table</p></li>
+<li><p>The ability to analyze trends in hazards or failures</p></li>
+</ol>
+</div></blockquote>
+<p>Information Retrieval (IR) enables the user to search a set of documents and obtain relevant documents
+or passages according to their query. This includes:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>An information retrieval pipeline using a bi-encoder and cross-encoder with options for users to
+choose from pretrained or custom models</p></li>
+</ol>
+</div></blockquote>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h2>
+<p>MIKA is available on PyPI and can be installed with:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">nasa</span><span class="o">-</span><span class="n">mika</span>
+</pre></div>
+</div>
+<p>After installing mika, initialize nltk by running the following in python:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">nltk</span>
+<span class="n">nltk</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="s1">&#39;words&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now you can import anything in MIKA:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mika.kd</span> <span class="kn">import</span> <span class="n">FMEA</span>
+<span class="kn">from</span> <span class="nn">mika.kd</span> <span class="kn">import</span> <span class="n">Topic_Model_plus</span>
+<span class="kn">from</span> <span class="nn">mika.kd.trend_analysis</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">mika.kd.NER</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">mika.ir</span> <span class="kn">import</span> <span class="n">search</span>
+
+<span class="kn">from</span> <span class="nn">mika.utils</span> <span class="kn">import</span> <span class="n">Data</span>
+<span class="kn">from</span> <span class="nn">mika.utils.SAFECOM</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">mika.utils.SAFENET</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">mika.utils.LLIS</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">mika.utils.ICS</span> <span class="kn">import</span> <span class="o">*</span>
+</pre></div>
+</div>
+<p>The latest version of MIKA is also available via the NASA github page using:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">nasa</span><span class="o">/</span><span class="n">mika</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+</section>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this heading"></a></h2>
+<p>MIKA uses Python 3 and has been tested on python&gt;=3.8. We recommend installing pytorch via anaconda first and configuring it for GPU use if desired. If installing via pip, all prerequesits are included.</p>
+<p>Alternatively, you can manually clone MIKA and install the requirements. MIKA requires the following packages and their dependencies outlined in requirements.txt:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">BERTopic</span>
+<span class="n">datasets</span>
+<span class="n">gensim</span>
+<span class="n">matplotlib</span>
+<span class="n">nltk</span>
+<span class="n">numpy</span>
+<span class="n">octis</span>
+<span class="n">pandas</span>
+<span class="n">pathlib</span>
+<span class="n">pingouin</span>
+<span class="n">pkg_resources</span>
+<span class="n">pyLDAvis</span>
+<span class="n">regex</span>
+<span class="n">scikit</span><span class="o">-</span><span class="n">learn</span>
+<span class="n">scipy</span>
+<span class="n">seaborn</span>
+<span class="n">sentence</span><span class="o">-</span><span class="n">transformers</span>
+<span class="n">spacy</span>
+<span class="n">symspellpy</span>
+<span class="n">tomotopy</span>
+<span class="n">torch</span>
+<span class="n">transformers</span>
+<span class="n">wordcloud</span>
+</pre></div>
+</div>
+<p>These can be installed with pip.</p>
+<p>Additional packages that should be downloaded for optional functions include:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">graphvis</span> <span class="c1">#(to plot hierarchical topic models)</span>
+<span class="n">pickle</span>   <span class="c1">#(to save results)</span>
+<span class="n">jupyter</span> <span class="n">notebook</span> <span class="c1">#(to view examples in the repository)</span>
+</pre></div>
+</div>
+</section>
+<section id="support">
+<h2>Support<a class="headerlink" href="#support" title="Permalink to this heading"></a></h2>
+<p>MIKA is considered research code and is under development to refine features, add new capabilities, and
+improve workflows. Certain functions may change over time. Please contact the contributors if any bugs or
+issues are present.</p>
+</section>
+<section id="contributors">
+<h2>Contributors<a class="headerlink" href="#contributors" title="Permalink to this heading"></a></h2>
+<p><a class="reference external" href="https://github.com/walshh">Hannah Walsh</a> : Semantic Search capability, Custom Information Retrieval
+capability, Topic Model Plus, Data utility, Documentation</p>
+<p><a class="reference external" href="https://github.com/sequoiarose">Sequoia Andrade</a> : FMEA capability, custom NER, Trend Analysis, Topic
+Model Plus, Data utilty, Dataset-specific utilities, Code Review, Documentation</p>
+</section>
+<section id="notices">
+<h2>Notices<a class="headerlink" href="#notices" title="Permalink to this heading"></a></h2>
+<p>Copyright © 2023 United States Government as represented by the Administrator of the National Aeronautics and Space Administration.  All Rights Reserved.</p>
+<section id="disclaimers">
+<h3>Disclaimers<a class="headerlink" href="#disclaimers" title="Permalink to this heading"></a></h3>
+<p>No Warranty: THE SUBJECT SOFTWARE IS PROVIDED “AS IS” WITHOUT ANY WARRANTY OF ANY KIND, EITHER EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT LIMITED TO, ANY WARRANTY THAT THE SUBJECT SOFTWARE WILL CONFORM TO SPECIFICATIONS, ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR FREEDOM FROM INFRINGEMENT, ANY WARRANTY THAT THE SUBJECT SOFTWARE WILL BE ERROR FREE, OR ANY WARRANTY THAT DOCUMENTATION, IF PROVIDED, WILL CONFORM TO THE SUBJECT SOFTWARE. THIS AGREEMENT DOES NOT, IN ANY MANNER, CONSTITUTE AN ENDORSEMENT BY GOVERNMENT AGENCY OR ANY PRIOR RECIPIENT OF ANY RESULTS, RESULTING DESIGNS, HARDWARE, SOFTWARE PRODUCTS OR ANY OTHER APPLICATIONS RESULTING FROM USE OF THE SUBJECT SOFTWARE.  FURTHER, GOVERNMENT AGENCY DISCLAIMS ALL WARRANTIES AND LIABILITIES REGARDING THIRD-PARTY SOFTWARE, IF PRESENT IN THE ORIGINAL SOFTWARE, AND DISTRIBUTES IT “AS IS.”</p>
+<p>Waiver and Indemnity:  RECIPIENT AGREES TO WAIVE ANY AND ALL CLAIMS AGAINST THE UNITED STATES GOVERNMENT, ITS CONTRACTORS AND SUBCONTRACTORS, AS WELL AS ANY PRIOR RECIPIENT.  IF RECIPIENT’S USE OF THE SUBJECT SOFTWARE RESULTS IN ANY LIABILITIES, DEMANDS, DAMAGES, EXPENSES OR LOSSES ARISING FROM SUCH USE, INCLUDING ANY DAMAGES FROM PRODUCTS BASED ON, OR RESULTING FROM, RECIPIENT’S USE OF THE SUBJECT SOFTWARE, RECIPIENT SHALL INDEMNIFY AND HOLD HARMLESS THE UNITED STATES GOVERNMENT, ITS CONTRACTORS AND SUBCONTRACTORS, AS WELL AS ANY PRIOR RECIPIENT, TO THE EXTENT PERMITTED BY LAW.  RECIPIENT’S SOLE REMEDY FOR ANY SUCH MATTER SHALL BE THE IMMEDIATE, UNILATERAL TERMINATION OF THIS AGREEMENT.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="MIKA" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="components.html" class="btn btn-neutral float-right" title="MIKA" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright © 2023 United States Government as represented by the Administrator of the National Aeronautics and Space Administration. All Rights Reserved.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

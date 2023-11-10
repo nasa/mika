@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SAFECOM Data Instructions &mdash; MIKA 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=af2ce170"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="SAFENET Data Instructions" href="SAFENET.html" />
+    <link rel="prev" title="NTSB Data Instructions" href="NTSB.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            MIKA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../components.html">MIKA</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../data.html">Datasets</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="ASRS.html">ASRS Data Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="NTSB.html">NTSB Data Instructions</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">SAFECOM Data Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SAFENET.html">SAFENET Data Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ICS-209-PLUS.html">ICS-209-PLUS Data Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LLIS.html">LLIS Data Instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MIKA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../data.html">Datasets</a></li>
+      <li class="breadcrumb-item active">SAFECOM Data Instructions</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/data/SAFECOM.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="safecom-data-instructions">
+<h1>SAFECOM Data Instructions<a class="headerlink" href="#safecom-data-instructions" title="Permalink to this heading"></a></h1>
+<p>Data Courtesy of: Department of the Interior</p>
+<p>The Aviation Safety Communiqué or SAFECOM system is available to the public at: <a class="reference external" href="https://www.safecom.gov/">https://www.safecom.gov/</a></p>
+<p>A subset of SAFECOM reports used in MIKA model training and examples is available in csv format in the repository under <cite>data/SAFECOM</cite> . Note that the dataset provided is a modified format from the original public data. The data is provided as is with no warrenty or guarantees.</p>
+<p>There is no easy to download file of the data, so it must be obtained via webscraping for any analysis.</p>
+<dl class="simple">
+<dt>Webscraper requirements are:</dt><dd><ul class="simple">
+<li><p>requests</p></li>
+<li><p>selenium (<a class="reference external" href="https://selenium-python.readthedocs.io/">https://selenium-python.readthedocs.io/</a>)</p></li>
+<li><p>beautiful soup</p></li>
+<li><p>time</p></li>
+<li><p>pandas</p></li>
+</ul>
+</dd>
+<dt>Notes about webscraping:</dt><dd><ul class="simple">
+<li><p>The SAFECOM pages require at least a one second time delay between scraping to allow the data to load.</p></li>
+<li><p>The webscraper provided uses the chrome webdriver, which must be installed in the location where the webscraper runs.</p></li>
+<li><p>The webscraper opens a chrome page for every document, which can be disruptive. Keeps this in mind.</p></li>
+<li><p>There around about 23,000 documents in the SAFECOM and the document numbers do not correspond directly to the count, so some of the scraping will be for invalid numbers. To speed up the process, the highest number per year is included in the webscraping script.</p></li>
+<li><p>To scrape the entire SAFECOM, the estimated run time is around two days.</p></li>
+<li><p>The webscraper tends to crash every so often, likely due to poor network connection or any interruptions. We recommend running the script in an IDE that saves the variables (spyder or jupyter will work, VScode may also work) so that you can save your progress data frame to a csv after a crash. Lines 94-97 can be uncommented to continue scraping at your last saved document after a crash, then you can append the saved pre-crash csv to the new csv using lines 108-109. Overall, it is recommended to scrape in increments and save progress to prevent data loss during a crash.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="NTSB.html" class="btn btn-neutral float-left" title="NTSB Data Instructions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="SAFENET.html" class="btn btn-neutral float-right" title="SAFENET Data Instructions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright © 2023 United States Government as represented by the Administrator of the National Aeronautics and Space Administration. All Rights Reserved.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

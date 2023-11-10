@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Custom Information Retrieval &mdash; MIKA 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=af2ce170"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Custom Named-Entity Recognition" href="FMEA.html" />
+    <link rel="prev" title="SafeAeroBERT" href="SafeAeroBERT.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            MIKA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../components.html">MIKA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data.html">Datasets</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../models.html">Models</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="SafeAeroBERT.html">SafeAeroBERT</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Custom Information Retrieval</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#usage-sentence-transformers">Usage (Sentence-Transformers)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#evaluation-results">Evaluation Results</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#training">Training</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#full-model-architecture">Full Model Architecture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#citing-authors">Citing &amp; Authors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="FMEA.html">Custom Named-Entity Recognition</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MIKA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../models.html">Models</a></li>
+      <li class="breadcrumb-item active">Custom Information Retrieval</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/models/CustomIR.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="custom-information-retrieval">
+<h1>Custom Information Retrieval<a class="headerlink" href="#custom-information-retrieval" title="Permalink to this heading"></a></h1>
+<p>Available at: <a class="reference external" href="https://huggingface.co/NASA-AIML/MIKA_Custom_IR">https://huggingface.co/NASA-AIML/MIKA_Custom_IR</a></p>
+<p>This is a <a class="reference external" href="https://www.SBERT.net">sentence-transformers</a> model: It maps sentences &amp; paragraphs to a 768 dimensional dense vector space and can be used for tasks like clustering or semantic search.</p>
+<p>The model is custom trained on engineering documents for asymmetric infromation retrieval. It is intended to be used to identify engineering documents relevant to a query for use in design time. For example, a repository can be queried to find support for requirements or learn more about a specific type of failure.</p>
+<section id="usage-sentence-transformers">
+<h2>Usage (Sentence-Transformers)<a class="headerlink" href="#usage-sentence-transformers" title="Permalink to this heading"></a></h2>
+<p>Using this model becomes easy when you have <a class="reference external" href="https://www.SBERT.net">sentence-transformers</a> installed:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">U</span> <span class="n">sentence</span><span class="o">-</span><span class="n">transformers</span>
+</pre></div>
+</div>
+<p>Then you can use the model like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sentence_transformers</span> <span class="kn">import</span> <span class="n">SentenceTransformer</span>
+<span class="n">sentences</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;This is an example sentence&quot;</span><span class="p">,</span> <span class="s2">&quot;Each sentence is converted&quot;</span><span class="p">]</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">SentenceTransformer</span><span class="p">(</span><span class="s2">&quot;NASA-AIML/MIKA_Custom_IR&quot;</span><span class="p">)</span>
+<span class="n">embeddings</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">sentences</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">embeddings</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="evaluation-results">
+<h2>Evaluation Results<a class="headerlink" href="#evaluation-results" title="Permalink to this heading"></a></h2>
+<p>This model was evaluated on three queries using precision at k for k=10,20, and 30. Mean average precision (MAP) was also calculated. The model was baselines against the pre-trained SBERT.</p>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Evaluation</span><a class="headerlink" href="#id1" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>IR Method</p></th>
+<th class="head"><p>MAP</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Pre-trained sBERT</p></td>
+<td><p>0.648</p></td>
+</tr>
+<tr class="row-odd"><td><p>Fine-tuned sBERT</p></td>
+<td><p>0.807</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="training">
+<h2>Training<a class="headerlink" href="#training" title="Permalink to this heading"></a></h2>
+<p>The model was trained with the parameters:</p>
+<p><strong>DataLoader</strong>:</p>
+<p><cite>sentence_transformers.datasets.NoDuplicatesDataLoader.NoDuplicatesDataLoader</cite> of length 693 with parameters:
+.. code-block:: python</p>
+<blockquote>
+<div><p>{‘batch_size’: 32}</p>
+</div></blockquote>
+<p><strong>Loss</strong>:</p>
+<dl>
+<dt><cite>sentence_transformers.losses.MultipleNegativesRankingLoss.MultipleNegativesRankingLoss</cite> with parameters:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;scale&#39;</span><span class="p">:</span> <span class="mf">20.0</span><span class="p">,</span> <span class="s1">&#39;similarity_fct&#39;</span><span class="p">:</span> <span class="s1">&#39;cos_sim&#39;</span><span class="p">}</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<p>Parameters of the fit()-Method:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="s2">&quot;epochs&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+<span class="s2">&quot;evaluation_steps&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+<span class="s2">&quot;evaluator&quot;</span><span class="p">:</span> <span class="s2">&quot;sentence_transformers.evaluation.InformationRetrievalEvaluator.InformationRetrievalEvaluator&quot;</span><span class="p">,</span>
+<span class="s2">&quot;max_grad_norm&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<span class="s2">&quot;optimizer_class&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;class &#39;transformers.optimization.AdamW&#39;&gt;&quot;</span><span class="p">,</span>
+<span class="s2">&quot;optimizer_params&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;lr&quot;</span><span class="p">:</span> <span class="mf">2e-05</span><span class="p">},</span>
+<span class="s2">&quot;scheduler&quot;</span><span class="p">:</span> <span class="s2">&quot;WarmupLinear&quot;</span><span class="p">,</span>
+<span class="s2">&quot;steps_per_epoch&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
+<span class="s2">&quot;warmup_steps&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="s2">&quot;weight_decay&quot;</span><span class="p">:</span> <span class="mf">0.01</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="full-model-architecture">
+<h2>Full Model Architecture<a class="headerlink" href="#full-model-architecture" title="Permalink to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">SentenceTransformer</span><span class="p">(</span>
+<span class="p">(</span><span class="mi">0</span><span class="p">):</span> <span class="n">Transformer</span><span class="p">({</span><span class="s1">&#39;max_seq_length&#39;</span><span class="p">:</span> <span class="mi">512</span><span class="p">,</span> <span class="s1">&#39;do_lower_case&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span> <span class="k">with</span> <span class="n">Transformer</span> <span class="n">model</span><span class="p">:</span> <span class="n">MPNetModel</span>
+<span class="p">(</span><span class="mi">1</span><span class="p">):</span> <span class="n">Pooling</span><span class="p">({</span><span class="s1">&#39;word_embedding_dimension&#39;</span><span class="p">:</span> <span class="mi">768</span><span class="p">,</span> <span class="s1">&#39;pooling_mode_cls_token&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;pooling_mode_mean_tokens&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;pooling_mode_max_tokens&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;pooling_mode_mean_sqrt_len_tokens&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
+<span class="p">(</span><span class="mi">2</span><span class="p">):</span> <span class="n">Normalize</span><span class="p">()</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="citing-authors">
+<h2>Citing &amp; Authors<a class="headerlink" href="#citing-authors" title="Permalink to this heading"></a></h2>
+<p>Walsh, HS, &amp; Andrade, SR. “Semantic Search With Sentence-BERT for Design Information Retrieval.” Proceedings of the ASME 2022 International Design Engineering Technical Conferences and Computers and Information in Engineering Conference. Volume 2: 42nd Computers and Information in Engineering Conference (CIE). St. Louis, Missouri, USA. August 14–17, 2022. V002T02A066. ASME. <a class="reference external" href="https://doi.org/10.1115/DETC2022-89557">https://doi.org/10.1115/DETC2022-89557</a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="SafeAeroBERT.html" class="btn btn-neutral float-left" title="SafeAeroBERT" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="FMEA.html" class="btn btn-neutral float-right" title="Custom Named-Entity Recognition" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright © 2023 United States Government as represented by the Administrator of the National Aeronautics and Space Administration. All Rights Reserved.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

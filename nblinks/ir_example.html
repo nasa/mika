@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Search &mdash; MIKA 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/nbsphinx-code-cells.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=af2ce170"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Topic Model Plus Example" href="topic_model_plus.html" />
+    <link rel="prev" title="Data Example" href="data_example.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            MIKA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../components.html">MIKA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">Models</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../examples.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#utils">Utils</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../examples.html#ir">IR</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Search</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Prepare-Data:-NTSB">Prepare Data: NTSB</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Perform-Search">Perform Search</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#kd">KD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#ntsb-case-study">NTSB Case Study</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MIKA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../examples.html">Examples</a></li>
+      <li class="breadcrumb-item active">Search</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/nblinks/ir_example.nblink.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Search">
+<h1>Search<a class="headerlink" href="#Search" title="Permalink to this heading"></a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import sys, os
+sys.path.append(os.path.join(&quot;..&quot;,&quot;..&quot;))
+import numpy as np
+import pandas as pd
+from mika.utils import Data
+from mika.ir import search
+</pre></div>
+</div>
+</div>
+<section id="Prepare-Data:-NTSB">
+<h2>Prepare Data: NTSB<a class="headerlink" href="#Prepare-Data:-NTSB" title="Permalink to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>os.chdir(&#39;../&#39;)
+os.chdir(&#39;../&#39;)
+ntsb_filepath = os.path.join(&quot;data/NTSB/ntsb_full.csv&quot;)
+ntsb_text_columns = [&#39;narr_cause&#39;, &#39;narr_accf&#39;] # narrative accident cause and narrative accident final
+ntsb_document_id_col = &#39;ev_id&#39;
+ntsb_database_name = &#39;NTSB&#39;
+ntsb_data = Data()
+ntsb_data.load(ntsb_filepath, preprocessed=False, id_col=ntsb_document_id_col, text_columns=ntsb_text_columns.copy(), name=ntsb_database_name, load_kwargs={&#39;dtype&#39;:str})
+ntsb_data.prepare_data(create_ids=False, combine_columns=ntsb_text_columns.copy(), remove_incomplete_rows=False)
+# filter to years of interest
+years_of_interest = [&#39;2011&#39;, &#39;2012&#39;, &#39;2013&#39;, &#39;2014&#39;, &#39;2015&#39;, &#39;2016&#39;, &#39;2017&#39;, &#39;2018&#39;, &#39;2019&#39;, &#39;2020&#39;, &#39;2021&#39;]
+ntsb_data.data_df = ntsb_data.data_df.loc[ntsb_data.data_df[&#39;ev_year&#39;].isin(years_of_interest)].drop_duplicates(subset=&#39;ev_id&#39;, keep=&quot;last&quot;).reset_index(drop=True) # keep the last record, this one has the phase of flight and mishap right before the accident
+ntsb_data._Data__update_ids()
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Combining Columns…: 100%|██████████| 196535/196535 [00:02&lt;00:00, 75855.79it/s]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+data preparation:  0.04 minutes
+
+</pre></div></div>
+</div>
+</section>
+<section id="Perform-Search">
+<h2>Perform Search<a class="headerlink" href="#Perform-Search" title="Permalink to this heading"></a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># fine tuned model
+model = SentenceTransformer(os.path.join(&#39;models&#39;, &#39;fine_tuned_llis_model&#39;))
+#model = SentenceTransformer(&#39;all-distilroberta-v1&#39;) #uncomment to use pretrained model
+ir_ntsb = search(&#39;narr_cause&#39;, ntsb_data, model)
+embeddings_path = os.path.join(&#39;data&#39;, &#39;NTSB&#39;, &#39;ntsb_sentence_embeddings_finetune.npy&#39;)
+ir_ntsb.get_sentence_embeddings(embeddings_path) # uncomment this if the embeddings do not yet exist
+#ir_ntsb.load_sentence_embeddings(embeddings_path) # uncomment this if you wish to load sentence embeddings that already exist
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>queries = [&#39;what components are vulnerable to fatigue crack&#39;, &#39;what are the consequences of a fuel leak&#39;, &#39;what are the risks of low visibility&#39;]
+for query in queries:
+    print(query)
+    display(ir_ntsb.run_search(query, return_k=10, rank_k=10))
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+what components are vulnerable to fatigue crack
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>top_hit_doc</th>
+      <th>top_hit_scores</th>
+      <th>top_hit_text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>20121204X63622</td>
+      <td>0.699882</td>
+      <td>The total loss of engine power as a result of ...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>20120703X63653</td>
+      <td>0.633137</td>
+      <td>An undetected fatigue crack on the outer surfa...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>20180404X13226</td>
+      <td>0.603839</td>
+      <td>Extensive fatigue cracking in the left-wing ma...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>20161027X90950</td>
+      <td>0.600091</td>
+      <td>A No. 1 engine fire caused by a fuel manifold ...</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>20110613X64905</td>
+      <td>0.599796</td>
+      <td>A quality control failure in the Sungear, Inc....</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>20140921X93622</td>
+      <td>0.598661</td>
+      <td>The fatigue fracture of the No. 3 exhaust valv...</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>20110315X35559</td>
+      <td>0.591568</td>
+      <td>The fatigue fracture and subsequent failure of...</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>20170607X22245</td>
+      <td>0.582699</td>
+      <td>The PW4056 engine lost power due to the fatigu...</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>20161216X91529</td>
+      <td>0.562310</td>
+      <td>A fatigue crack of the crankshaft at the No. 4...</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>20130524X83830</td>
+      <td>0.560072</td>
+      <td>Failure of the right inboard foreflap outboard...</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+what are the consequences of a fuel leak
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>top_hit_doc</th>
+      <th>top_hit_scores</th>
+      <th>top_hit_text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>20110729X01918</td>
+      <td>0.596457</td>
+      <td>The loss of engine power due to fuel contamina...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>20140608X03928</td>
+      <td>0.595382</td>
+      <td>The loosening of a B-nut in the fuel system wh...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>20211004104034</td>
+      <td>0.592871</td>
+      <td>A total loss of engine power due to fuel conta...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>20110923X51306</td>
+      <td>0.592871</td>
+      <td>A total loss of engine power due to fuel conta...</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>20150421X33923</td>
+      <td>0.591596</td>
+      <td>The partial loss of engine power due to contam...</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>20110621X20741</td>
+      <td>0.585873</td>
+      <td>Fuel leaking from the fuel flow transmitter th...</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>20151005X24854</td>
+      <td>0.582271</td>
+      <td>The total loss of engine power due to contamin...</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>20150325X74504</td>
+      <td>0.582222</td>
+      <td>Loss of engine power due to fuel contamination...</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>20180918X41159</td>
+      <td>0.582222</td>
+      <td>Loss of engine power due to fuel contamination...</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>20200601X20239</td>
+      <td>0.575583</td>
+      <td>A total loss of engine power due to a fuel lea...</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+what are the risks of low visibility
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>top_hit_doc</th>
+      <th>top_hit_scores</th>
+      <th>top_hit_text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>20150110X84136</td>
+      <td>0.471297</td>
+      <td>The non-instrument rated pilot’s decision to d...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>20180319X90457</td>
+      <td>0.445092</td>
+      <td>The pilot's failure to see and avoid power lin...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>20170114X83817</td>
+      <td>0.441732</td>
+      <td>The pilot's failure to see and avoid power lin...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>20210909103825</td>
+      <td>0.434227</td>
+      <td>The pilot's failure to maintain clearance from...</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>20110401X40531</td>
+      <td>0.431236</td>
+      <td>The pilot’s inadequate visual lookout and fail...</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>20131002X40410</td>
+      <td>0.431074</td>
+      <td>The pilot’s distracted attention and failure t...</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>20150903X31635</td>
+      <td>0.426771</td>
+      <td>The pilot’s inadequate visual lookout and fail...</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>20150514X61132</td>
+      <td>0.425973</td>
+      <td>The pilot's failure to see and avoid power lin...</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>20130517X02521</td>
+      <td>0.425482</td>
+      <td>The pilot's failure to maintain clearance from...</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>20140430X30514</td>
+      <td>0.425437</td>
+      <td>The pilots’ failure to maintain clearance from...</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="data_example.html" class="btn btn-neutral float-left" title="Data Example" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="topic_model_plus.html" class="btn btn-neutral float-right" title="Topic Model Plus Example" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright © 2023 United States Government as represented by the Administrator of the National Aeronautics and Space Administration. All Rights Reserved.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Example &mdash; MIKA 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/nbsphinx-code-cells.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=af2ce170"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Search" href="ir_example.html" />
+    <link rel="prev" title="Examples" href="../examples.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            MIKA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../components.html">MIKA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">Models</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../examples.html">Examples</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../examples.html#utils">Utils</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Data Example</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Initiate-object">Initiate object</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Load-file">Load file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Prepare-data">Prepare data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Preprocessing">Preprocessing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Sentence-Tokenization">Sentence Tokenization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Save-results">Save results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Loading-preprocessed-data">Loading preprocessed data</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#ir">IR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#kd">KD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#ntsb-case-study">NTSB Case Study</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MIKA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../examples.html">Examples</a></li>
+      <li class="breadcrumb-item active">Data Example</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/nblinks/data_example.nblink.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Data-Example">
+<h1>Data Example<a class="headerlink" href="#Data-Example" title="Permalink to this heading"></a></h1>
+<p>This notebook provides an example of how to use the Data class. In this example, we use the ICS-209-PLUS data set of wildfire incident reports.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import sys
+import os
+sys.path.append(os.path.join(&quot;..&quot;,&quot;..&quot;))
+
+from mika.utils import Data
+from mika.utils.stopwords.ICS_stop_words import stop_words
+</pre></div>
+</div>
+</div>
+<section id="Initiate-object">
+<h2>Initiate object<a class="headerlink" href="#Initiate-object" title="Permalink to this heading"></a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>ICS_data = Data()
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Load-file">
+<h2>Load file<a class="headerlink" href="#Load-file" title="Permalink to this heading"></a></h2>
+<section id="Initiate-loading-information">
+<h3>Initiate loading information<a class="headerlink" href="#Initiate-loading-information" title="Permalink to this heading"></a></h3>
+<ul class="simple">
+<li><p>filename</p></li>
+<li><p>text columns</p></li>
+<li><p>extra non-text columns you want to keep</p></li>
+<li><p>column with document ids</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>file_name = os.path.join(&#39;..&#39;,&#39;..&#39;,&#39;data&#39;,&#39;ICS&#39;,&#39;ics209-plus-wf_sitreps_1999to2014.csv&#39;)
+text_columns = [&quot;REMARKS&quot;, &quot;SIGNIF_EVENTS_SUMMARY&quot;, &quot;MAJOR_PROBLEMS&quot;]
+document_id_col = &quot;INCIDENT_ID&quot;
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Load-the-data">
+<h3>Load the data<a class="headerlink" href="#Load-the-data" title="Permalink to this heading"></a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>ICS_data.load(file_name, id_col=document_id_col, text_columns=text_columns, load_kwargs={&#39;dtype&#39;:str})
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>ICS_data.data_df
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>ACRES</th>
+      <th>ADDTNL_COOP_ASSIST_ORG_NARR</th>
+      <th>CAUSE</th>
+      <th>COMPLEX</th>
+      <th>COMPLEXITY_LEVEL_NARR</th>
+      <th>COMPLEX_NAME</th>
+      <th>CRIT_RES_NEEDS_NARR</th>
+      <th>CURRENT_THREAT_NARR</th>
+      <th>CURR_INCIDENT_AREA</th>
+      <th>CURR_INC_AREA_UOM</th>
+      <th>...</th>
+      <th>UNIT_OR_OTHER_NARR</th>
+      <th>WEATHER_CONCERNS_NARR</th>
+      <th>INCTYP_DESC</th>
+      <th>INCTYP_ABBREVIATION</th>
+      <th>REPORT_DOY</th>
+      <th>DISCOVERY_DOY</th>
+      <th>NEW_ACRES</th>
+      <th>REPORT_DAY_SPAN</th>
+      <th>WF_FSR</th>
+      <th>MAX_FIRE_PCT_FINAL_SIZE</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1500.0</td>
+      <td></td>
+      <td>H</td>
+      <td>False</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>...</td>
+      <td>AIC</td>
+      <td></td>
+      <td>Wildfire</td>
+      <td>WF</td>
+      <td>165</td>
+      <td>165</td>
+      <td>1500.0</td>
+      <td>1.0</td>
+      <td>1500.0</td>
+      <td>0.39473684210526316</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2100.0</td>
+      <td></td>
+      <td>H</td>
+      <td>False</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>...</td>
+      <td>AIC</td>
+      <td></td>
+      <td>Wildfire</td>
+      <td>WF</td>
+      <td>166</td>
+      <td>165</td>
+      <td>600.0</td>
+      <td>1.0</td>
+      <td>600.0</td>
+      <td>0.5526315789473685</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3000.0</td>
+      <td></td>
+      <td>H</td>
+      <td>False</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>...</td>
+      <td>AIC</td>
+      <td></td>
+      <td>Wildfire</td>
+      <td>WF</td>
+      <td>167</td>
+      <td>165</td>
+      <td>900.0</td>
+      <td>1.0</td>
+      <td>900.0</td>
+      <td>0.7894736842105263</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>3800.0</td>
+      <td></td>
+      <td>H</td>
+      <td>False</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>...</td>
+      <td>AIC</td>
+      <td></td>
+      <td>Wildfire</td>
+      <td>WF</td>
+      <td>168</td>
+      <td>165</td>
+      <td>800.0</td>
+      <td>1.0</td>
+      <td>800.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>3800.0</td>
+      <td></td>
+      <td>H</td>
+      <td>False</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>...</td>
+      <td>AIC</td>
+      <td></td>
+      <td>Wildfire</td>
+      <td>WF</td>
+      <td>169</td>
+      <td>165</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>120799</th>
+      <td>150.0</td>
+      <td></td>
+      <td>H</td>
+      <td>False</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>contained</td>
+      <td>150.0</td>
+      <td>Acres</td>
+      <td>...</td>
+      <td></td>
+      <td></td>
+      <td>Wildfire</td>
+      <td>WF</td>
+      <td>82</td>
+      <td>80</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>120800</th>
+      <td>150.0</td>
+      <td></td>
+      <td>H</td>
+      <td>False</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>contained</td>
+      <td>150.0</td>
+      <td>Acres</td>
+      <td>...</td>
+      <td></td>
+      <td></td>
+      <td>Wildfire</td>
+      <td>WF</td>
+      <td>82</td>
+      <td>80</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>120801</th>
+      <td>1900.0</td>
+      <td></td>
+      <td>L</td>
+      <td>False</td>
+      <td>3</td>
+      <td></td>
+      <td></td>
+      <td>everything in canyons is natural vegetation. a...</td>
+      <td>2500.0</td>
+      <td>Acres</td>
+      <td>...</td>
+      <td></td>
+      <td>imt has spot weather forecast for next 24 hour...</td>
+      <td>Wildfire</td>
+      <td>WF</td>
+      <td>234</td>
+      <td>232</td>
+      <td>1900.0</td>
+      <td>2.0</td>
+      <td>950.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>120802</th>
+      <td>1900.0</td>
+      <td></td>
+      <td>L</td>
+      <td>False</td>
+      <td>3</td>
+      <td></td>
+      <td>none</td>
+      <td>everything in canyons is natural vegetation. a...</td>
+      <td>1900.0</td>
+      <td>Acres</td>
+      <td>...</td>
+      <td></td>
+      <td>imt has spot weather forecast for next 24 hour...</td>
+      <td>Wildfire</td>
+      <td>WF</td>
+      <td>235</td>
+      <td>232</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>120803</th>
+      <td>1900.0</td>
+      <td></td>
+      <td>L</td>
+      <td>False</td>
+      <td>3</td>
+      <td></td>
+      <td>none</td>
+      <td></td>
+      <td>1900.0</td>
+      <td>Acres</td>
+      <td>...</td>
+      <td></td>
+      <td></td>
+      <td>Wildfire</td>
+      <td>WF</td>
+      <td>235</td>
+      <td>232</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+    </tr>
+  </tbody>
+</table>
+<p>120804 rows × 114 columns</p>
+</div></div>
+</div>
+</section>
+</section>
+<section id="Prepare-data">
+<h2>Prepare data<a class="headerlink" href="#Prepare-data" title="Permalink to this heading"></a></h2>
+<p>This step provides simple data preparation including: combining columns, removing incomplete rows, and creating unique ids</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>ICS_data.prepare_data(create_ids=True, combine_columns=text_columns, remove_incomplete_rows=True)
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Removing Incomplete Rows…: 100%|██████████| 120804/120804 [01:23&lt;00:00, 1455.22it/s]
+Creating Unique IDs…: 100%|██████████| 37350/37350 [00:01&lt;00:00, 20485.25it/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+data preparation:  1.44 minutes
+
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<p>If the columns were combined and you are only interested in the combine text, reset the text column variable:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>ICS_data.text_columns = [&#39;Combined Text&#39;]
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Preprocessing">
+<h2>Preprocessing<a class="headerlink" href="#Preprocessing" title="Permalink to this heading"></a></h2>
+<p>The preprocessing step provides a more thorough preprocessing required for traditional NLP methods, such as LDA and hLDA topic modeling. For preprocessing, you should define:</p>
+<ul class="simple">
+<li><p>any additional domain-specific stop words</p></li>
+<li><p>any potential stop words you would like to keep</p></li>
+<li><p>function arguments</p></li>
+</ul>
+<p>Function arguments correspond to optional preprocessing steps, such as ngrams, spellcheck, quote mark removal, and dropping short documents.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from mika.utils.stopwords.ICS_stop_words import stop_words
+
+ICS_stop_words = stop_words
+save_words = [&#39;jurisdictions&#39;, &#39;team&#39;, &#39;command&#39;, &#39;organization&#39;, &#39;type&#39;, &#39;involved&#39;, &#39;transition&#39;, &#39;transfer&#39;, &#39;impact&#39;, &#39;concern&#39;, &#39;site&#39;, &#39;nation&#39;, &#39;political&#39;, &#39;social&#39;, &#39;adjacent&#39;, &#39;community&#39;, &#39;cultural&#39;, &#39;tribal&#39;, &#39;monument&#39;, &#39;archeaological&#39;, &#39;highway&#39;, &#39;traffic&#39;, &#39;road&#39;, &#39;travel&#39;, &#39;interstate&#39;, &#39;closure&#39;, &#39;remain&#39;, &#39;remains&#39;, &#39;close&#39;, &#39;block&#39;, &#39;continue&#39;, &#39;impact&#39;, &#39;access&#39;, &#39;limit&#39;, &#39;limited&#39;, &#39;terrain&#39;, &#39;rollout&#39;, &#39;snag&#39;, &#39;steep&#39;, &#39;debris&#39;, &#39;access&#39;, &#39;terrian&#39;, &#39;concern&#39;, &#39;hazardous&#39;, &#39;pose&#39;, &#39;heavy&#39;, &#39;rugged&#39;, &#39;difficult&#39;, &#39;steep&#39;, &#39;narrow&#39;, &#39;violation&#39;, &#39;notification&#39;, &#39;respond&#39;, &#39;law&#39;, &#39;patrol&#39;, &#39;cattle&#39;, &#39;buffalo&#39;, &#39;grow&#39;, &#39;allotment&#39;, &#39;ranch&#39;, &#39;sheep&#39;, &#39;livestock&#39;, &#39;grazing&#39;, &#39;pasture&#39;, &#39;threaten&#39;, &#39;concern&#39;, &#39;risk&#39;, &#39;threat&#39;, &#39;evacuation&#39;, &#39;evacuate&#39;, &#39; threaten&#39;, &#39;threat&#39;, &#39;resident&#39;, &#39; residence&#39;, &#39;level&#39;, &#39;notice&#39;, &#39;community&#39;, &#39;structure&#39;, &#39;subdivision&#39;, &#39;mandatory&#39;, &#39;order&#39;, &#39;effect&#39;, &#39;remain&#39;, &#39;continue&#39;, &#39;issued&#39;, &#39;issue&#39;, &#39;injury&#39;, &#39;hospital&#39;, &#39;injured&#39;, &#39;accident&#39;, &#39;treatment&#39;, &#39;laceration&#39;, &#39;firefighter&#39;, &#39;treated&#39;, &#39;minor&#39;, &#39;report&#39;, &#39;transport&#39;, &#39;heat&#39;, &#39;shoulder&#39;, &#39;ankle&#39;, &#39;medical&#39;, &#39;released&#39;, &#39;military&#39;, &#39;unexploded&#39;, &#39;national&#39;, &#39;training&#39;, &#39;present&#39;, &#39;ordinance&#39;, &#39;guard&#39;, &#39;infrastructure&#39;, &#39;utility&#39;, &#39;powerline&#39;, &#39;water&#39;, &#39;electric&#39;, &#39;pipeline&#39;, &#39;powerlines&#39;, &#39;watershed&#39;, &#39;pole&#39;, &#39;power&#39;, &#39;gas&#39;, &#39;concern&#39;, &#39;near&#39;, &#39;hazard&#39;, &#39;critical&#39;, &#39;threaten&#39;, &#39;threat&#39;, &#39;off&#39;, &#39;weather&#39;, &#39;behavior&#39;, &#39;wind&#39;, &#39;thunderstorm&#39;, &#39;storm&#39;, &#39;gusty&#39;, &#39;lightning&#39;, &#39;flag&#39;, &#39;unpredictable&#39;, &#39;extreme&#39;, &#39;erratic&#39;, &#39;strong&#39;, &#39;red&#39;, &#39;warning&#39;, &#39;species&#39;, &#39;specie&#39;, &#39;habitat&#39;, &#39;animal&#39;, &#39;plant&#39;, &#39;conservation&#39;, &#39;threaten&#39;, &#39;endanger&#39;, &#39;threat&#39;, &#39;sensitive&#39;, &#39;threatened&#39;, &#39;endangered&#39;, &#39;risk&#39;, &#39;loss&#39;, &#39;impacts&#39;, &#39;unstaffed&#39;, &#39;resources&#39;, &#39;support&#39;, &#39;crew&#39;, &#39;aircraft&#39;, &#39;helicopter&#39;, &#39;engines&#39;, &#39;staffing&#39;, &#39;staff&#39;, &#39;lack&#39;, &#39;need&#39;, &#39;shortage&#39;, &#39;minimal&#39;, &#39;share&#39;, &#39;necessary&#39;, &#39;limited&#39;, &#39;limit&#39;, &#39;fatigue&#39;, &#39;flood&#39;, &#39;flashflood&#39;, &#39;flash&#39;, &#39;risk&#39;, &#39;potential&#39;, &#39;mapping&#39;, &#39;map&#39;, &#39;reflect&#39;, &#39;accurate&#39;, &#39;adjustment&#39;, &#39;change&#39;, &#39;reflect&#39;, &#39;aircraft&#39;, &#39;heli&#39;, &#39;helicopter&#39;, &#39;aerial&#39;, &#39;tanker&#39;, &#39;copter&#39;, &#39;grounded&#39;, &#39;ground&#39;, &#39;suspended&#39;, &#39;suspend&#39;, &#39;smoke&#39;, &#39;impact&#39;, &#39;hazard&#39;, &#39;windy&#39;, &#39;humidity&#39;, &#39;moisture&#39;, &#39;hot&#39;, &#39;drought&#39;, &#39;low&#39;, &#39;dry&#39;, &#39;prolonged&#39;]
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>ICS_data.preprocess_data(domain_stopwords=ICS_stop_words, ngrams=False, save_words=save_words)
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Preprocessing Combined Text…: 100%|██████████| 100/100 [57:47&lt;00:00, 34.68s/it]
+Removing frequent words…: 100%|██████████| 1/1 [29:07&lt;00:00, 1747.63s/it]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Processing time:  86.94  minutes
+</pre></div></div>
+</div>
+</section>
+<section id="Sentence-Tokenization">
+<h2>Sentence Tokenization<a class="headerlink" href="#Sentence-Tokenization" title="Permalink to this heading"></a></h2>
+<p>Additional processing options include sentence tokenization. Note that this must be applied to non-preprocessed data.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>text_columns = [&quot;REMARKS&quot;, &quot;SIGNIF_EVENTS_SUMMARY&quot;, &quot;MAJOR_PROBLEMS&quot;]
+ICS_data.load(file_name, id_col=document_id_col, text_columns=text_columns, load_kwargs={&#39;dtype&#39;:str})
+ICS_data.prepare_data(create_ids=True, combine_columns=text_columns, remove_incomplete_rows=True)
+ICS_data.sentence_tokenization()
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Removing Incomplete Rows…: 100%|██████████| 120804/120804 [01:22&lt;00:00, 1469.66it/s]
+Creating Unique IDs…: 100%|██████████| 37350/37350 [00:01&lt;00:00, 20735.39it/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+data preparation:  1.42 minutes
+
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Sentence Tokenization…: 100%|██████████| 37350/37350 [01:32&lt;00:00, 404.89it/s]
+</pre></div></div>
+</div>
+</section>
+<section id="Save-results">
+<h2>Save results<a class="headerlink" href="#Save-results" title="Permalink to this heading"></a></h2>
+<p>After preprocessing your dataset, make sure to save it</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>ICS_data.save()
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Loading-preprocessed-data">
+<h2>Loading preprocessed data<a class="headerlink" href="#Loading-preprocessed-data" title="Permalink to this heading"></a></h2>
+<p>Previously processed MIKA data objects can be reloaded in</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>file = os.path.join(&#39;..&#39;,&#39;..&#39;,&#39;data&#39;,&#39;ICS&#39;,&#39;ICS_filtered_preprocessed_combined_data.csv&#39;)
+ICS_data = Data()
+ICS_data.load(file, preprocessed=True, id_col=document_id_col, text_columns=[&quot;Combined Text&quot;], name=&#39;ICS&#39;,  load_kwargs={&#39;dtype&#39;:str})
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>ICS_data.data_df
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>CY</th>
+      <th>DISCOVERY_DATE</th>
+      <th>INCIDENT_ID</th>
+      <th>PCT_CONTAINED_COMPLETED</th>
+      <th>START_YEAR</th>
+      <th>TOTAL_AERIAL</th>
+      <th>TOTAL_PERSONNEL</th>
+      <th>REPORT_DOY</th>
+      <th>DISCOVERY_DOY</th>
+      <th>Combined Text</th>
+      <th>...</th>
+      <th>EST_IM_COST_TO_DATE</th>
+      <th>STR_DAMAGED</th>
+      <th>STR_DESTROYED</th>
+      <th>NEW_ACRES</th>
+      <th>POO_STATE</th>
+      <th>POO_LATITUDE</th>
+      <th>POO_LONGITUDE</th>
+      <th>WEATHER_CONCERNS_NARR</th>
+      <th>INC_MGMT_ORG_ABBREV</th>
+      <th>EVACUATION_IN_PROGRESS</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2010</td>
+      <td>2010-07-15 15:00:00</td>
+      <td>2000_CA-RRU-062485_VALLEY COMPLEX</td>
+      <td>80.0</td>
+      <td>2010.0</td>
+      <td>5.000000</td>
+      <td>230.000000</td>
+      <td>197</td>
+      <td>196</td>
+      <td>[resource, share, cactus]</td>
+      <td>...</td>
+      <td>10000.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>70.0</td>
+      <td>CA</td>
+      <td>33.619444</td>
+      <td>-116.9</td>
+      <td>Current Weather RH: 45 TEMP: 75 WS: 10 WD: VAR...</td>
+      <td>4</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2010</td>
+      <td>2010-07-15 15:00:00</td>
+      <td>2000_CA-RRU-062485_VALLEY COMPLEX</td>
+      <td>60.0</td>
+      <td>2010.0</td>
+      <td>5.000000</td>
+      <td>230.000000</td>
+      <td>197</td>
+      <td>196</td>
+      <td>[resource, share, incident, cactus, incident, ...</td>
+      <td>...</td>
+      <td>90000.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>503.0</td>
+      <td>CA</td>
+      <td>33.666667</td>
+      <td>-117.0</td>
+      <td>Current Weather RH: 52 TEMP: 78 WS: 12 WD: Var...</td>
+      <td>4</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2010</td>
+      <td>2010-07-15 15:00:00</td>
+      <td>2000_CA-RRU-062485_VALLEY COMPLEX</td>
+      <td>30.0</td>
+      <td>2010.0</td>
+      <td>4.000000</td>
+      <td>165.000000</td>
+      <td>197</td>
+      <td>196</td>
+      <td>[resource, share, cactus, erratic, wind, due, ...</td>
+      <td>...</td>
+      <td>45000.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>450.0</td>
+      <td>CA</td>
+      <td>33.65</td>
+      <td>-116.9</td>
+      <td>Current Weather RH: 52 TEMP: 78 WS: 12 WD: VAR...</td>
+      <td>4</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2010</td>
+      <td>2010-07-15 15:00:00</td>
+      <td>2000_CA-RRU-062485_VALLEY COMPLEX</td>
+      <td>100.0</td>
+      <td>2010.0</td>
+      <td>4.333333</td>
+      <td>192.333333</td>
+      <td>197</td>
+      <td>196</td>
+      <td>[resource, share, cactus, cactus, become, vall...</td>
+      <td>...</td>
+      <td>10000.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>10.0</td>
+      <td>CA</td>
+      <td>33.619444</td>
+      <td>-116.9</td>
+      <td>Current Weather RH: 21 TEMP: 102 WS: 12 WD: SW...</td>
+      <td>4</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2010</td>
+      <td>2010-07-15 15:00:00</td>
+      <td>2000_CA-RRU-062485_VALLEY COMPLEX</td>
+      <td>60.0</td>
+      <td>2010.0</td>
+      <td>4.333333</td>
+      <td>192.333333</td>
+      <td>197</td>
+      <td>196</td>
+      <td>[resource, share, cactus, cactus, become, vall...</td>
+      <td>...</td>
+      <td>50000.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>CA</td>
+      <td>33.666667</td>
+      <td>-117.0</td>
+      <td>Current Weather RH: 22 TEMP: 104 WS: 15 WD: SW</td>
+      <td>4</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>44358</th>
+      <td>2014</td>
+      <td>2014-03-15 14:30:00</td>
+      <td>2014_VAVAS1403037_BEAVER LODGE RD.</td>
+      <td>100.0</td>
+      <td>2014.0</td>
+      <td>0.000000</td>
+      <td>13.000000</td>
+      <td>74</td>
+      <td>74</td>
+      <td>[fast, spread, field]</td>
+      <td>...</td>
+      <td>450.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>VA</td>
+      <td>38.521389</td>
+      <td>-77.576111</td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>44359</th>
+      <td>2014</td>
+      <td>2014-03-19 14:00:00</td>
+      <td>2014_VAVAS1406037_AIRPORT MOUNTAIN</td>
+      <td>85.0</td>
+      <td>2014.0</td>
+      <td>0.000000</td>
+      <td>18.500000</td>
+      <td>80</td>
+      <td>78</td>
+      <td>[heavy, plume, primary, carrier]</td>
+      <td>...</td>
+      <td>4000.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>85.0</td>
+      <td>VA</td>
+      <td>37.243056</td>
+      <td>-82.103333</td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>44360</th>
+      <td>2014</td>
+      <td>2014-08-20 13:00:00</td>
+      <td>2014_WA-WFS-513_SAND RIDGE</td>
+      <td>0.0</td>
+      <td>2014.0</td>
+      <td>1.000000</td>
+      <td>95.000000</td>
+      <td>234</td>
+      <td>232</td>
+      <td>[heavy, canyon, river, mainly, canyon, come, e...</td>
+      <td>...</td>
+      <td>50000.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1900.0</td>
+      <td>WA</td>
+      <td>46.000395</td>
+      <td>-120.024213</td>
+      <td>imt has spot weather forecast for next 24 hour...</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>44361</th>
+      <td>2014</td>
+      <td>2014-08-20 13:00:00</td>
+      <td>2014_WA-WFS-513_SAND RIDGE</td>
+      <td>86.0</td>
+      <td>2014.0</td>
+      <td>1.000000</td>
+      <td>120.000000</td>
+      <td>235</td>
+      <td>232</td>
+      <td>[laid, night, test, wind, remain, canyon, peri...</td>
+      <td>...</td>
+      <td>185000.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>WA</td>
+      <td>46.000395</td>
+      <td>-120.024213</td>
+      <td>imt has spot weather forecast for next 24 hour...</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>44362</th>
+      <td>2014</td>
+      <td>2014-08-20 13:00:00</td>
+      <td>2014_WA-WFS-513_SAND RIDGE</td>
+      <td>100.0</td>
+      <td>2014.0</td>
+      <td>0.000000</td>
+      <td>46.000000</td>
+      <td>235</td>
+      <td>232</td>
+      <td>[report, incident, wind, test, overnight]</td>
+      <td>...</td>
+      <td>200000.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>WA</td>
+      <td>46.000395</td>
+      <td>-120.024213</td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+<p>44363 rows × 25 columns</p>
+</div></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../examples.html" class="btn btn-neutral float-left" title="Examples" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ir_example.html" class="btn btn-neutral float-right" title="Search" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright © 2023 United States Government as represented by the Administrator of the National Aeronautics and Space Administration. All Rights Reserved.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

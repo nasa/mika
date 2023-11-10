@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Taxonomy Results &mdash; MIKA 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=af2ce170"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="FMEA Example" href="../nblinks/fmea_example.html" />
+    <link rel="prev" title="Topic Modeling Results" href="topic_modeling_results.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            MIKA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../components.html">MIKA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">Models</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../examples.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#utils">Utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#ir">IR</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../examples.html#kd">KD</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../nblinks/topic_model_plus.html">Topic Model Plus Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="topic_modeling_results.html">Topic Modeling Results</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Taxonomy Results</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../nblinks/fmea_example.html">FMEA Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fmea_results.html">FMEA Results</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../nblinks/ics_heat.html">Hazard Extraction and Analysis of Trends (HEAT): ICS-209-PLUS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../nblinks/safecom_heat.html">Hazard Extraction and Analysis of Trends (HEAT): SAFECOM</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#ntsb-case-study">NTSB Case Study</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MIKA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../examples.html">Examples</a></li>
+      <li class="breadcrumb-item active">Taxonomy Results</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/results/taxonomy_results.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="taxonomy-results">
+<h1>Taxonomy Results<a class="headerlink" href="#taxonomy-results" title="Permalink to this heading"></a></h1>
+<p>Taxonmies can be formed from topic modeling results using the following syntax:</p>
+<p><code class="docutils literal notranslate"><span class="pre">tm.save_bert_taxonomy()</span></code> or <code class="docutils literal notranslate"><span class="pre">tm.save_hlda_taxonomy()</span></code></p>
+<p>Example results are shown below:</p>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">hLDA Taxonomy</span><a class="headerlink" href="#id1" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 2%" />
+<col style="width: 3%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"><p>index</p></th>
+<th class="head"><p>Lesson(s) Learned Level 1</p></th>
+<th class="head"><p>Lesson(s) Learned Level 2</p></th>
+<th class="head"><p>Driving Event Level 1</p></th>
+<th class="head"><p>Driving Event Level 2</p></th>
+<th class="head"><p>Recommendation(s) Level 1</p></th>
+<th class="head"><p>Recommendation(s) Level 2</p></th>
+<th class="head"><p>Lesson IDs for row</p></th>
+<th class="head"><p>Number of lessons for row</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>1425</p></td>
+<td><p>activation, line, activate, prevent, locate, switch, emergency, personnel, valve, incorrectly</p></td>
+<td><p>injury personnel, identify potential, building, communication, pipe, impossible, utility, outage, radio, protective</p></td>
+<td><p>anomaly investigation, centaur, thrust, potable water, atlas centaur, cape canaveral, hughes, general purpose computer, engine start, dewar</p></td>
+<td><p>weld joint, vibration induced, heat sink, maturity, furnace, cartridge, retesting, engineering drawing, open loop, dimensionally</p></td>
+<td><p>risk assessment, self, orbital, constant, minute, radio frequency, personal, occurs, budget schedule, nature</p></td>
+<td><p>late development, presentation, decision make, weekly, furthermore, contains, conflict, pull, face, schedule budget</p></td>
+<td><p>[81]</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>1493</p></td>
+<td><p>activation, line, activate, prevent, locate, switch, emergency, personnel, valve, incorrectly</p></td>
+<td><p>injury personnel, identify potential, building, communication, pipe, impossible, utility, outage, radio, protective</p></td>
+<td><p>anomaly investigation, centaur, thrust, potable water, atlas centaur, cape canaveral, hughes, general purpose computer, engine start, dewar</p></td>
+<td><p>weld joint, vibration induced, heat sink, maturity, furnace, cartridge, retesting, engineering drawing, open loop, dimensionally</p></td>
+<td><p>protection, fault protection, fault, shutdown, anomaly, spacecraft, detect, software, condition, hardware</p></td>
+<td><p>valve, install, vent line, high pressure, check valve, utilize, prevent inadvertent, operation, system, vacuum</p></td>
+<td><p>[47]</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>539</p></td>
+<td><p>activation, line, activate, prevent, locate, switch, emergency, personnel, valve, incorrectly</p></td>
+<td><p>injury personnel, identify potential, building, communication, pipe, impossible, utility, outage, radio, protective</p></td>
+<td><p>base reliability, prefer, reliability, implementation method, technical, test benefit, reliability prefer, rationale, benefit, technical rationale</p></td>
+<td><p>connector, discharge, electrostatic, voltage, electrostatic discharge, electrical, additional word, chassis, shield, harness</p></td>
+<td><p>measure, bearing, constrain, impose, attitude control, frequency, limitation, constraint, condition, performance</p></td>
+<td><p>charge, susceptible, electrostatic discharge, structural, mass, first, protect, damage, model, precaution</p></td>
+<td><p>[1330]</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>767</p></td>
+<td><p>activation, line, activate, prevent, locate, switch, emergency, personnel, valve, incorrectly</p></td>
+<td><p>injury personnel, identify potential, building, communication, pipe, impossible, utility, outage, radio, protective</p></td>
+<td><p>base reliability, prefer, reliability, implementation method, technical, test benefit, reliability prefer, rationale, benefit, technical rationale</p></td>
+<td><p>connector, discharge, electrostatic, voltage, electrostatic discharge, electrical, additional word, chassis, shield, harness</p></td>
+<td><p>remote, compliance, pressurization, analysis fmea, rigor, fmea, exists, correction, pressure, human factor</p></td>
+<td><p>solder, research, indicate, instal, investigate, completion, avoid, experiment, connector, indication</p></td>
+<td><p>[985]</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>1209</p></td>
+<td><p>activation, line, activate, prevent, locate, switch, emergency, personnel, valve, incorrectly</p></td>
+<td><p>injury personnel, identify potential, building, communication, pipe, impossible, utility, outage, radio, protective</p></td>
+<td><p>base reliability, prefer, reliability, implementation method, technical, test benefit, reliability prefer, rationale, benefit, technical rationale</p></td>
+<td><p>connector, discharge, electrostatic, voltage, electrostatic discharge, electrical, additional word, chassis, shield, harness</p></td>
+<td><p>remote, compliance, pressurization, analysis fmea, rigor, fmea, exists, correction, pressure, human factor</p></td>
+<td><p>assure adequate, insulate, electrostatic discharge, power, conductive, ground, discharge, circuit, connection, range</p></td>
+<td><p>[448]</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>5</p></td>
+<td><p>1266</p></td>
+<td><p>activation, line, activate, prevent, locate, switch, emergency, personnel, valve, incorrectly</p></td>
+<td><p>injury personnel, identify potential, building, communication, pipe, impossible, utility, outage, radio, protective</p></td>
+<td><p>base reliability, prefer, reliability, implementation method, technical, test benefit, reliability prefer, rationale, benefit, technical rationale</p></td>
+<td><p>optic, spherical, aberration, lens, spie, optical, focal, plane, beam, mirror</p></td>
+<td><p>safety, hazardous, lift, procedure, hazard, equipment, remove, proper, handle, load</p></td>
+<td><p>flight hardware, configuration control, fail safe, make sure, launch vehicle, quality assurance, project manager, personnel involve, period time, high fidelity</p></td>
+<td><p>[332]</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>6</p></td>
+<td><p>1584</p></td>
+<td><p>activation, line, activate, prevent, locate, switch, emergency, personnel, valve, incorrectly</p></td>
+<td><p>injury personnel, identify potential, building, communication, pipe, impossible, utility, outage, radio, protective</p></td>
+<td><p>base reliability, prefer, reliability, implementation method, technical, test benefit, reliability prefer, rationale, benefit, technical rationale</p></td>
+<td><p>residue, cleanliness, particulate, molecule, contamination control, volatile, contaminates, molecular, cleaning process, performance degradation</p></td>
+<td><p>crane, strap, second, lift, load, redesign, release, secure, stop, modify</p></td>
+<td><p>spacecraft instrument, frequent, sample, contamination, witness, cleanliness, plate, objective, instrument, level</p></td>
+<td><p>[323, 352]</p></td>
+<td><p>2</p></td>
+</tr>
+<tr class="row-odd"><td><p>7</p></td>
+<td><p>750</p></td>
+<td><p>activation, line, activate, prevent, locate, switch, emergency, personnel, valve, incorrectly</p></td>
+<td><p>injury personnel, identify potential, building, communication, pipe, impossible, utility, outage, radio, protective</p></td>
+<td><p>breaker, effective maintainability benefit, base maintainability, recommend technique, circuit breaker, cost saving, technique number, effective maintainability, fault, saving</p></td>
+<td><p>engine, main engine, main, space shuttle, abort, ssme, fuel pump, command data simulator, data simulator, large amount</p></td>
+<td><p>subject, thermal vacuum test, temperature, thermal vacuum, thermal, flight, test, reliability, fatigue, component</p></td>
+<td><p>space flight, research center, prior start, high voltage, high temperature, take account, training certification, power source, potential hazard, test article</p></td>
+<td><p>[1006]</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>8</p></td>
+<td><p>424</p></td>
+<td><p>activation, line, activate, prevent, locate, switch, emergency, personnel, valve, incorrectly</p></td>
+<td><p>injury personnel, identify potential, building, communication, pipe, impossible, utility, outage, radio, protective</p></td>
+<td><p>explosion, injury, employee, tighten, burn, electrical shock, injured, explode, newly, contact</p></td>
+<td><p>approximately hour, high resolution, trajectory, spacecraft trajectory, soil moisture, smap, illuminate, intervention, auto, soil</p></td>
+<td><p>protection, fault protection, fault, shutdown, anomaly, spacecraft, detect, software, condition, hardware</p></td>
+<td><p>valve, install, vent line, high pressure, check valve, utilize, prevent inadvertent, operation, system, vacuum</p></td>
+<td><p>[1577]</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>9</p></td>
+<td><p>1411</p></td>
+<td><p>activation, line, activate, prevent, locate, switch, emergency, personnel, valve, incorrectly</p></td>
+<td><p>injury personnel, identify potential, building, communication, pipe, impossible, utility, outage, radio, protective</p></td>
+<td><p>explosion, injury, employee, tighten, burn, electrical shock, injured, explode, newly, contact</p></td>
+<td><p>approximately hour, high resolution, trajectory, spacecraft trajectory, soil moisture, smap, illuminate, intervention, auto, soil</p></td>
+<td><p>composite, composite material, cleanliness, seal, material, contamination, material property, precision, life cycle, inspection</p></td>
+<td><p>pyrotechnic, reliability, property, application, functional, material, failure mode, mode, combine, material property</p></td>
+<td><p>[69, 1098]</p></td>
+<td><p>2</p></td>
+</tr>
+<tr class="row-even"><td><p>10</p></td>
+<td><p>1456</p></td>
+<td><p>activation, line, activate, prevent, locate, switch, emergency, personnel, valve, incorrectly</p></td>
+<td><p>injury personnel, identify potential, building, communication, pipe, impossible, utility, outage, radio, protective</p></td>
+<td><p>explosion, injury, employee, tighten, burn, electrical shock, injured, explode, newly, contact</p></td>
+<td><p>peer, cloud, work together, truly, male, drove, fasten, suppose, female, data acquisition system</p></td>
+<td><p>fabrication assembly, defect, effort make, fabrication, material, complex, effort, wiring, harness, connector</p></td>
+<td><p>care, care take, lock device, clearly identify, spacecraft, highly, enable, fault, validation, cycle</p></td>
+<td><p>[114]</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>11</p></td>
+<td><p>922</p></td>
+<td><p>activation, line, activate, prevent, locate, switch, emergency, personnel, valve, incorrectly</p></td>
+<td><p>injury personnel, identify potential, building, communication, pipe, impossible, utility, outage, radio, protective</p></td>
+<td><p>management, project, lack, formal, manager, organization, contractor, request, risk, development</p></td>
+<td><p>caltech propulsion laboratory, caltech, caltech propulsion, science laboratory, document docid, problem failure report, docid, grail, integration test, rover</p></td>
+<td><p>composite, composite material, cleanliness, seal, material, contamination, material property, precision, life cycle, inspection</p></td>
+<td><p>self, fully understand, article, configure, test article, input, unit, analyze, example, fully</p></td>
+<td><p>[749]</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>12</p></td>
+<td><p>1079</p></td>
+<td><p>activation, line, activate, prevent, locate, switch, emergency, personnel, valve, incorrectly</p></td>
+<td><p>injury personnel, identify potential, building, communication, pipe, impossible, utility, outage, radio, protective</p></td>
+<td><p>management, project, lack, formal, manager, organization, contractor, request, risk, development</p></td>
+<td><p>international space, huygens probe, software development, cassini spacecraft, international space station, probe, european space agency, european space, cassini, operation atlo</p></td>
+<td><p>protection, fault protection, fault, shutdown, anomaly, spacecraft, detect, software, condition, hardware</p></td>
+<td><p>hardware software, manufacturing process, prior launch, full range, environmental condition, corrective action, concurrent engineering, solid state, operating condition, failure mode</p></td>
+<td><p>[225, 607, 609, 16901]</p></td>
+<td><p>4</p></td>
+</tr>
+<tr class="row-odd"><td><p>13</p></td>
+<td><p>313</p></td>
+<td><p>activation, line, activate, prevent, locate, switch, emergency, personnel, valve, incorrectly</p></td>
+<td><p>injury personnel, identify potential, building, communication, pipe, impossible, utility, outage, radio, protective</p></td>
+<td><p>management, project, lack, formal, manager, organization, contractor, request, risk, development</p></td>
+<td><p>quick disconnect, orbiter, shuttle, space shuttle, disconnect, orbiter processing, space shuttle orbiter, processing, line replaceable, ground umbilical</p></td>
+<td><p>propellant, engine, cryogenic, liquid, propulsion system, propulsion, purge, coat, base, rocket</p></td>
+<td><p>future program, long term, hypergolic propellant, evaluate effect, eliminate need, improve reliability, short term, software development, electronic part, reduce risk</p></td>
+<td><p>[2217]</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>14</p></td>
+<td><p>1291</p></td>
+<td><p>activation, line, activate, prevent, locate, switch, emergency, personnel, valve, incorrectly</p></td>
+<td><p>injury personnel, identify potential, building, communication, pipe, impossible, utility, outage, radio, protective</p></td>
+<td><p>management, project, lack, formal, manager, organization, contractor, request, risk, development</p></td>
+<td><p>quick disconnect, orbiter, shuttle, space shuttle, disconnect, orbiter processing, space shuttle orbiter, processing, line replaceable, ground umbilical</p></td>
+<td><p>subject, thermal vacuum test, temperature, thermal vacuum, thermal, flight, test, reliability, fatigue, component</p></td>
+<td><p>space flight, research center, prior start, high voltage, high temperature, take account, training certification, power source, potential hazard, test article</p></td>
+<td><p>[257]</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>15</p></td>
+<td><p>521</p></td>
+<td><p>activation, line, activate, prevent, locate, switch, emergency, personnel, valve, incorrectly</p></td>
+<td><p>injury personnel, identify potential, building, communication, pipe, impossible, utility, outage, radio, protective</p></td>
+<td><p>management, project, lack, formal, manager, organization, contractor, request, risk, development</p></td>
+<td><p>variable size, nasda, adeos, undetected, data capture, processing system seawinds, system seawinds, intermittent nature, interval data, early nasda report</p></td>
+<td><p>circuit, temperature, redundant, part stress, transient, assume, selection, stress, mode, consider</p></td>
+<td><p>develop detailed, isolation, fidelity, high fidelity, parameter, back, reduce, continue, available, establish</p></td>
+<td><p>[1349]</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>16</p></td>
+<td><p>3</p></td>
+<td><p>activation, line, activate, prevent, locate, switch, emergency, personnel, valve, incorrectly</p></td>
+<td><p>injury personnel, identify potential, building, communication, pipe, impossible, utility, outage, radio, protective</p></td>
+<td><p>orbiter, brake, fall, position, hydraulic fluid, mast, pull, operator, smoke, thermal protection system</p></td>
+<td><p>fiber optic, fiber, optic, fiber optic cable, transmission, launch countdown, receives, receiver, hardware software, input signal</p></td>
+<td><p>close, leak check, orbiter, open, position, valve, flow, open close, calibration, door</p></td>
+<td><p>matrix, vulnerability, correction, fault, potential, lose, prime, reexamine, take step, assignment</p></td>
+<td><p>[28101]</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>17</p></td>
+<td><p>851</p></td>
+<td><p>activation, line, activate, prevent, locate, switch, emergency, personnel, valve, incorrectly</p></td>
+<td><p>injury personnel, identify potential, building, communication, pipe, impossible, utility, outage, radio, protective</p></td>
+<td><p>orbiter, brake, fall, position, hydraulic fluid, mast, pull, operator, smoke, thermal protection system</p></td>
+<td><p>fiber optic, fiber, optic, fiber optic cable, transmission, launch countdown, receives, receiver, hardware software, input signal</p></td>
+<td><p>vessel, pressure vessel, point, pressure, contact, internal, single point failure, routine, pertain, perform periodic</p></td>
+<td><p>carefully evaluate, carefully review, heat, control, coat, significantly, evaluate, carefully, margin, thermal</p></td>
+<td><p>[881]</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>18</p></td>
+<td><p>1035</p></td>
+<td><p>activation, line, activate, prevent, locate, switch, emergency, personnel, valve, incorrectly</p></td>
+<td><p>injury personnel, identify potential, building, communication, pipe, impossible, utility, outage, radio, protective</p></td>
+<td><p>orbiter, brake, fall, position, hydraulic fluid, mast, pull, operator, smoke, thermal protection system</p></td>
+<td><p>fiber optic, fiber, optic, fiber optic cable, transmission, launch countdown, receives, receiver, hardware software, input signal</p></td>
+<td><p>safety, hazardous, lift, procedure, hazard, equipment, remove, proper, handle, load</p></td>
+<td><p>flight hardware, configuration control, fail safe, make sure, launch vehicle, quality assurance, project manager, personnel involve, period time, high fidelity</p></td>
+<td><p>[661]</p></td>
+<td><p>1</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default" id="id2">
+<caption><span class="caption-text">BERTopic Taxonomy</span><a class="headerlink" href="#id2" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 30%" />
+<col style="width: 30%" />
+<col style="width: 20%" />
+<col style="width: 10%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"><p>narr_cause</p></th>
+<th class="head"><p>narr_accf</p></th>
+<th class="head"><p>document IDs for row</p></th>
+<th class="head"><p>number of documents for row</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>abort, abort takeoff, decision abort, decision abort takeoff, delayed decision, delayed decision abort, pilots delayed decision, pilots delayed, takeoff, delayed</p></td>
+<td><p>airplane, pilot reported, pilot, reported, runway, landing, mechanical, malfunctions, substantial, substantial damage</p></td>
+<td><p>[‘20120515X10453’, ‘20120531X13740’, ‘20120907X03444’,…]</p></td>
+<td><p>10</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>abort, abort takeoff, decision abort, decision abort takeoff, delayed decision, delayed decision abort, pilots delayed decision, pilots delayed, takeoff, delayed</p></td>
+<td><p>airplane, pilot, runway, landing, engine, left, reported, flight, right, pilot reported</p></td>
+<td><p>[‘20110609X25931’, ‘20110706X70339’, ‘20110805X95510’,…]</p></td>
+<td><p>41</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>abort, abort takeoff, decision abort, decision abort takeoff, delayed decision, delayed decision abort, pilots delayed decision, pilots delayed, takeoff, delayed</p></td>
+<td><p>carburetor, power, engine, carburetor heat, heat, icing, carburetor icing, engine power, ice, loss</p></td>
+<td><p>[‘20120430X00440’, ‘20120514X11605’]</p></td>
+<td><p>2</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>abort, abort takeoff, decision abort, decision abort takeoff, delayed decision, delayed decision abort, pilots delayed decision, pilots delayed, takeoff, delayed</p></td>
+<td><p>fuel, tank, engine, fuel tank, power, tanks, pilot, gallons, airplane, flight</p></td>
+<td><p>[‘20111221X54903’, ‘20200920X32151’]</p></td>
+<td><p>2</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>abort, abort takeoff, decision abort, decision abort takeoff, delayed decision, delayed decision abort, pilots delayed decision, pilots delayed, takeoff, delayed</p></td>
+<td><p>snow, airplane, snowcovered, pilot, reported, runway, pilot reported, landing, left, substantial damage</p></td>
+<td><p>[‘20120316X94235’]</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>5</p></td>
+<td><p>abort, abort takeoff, decision abort, decision abort takeoff, delayed decision, delayed decision abort, pilots delayed decision, pilots delayed, takeoff, delayed</p></td>
+<td><p>student, student pilot, airplane, instructor, flight instructor, flight, student pilot reported, runway, reported, pilot</p></td>
+<td><p>[‘20120502X85511’, ‘20131028X32032’]</p></td>
+<td><p>2</p></td>
+</tr>
+<tr class="row-even"><td><p>6</p></td>
+<td><p>abort, abort takeoff, decision abort, decision abort takeoff, delayed decision, delayed decision abort, pilots delayed decision, pilots delayed, takeoff, delayed</p></td>
+<td><p>takeoff, weight, runway, gross, airplane, maximum, gross weight, end, pilot, flaps</p></td>
+<td><p>[‘20110511X35743’, ‘20111002X30120’, ‘20120618X11856’,…]</p></td>
+<td><p>7</p></td>
+</tr>
+<tr class="row-odd"><td><p>7</p></td>
+<td><p>abort, abort takeoff, decision abort, decision abort takeoff, delayed decision, delayed decision abort, pilots delayed decision, pilots delayed, takeoff, delayed</p></td>
+<td><p>taxiway, taxi, airplane, taxiing, wing, pilot, reported, left, truck, right</p></td>
+<td><p>[‘20120716X15145’]</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>8</p></td>
+<td><p>abort, abort takeoff, decision abort, decision abort takeoff, delayed decision, delayed decision abort, pilots delayed decision, pilots delayed, takeoff, delayed</p></td>
+<td><p>throttle, cable, throttle control, throttle cable, arm, engine, linkage, control, nut, cotter</p></td>
+<td><p>[‘20130709X54818’]</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>9</p></td>
+<td><p>abort, abort takeoff, decision abort, decision abort takeoff, delayed decision, delayed decision abort, pilots delayed decision, pilots delayed, takeoff, delayed</p></td>
+<td><p>water, lake, airplane, pilot, float, reported, landing, boat, amphibious, floatequipped</p></td>
+<td><p>[‘20110921X93314’, ‘20140807X52333’, ‘20190922X10702’,…]</p></td>
+<td><p>4</p></td>
+</tr>
+<tr class="row-even"><td><p>10</p></td>
+<td><p>abort, abort takeoff, decision abort, decision abort takeoff, delayed decision, delayed decision abort, pilots delayed decision, pilots delayed, takeoff, delayed</p></td>
+<td><p>weight, gross, airplane, gross weight, takeoff, weight balance, balance, maximum, torque, cg</p></td>
+<td><p>[‘20110831X34358’]</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>11</p></td>
+<td><p>abort, abort takeoff, decision abort, decision abort takeoff, delayed decision, delayed decision abort, pilots delayed decision, pilots delayed, takeoff, delayed</p></td>
+<td><p>wind, knots, airplane, runway, reported, pilot, left, accident, pilot reported, landing</p></td>
+<td><p>[‘20111014X60059’, ‘20111121X63408’, ‘20120615X63501’,…]</p></td>
+<td><p>9</p></td>
+</tr>
+<tr class="row-even"><td><p>12</p></td>
+<td><p>accident, stall contributing accident, stall contributing, accident pilots, stall, experience, contributing accident, aerodynamic stall contributing, contributing accident pilots, airspeed</p></td>
+<td><p>aileron, control, aileron control, airplane, flight, left aileron, cable, flight control, left, hinge</p></td>
+<td><p>[‘20110713X30105’]</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>13</p></td>
+<td><p>accident, stall contributing accident, stall contributing, accident pilots, stall, experience, contributing accident, aerodynamic stall contributing, contributing accident pilots, airspeed</p></td>
+<td><p>airplane, accident, witness, flight, pilot, airplanes, stall, pilots, turn, engine</p></td>
+<td><p>[‘20110202X85818’, ‘20110626X95323’, ‘20110802X53813’,…]</p></td>
+<td><p>17</p></td>
+</tr>
+<tr class="row-even"><td><p>14</p></td>
+<td><p>accident, stall contributing accident, stall contributing, accident pilots, stall, experience, contributing accident, aerodynamic stall contributing, contributing accident pilots, airspeed</p></td>
+<td><p>airplane, pilot reported, pilot, reported, runway, landing, mechanical, malfunctions, substantial, substantial damage</p></td>
+<td><p>[‘20110620X14505’, ‘20110815X44012’, ‘20200725X21035’]</p></td>
+<td><p>3</p></td>
+</tr>
+<tr class="row-odd"><td><p>15</p></td>
+<td><p>accident, stall contributing accident, stall contributing, accident pilots, stall, experience, contributing accident, aerodynamic stall contributing, contributing accident pilots, airspeed</p></td>
+<td><p>airplane, pilot, runway, landing, engine, left, reported, flight, right, pilot reported</p></td>
+<td><p>[‘20110524X80102’, ‘20110528X21434’, ‘20120904X22203’,…]</p></td>
+<td><p>25</p></td>
+</tr>
+<tr class="row-even"><td><p>16</p></td>
+<td><p>accident, stall contributing accident, stall contributing, accident pilots, stall, experience, contributing accident, aerodynamic stall contributing, contributing accident pilots, airspeed</p></td>
+<td><p>analysis pending, pending, analysis</p></td>
+<td><p>[‘20190622X23034’]</p></td>
+<td><p>1</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="topic_modeling_results.html" class="btn btn-neutral float-left" title="Topic Modeling Results" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../nblinks/fmea_example.html" class="btn btn-neutral float-right" title="FMEA Example" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright © 2023 United States Government as represented by the Administrator of the National Aeronautics and Space Administration. All Rights Reserved.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

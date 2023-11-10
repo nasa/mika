@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FMEA Results &mdash; MIKA 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=af2ce170"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Hazard Extraction and Analysis of Trends (HEAT): ICS-209-PLUS" href="../nblinks/ics_heat.html" />
+    <link rel="prev" title="FMEA Example" href="../nblinks/fmea_example.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            MIKA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../components.html">MIKA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">Models</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../examples.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#utils">Utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#ir">IR</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../examples.html#kd">KD</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../nblinks/topic_model_plus.html">Topic Model Plus Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="topic_modeling_results.html">Topic Modeling Results</a></li>
+<li class="toctree-l3"><a class="reference internal" href="taxonomy_results.html">Taxonomy Results</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../nblinks/fmea_example.html">FMEA Example</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">FMEA Results</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../nblinks/ics_heat.html">Hazard Extraction and Analysis of Trends (HEAT): ICS-209-PLUS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../nblinks/safecom_heat.html">Hazard Extraction and Analysis of Trends (HEAT): SAFECOM</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#ntsb-case-study">NTSB Case Study</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MIKA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../examples.html">Examples</a></li>
+      <li class="breadcrumb-item active">FMEA Results</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/results/fmea_results.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="fmea-results">
+<h1>FMEA Results<a class="headerlink" href="#fmea-results" title="Permalink to this heading"></a></h1>
+<p>FMEAs can be generated using the <code class="docutils literal notranslate"><span class="pre">mika.kd.FMEA</span></code> class, with example results from SAFECOM below:</p>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">FMEA results</span><a class="headerlink" href="#id1" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 8%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>cluster</p></th>
+<th class="head"><p>Phase</p></th>
+<th class="head"><p>Cause</p></th>
+<th class="head"><p>Failure Mode</p></th>
+<th class="head"><p>Effect</p></th>
+<th class="head"><p>Control Process</p></th>
+<th class="head"><p>Recommendations</p></th>
+<th class="head"><p>Frequency</p></th>
+<th class="head"><p>Severity</p></th>
+<th class="head"><p>Risk</p></th>
+<th class="head"><p>SAFECOM</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Battery</p></td>
+<td><p>Reconnaissance; Infrared Imagery</p></td>
+<td><p>“ b, button, not, could, issue, battery level status, showing,</p></td>
+<td><p>hard, landing, depleted, battery, 40 percent, battery level, sufficient power,</p></td>
+<td><p>dropping, 10, percent, lost, fell at close to free, fall,</p></td>
+<td><p>assumed manual, control, bringing it down, manually, the, ”, ua,</p></td>
+<td><p>batteries will be, tracked on an individual, level, be, removed</p></td>
+<td><p>2</p></td>
+<td><p>0.333</p></td>
+<td><p>0.667</p></td>
+<td><p>17-0977</p></td>
+</tr>
+<tr class="row-odd"><td><p>Casing dislodged</p></td>
+<td><p>Reconnaissance; Infrared Imagery</p></td>
+<td><p>fuselage, cowling on the aircraft was, missing, winds funneled under</p></td>
+<td><p>battery hatch cover disengaged from the, motor failsafe, activated, dirt,</p></td>
+<td><p>hit, motors, shut down, the, small, nick, trap the, dirt,</p></td>
+<td><p>propeller and battery hatch cover were, replaced, redesigning the battery</p></td>
+<td></td>
+<td><p>2</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>21-0015</p></td>
+</tr>
+<tr class="row-even"><td><p>Communications/flight navigation with UAS failed</p></td>
+<td><p>External Load (Longline); Infrared Imagery</p></td>
+<td><p>no contact with, operation, not know about, mission, asked ops</p></td>
+<td><p>positive contact with a, uas operation, failed, uas, mission, not,</p></td>
+<td><p>flight navigation software on the computer started to, freeze, crashed,</p></td>
+<td><p>confirmed frequencies and mission, parameters, adequate, separation, appropriate, safety first,</p></td>
+<td><p>contact, gain, approvals, and planning, processes, occurred, confirm, items, lend</p></td>
+<td><p>2</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>18-0839</p></td>
+</tr>
+<tr class="row-odd"><td><p>Employee personal drone usage without certification/official approval</p></td>
+<td><p>Initial Attack; Aerial Ignition (Prescribed); Reconnaissance</p></td>
+<td><p>did not recall any discussion of uas, use, nan, drone,</p></td>
+<td><p>ua, was put, the, litter</p></td>
+<td><p>away, not, consuming, needle</p></td>
+<td><p>1420 acre prescribed, burn, uas was, aerial, photography, area safety</p></td>
+<td><p>check the fire, activity, the, fuels, size of, fire, take</p></td>
+<td><p>2</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>16-0168</p></td>
+</tr>
+<tr class="row-even"><td><p>Engine Failure</p></td>
+<td><p>Other; Infrared Imagery</p></td>
+<td><p>remained in guided, mode, attempting to maintain altitude without engine,</p></td>
+<td><p>a33n engine, failed, aircraft, failure of the, piston, engine to,</p></td>
+<td><p>was, aircraft then, spiral, and, crashed, ground, quit, extensive, damage</p></td>
+<td><p>aircraft, landing, monitoring the, visually, crash was, located, within the,</p></td>
+<td><p>replace, replace current mission planner, messaging, with, update mission, planner,</p></td>
+<td><p>3</p></td>
+<td><p>0.5</p></td>
+<td><p>1.5</p></td>
+<td><p>20-0822</p></td>
+</tr>
+<tr class="row-odd"><td><p>Fight plan error</p></td>
+<td><p>Air Attack; Reconnaissance; Infrared Imagery</p></td>
+<td><p>location of the, fire, placement of the launch, angle of</p></td>
+<td><p>uas aggressively changed its angle of, attack, and, pitched, down,</p></td>
+<td><p>ground, sustained, significant, damage, higher, of, impact to the, wilderness,</p></td>
+<td><p>heat, flight, safety and operational, briefing, area, in charge, pic</p></td>
+<td><p>detect any, remaining, map their, perimeters, provide, imagery, thorough, double,</p></td>
+<td><p>3</p></td>
+<td><p>0.5</p></td>
+<td><p>1.5</p></td>
+<td><p>19-0489</p></td>
+</tr>
+<tr class="row-even"><td><p>Hang Fire</p></td>
+<td><p>Aerial Ignition</p></td>
+<td><p>form of, visible, hang fire, functioned, melted, sphere, was still</p></td>
+<td><p>a, hang, fire, on, aircraft gave a, hatch motion, error,</p></td>
+<td><p>in, flight, fires</p></td>
+<td><p>vo assisted the pilot, resetting the ignis per, took control</p></td>
+<td><p>follow, immediately using the, camera, identify any, ensure that you</p></td>
+<td><p>1</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>20-0872</p></td>
+</tr>
+<tr class="row-odd"><td><p>High wind pushes UAS off course</p></td>
+<td><p>Reconnaissance</p></td>
+<td></td>
+<td><p>propeller, strike, side gust of, hit a, landing, composite tip</p></td>
+<td><p>wind, off, target, ground was, struck, breaking the tips of</p></td>
+<td><p>in guided, mode, automated rtl, landing, area, opening, propeller strike,</p></td>
+<td><p>relocate, larger, area, clear of all, obstacles, sent, the, inspected</p></td>
+<td><p>2</p></td>
+<td><p>0.5</p></td>
+<td><p>1</p></td>
+<td><p>18-0847</p></td>
+</tr>
+<tr class="row-even"><td><p>Hobbyist offers services</p></td>
+<td><p>Initial Attack</p></td>
+<td><p>mission, no, t</p></td>
+<td></td>
+<td></td>
+<td><p>fire, department, camera - equipped, drone, was notified of the,</p></td>
+<td><p>fly, will not be, allowed, faa, accreditation, federal fire, managers,</p></td>
+<td><p>1</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>15-0166</p></td>
+</tr>
+<tr class="row-odd"><td><p>Inappropriate Landing Site</p></td>
+<td><p>Infrared Imagery</p></td>
+<td><p>pilot was landing on the landing, pad, black, trim</p></td>
+<td><p>portion of the skid landed on the, ” ), rise,</p></td>
+<td><p>landing, upside, minor, damage, to, rotors</p></td>
+<td><p>lift, pic, moving both sticks to forward</p></td>
+<td><p>taking, more time to, level out uneven, surfaces, procedures, land</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>21-0761</p></td>
+</tr>
+<tr class="row-even"><td><p>Landing Gear Failure</p></td>
+<td><p>Aerial Ignition</p></td>
+<td><p>position, screws that hold the landing gear servo, had become,</p></td>
+<td><p>lift the landing gear, flight, failed to, raise, right side</p></td>
+<td><p>the landing, gear</p></td>
+<td><p>through the preflight, checklist, manually cycle the landing, lower the,</p></td>
+<td></td>
+<td><p>1</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>20-0495</p></td>
+</tr>
+<tr class="row-odd"><td><p>Loss of GCS</p></td>
+<td><p>Aerial Ignition; Reconnaissance; Infrared Imagery</p></td>
+<td><p>error, combination, thermal, signal, controller and, feedback, gcs did not</p></td>
+<td><p>in flight, failure, gsc, disconnection, error, video, loss, motor, wine,</p></td>
+<td><p>immediately, ignis, warning, crash from, separated, motor, home, not, turned,</p></td>
+<td><p>reset the home, point, noted the gps, location, up, plan,</p></td>
+<td><p>management, pulling flight logs and, video, ensure that, are, done,</p></td>
+<td><p>3</p></td>
+<td><p>0.333</p></td>
+<td><p>1</p></td>
+<td><p>21-0172</p></td>
+</tr>
+<tr class="row-even"><td><p>Loss of GPS on UAS</p></td>
+<td><p>Other; Reconnaissance; Infrared Imagery</p></td>
+<td><p>erratic, nose of the aircraft was pointed at, lack of</p></td>
+<td><p>of, solo made contact with, solo lost, gps, winds, battery</p></td>
+<td><p>experienced loss, gps, tree, loss of, control, and, crash, shifted,</p></td>
+<td><p>autonomous, regain manual flight, control, initiate ” return to home,</p></td>
+<td><p>should have been, suspended, or, cancelled, having eyes on the,</p></td>
+<td><p>3</p></td>
+<td><p>0.4</p></td>
+<td><p>1.2</p></td>
+<td><p>21-0138</p></td>
+</tr>
+<tr class="row-odd"><td><p>Loss of LOS</p></td>
+<td><p>Aerial Ignition</p></td>
+<td><p>had, lost, of the aircraft, position, and the, pad, could</p></td>
+<td><p>with a, broken, broken arm locking, ignis housing was, cracked,</p></td>
+<td><p>aircraft, collided, tree, tilted and, fell about 15’to the, ground,</p></td>
+<td><p>a hand held led, light, spot the, pad, exactly, analysis</p></td>
+<td><p>having the, visual observer 90, degrees, off of the landing,</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>20-0949</p></td>
+</tr>
+<tr class="row-even"><td><p>Loss of control</p></td>
+<td><p>Reconnaissance; Infrared Imagery</p></td>
+<td><p>left wing aileron servo was, sticking, aircraft, hit, wall, refused,</p></td>
+<td><p>rapid and uncommanded, descent, roll and, aircraft, to quickly lose,</p></td>
+<td><p>steep, aircraft, dropped and hit the, feed and connection was,</p></td>
+<td><p>no, monitored instruments, programmed flight, terminate, land, troubleshoot, reviewing the</p></td>
+<td><p>be, inspected and, tested, at, facility, , compass and, micro,</p></td>
+<td><p>3</p></td>
+<td><p>0.667</p></td>
+<td><p>2</p></td>
+<td><p>20-1042</p></td>
+</tr>
+<tr class="row-odd"><td><p>Manned Aircraft Intrusion</p></td>
+<td><p>Infrared Imagery</p></td>
+<td><p>altitude, aircraft, no tail, tower did not recognize the description</p></td>
+<td><p>tfr, inc, aircraft operating, turned north, of, di, was, aircraft</p></td>
+<td><p>lost, visual, northwest, presence, , the</p></td>
+<td><p>preflight checklist /, inspection, a controls, check, held position, land</p></td>
+<td><p>made, and, avoid, discussed, being, vigilant, in listening and looking</p></td>
+<td><p>3</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>20-1098</p></td>
+</tr>
+<tr class="row-even"><td><p>Motor Mount Failure</p></td>
+<td><p>Aerial Ignition; Infrared Imagery</p></td>
+<td><p>m600 motor mount, separation, motor was, the motor, mount, via,</p></td>
+<td><p>flight failure to, went into, uncontrolled, ya, impacted the, dangling</p></td>
+<td><p>loss of, control, impacted, terrain, aircraft, ground, damaging landing gear</p></td>
+<td><p>maintenance, performed, lander gear, full, notification, quickly, strong field, work,</p></td>
+<td><p>reduce the payload, weight, reduction of number of balls to,</p></td>
+<td><p>3</p></td>
+<td><p>1</p></td>
+<td><p>3</p></td>
+<td><p>21-0876</p></td>
+</tr>
+<tr class="row-odd"><td><p>Motor failure</p></td>
+<td><p>Reconnaissance</p></td>
+<td><p>failed attempts to control the left, positive connection, right rear</p></td>
+<td><p>right rear motor, failed, ya, of, motors, failing, inputs for,</p></td>
+<td><p>arch and, melt the surrounding, plastic, melted the left, damage,</p></td>
+<td><p>aircraft was re positioned over the, road, landed, screw, multiple</p></td>
+<td><p>thorough, inspection</p></td>
+<td><p>3</p></td>
+<td><p>1</p></td>
+<td><p>3</p></td>
+<td><p>19-0519</p></td>
+</tr>
+<tr class="row-even"><td><p>Parachute Landing Failure</p></td>
+<td><p>Infrared Imagery</p></td>
+<td><p>chu, fully, parachute was packed, incorrectly, drogue chute was packed</p></td>
+<td><p>deploy, partial, opening, the, canopy</p></td>
+<td><p>hard, fuselage was, damaged, e, been</p></td>
+<td><p>checked all parachute, on, confirmed proper</p></td>
+<td><p>site, packing, use a, buddy, check</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>18-0821</p></td>
+</tr>
+<tr class="row-odd"><td><p>Pilot Error</p></td>
+<td><p>Aerial Ignition; Infrared Imagery</p></td>
+<td><p>intense, smoke, cover, were, line, resources had departed, line early,</p></td>
+<td><p>fire, growth, indirect, crews, pulled off the, the, would, be,</p></td>
+<td><p>significant, impacted, multiple, sl, overs, not be, returning in a,</p></td>
+<td><p>) infrared, video and ir, resource was, awoken and asked</p></td>
+<td><p>access, overs, imagery, and emergency, protocols, thoroughly, plan and, coordinate</p></td>
+<td><p>3</p></td>
+<td><p>0.5</p></td>
+<td><p>1.5</p></td>
+<td><p>21-0934</p></td>
+</tr>
+<tr class="row-even"><td><p>Pins or needles dislodged</p></td>
+<td><p>Aerial Ignition; Reconnaissance</p></td>
+<td><p>mounted, position, space, pins, had, loose, no longer, place, vibrating</p></td>
+<td><p>red puncture motion, error, puncture needle was dislodged from its,</p></td>
+<td><p>damage, abnormalities</p></td>
+<td><p>error, stayed within the burn, unit, initiated the emergency release,</p></td>
+<td><p>inspect the, needles, to, incorporating a needle, check, evaluation, be,</p></td>
+<td><p>3</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>21-0169</p></td>
+</tr>
+<tr class="row-odd"><td><p>Propellor arm disconnect (sheared bolt heads or snaps)</p></td>
+<td><p>Aerial Ignition; Aerial Ignition (Prescribed); Infrared Imagery</p></td>
+<td><p>heads on a propeller bolt had, normal, aircraft, having difficulty</p></td>
+<td><p>missing, separate bolt head had, sheared, loud, piece of, unknown,</p></td>
+<td><p>snap, descended and, impacted the, ground, 4, propeller, where, flight</p></td>
+<td><p>photo, was, propeller assembly was, rebuilt, test flight, full, inspections,</p></td>
+<td><p>check propeller, bolts, and, document all bolt, failures, and potential</p></td>
+<td><p>3</p></td>
+<td><p>1</p></td>
+<td><p>3</p></td>
+<td><p>19-0298</p></td>
+</tr>
+<tr class="row-even"><td><p>UAS Intrusion</p></td>
+<td><p>Water Drop (Helicopter Bucket); Aerial Ignition; Passenger Transport; Aerial Ignition (Prescribed); Helitack; Initial Attack; Other; Retardant; Air-Attack (Prescribed); External Load (Longline); Water Drop (Fixed Wing); Retardant Drop (SEAT); Air Attack; Retardant Drop (Airtanker); Water Drop (Helicopter Fixed-Tank); Leadplane; Reconnaissance</p></td>
+<td><p>system, heavy, smoke, erratic fire, conditions, recreational, ua, dropping, water,</p></td>
+<td><p>firefighters, a, recreational type unmanned aircraft system { ua, },</p></td>
+<td><p>immediately, cease, leave the, catastrophic, flew out of, sight, ceased,</p></td>
+<td><p>tfr was put in place, was, ua, confronted, and, removed,</p></td>
+<td><p>wide circulation of, events, go, taken, maintain visual on, documented,</p></td>
+<td><p>4</p></td>
+<td><p>0.067</p></td>
+<td><p>0.269</p></td>
+<td><p>16-0657</p></td>
+</tr>
+<tr class="row-odd"><td><p>UAS airspace separation issue</p></td>
+<td><p>Aerial Ignition; Other; Infrared Imagery</p></td>
+<td><p>stationary, hove, clearance, altered, hovering ( stationary, at, pitching, the</p></td>
+<td><p>unmanned aerial, came in close proximity of one, another, visual</p></td>
+<td><p>passed by the, ua, attack, halted the su, momentarily, ,</p></td>
+<td><p>aerial supervision was in place, were made aware of the</p></td>
+<td><p>see and, avoid, all incident aircraft should, , same altitude,</p></td>
+<td><p>3</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>21-0774</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>21-0859</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../nblinks/fmea_example.html" class="btn btn-neutral float-left" title="FMEA Example" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../nblinks/ics_heat.html" class="btn btn-neutral float-right" title="Hazard Extraction and Analysis of Trends (HEAT): ICS-209-PLUS" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright © 2023 United States Government as represented by the Administrator of the National Aeronautics and Space Administration. All Rights Reserved.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

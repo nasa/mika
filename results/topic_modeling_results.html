@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Topic Modeling Results &mdash; MIKA 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=af2ce170"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Taxonomy Results" href="taxonomy_results.html" />
+    <link rel="prev" title="Topic Model Plus Example" href="../nblinks/topic_model_plus.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            MIKA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../components.html">MIKA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">Models</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../examples.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#utils">Utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#ir">IR</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../examples.html#kd">KD</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../nblinks/topic_model_plus.html">Topic Model Plus Example</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Topic Modeling Results</a></li>
+<li class="toctree-l3"><a class="reference internal" href="taxonomy_results.html">Taxonomy Results</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../nblinks/fmea_example.html">FMEA Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fmea_results.html">FMEA Results</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../nblinks/ics_heat.html">Hazard Extraction and Analysis of Trends (HEAT): ICS-209-PLUS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../nblinks/safecom_heat.html">Hazard Extraction and Analysis of Trends (HEAT): SAFECOM</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#ntsb-case-study">NTSB Case Study</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MIKA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../examples.html">Examples</a></li>
+      <li class="breadcrumb-item active">Topic Modeling Results</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/results/topic_modeling_results.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="topic-modeling-results">
+<h1>Topic Modeling Results<a class="headerlink" href="#topic-modeling-results" title="Permalink to this heading"></a></h1>
+<p>MIKA supports multiple topic modeling algorthims and outputs results in a standard format. Results are typically saved with topic numbers, topic words, documents per topic, and best document per topic.</p>
+<p>Just the topic model results can be saved, as well as a full set of results with a taxonomy, document-topic distribution, and coherence. To save just the topics:</p>
+<p><code class="docutils literal notranslate"><span class="pre">tm.save_bert_topics()</span></code>, <code class="docutils literal notranslate"><span class="pre">tm.save_lda_topics()</span></code>, or  <code class="docutils literal notranslate"><span class="pre">tm.save_hlda_topics()</span></code></p>
+<p>To save the full set of results:</p>
+<p><code class="docutils literal notranslate"><span class="pre">tm.save_bert_results()</span></code>, <code class="docutils literal notranslate"><span class="pre">tm.save_lda_results()</span></code>, or  <code class="docutils literal notranslate"><span class="pre">tm.save_hlda_results()</span></code></p>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">LDA results</span><a class="headerlink" href="#id1" title="Permalink to this table"></a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>topic number</p></th>
+<th class="head"><p>number of documents in topic</p></th>
+<th class="head"><p>topic words</p></th>
+<th class="head"><p>total number of words</p></th>
+<th class="head"><p>number of words</p></th>
+<th class="head"><p>best document</p></th>
+<th class="head"><p>coherence</p></th>
+<th class="head"><p>documents</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>218</p></td>
+<td><p>jettison, crash, crash rescue, jettison load, rescue, jettison retardant, …</p></td>
+<td><p>1585</p></td>
+<td><p>250</p></td>
+<td><p>00-1147</p></td>
+<td><p>0.805071926</p></td>
+<td><p>[‘97-0077’, ‘98-0027’, ‘98-0116’, ‘98-0154’,…]</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>80</p></td>
+<td><p>silver city, silver, trouble shot, shot, city, trouble, technician, crux, radio technician, …</p></td>
+<td><p>444</p></td>
+<td><p>222</p></td>
+<td><p>00-0267</p></td>
+<td><p>0.825701749</p></td>
+<td><p>[‘95-0036’, ‘95-0206’, ‘95-0262’, ‘97-0206’,,…]</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>857</p></td>
+<td><p>taxi, ramp, parking, runway, park, taxiway, stop, pit, brake, wing, left, right, …</p></td>
+<td><p>9772</p></td>
+<td><p>330</p></td>
+<td><p>08-0457</p></td>
+<td><p>0.764096785</p></td>
+<td><p>[‘95-0006’, ‘95-0024’, ‘95-0035’, ‘95-0216’, …]</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>2692</p></td>
+<td><p>tree, bucket, water, dip, site, drop, top, line, dip site, damage, water drop, …</p></td>
+<td><p>38772</p></td>
+<td><p>276</p></td>
+<td><p>12-0768</p></td>
+<td><p>0.696187669</p></td>
+<td><p>[‘95-0002’, ‘95-0013’, ‘95-0039’, ‘95-0042’, …]</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>153</p></td>
+<td><p>spring, hot spring, nothing ordinary, ordinary, warm, warm spring, …</p></td>
+<td><p>866</p></td>
+<td><p>282</p></td>
+<td><p>02-0834</p></td>
+<td><p>0.846775067</p></td>
+<td><p>[‘95-0028’, ‘95-0029’, ‘95-0236’, ‘97-0192’,…]</p></td>
+</tr>
+<tr class="row-odd"><td><p>5</p></td>
+<td><p>332</p></td>
+<td><p>caution, master caution, master, illuminate, light, light illuminate, caution light, …</p></td>
+<td><p>2696</p></td>
+<td><p>158</p></td>
+<td><p>12-0501</p></td>
+<td><p>0.843005717</p></td>
+<td><p>[‘97-0075’, ‘98-0144’, ‘98-0206’, ‘98-0471’, …]</p></td>
+</tr>
+<tr class="row-even"><td><p>6</p></td>
+<td><p>157</p></td>
+<td><p>ppe, wear, helmet, flight helmet, glove, nomex, suit, flight suit, proper ppe, …</p></td>
+<td><p>1255</p></td>
+<td><p>253</p></td>
+<td><p>12-0593</p></td>
+<td><p>0.87565009</p></td>
+<td><p>[‘95-0039’, ‘95-0118’, ‘95-0123’, ‘95-0142’,…]</p></td>
+</tr>
+<tr class="row-odd"><td><p>7</p></td>
+<td><p>1162</p></td>
+<td><p>tfr, intrusion, fly, drone, agl, south, law, air, enforcement, area, air attack, …</p></td>
+<td><p>14831</p></td>
+<td><p>293</p></td>
+<td><p>03-0231</p></td>
+<td><p>0.66449779</p></td>
+<td><p>[‘95-0002’, ‘95-0007’, ‘95-0014’, ‘95-0163’,…]</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default" id="id2">
+<caption><span class="caption-text">hLDA results</span><a class="headerlink" href="#id2" title="Permalink to this table"></a></caption>
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"><p>topic level</p></th>
+<th class="head"><p>topic number</p></th>
+<th class="head"><p>parent</p></th>
+<th class="head"><p>number of documents in topic</p></th>
+<th class="head"><p>topic words</p></th>
+<th class="head"><p>number of words</p></th>
+<th class="head"><p>best lesson</p></th>
+<th class="head"><p>coherence</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>-1</p></td>
+<td><p>1639</p></td>
+<td><p>time, flight, require, control, problem, perform, component, failure, data, however</p></td>
+<td><p>67747</p></td>
+<td><p>2496</p></td>
+<td><p>0.626159891</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>8</p></td>
+<td><p>0</p></td>
+<td><p>248</p></td>
+<td><p>base reliability, prefer, reliability, implementation method, technical, test benefit, reliability prefer, rationale, benefit, technical rationale</p></td>
+<td><p>11052</p></td>
+<td><p>547</p></td>
+<td><p>0.761625791</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>1</p></td>
+<td><p>9</p></td>
+<td><p>0</p></td>
+<td><p>103</p></td>
+<td><p>tunnel, transonic, aerodynamic, test mach, tunnel blade, transonic tunnel, mach, deflection, blade, vane</p></td>
+<td><p>719</p></td>
+<td><p>1264</p></td>
+<td><p>0.940507549</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>1</p></td>
+<td><p>10</p></td>
+<td><p>0</p></td>
+<td><p>296</p></td>
+<td><p>management, project, lack, formal, manager, organization, contractor, request, risk, development</p></td>
+<td><p>5382</p></td>
+<td><p>1368</p></td>
+<td><p>0.767053002</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>1</p></td>
+<td><p>11</p></td>
+<td><p>0</p></td>
+<td><p>206</p></td>
+<td><p>ssme, oxidizer, pump, liquid, fuel, propellant, shape, erosion, ring, space shuttle</p></td>
+<td><p>3176</p></td>
+<td><p>113</p></td>
+<td><p>0.812935519</p></td>
+</tr>
+<tr class="row-odd"><td><p>5</p></td>
+<td><p>1</p></td>
+<td><p>12</p></td>
+<td><p>0</p></td>
+<td><p>301</p></td>
+<td><p>valve, tank, pressure, leak, supply, line, vent, nitrogen, vent line, water</p></td>
+<td><p>4261</p></td>
+<td><p>745</p></td>
+<td><p>0.782795066</p></td>
+</tr>
+<tr class="row-even"><td><p>6</p></td>
+<td><p>1</p></td>
+<td><p>13</p></td>
+<td><p>0</p></td>
+<td><p>74</p></td>
+<td><p>state microgravity, first united, microgravity, injury, fire occur, damage, first shift, ignite, united, mile</p></td>
+<td><p>895</p></td>
+<td><p>1710</p></td>
+<td><p>0.869355899</p></td>
+</tr>
+<tr class="row-odd"><td><p>7</p></td>
+<td><p>1</p></td>
+<td><p>14</p></td>
+<td><p>0</p></td>
+<td><p>62</p></td>
+<td><p>breaker, effective maintainability benefit, base maintainability, recommend technique, circuit breaker, cost saving, technique number, effective maintainability, fault, saving</p></td>
+<td><p>659</p></td>
+<td><p>1208</p></td>
+<td><p>0.871555471</p></td>
+</tr>
+<tr class="row-even"><td><p>8</p></td>
+<td><p>1</p></td>
+<td><p>15</p></td>
+<td><p>0</p></td>
+<td><p>172</p></td>
+<td><p>orbiter, brake, fall, position, hydraulic fluid, mast, pull, operator, smoke, thermal protection system</p></td>
+<td><p>1252</p></td>
+<td><p>861</p></td>
+<td><p>0.856068957</p></td>
+</tr>
+<tr class="row-odd"><td><p>9</p></td>
+<td><p>2</p></td>
+<td><p>16</p></td>
+<td><p>8</p></td>
+<td><p>19</p></td>
+<td><p>follow recommendation, torque analog, base legacy, need great hinge, necessary torque include, great hinge, redesign accommodate, system redesign digital, redesign digital, flight pegasus</p></td>
+<td><p>1083</p></td>
+<td><p>1609</p></td>
+<td><p>0.999997592</p></td>
+</tr>
+<tr class="row-even"><td><p>10</p></td>
+<td><p>2</p></td>
+<td><p>17</p></td>
+<td><p>9</p></td>
+<td><p>3</p></td>
+<td><p>shaker, random vibration, sine burst, open loop, random, quasi, fixturing, sine, impart, random vibration test</p></td>
+<td><p>240</p></td>
+<td><p>6196</p></td>
+<td><p>0.926993883</p></td>
+</tr>
+<tr class="row-odd"><td><p>11</p></td>
+<td><p>2</p></td>
+<td><p>18</p></td>
+<td><p>10</p></td>
+<td><p>55</p></td>
+<td><p>lander, exploration rover, rover, land, martian, additional word, exploration, entry descent land, entry, entry descent</p></td>
+<td><p>2513</p></td>
+<td><p>1615</p></td>
+<td><p>0.879423398</p></td>
+</tr>
+<tr class="row-even"><td><p>12</p></td>
+<td><p>2</p></td>
+<td><p>19</p></td>
+<td><p>8</p></td>
+<td><p>11</p></td>
+<td><p>optic, spherical, aberration, lens, spie, optical, focal, plane, beam, mirror</p></td>
+<td><p>1174</p></td>
+<td><p>718</p></td>
+<td><p>0.888498485</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default" id="id3">
+<caption><span class="caption-text">BERTopic results</span><a class="headerlink" href="#id3" title="Permalink to this table"></a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>topic number</p></th>
+<th class="head"><p>topic words</p></th>
+<th class="head"><p>number of words</p></th>
+<th class="head"><p>best documents</p></th>
+<th class="head"><p>documents</p></th>
+<th class="head"><p>number of documents in topic</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>-1</p></td>
+<td><p>terrain, area, steep, fires, access, resources, heavy, smoke, complex, limited, suppression, containment, continue, acres, fuels, incident, creek, difficult, crews, continues</p></td>
+<td><p>20</p></td>
+<td><p>n/a</p></td>
+<td><p>[‘2000_CA-RRU-062485_VALLEY COMPLEX_6’, ‘2000_CA-RRU-062485_VALLEY COMPLEX_7’, …]</p></td>
+<td><p>68098</p></td>
+</tr>
+<tr class="row-odd"><td><p>0</p></td>
+<td><p>nonw, slow slow, slow, em wann bye, nonw fortunately, nonw em, fortunately confirm nonw, fortunately confirm, nonw fortunately confirm, em wann, confirm nonw em, confirm nonw, wann bye slow, bye slow slow, bye slow, bye, slow slow slow, wann bye, nonw em wann, fortunately</p></td>
+<td><p>20</p></td>
+<td><p>[‘2000_CA-RRU-062485_VALLEY COMPLEX_0’, ‘2000_CA-RRU-062485_VALLEY COMPLEX_0’, ‘2000_CA-RRU-062485_VALLEY COMPLEX_0’]</p></td>
+<td><p>[‘2000_CA-RRU-062485_VALLEY COMPLEX_0’, ‘2000_CA-RRU-062485_VALLEY COMPLEX_1’, …]</p></td>
+<td><p>99828</p></td>
+</tr>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>road, closed, closure, closures, highway, traffic, road closures, hwy, effect, remain, remains, remains closed, open, roads, road closure, public, area, closures effect, remain closed, reopened</p></td>
+<td><p>20</p></td>
+<td><p>[‘2010_CA-INF-934_MONO_1’, ‘2007_GA-GAS-070010_BUGABOO SCRUB 2_2’, ‘2009_AZ-KNF-0705_RIDGE_0’]</p></td>
+<td><p>[‘2006_AK-FAS-611163_PARKS HWY_0’, ‘2006_AK-FAS-611163_PARKS HWY_1’, …]</p></td>
+<td><p>11306</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>evacuation, evacuations, evacuated, lifted, level, effect, residents, mandatory, road, residences, remain, level evacuation, voluntary, community, homes, mandatory evacuation, evacuation orders, advisory, evacuation order, orders</p></td>
+<td><p>20</p></td>
+<td><p>[‘2012_CA-SQF-1644_GULCH_1’, ‘2011_TX-TXS-011190_ROGERS ROAD_0’, ‘2006_CA-RRU-79875_RANCH_2’]</p></td>
+<td><p>[‘2006_AK-FAS-611163_PARKS HWY_0’, ‘2006_AK-FAS-611163_PARKS HWY_2’ ,…]</p></td>
+<td><p>7922</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>acres, contained, acreage, 100, burned, 100 contained, acres 100, fires, acres 100 contained, acre, acres burned, mapping, complex, 000 acres, 000, approximately, increase, size, ownership, private</p></td>
+<td><p>20</p></td>
+<td><p>[‘2009_TX-BRR-E5LD_HALF MOON FIRE_0’, ‘2011_MT-BDF-052_STEWART FIRE_16’, ‘2006_TX-TXS-066138_GLASS MOUNTAIN COMPLEX_8’]</p></td>
+<td><p>[‘2005_OK-CHA-005077_WILLIS_0’,’2006_00276_MILLER COMPLEX_1’, …]</p></td>
+<td><p>6694</p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p>dry, low, humidity, weather, rain, conditions, drought, temperatures, hot, relative, fuel, humidities, fuels, precipitation, hot dry, moistures, fuel moistures, relative humidity, dry weather, drought conditions</p></td>
+<td><p>20</p></td>
+<td><p>[‘2008_OR-MHF-000014_GNARL RIDGE_10’, ‘2006_AZ-ASF-060304_BEAVERHEAD_1’, ‘2006_UT-FIF-000215_DOG VALLEY_4’]</p></td>
+<td><p>[‘2006_AK-FAS-611163_PARKS HWY_13’, ‘2006_AK-FAS-611163_PARKS HWY_15’,…]</p></td>
+<td><p>7101</p></td>
+</tr>
+<tr class="row-even"><td><p>5</p></td>
+<td><p>acres, acreage, private, blm, ownership, acre, nf, forest, national forest, national, acres private, acres acres, acres national, ir, acres national forest, acres acreage, breakdown, contained, wfu, 25</p></td>
+<td><p>20</p></td>
+<td><p>[‘2010_KS-KSX-000231_EAST KENNEDY CREEK_1’, ‘2010_AZ-CRD-100117_MITCHEL_3’, ‘2008_CA-LNF-002782_PETERSON COMPLEX_14’]</p></td>
+<td><p>[‘2000_CA-RRU-062485_VALLEY COMPLEX_10’, ‘2006_AK-FAS-611163_PARKS HWY_1’, …]</p></td>
+<td><p>6466</p></td>
+</tr>
+<tr class="row-odd"><td><p>6</p></td>
+<td><p>resources, demobilization, demob, excess resources, excess, demobilization resources, resource, demob resources, resources released, released, demobed, resources demobed, resources continue, demobilization excess resources, demobilization excess, demob excess, demob excess resources, today, available, continue</p></td>
+<td><p>20</p></td>
+<td><p>[‘2009_AK-KKS-903088_MI.17 EAST END RD._5’, ‘2013_NM-N6S-000230_THOMPSON RIDGE_16’, ‘2009_CA-PNF-0961_SILVER_6’]</p></td>
+<td><p>[‘2000_CA-RRU-062485_VALLEY COMPLEX_1’, ‘2000_CA-RRU-062485_VALLEY COMPLEX_7’,…]</p></td>
+<td><p>9371</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../nblinks/topic_model_plus.html" class="btn btn-neutral float-left" title="Topic Model Plus Example" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="taxonomy_results.html" class="btn btn-neutral float-right" title="Taxonomy Results" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright © 2023 United States Government as represented by the Administrator of the National Aeronautics and Space Administration. All Rights Reserved.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

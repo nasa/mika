@@ -1,0 +1,6248 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hazard Extraction and Analysis of Trends (HEAT): ICS-209-PLUS &mdash; MIKA 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/nbsphinx-code-cells.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=af2ce170"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Hazard Extraction and Analysis of Trends (HEAT): SAFECOM" href="safecom_heat.html" />
+    <link rel="prev" title="FMEA Results" href="../results/fmea_results.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            MIKA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../components.html">MIKA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">Models</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../examples.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#utils">Utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#ir">IR</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../examples.html#kd">KD</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="topic_model_plus.html">Topic Model Plus Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../results/topic_modeling_results.html">Topic Modeling Results</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../results/taxonomy_results.html">Taxonomy Results</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fmea_example.html">FMEA Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../results/fmea_results.html">FMEA Results</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Hazard Extraction and Analysis of Trends (HEAT): ICS-209-PLUS</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Data-Import">Data Import</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Hazard-Extraction">Hazard Extraction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Primary-Analysis:">Primary Analysis:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Graphic-Analysis:">Graphic Analysis:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Secondary-Analysis:">Secondary Analysis:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Experimental">Experimental</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Colinearity">Colinearity</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="safecom_heat.html">Hazard Extraction and Analysis of Trends (HEAT): SAFECOM</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#ntsb-case-study">NTSB Case Study</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MIKA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../examples.html">Examples</a></li>
+      <li class="breadcrumb-item active">Hazard Extraction and Analysis of Trends (HEAT): ICS-209-PLUS</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/nblinks/ics_heat.nblink.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Hazard-Extraction-and-Analysis-of-Trends-(HEAT):-ICS-209-PLUS">
+<h1>Hazard Extraction and Analysis of Trends (HEAT): ICS-209-PLUS<a class="headerlink" href="#Hazard-Extraction-and-Analysis-of-Trends-(HEAT):-ICS-209-PLUS" title="Permalink to this heading"></a></h1>
+<p>This notebook provides a demonstration of the hazard extraction and analysis of trends (HEAT) framework applied to the ICS-209-PLUS dataset, available at <a class="reference external" href="https://data.nal.usda.gov/dataset/data-all-hazards-dataset-mined-us-national-incident-management-system-1999%E2%80%932014">https://data.nal.usda.gov/dataset/data-all-hazards-dataset-mined-us-national-incident-management-system-1999%E2%80%932014</a></p>
+<p>This example uses the trend analysis module from MIKA’s knowledge discovery toolkit, as well as the Data and ICS utilities.</p>
+<p>Prior to performing the analysis in this notebook, hazards are extracted using BERTopic from topic model plus using the ICS_hazard_extraction_script.</p>
+<section id="Imports">
+<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this heading"></a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import pandas as pd
+import numpy as np
+%matplotlib inline
+import matplotlib.style
+matplotlib.style.use(&quot;seaborn-v0_8&quot;)
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+plt.rcParams[&quot;font.family&quot;] = &quot;Times New Roman&quot;
+import seaborn as sn
+sn.color_palette(&quot;hls&quot;, 17)
+import scipy.stats as st
+import math
+import dill
+from pingouin import rcorr
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import sys
+import os
+sys.path.append(os.path.join(&quot;..&quot;, &quot;..&quot;, &quot;..&quot;, &quot;..&quot;))
+
+from mika.kd.trend_analysis import *
+from mika.utils.ICS import *
+from mika.utils import Data
+</pre></div>
+</div>
+</div>
+<p>For figure consistency, global configuration variables are defined here.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>figsize = (6, 4)
+fontsize = 14
+matrix_figsize = (8,9)
+matrix_fontsize = 10
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Data-Import">
+<h2>Data Import<a class="headerlink" href="#Data-Import" title="Permalink to this heading"></a></h2>
+<p>The preprocessed ICS-209-PLUS dataset is loaded in using the Data utility</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>document_id_col = &quot;Unique IDs&quot;
+extra_cols = [&quot;CY&quot;,&quot;DISCOVERY_DATE&quot;, &quot;START_YEAR&quot;, &quot;REPORT_DOY&quot;, &quot;DISCOVERY_DOY&quot;,
+              &quot;TOTAL_PERSONNEL&quot;, &quot;TOTAL_AERIAL&quot;, &quot;PCT_CONTAINED_COMPLETED&quot;]
+list_of_attributes = [&quot;Combined Text&quot;]
+file = os.path.join(&#39;topic_model_results&#39;, &#39;preprocessed_data_combined_text.csv&#39;)
+ICS = Data()
+ICS.load(file, preprocessed=True, id_col=document_id_col, text_columns=[&quot;Combined Text&quot;], preprocessed_kwargs={&#39;drop_short_docs&#39;:False, &#39;drop_duplicates&#39;:True})
+</pre></div>
+</div>
+</div>
+<p>Now the preprocessed dataframe that will be used is defined:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>preprocessed_df = ICS.data_df
+</pre></div>
+</div>
+</div>
+<p>The dataframe is then filtered to ensure it includes the correct years and incidents.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>incident_file = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir, os.pardir, os.pardir)),&#39;data&#39;,&#39;ICS&#39;,&#39;summary_reports_cleaned.csv&#39;)
+incident_summary_df = pd.read_csv(incident_file,low_memory=False)
+incident_summary_df = incident_summary_df.drop(&quot;Unnamed: 0&quot;, axis=1)
+incident_summary_df = incident_summary_df.loc[incident_summary_df[&quot;START_YEAR&quot;]&gt;=2006].reset_index(drop=True)
+
+fire_ids = incident_summary_df[&#39;INCIDENT_ID&#39;].unique()
+sitrep_ids = preprocessed_df[&#39;INCIDENT_ID&#39;].unique()
+incident_summary_df = incident_summary_df[incident_summary_df[&#39;INCIDENT_ID&#39;].isin(sitrep_ids)].reset_index(drop=True)
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Hazard-Extraction">
+<h2>Hazard Extraction<a class="headerlink" href="#Hazard-Extraction" title="Permalink to this heading"></a></h2>
+<p>First hazards are identified in documents using BERTopic modeling results and a hazard interptretation spreed sheet created from the topics.</p>
+<p>The hazard file and topic modeling results file are specified here:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>hazard_file =  os.path.join(&#39;topic_model_results&#39;,&#39;hazard_interpretation_v1.xlsx&#39;)
+results_file = os.path.join(&#39;topic_model_results&#39;,&quot;Combined Text Sentences_BERT_topics_modified.csv&quot;)
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>hazard_interpretation_df = pd.read_excel(hazard_file, sheet_name=&#39;topic-focused&#39;)
+categories = hazard_interpretation_df[&#39;Hazard Category&#39;].tolist()
+hazards = hazard_interpretation_df[&#39;Hazard name&#39;].tolist()
+</pre></div>
+</div>
+</div>
+<p>The hazard and results file are passed into the identify_docs_per_hazard function, which returns the frequency and documents associated with each hazard in addition to the hazard words and topics per each document. Hazard metrics specific to the ICS are calulcuated using calc_ICS_metrics:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># frequency, docs_per_hazard, hazard_words_per_doc, topics_per_doc, hazard_topics_per_doc = identify_docs_per_hazard(hazard_file, preprocessed_df, results_file, text_field=&#39;Combined Text&#39;, results_text_field=&#39;Combined Text Sentences_BERT_to&#39;, time_field=&quot;CY&quot;, id_field=&#39;Unique IDs&#39;, doc_topic_dist_field=None, topic_thresh=0.0)
+# time_of_occurence_days, time_of_occurence_pct_contained, frequency, fires, frequency_fires = calc_ICS_metrics(docs_per_hazard, preprocessed_df, id_col=&quot;INCIDENT_ID&quot;, unique_ids_col=&#39;Unique IDs&#39;, rm_outliers=False)
+</pre></div>
+</div>
+</div>
+<p>Results can be saved for future use using pickle.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># with open(&quot;OTTO_days_w_outliers.pkl&quot;, &quot;wb&quot;) as f:
+#     dill.dump(time_of_occurence_days, f)
+# with open(&quot;OTTO_pct_w_outliers.pkl&quot;, &quot;wb&quot;) as f:
+#     dill.dump(time_of_occurence_pct_contained, f)
+# with open(&quot;frequency_w_outliers.pkl&quot;, &quot;wb&quot;) as f:
+#     dill.dump(frequency, f)
+# with open(&quot;fires_w_outliers.pkl&quot;, &quot;wb&quot;) as f:
+#     dill.dump(fires, f)
+# with open(&quot;frequency_fires_w_outliers.pkl&quot;, &quot;wb&quot;) as f:
+#     dill.dump(frequency_fires, f)
+# with open(&quot;docs_per_hazard_w_outliers.pkl&quot;, &quot;wb&quot;) as f:
+#     dill.dump(docs_per_hazard, f)
+# with open(&quot;hazard_words_per_doc_w_outliers.pkl&quot;, &quot;wb&quot;) as f:
+#     dill.dump(hazard_words_per_doc, f)
+# with open(&quot;topics_per_doc_w_outliers.pkl&quot;, &quot;wb&quot;) as f:
+#     dill.dump(topics_per_doc, f)
+# with open(&quot;hazard_topics_per_doc_w_outliers.pkl&quot;, &quot;wb&quot;) as f:
+#     dill.dump(hazard_topics_per_doc, f)
+</pre></div>
+</div>
+</div>
+<p>Since the results have already been saved, we can load them using pickle:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>with open(&quot;OTTO_days_w_outliers.pkl&quot;, &quot;rb&quot;) as f:
+    time_of_occurence_days = dill.load(f)
+with open(&quot;OTTO_pct_w_outliers.pkl&quot;, &quot;rb&quot;) as f:
+    time_of_occurence_pct_contained = dill.load(f)
+with open(&quot;frequency_w_outliers.pkl&quot;, &quot;rb&quot;) as f:
+    frequency = dill.load(f)
+with open(&quot;fires_w_outliers.pkl&quot;, &quot;rb&quot;) as f:
+    fires = dill.load(f)
+with open(&quot;frequency_fires_w_outliers.pkl&quot;, &quot;rb&quot;) as f:
+    frequency_fires = dill.load(f)
+with open(&quot;docs_per_hazard_w_outliers.pkl&quot;, &quot;rb&quot;) as f:
+    docs_per_hazard = dill.load(f)
+with open(&quot;hazard_words_per_doc_w_outliers.pkl&quot;, &quot;rb&quot;) as f:
+    hazard_words_per_doc = dill.load(f)
+with open(&quot;topics_per_doc_w_outliers.pkl&quot;, &quot;rb&quot;) as f:
+    topics_per_doc = dill.load(f)
+with open(&quot;hazard_topics_per_doc_w_outliers.pkl&quot;, &quot;rb&quot;) as f:
+    hazard_topics_per_doc = dill.load(f)
+</pre></div>
+</div>
+</div>
+<p>To evaluate the quality of the hazard extraction, we recommend randomly sampling 1000 documents to manually label as containing or not containing each hazard. This can be done using the sample_for_accuracy function. The 1000 document set is split into two 500 document sets for validation and testing.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>results_path=os.path.join(&#39;topic_model_results&#39;)
+</pre></div>
+</div>
+</div>
+<p>First we calculate the classification metrics on the validation set:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>metrics, true, pred = calc_classification_metrics(os.path.join(&#39;topic_model_results&#39;, &#39;labeled_ICS.csv&#39;), docs_per_hazard=docs_per_hazard, id_col=&#39;Unique IDs&#39;)
+</pre></div>
+</div>
+</div>
+<p>Next we calculate the classification metrics on the test set:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>test_metrics, _, _ = calc_classification_metrics(os.path.join(&#39;topic_model_results&#39;, &#39;labeled_ICS_test_set_full.csv&#39;), docs_per_hazard=docs_per_hazard, id_col=&#39;Unique IDs&#39;)
+</pre></div>
+</div>
+</div>
+<p>Mismatches between HEAT and manual labels are detected and saved to an excel file:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>_ = examine_hazard_extraction_mismatches(preprocessed_df, true, pred, hazards, hazard_words_per_doc=hazard_words_per_doc, topics_per_doc=topics_per_doc, hazard_topics_per_doc=hazard_topics_per_doc, results_path=results_path, id_col=&#39;Unique IDs&#39;, text_col=&#39;Combined Text&#39;)
+</pre></div>
+</div>
+</div>
+<p>To display the results tables consistently, we first create the primary results table then sort the hazard extraction evaluation table according to the order of the hazards in the primary table</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>years = preprocessed_df[&quot;CY&quot;].unique()
+years.sort() #sort years
+table_data = create_primary_results_table(time_of_occurence_days, time_of_occurence_pct_contained, frequency, frequency_fires, preprocessed_df, categories, hazards, years, interval=True) #primary results table with metrics
+table = pd.DataFrame(table_data).sort_values(&#39;Hazard Category&#39;).reset_index(drop=True) #sort by category
+hazards_sorted = table[&#39;Hazard Name&#39;].tolist() #get sorted hazards for formatting evaluation table
+</pre></div>
+</div>
+</div>
+<p>Now we can display the hazard extraction evaluation table:</p>
+<p>High precision -&gt; only counting instances of the hazard, not over counting</p>
+<p>Low recall -&gt; under counting, there are instances with the hazard that are not counted</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>hazard_extraction = pd.concat([metrics,test_metrics],axis=1,keys=[&#39;Validation&#39;,&#39;Test&#39;]).reindex(hazards_sorted)
+hazard_extraction
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="5" halign="left">Validation</th>
+      <th colspan="5" halign="left">Test</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>Recall</th>
+      <th>Precision</th>
+      <th>F1</th>
+      <th>Accuracy</th>
+      <th>Support</th>
+      <th>Recall</th>
+      <th>Precision</th>
+      <th>F1</th>
+      <th>Accuracy</th>
+      <th>Support</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Hazardous Terrain</th>
+      <td>0.883</td>
+      <td>0.938</td>
+      <td>0.910</td>
+      <td>0.940</td>
+      <td>171</td>
+      <td>0.859</td>
+      <td>0.907</td>
+      <td>0.882</td>
+      <td>0.912</td>
+      <td>192</td>
+    </tr>
+    <tr>
+      <th>Ecological Resources</th>
+      <td>0.621</td>
+      <td>0.900</td>
+      <td>0.735</td>
+      <td>0.948</td>
+      <td>58</td>
+      <td>0.667</td>
+      <td>0.881</td>
+      <td>0.759</td>
+      <td>0.934</td>
+      <td>78</td>
+    </tr>
+    <tr>
+      <th>Thunderstorms</th>
+      <td>0.875</td>
+      <td>1.000</td>
+      <td>0.933</td>
+      <td>0.992</td>
+      <td>32</td>
+      <td>0.857</td>
+      <td>0.818</td>
+      <td>0.837</td>
+      <td>0.986</td>
+      <td>21</td>
+    </tr>
+    <tr>
+      <th>Wind</th>
+      <td>0.840</td>
+      <td>0.988</td>
+      <td>0.908</td>
+      <td>0.968</td>
+      <td>94</td>
+      <td>0.795</td>
+      <td>0.912</td>
+      <td>0.849</td>
+      <td>0.956</td>
+      <td>78</td>
+    </tr>
+    <tr>
+      <th>Dry Weather</th>
+      <td>0.791</td>
+      <td>0.973</td>
+      <td>0.873</td>
+      <td>0.958</td>
+      <td>91</td>
+      <td>0.732</td>
+      <td>0.938</td>
+      <td>0.822</td>
+      <td>0.948</td>
+      <td>82</td>
+    </tr>
+    <tr>
+      <th>Rain</th>
+      <td>0.872</td>
+      <td>0.872</td>
+      <td>0.872</td>
+      <td>0.980</td>
+      <td>39</td>
+      <td>0.800</td>
+      <td>0.800</td>
+      <td>0.800</td>
+      <td>0.976</td>
+      <td>30</td>
+    </tr>
+    <tr>
+      <th>Smoke</th>
+      <td>0.943</td>
+      <td>0.847</td>
+      <td>0.893</td>
+      <td>0.976</td>
+      <td>53</td>
+      <td>0.929</td>
+      <td>0.796</td>
+      <td>0.857</td>
+      <td>0.974</td>
+      <td>42</td>
+    </tr>
+    <tr>
+      <th>Evacuations</th>
+      <td>0.885</td>
+      <td>0.958</td>
+      <td>0.920</td>
+      <td>0.984</td>
+      <td>52</td>
+      <td>0.909</td>
+      <td>0.930</td>
+      <td>0.920</td>
+      <td>0.986</td>
+      <td>44</td>
+    </tr>
+    <tr>
+      <th>Injury</th>
+      <td>0.786</td>
+      <td>1.000</td>
+      <td>0.880</td>
+      <td>0.994</td>
+      <td>14</td>
+      <td>0.700</td>
+      <td>1.000</td>
+      <td>0.824</td>
+      <td>0.994</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>Resource Shortage</th>
+      <td>0.776</td>
+      <td>0.826</td>
+      <td>0.800</td>
+      <td>0.962</td>
+      <td>49</td>
+      <td>0.778</td>
+      <td>0.651</td>
+      <td>0.709</td>
+      <td>0.954</td>
+      <td>36</td>
+    </tr>
+    <tr>
+      <th>Road Closures</th>
+      <td>0.792</td>
+      <td>0.704</td>
+      <td>0.745</td>
+      <td>0.948</td>
+      <td>48</td>
+      <td>0.760</td>
+      <td>0.613</td>
+      <td>0.679</td>
+      <td>0.928</td>
+      <td>50</td>
+    </tr>
+    <tr>
+      <th>Command Transition</th>
+      <td>0.902</td>
+      <td>0.965</td>
+      <td>0.932</td>
+      <td>0.984</td>
+      <td>61</td>
+      <td>0.758</td>
+      <td>0.833</td>
+      <td>0.794</td>
+      <td>0.948</td>
+      <td>66</td>
+    </tr>
+    <tr>
+      <th>Inaccurate Mapping</th>
+      <td>0.824</td>
+      <td>0.933</td>
+      <td>0.875</td>
+      <td>0.992</td>
+      <td>17</td>
+      <td>0.913</td>
+      <td>0.840</td>
+      <td>0.875</td>
+      <td>0.988</td>
+      <td>23</td>
+    </tr>
+    <tr>
+      <th>Aerial Grounding</th>
+      <td>1.000</td>
+      <td>0.765</td>
+      <td>0.867</td>
+      <td>0.992</td>
+      <td>13</td>
+      <td>0.625</td>
+      <td>0.833</td>
+      <td>0.714</td>
+      <td>0.992</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>Military Base</th>
+      <td>0.667</td>
+      <td>0.857</td>
+      <td>0.750</td>
+      <td>0.992</td>
+      <td>9</td>
+      <td>0.800</td>
+      <td>0.667</td>
+      <td>0.727</td>
+      <td>0.994</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>Cultural Resources</th>
+      <td>0.810</td>
+      <td>0.810</td>
+      <td>0.810</td>
+      <td>0.956</td>
+      <td>58</td>
+      <td>0.729</td>
+      <td>0.827</td>
+      <td>0.775</td>
+      <td>0.950</td>
+      <td>59</td>
+    </tr>
+    <tr>
+      <th>Law Violations</th>
+      <td>1.000</td>
+      <td>1.000</td>
+      <td>1.000</td>
+      <td>1.000</td>
+      <td>3</td>
+      <td>1.000</td>
+      <td>0.667</td>
+      <td>0.800</td>
+      <td>0.998</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>Infrastructure</th>
+      <td>0.714</td>
+      <td>0.921</td>
+      <td>0.805</td>
+      <td>0.966</td>
+      <td>49</td>
+      <td>0.725</td>
+      <td>0.829</td>
+      <td>0.773</td>
+      <td>0.966</td>
+      <td>40</td>
+    </tr>
+    <tr>
+      <th>Livestock</th>
+      <td>0.842</td>
+      <td>0.842</td>
+      <td>0.842</td>
+      <td>0.988</td>
+      <td>19</td>
+      <td>0.765</td>
+      <td>0.619</td>
+      <td>0.684</td>
+      <td>0.976</td>
+      <td>17</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>To visualize what words define the hazards, we create word clouds based on word frequency using the trend analysis module.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>word_frequencies = get_word_frequencies(hazard_words_per_doc, hazards_sorted)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>build_word_clouds(word_frequencies, nrows=4, ncols=5, figsize=(16, 8), cmap=None, save=False, save_path=os.path.join(&#39;topic_model_results&#39;,&#39;&#39;), fontsize=20)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_ics_heat_37_0.png" src="../_images/nblinks_ics_heat_37_0.png" />
+</div>
+</div>
+</section>
+<section id="Primary-Analysis:">
+<h2>Primary Analysis:<a class="headerlink" href="#Primary-Analysis:" title="Permalink to this heading"></a></h2>
+<p>The primary analysis involves two main outputs: - hazard metrics - risk matrix</p>
+<section id="Hazard-Metrics">
+<h3>Hazard Metrics<a class="headerlink" href="#Hazard-Metrics" title="Permalink to this heading"></a></h3>
+<p>Hazard metrics, including frequency, rate, and severity, are displayed in a table.</p>
+<p>First, we reorder the dictionary containing fires for each hazard according to the sorted hazard list:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fires = {hazard: fires[hazard] for hazard in hazards_sorted}
+</pre></div>
+</div>
+</div>
+<p>Next, we calculate severity and sort it according to the sorted hazard list:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>severity_total, severity_table = calc_severity(fires, incident_summary_df ,rm_all_outliers=False, rm_severity_outliers=False)
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>severity_table = severity_table.set_index(&#39;Hazard&#39;).reindex(hazards_sorted).reset_index()
+</pre></div>
+</div>
+</div>
+<p>For comparison, we also calcluated severity values accross the entire dataset. This allows us to compare the average severity for incidents with certain hazards to a baseline value.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>severity_accross_all_incidents = []; injuries_all = []; fatalities_all = []; str_dam_all = []; str_des_all = []
+for i in range(len(incident_summary_df)):
+    severity = int(incident_summary_df.iloc[i][&quot;STR_DESTROYED_TOTAL&quot;]) + int(incident_summary_df.iloc[i][&quot;STR_DAMAGED_TOTAL&quot;])+ int(incident_summary_df.iloc[i][&quot;INJURIES_TOTAL&quot;])+ int(incident_summary_df.iloc[i][&quot;FATALITIES&quot;])
+    severity_accross_all_incidents.append(severity)
+    injuries_all.append(int(incident_summary_df.iloc[i][&quot;INJURIES_TOTAL&quot;])); fatalities_all.append(int(incident_summary_df.iloc[i][&quot;FATALITIES&quot;]))
+    str_dam_all.append(int(incident_summary_df.iloc[i][&quot;STR_DAMAGED_TOTAL&quot;])); str_des_all.append(int(incident_summary_df.iloc[i][&quot;STR_DESTROYED_TOTAL&quot;]))
+</pre></div>
+</div>
+</div>
+<p>Now we save the total dataset information as a single-row dataframe so we can add it to the existing hazard metric table.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>total_incidents_df = pd.DataFrame({&quot;Hazard Category&quot;: [&#39;Total Reports&#39;],
+                                  &quot;Hazard Name&quot;: [&#39;&#39;],
+                                  &quot;OTTO %&quot;:[&#39;&#39;],
+                                   &quot;Total Fire Frequency&quot;:[str(len(incident_summary_df))],
+                                  &quot;Rate&quot;:[str(round(np.average(incident_summary_df[&#39;START_YEAR&#39;].value_counts().values),1))+&quot;+-&quot;+str(round(np.std(incident_summary_df[&#39;START_YEAR&#39;].value_counts().values),1))],#len(incident_summary_df)/len(years))],
+                                  &quot;Fatalities&quot;:[str(round(np.average(fatalities_all),1))+&quot;+-&quot;+str(round(np.std(fatalities_all),1))],
+                                  &quot;Injuries&quot;:[str(round(np.average(injuries_all),1))+&quot;+-&quot;+str(round(np.std(injuries_all),1))],
+                                  &quot;Structures Damaged&quot;:[str(round(np.average(str_dam_all),1))+&quot;+-&quot;+str(round(np.std(str_dam_all),1))],
+                                  &quot;Structures Destroyed&quot;:[str(round(np.average(str_des_all),1))+&quot;+-&quot;+str(round(np.std(str_des_all),1))],
+                                  &quot;Severity&quot;:[str(round(np.average(severity_accross_all_incidents),1))+&quot;+-&quot;+str(round(np.std(severity_accross_all_incidents),1))]},
+                                 index =[&#39;Total Reports&#39;])
+</pre></div>
+</div>
+</div>
+<p>Here we rename the columns for readability:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>values = [&#39;Fatalities&#39;, &#39;Injuries&#39;, &#39;Structures Damaged&#39;, &#39;Structures Destroyed&#39;]
+for value in values:
+    table[value] = severity_table[&#39;Average &#39;+value].astype(str) + &quot;+-&quot; + severity_table[&#39;std dev &#39;+value].astype(str)
+</pre></div>
+</div>
+</div>
+<p>Now we combine the dataframes to get the final primary results table:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>table[&#39;Severity&#39;] = severity_table[&#39;formatted&#39;]
+columns = [&#39;Hazard Category&#39;, &#39;Hazard Name&#39;, &#39;OTTO %&#39;, &#39;Total Fire Frequency&#39;, &#39;Rate&#39;] + values +[&#39;Severity&#39;]
+table = table[columns]
+table = table.set_index(&#39;Hazard Category&#39;)#.drop([&#39;Hazard Category&#39;], axis=1)
+table = table.append(total_incidents_df.drop([&#39;Hazard Category&#39;], axis=1))
+display(table)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Hazard Name</th>
+      <th>OTTO %</th>
+      <th>Total Fire Frequency</th>
+      <th>Rate</th>
+      <th>Fatalities</th>
+      <th>Injuries</th>
+      <th>Structures Damaged</th>
+      <th>Structures Destroyed</th>
+      <th>Severity</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Environment</th>
+      <td>Hazardous Terrain</td>
+      <td>53.3+-36.5</td>
+      <td>2900</td>
+      <td>322.2+-120.9</td>
+      <td>0.0+-0.5</td>
+      <td>1.4+-3.9</td>
+      <td>0.8+-10.1</td>
+      <td>4.5+-41.1</td>
+      <td>6.8+-46.4</td>
+    </tr>
+    <tr>
+      <th>Environment</th>
+      <td>Ecological Resources</td>
+      <td>46.8+-35.1</td>
+      <td>792</td>
+      <td>88.0+-29.2</td>
+      <td>0.0+-0.4</td>
+      <td>2.5+-5.7</td>
+      <td>1.5+-18.4</td>
+      <td>6.4+-34.3</td>
+      <td>10.5+-50.0</td>
+    </tr>
+    <tr>
+      <th>Environment</th>
+      <td>Thunderstorms</td>
+      <td>55.1+-35.8</td>
+      <td>1127</td>
+      <td>125.2+-51.2</td>
+      <td>0.0+-0.5</td>
+      <td>1.8+-4.8</td>
+      <td>1.1+-15.6</td>
+      <td>5.0+-33.6</td>
+      <td>8.0+-45.8</td>
+    </tr>
+    <tr>
+      <th>Environment</th>
+      <td>Wind</td>
+      <td>51.8+-36.3</td>
+      <td>2950</td>
+      <td>327.8+-120.2</td>
+      <td>0.0+-0.5</td>
+      <td>1.3+-3.9</td>
+      <td>1.1+-12.1</td>
+      <td>6.2+-53.2</td>
+      <td>8.6+-60.1</td>
+    </tr>
+    <tr>
+      <th>Environment</th>
+      <td>Dry Weather</td>
+      <td>55.4+-36.3</td>
+      <td>2171</td>
+      <td>241.2+-92.6</td>
+      <td>0.0+-0.5</td>
+      <td>1.5+-4.2</td>
+      <td>1.4+-13.8</td>
+      <td>7.6+-61.6</td>
+      <td>10.6+-69.5</td>
+    </tr>
+    <tr>
+      <th>Environment</th>
+      <td>Rain</td>
+      <td>64.4+-37.7</td>
+      <td>1696</td>
+      <td>188.4+-42.7</td>
+      <td>0.0+-0.5</td>
+      <td>1.2+-3.4</td>
+      <td>1.2+-14.3</td>
+      <td>5.0+-49.5</td>
+      <td>7.4+-56.5</td>
+    </tr>
+    <tr>
+      <th>Environment</th>
+      <td>Smoke</td>
+      <td>48.6+-37.5</td>
+      <td>1281</td>
+      <td>142.3+-33.4</td>
+      <td>0.0+-0.5</td>
+      <td>1.8+-5.0</td>
+      <td>1.4+-15.3</td>
+      <td>7.6+-58.9</td>
+      <td>10.8+-69.1</td>
+    </tr>
+    <tr>
+      <th>Mission</th>
+      <td>Evacuations</td>
+      <td>36.0+-31.0</td>
+      <td>1296</td>
+      <td>144.0+-58.4</td>
+      <td>0.1+-0.7</td>
+      <td>2.5+-5.5</td>
+      <td>2.5+-18.0</td>
+      <td>14.6+-80.1</td>
+      <td>19.6+-90.0</td>
+    </tr>
+    <tr>
+      <th>Mission</th>
+      <td>Injury</td>
+      <td>56.0+-34.3</td>
+      <td>783</td>
+      <td>87.0+-31.7</td>
+      <td>0.1+-0.5</td>
+      <td>3.9+-6.2</td>
+      <td>1.9+-18.5</td>
+      <td>14.1+-95.0</td>
+      <td>20.0+-104.9</td>
+    </tr>
+    <tr>
+      <th>Mission</th>
+      <td>Resource Shortage</td>
+      <td>40.2+-33.7</td>
+      <td>1229</td>
+      <td>136.6+-58.3</td>
+      <td>0.0+-0.6</td>
+      <td>2.4+-5.4</td>
+      <td>1.5+-15.5</td>
+      <td>8.4+-60.0</td>
+      <td>12.4+-70.8</td>
+    </tr>
+    <tr>
+      <th>Mission</th>
+      <td>Road Closures</td>
+      <td>44.5+-34.6</td>
+      <td>1726</td>
+      <td>191.8+-67.6</td>
+      <td>0.0+-0.4</td>
+      <td>2.0+-4.8</td>
+      <td>1.9+-16.0</td>
+      <td>9.9+-69.5</td>
+      <td>13.9+-78.6</td>
+    </tr>
+    <tr>
+      <th>Mission</th>
+      <td>Command Transition</td>
+      <td>60.8+-38.2</td>
+      <td>1868</td>
+      <td>207.6+-55.0</td>
+      <td>0.0+-0.6</td>
+      <td>2.2+-4.9</td>
+      <td>1.7+-15.4</td>
+      <td>9.1+-66.7</td>
+      <td>13.1+-75.6</td>
+    </tr>
+    <tr>
+      <th>Mission</th>
+      <td>Inaccurate Mapping</td>
+      <td>65.8+-34.3</td>
+      <td>1383</td>
+      <td>153.7+-47.5</td>
+      <td>0.0+-0.2</td>
+      <td>1.8+-4.6</td>
+      <td>1.0+-9.6</td>
+      <td>5.7+-32.4</td>
+      <td>8.5+-39.0</td>
+    </tr>
+    <tr>
+      <th>Mission</th>
+      <td>Aerial Grounding</td>
+      <td>32.1+-26.7</td>
+      <td>149</td>
+      <td>16.6+-7.6</td>
+      <td>0.1+-0.8</td>
+      <td>6.3+-9.7</td>
+      <td>5.3+-40.2</td>
+      <td>10.4+-45.3</td>
+      <td>22.1+-86.3</td>
+    </tr>
+    <tr>
+      <th>Wildland Urban Interface</th>
+      <td>Military Base</td>
+      <td>58.0+-35.7</td>
+      <td>83</td>
+      <td>9.2+-3.5</td>
+      <td>0.1+-0.5</td>
+      <td>2.9+-6.8</td>
+      <td>1.1+-3.9</td>
+      <td>17.6+-74.9</td>
+      <td>21.7+-82.8</td>
+    </tr>
+    <tr>
+      <th>Wildland Urban Interface</th>
+      <td>Cultural Resources</td>
+      <td>44.9+-35.0</td>
+      <td>865</td>
+      <td>96.1+-29.7</td>
+      <td>0.0+-0.4</td>
+      <td>2.6+-5.4</td>
+      <td>1.5+-10.1</td>
+      <td>10.5+-70.9</td>
+      <td>14.6+-78.5</td>
+    </tr>
+    <tr>
+      <th>Wildland Urban Interface</th>
+      <td>Law Violations</td>
+      <td>78.2+-31.3</td>
+      <td>328</td>
+      <td>36.4+-21.4</td>
+      <td>0.1+-0.6</td>
+      <td>1.0+-3.1</td>
+      <td>1.5+-11.1</td>
+      <td>7.9+-43.4</td>
+      <td>10.4+-51.0</td>
+    </tr>
+    <tr>
+      <th>Wildland Urban Interface</th>
+      <td>Infrastructure</td>
+      <td>50.2+-35.0</td>
+      <td>877</td>
+      <td>97.4+-35.4</td>
+      <td>0.1+-0.8</td>
+      <td>2.4+-6.0</td>
+      <td>2.6+-20.2</td>
+      <td>15.5+-93.9</td>
+      <td>20.6+-104.7</td>
+    </tr>
+    <tr>
+      <th>Wildland Urban Interface</th>
+      <td>Livestock</td>
+      <td>40.2+-34.9</td>
+      <td>530</td>
+      <td>58.9+-31.2</td>
+      <td>0.1+-0.5</td>
+      <td>2.6+-6.3</td>
+      <td>0.9+-5.0</td>
+      <td>11.8+-82.1</td>
+      <td>15.4+-88.6</td>
+    </tr>
+    <tr>
+      <th>Total Reports</th>
+      <td></td>
+      <td></td>
+      <td>8991</td>
+      <td>999.0+-312.3</td>
+      <td>0.0+-0.3</td>
+      <td>0.6+-2.5</td>
+      <td>0.6+-8.3</td>
+      <td>2.6+-31.4</td>
+      <td>3.8+-36.3</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>We can also create a table with just the severity metrics:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>avg_injuries = round(np.average(injuries_all))
+avg_fatalities = round(np.average(fatalities_all))
+avg_des = round(np.average(str_des_all))
+avg_dam = round(np.average(str_dam_all))
+avg_df = pd.DataFrame({&quot;Total Avg Injuries&quot;:[avg_injuries for hazard in hazards],
+                     &quot;Total Avg Fatalities&quot;:[avg_fatalities for hazard in hazards],
+                     &quot;Total Avg Str Dam&quot;:[avg_dam for hazard in hazards],
+                     &quot;Total Avg Str Des&quot;:[avg_des for hazard in hazards]})
+severity_results = pd.DataFrame({&quot;&quot;})
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>ICS_results = pd.concat([table.drop([&#39;Total Reports&#39;]).reset_index(drop=True), severity_table, avg_df], axis=1)
+#ICS_results.to_csv(os.path.join(os.path.dirname(os.getcwd()),&#39;results&#39;,&#39;ICS_hazards.csv&#39;))
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Risk-Matrix-of-Hazards-(rate-by-severity)">
+<h3>Risk Matrix of Hazards (rate by severity)<a class="headerlink" href="#Risk-Matrix-of-Hazards-(rate-by-severity)" title="Permalink to this heading"></a></h3>
+<p>The next part of the primary analysis is to create a risk matrix placing hazards in risk categories according to severity and rate. Risk matrices can be created according to either FAA or USFS specifications.</p>
+<p>For display purposes, initialize the matplotlib with the following parameters:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>matplotlib.style.use(&quot;default&quot;)
+plt.rcParams[&quot;font.family&quot;] = &quot;Times New Roman&quot;
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>#ICS_results = pd.read_csv(os.path.join(os.path.dirname(os.getcwd()),&#39;results&#39;,&#39;ICS_hazards.csv&#39;))
+</pre></div>
+</div>
+</div>
+<p>Set the index of the results dataframe to the hazards:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>ICS_results.index = ICS_results[&#39;Hazard Name&#39;]
+</pre></div>
+</div>
+</div>
+<p>Calculate the severity category from the results:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>severities = get_ICS_severity_FAA(ICS_results, hazards)
+</pre></div>
+</div>
+</div>
+<p>Calculate the likelihood category from the rates:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>rates = {hazard:float(table[table[&#39;Hazard Name&#39;]==hazard][&#39;Rate&#39;].values[0].split(&quot;+-&quot;)[0]) for hazard in hazards}
+rates_FAA = get_likelihood_ICS_FAA(rates)
+</pre></div>
+</div>
+</div>
+<p>Now you can plot a risk matrix:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plot_risk_matrix(rates_FAA, severities, figsize=(9,8), results_path=os.path.join(&#39;risk_matrix&#39;), save=False, max_chars=22, fontsize=10)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_ics_heat_65_0.png" src="../_images/nblinks_ics_heat_65_0.png" />
+</div>
+</div>
+<p>To produces the USFS risk matrix, follow the same method and calculate the likelihood and severity categories:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>likelihoods = get_likelihood_ICS_USFS(rates)
+severities = get_ICS_severity_USFS(ICS_results, hazards)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>severities
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;Evacuations&#39;: &#39;Critical&#39;,
+ &#39;Hazardous Terrain&#39;: &#39;Marginal&#39;,
+ &#39;Inaccurate Mapping&#39;: &#39;Marginal&#39;,
+ &#39;Ecological Resources&#39;: &#39;Marginal&#39;,
+ &#39;Command Transition&#39;: &#39;Marginal&#39;,
+ &#39;Wind&#39;: &#39;Marginal&#39;,
+ &#39;Dry Weather&#39;: &#39;Marginal&#39;,
+ &#39;Rain&#39;: &#39;Marginal&#39;,
+ &#39;Law Violations&#39;: &#39;Marginal&#39;,
+ &#39;Road Closures&#39;: &#39;Marginal&#39;,
+ &#39;Smoke&#39;: &#39;Marginal&#39;,
+ &#39;Military Base&#39;: &#39;Critical&#39;,
+ &#39;Cultural Resources&#39;: &#39;Marginal&#39;,
+ &#39;Resource Shortage&#39;: &#39;Marginal&#39;,
+ &#39;Thunderstorms&#39;: &#39;Marginal&#39;,
+ &#39;Infrastructure&#39;: &#39;Critical&#39;,
+ &#39;Injury&#39;: &#39;Critical&#39;,
+ &#39;Livestock&#39;: &#39;Marginal&#39;,
+ &#39;Aerial Grounding&#39;: &#39;Critical&#39;}
+</pre></div></div>
+</div>
+<p>Now plot the risk matrix:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plot_USFS_risk_matrix(likelihoods, severities, figsize=(9,8), results_path=os.path.join(&#39;risk_matrix&#39;), save=False, max_chars=24,fontsize=12)#fontsize)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_ics_heat_70_0.png" src="../_images/nblinks_ics_heat_70_0.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="Graphic-Analysis:">
+<h2>Graphic Analysis:<a class="headerlink" href="#Graphic-Analysis:" title="Permalink to this heading"></a></h2>
+<p>In the graphic analysis, we produce time series graphs of hazard metrics and predictors over time. - Time Series - Hazard Metrics: OTTO, Severity, Frequency - Predictors</p>
+<section id="Hazard-Metrics-Time-Series">
+<h3>Hazard Metrics Time Series<a class="headerlink" href="#Hazard-Metrics-Time-Series" title="Permalink to this heading"></a></h3>
+<p>Here we graph time series for relevant hazard metrics. The metrics of interest in this example are: - frequency, - Operational Time To Occurrence (OTTO) in percent containment - severity</p>
+<p>First we set the graphing parameters for consistency. For the time series we prefer seaborn style. Then, we format the data to be in the same order of the sorted hazards.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>matplotlib.style.use(&quot;seaborn&quot;)
+plt.rcParams[&quot;font.family&quot;] = &quot;Times New Roman&quot;
+categories = table.index[:-1]#[&#39;Hazard Category&#39;][:-1].index
+metric_data = [time_of_occurence_days, time_of_occurence_pct_contained, frequency, frequency_fires]
+time_of_occurence_days = {hazard: time_of_occurence_days[hazard] for hazard in hazards_sorted}
+time_of_occurence_pct_contained = {hazard: time_of_occurence_pct_contained[hazard] for hazard in hazards_sorted}
+frequency = {hazard: frequency[hazard] for hazard in hazards_sorted}
+frequency_fires = {hazard: frequency_fires[hazard] for hazard in hazards_sorted}
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>categories
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Index([&#39;Environment&#39;, &#39;Environment&#39;, &#39;Environment&#39;, &#39;Environment&#39;,
+       &#39;Environment&#39;, &#39;Environment&#39;, &#39;Environment&#39;, &#39;Mission&#39;, &#39;Mission&#39;,
+       &#39;Mission&#39;, &#39;Mission&#39;, &#39;Mission&#39;, &#39;Mission&#39;, &#39;Mission&#39;,
+       &#39;Wildland Urban Interface&#39;, &#39;Wildland Urban Interface&#39;,
+       &#39;Wildland Urban Interface&#39;, &#39;Wildland Urban Interface&#39;,
+       &#39;Wildland Urban Interface&#39;],
+      dtype=&#39;object&#39;)
+</pre></div></div>
+</div>
+<p>Now we can input the metrics into the graph_ICS_time_series utility function, which uses graphing methods from the trend analysis module. This results in four graphs, one for the OTTO in days, OTTO in perect containment, total frequency (i.e., number of reports with hazards - can have multiple per fire), and the fire frequency (i.e., number of fires with hazards)</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>graph_ICS_time_series(time_of_occurence_days, time_of_occurence_pct_contained, frequency, frequency_fires, hazards, categories, save=False, std_dev=False, results_path=os.getcwd(), figsize=figsize, fontsize=fontsize, titles=False)
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_ics_heat_77_0.png" src="../_images/nblinks_ics_heat_77_0.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_ics_heat_77_1.png" src="../_images/nblinks_ics_heat_77_1.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_ics_heat_77_2.png" src="../_images/nblinks_ics_heat_77_2.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_ics_heat_77_3.png" src="../_images/nblinks_ics_heat_77_3.png" />
+</div>
+</div>
+<p>To prepare for the secondary analysis, we minmix scale the frequency:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[43]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>frequencies_fire = {hazard: [frequency_fires[hazard][year] for year in frequency_fires[hazard]] for hazard in frequency_fires}
+fire_freqs_scaled = {hazard: minmax_scale(frequencies_fire[hazard]) for hazard in frequencies_fire}
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Predictor-Time-Series">
+<h3>Predictor Time Series<a class="headerlink" href="#Predictor-Time-Series" title="Permalink to this heading"></a></h3>
+<p>We are also interested in how potential predictors vary accross time. The predictors of interest here are: - fire characteristics - operations - intensity</p>
+<p>Each of the predictors above are calculated by combining multiple lower level predictors. Hence, we first define the combine_predictors function and graph each of the subpredictors.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[44]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def combine_predictors(predictors=[], scale=True):
+    max_weight = 1/len(predictors)
+    num_values = len(predictors[-1])
+    if scale:
+        variable_weights = [minmax_scale(p) for p in predictors]
+    else:
+        variable_weights = predictors
+    combined_vars = [[max_weight*var_weight for var_weight in var_weight_list] for var_weight_list in variable_weights]
+    combined_vars = [sum([combined_vars[var][i] for var in range(len(combined_vars))]) for i in range(num_values)]
+    return combined_vars
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[45]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>combined_predictors = pd.DataFrame()
+</pre></div>
+</div>
+</div>
+<section id="Fire-Characteristics">
+<h4>Fire Characteristics<a class="headerlink" href="#Fire-Characteristics" title="Permalink to this heading"></a></h4>
+<p>We start with the fire characteristics combined predictor. It is formed from the fire frequency, acres burned, and the number of days a fire burns on average per year. Potentially add FSR (WF_MAX_FSR), number of complexes (COMPLEX), evacuations (EVACUATION_REPORTED).</p>
+<p>We define the columns of interest, then filter the incident summary reports by these columns:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[46]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fire_trends_cols = [&quot;FINAL_ACRES&quot;, &quot;FOD_DISCOVERY_DOY&quot;, &quot;FOD_CONTAIN_DOY&quot;, &quot;START_YEAR&quot;]
+fire_trends_df = incident_summary_df[fire_trends_cols]
+</pre></div>
+</div>
+</div>
+<p>We get the fire frequency per year by counting the number of reports per year:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[47]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>counts = fire_trends_df[&quot;START_YEAR&quot;].value_counts()
+count = {int(year):counts[year] for year in counts.index.sort_values()}
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[48]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>years = count.keys()
+</pre></div>
+</div>
+</div>
+<p>Next we calculate the total and average days burning and acreage per year:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[49]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>average_days_burning = {}
+total_days_burning = {}
+total_acres = {}
+average_acres = {}
+for year in years:
+    temp_df = fire_trends_df.loc[fire_trends_df[&#39;START_YEAR&#39;]==year]
+    list_of_days_burning = [temp_df.iloc[i][&quot;FOD_CONTAIN_DOY&quot;]-temp_df.iloc[i][&#39;FOD_DISCOVERY_DOY&#39;] for i in range(len(temp_df.dropna(subset=[&#39;FOD_DISCOVERY_DOY&#39;, &quot;FOD_CONTAIN_DOY&quot;]).reset_index(drop=True)))]
+    average_days_burning[year] = np.average(list_of_days_burning)
+    total_days_burning[year] = np.sum(list_of_days_burning)
+    list_of_acres = temp_df[&#39;FINAL_ACRES&#39;].dropna().tolist()
+    average_acres[year] = np.average(list_of_acres)
+    total_acres[year] = np.sum(list_of_acres)
+#print(total_days_burning)
+</pre></div>
+</div>
+</div>
+<p>Now we can calculate the combined predictor variable, fire characteristics, using the function defined above.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[50]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fire_predictors = [total_acres.values(), counts, total_days_burning.values()]
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[51]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fire_predictors = [total_acres.values(), counts, total_days_burning.values()]
+combined_predictors[&#39;Fire Characteristics&#39;] = combine_predictors(fire_predictors)
+combined_predictors.index = years
+</pre></div>
+</div>
+</div>
+<section id="Graphs">
+<h5>Graphs<a class="headerlink" href="#Graphs" title="Permalink to this heading"></a></h5>
+<p>We graph the average and total values for the subpredictors comprising fire characteristics.</p>
+<p>First we scale the predictors using minmax scaling:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[52]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>av_acres = average_acres.values()
+av_days_burn = average_days_burning.values()
+count = count.values()
+freq_scaled = minmax_scale(count)
+av_days_burn_scaled = minmax_scale(av_days_burn)
+av_acres_scaled = minmax_scale(av_acres)
+
+total_days_burn = total_days_burning.values()
+total_acre = total_acres.values()
+total_days_burn_scaled = minmax_scale(total_days_burn)
+total_acres_scaled = minmax_scale(total_acre)
+</pre></div>
+</div>
+</div>
+<p>Now we graph the predictors:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[53]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>nrows = 1
+ncols = 2
+fig, axs = plt.subplots(nrows = nrows,
+                            ncols = ncols,
+                            figsize = (10,4))
+fire_labels = [&#39;Acres&#39;, &#39;Frequency&#39;, &#39;Days Burning&#39;]
+fire_totals = [total_acres_scaled, freq_scaled, total_days_burn_scaled]
+fire_avgs = [av_acres_scaled, freq_scaled, av_days_burn_scaled]
+fig, axs[0] = plot_predictors(fire_totals, fire_labels, time=years, time_label=&#39;Year&#39;, title=&quot;Change in Fire Characteristics from 2006-2014&quot;,
+                totals=True, averages=False, scaled=True, figsize=(12, 5), axs=axs[0], fig=fig, show=False, legend=False)
+fig, axs[1] = plot_predictors(fire_avgs, fire_labels, time=years, time_label=&#39;Year&#39;, title=&quot;Change in Fire Characteristics from 2006-2014&quot;,
+                totals=False, averages=True, scaled=True, figsize=(12, 5), axs=axs[1], fig=fig, show=False)
+plt.show()
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_ics_heat_97_0.png" src="../_images/nblinks_ics_heat_97_0.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="Operations">
+<h4>Operations<a class="headerlink" href="#Operations" title="Permalink to this heading"></a></h4>
+<p>Next we examine the operational trends predictor, which is defined by aerial assets (total and max in one day), personnel (total and max in one day), and projected cost. Could also potentially add number of sit reports (INC_MGMT_NUM_SITREPS)??</p>
+<p>First we identify the columns of interest and filter the incident summary dataframe.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[54]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>operational_trends_cols = [&quot;TOTAL_AERIAL_SUM&quot;, &quot;TOTAL_PERSONNEL_SUM&quot;, &quot;WF_PEAK_AERIAL&quot;, &quot;WF_PEAK_PERSONNEL&quot;, &quot;START_YEAR&quot;,&quot;PROJECTED_FINAL_IM_COST&quot;]
+operational_trends_df = incident_summary_df[operational_trends_cols]
+</pre></div>
+</div>
+</div>
+<p>Next we calculate the average and total values for the sub predictors:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[55]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>total_aerial = {}
+average_aerial = {}
+total_person = {}
+average_person = {}
+total_cost = {}
+average_cost = {}
+for year in years:
+    list_of_person = []
+    list_of_aerial = []
+    temp_df = operational_trends_df.loc[operational_trends_df[&#39;START_YEAR&#39;]==year]
+    list_of_person = temp_df[&#39;WF_PEAK_PERSONNEL&#39;].fillna(value=0).tolist()
+    list_of_aerial = temp_df[&quot;WF_PEAK_AERIAL&quot;].fillna(value=0).tolist()
+    list_of_cost = temp_df[&quot;PROJECTED_FINAL_IM_COST&quot;].dropna().tolist()
+    average_aerial[year] = np.average(list_of_aerial)
+    total_aerial[year] = np.sum(list_of_aerial)
+    average_person[year] = np.average(list_of_person)
+    total_person[year] = np.sum(list_of_person)
+    average_cost[year] = np.average(list_of_cost)
+    total_cost[year] = np.sum(list_of_cost)
+</pre></div>
+</div>
+</div>
+<p>Now we calculate the combined operations predictor variable:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[56]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>ops_predictors = [total_cost.values(), total_aerial.values(), total_person.values()]
+combined_predictors[&#39;Operations&#39;] = combine_predictors(ops_predictors)
+</pre></div>
+</div>
+</div>
+<p>Now we grab the values and minmax scale them for graphing:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[57]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>av_aerial = average_aerial.values()
+total_aerial = total_aerial.values()
+
+av_person = average_person.values()
+total_person = total_person.values()
+av_cost = average_cost.values()
+total_cost = total_cost.values()
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[58]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>av_cost_scaled = minmax_scale(av_cost)
+av_person_scaled = minmax_scale(av_person)
+av_aerial_scaled = minmax_scale(av_aerial)
+
+total_cost_scaled = minmax_scale(total_cost)
+total_person_scaled = minmax_scale(total_person)
+total_aerial_scaled = minmax_scale(total_aerial)
+</pre></div>
+</div>
+</div>
+<section id="id1">
+<h5>Graphs<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h5>
+<p>We then graph each of the subpredictors together, both the averages and total values.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[59]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>nrows = 1
+ncols = 2
+fig, axs = plt.subplots(nrows = nrows,
+                            ncols = ncols,
+                            figsize = (10,4))
+operations_labels = [&#39;Cost&#39;, &#39;Personnel&#39;, &#39;Aerial Assets&#39;]
+operations_totals = [total_cost_scaled, total_person_scaled, total_aerial_scaled]
+operations_avgs = [av_cost_scaled, av_person_scaled, av_aerial_scaled]
+fig, axs[0] = plot_predictors(operations_totals, operations_labels, time=years, time_label=&#39;Year&#39;, title=&quot;Change in Operations from 2006-2014&quot;,
+                totals=True, averages=False, scaled=True, figsize=(12, 5), axs=axs[0], fig=fig, show=False, legend=False)
+fig, axs[1] = plot_predictors(operations_avgs, operations_labels, time=years, time_label=&#39;Year&#39;, title=&quot;Change in Operations from 2006-2014&quot;,
+                totals=False, averages=True, scaled=True, figsize=(12, 5), axs=axs[1], fig=fig, show=False)
+plt.show()
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_ics_heat_109_0.png" src="../_images/nblinks_ics_heat_109_0.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="Intensity">
+<h4>Intensity<a class="headerlink" href="#Intensity" title="Permalink to this heading"></a></h4>
+<p>The final predictor we consider is the intensity predictor, which is defined by the number of injuries, number of fatalities, number of structures damaged, number of structures destroyed.</p>
+<p>Again, first we identify the relevant columns and filter the incident dataframe to include them:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[60]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>intensity_cols = [&quot;STR_DESTROYED_TOTAL&quot;,&quot;STR_DAMAGED_TOTAL&quot;,&quot;INJURIES_TOTAL&quot;,&quot;FATALITIES&quot;, &quot;START_YEAR&quot;]
+intensity_df = incident_summary_df[intensity_cols]
+</pre></div>
+</div>
+</div>
+<p>Now we caluclate the total and average values for each of the subpredictors:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[61]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>total_str_des = {}
+average_str_des = {}
+total_str_damage = {}
+average_str_damage = {}
+total_injuries = {}
+average_injuries = {}
+total_fatalities = {}
+average_fatalities = {}
+
+for year in years:
+    temp_df =intensity_df.loc[intensity_df[&#39;START_YEAR&#39;]==year]
+    list_of_dest = temp_df[&quot;STR_DESTROYED_TOTAL&quot;].tolist()
+    list_of_dam = temp_df[&quot;STR_DAMAGED_TOTAL&quot;].tolist()
+    list_of_injury = temp_df[&quot;INJURIES_TOTAL&quot;].tolist()
+    list_of_fatalities = temp_df[&quot;FATALITIES&quot;].tolist()
+    total_str_des[year] = np.sum(list_of_dest)
+    average_str_des[year] = np.average(list_of_dest)
+    total_str_damage[year] = np.sum(list_of_dam)
+    average_str_damage[year] = np.average(list_of_dam)
+    total_injuries[year] = np.sum(list_of_injury)
+    average_injuries[year] = np.average(list_of_injury)
+    total_fatalities[year] = np.sum(list_of_fatalities)
+    average_fatalities[year] = np.average(list_of_fatalities)
+</pre></div>
+</div>
+</div>
+<p>The combined intensity predictor is then calculated:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[62]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>intensity_predictors = [total_fatalities.values(), total_str_damage.values(), total_injuries.values(), total_str_des.values()]
+combined_predictors[&#39;Intensity&#39;] = combine_predictors(intensity_predictors)
+</pre></div>
+</div>
+</div>
+<p>Once again, we grab the values and minmax scale them for graphing:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[63]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>av_des = average_str_des.values()
+total_des = total_str_des.values()
+av_damage = average_str_damage.values()
+total_damage = total_str_damage.values()
+av_injury = average_injuries.values()
+total_injury = total_injuries.values()
+av_fatality = average_fatalities.values()
+total_fatality = total_fatalities.values()
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[64]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>total_fatality_scaled = minmax_scale(total_fatality)
+total_injury_scaled = minmax_scale(total_injury)
+total_damage_scaled = minmax_scale(total_damage)
+total_des_scaled = minmax_scale(total_des)
+
+av_fatality_scaled = minmax_scale(av_fatality)
+av_injury_scaled = minmax_scale(av_injury)
+av_damage_scaled = minmax_scale(av_damage)
+av_des_scaled = minmax_scale(av_des)
+</pre></div>
+</div>
+</div>
+<section id="id2">
+<h5>Graphs<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h5>
+<p>The subpredictors of intensity are graphed together as a time series:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[65]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>nrows = 1
+ncols = 2
+fig, axs = plt.subplots(nrows = nrows,
+                            ncols = ncols,
+                            figsize = (10,4))
+intensity_labels = [&#39;Fatalities&#39;, &#39;Injuries&#39;, &#39;Damaged Structures&#39;, &#39;Destroyed Structures&#39;]
+intensity_totals = [total_fatality_scaled, total_injury_scaled, total_damage_scaled, total_des_scaled]
+intensity_avgs = [av_fatality_scaled, av_injury_scaled, av_damage_scaled, av_des_scaled]
+fig, axs[0] = plot_predictors(intensity_totals, intensity_labels, time=years, time_label=&#39;Year&#39;, title=&quot;Change in Intensity from 2006-2014&quot;,
+                totals=True, averages=False, scaled=True, figsize=(12, 5), axs=axs[0], fig=fig, show=False, legend=False)
+fig, axs[1] = plot_predictors(intensity_avgs, intensity_labels, time=years, time_label=&#39;Year&#39;, title=&quot;Change in Intensity from 2006-2014&quot;,
+                totals=False, averages=True, scaled=True, figsize=(12, 5), axs=axs[1], fig=fig, show=False)
+plt.show()
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_ics_heat_120_0.png" src="../_images/nblinks_ics_heat_120_0.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="Combined-predictors-time-series">
+<h4>Combined predictors time series<a class="headerlink" href="#Combined-predictors-time-series" title="Permalink to this heading"></a></h4>
+<p>To see how the predictors compare together, we graph all three of the combined predictors and their subpredictors in one graph. We graph both the total and average values.</p>
+<p>First we define dictionaries to contain the data and minmax scale the total data values:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[66]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>totals = {&quot;Fire Frequency&quot;: count,
+    &quot;total Days Fires Burned&quot;: total_days_burn,
+    &quot;total Acres Fires Burned&quot;: total_acre,
+    &quot;total Aerial Assets&quot;: total_aerial,
+    &quot;total Personnel&quot;: total_person,
+    &quot;total Cost&quot;: total_cost,
+    &quot;total Structures Damaged&quot;: total_damage,
+    &quot;total Structures Destroyed&quot;: total_des,
+    &quot;total Injuries&quot;: total_injury,
+    &quot;total Fatalities&quot;: total_fatality}
+totals_df = pd.DataFrame(totals)
+
+averages = {
+    &quot;fire frequency&quot;: count,
+    &quot;average days fire burns&quot;: av_days_burn,
+    &quot;average acres fire burns&quot;: av_acres,
+    &quot;average aerial assets per fire&quot;: av_aerial,
+    &quot;average personnel per fire&quot;: av_person,
+    &quot;average cost per fire&quot;: av_cost,
+    &quot;average structures damaged per fire&quot;: av_damage,
+    &quot;average structures destroyed per fire&quot;: av_des,
+    &quot;average injuries per fire&quot;: av_injury,
+    &quot;average fatalities per fire&quot;: av_fatality}
+avs_df = pd.DataFrame(averages)
+
+totals_scaled = {feature:minmax_scale(totals[feature]) for feature in totals}
+<br/></pre></div>
+</div>
+</div>
+<p>Next we scale to combined predictors as well:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[67]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>combined_predictors_scaled = combined_predictors.copy()
+for col in combined_predictors_scaled:
+    combined_predictors_scaled[col] = minmax_scale(combined_predictors_scaled[col])
+</pre></div>
+</div>
+</div>
+<p>Now we define the line style, markers, and colors for the predictor graphs:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[68]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>lines = {&quot;Fire Frequency&quot;: &#39;--&#39;,
+    &quot;total Days Fires Burned&quot;: &#39;--&#39;,
+    &quot;total Acres Fires Burned&quot;: &#39;--&#39;,
+    &quot;total Aerial Assets&quot;: &#39;-&#39;,
+    &quot;total Personnel&quot;: &#39;-&#39;,
+    &quot;total Cost&quot;: &#39;-&#39;,
+    &quot;total Structures Damaged&quot;: &#39;:&#39;,
+    &quot;total Structures Destroyed&quot;: &#39;:&#39;,
+    &quot;total Injuries&quot;: &#39;:&#39;,
+    &quot;total Fatalities&quot;: &#39;:&#39;}
+colors = cm.tab10(np.linspace(0, 1, len(lines)))
+colors_dict = {}
+i = 0
+for feature in lines:
+    colors_dict[feature] = colors[i]
+    i+=1
+markers = {&quot;Fire Frequency&quot;: &#39;.&#39;,
+    &quot;total Days Fires Burned&quot;: &#39;v&#39;,
+    &quot;total Acres Fires Burned&quot;: &#39;^&#39;,
+    &quot;total Aerial Assets&quot;: &#39;s&#39;,
+    &quot;total Personnel&quot;: &#39;p&#39;,
+    &quot;total Cost&quot;: &#39;P&#39;,
+    &quot;total Structures Damaged&quot;: &#39;h&#39;,
+    &quot;total Structures Destroyed&quot;: &#39;X&#39;,
+    &quot;total Injuries&quot;: &#39;D&#39;,
+    &quot;total Fatalities&quot;: &#39;*&#39;}
+</pre></div>
+</div>
+</div>
+<p>Here we plot the total scaled value for each predictor:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[69]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plt.figure(figsize=figsize)
+plt.ylabel(&quot;Total Sum Scaled&quot;, fontsize=fontsize)
+plt.xlabel(&quot;Year&quot;, fontsize=fontsize)
+for feature in totals_scaled:
+    plt.plot(years, totals_scaled[feature], label=feature.replace(&quot;total &quot;,&quot;&quot;), linestyle=lines[feature], marker=markers[feature], color=colors_dict[feature])
+    plt.tick_params(labelsize=fontsize)
+plt.plot(years,combined_predictors_scaled[&#39;Fire Characteristics&#39;], label=&#39;Fire Characteristics&#39;, color=&#39;black&#39;, linestyle=&#39;--&#39;)
+plt.plot(years,combined_predictors_scaled[&#39;Operations&#39;], label = &#39;Operations&#39;, color=&#39;black&#39;, linestyle = &#39;-&#39;)
+plt.plot(years,combined_predictors_scaled[&#39;Intensity&#39;], label = &#39;Intensity&#39;, color = &#39;black&#39;, linestyle = &#39;:&#39;)
+plt.legend(bbox_to_anchor=(1.05, 1), loc=&#39;upper left&#39;, fontsize=fontsize)
+#plt.savefig(&#39;predictors_scaled.pdf&#39;, bbox_inches=&quot;tight&quot;)
+plt.show()
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_ics_heat_128_0.png" src="../_images/nblinks_ics_heat_128_0.png" />
+</div>
+</div>
+<p>Next we graph the unscaled values:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[70]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>combined_predictors_unscaled = pd.DataFrame()
+fire_predictors = [total_acres.values(), counts, total_days_burning.values()]
+combined_predictors_unscaled[&#39;Fire Characteristics&#39;] = combine_predictors(fire_predictors, scale=False)
+combined_predictors_unscaled.index = years
+intensity_predictors = [total_fatalities.values(), total_str_damage.values(), total_injuries.values(), total_str_des.values()]
+ops_predictors = [total_cost, total_aerial, total_person]
+combined_predictors_unscaled[&#39;Operations&#39;] = combine_predictors(ops_predictors, scale=False)
+combined_predictors_unscaled[&#39;Intensity&#39;] = combine_predictors(intensity_predictors, scale=False)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[71]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plt.figure()
+plt.ylabel(&quot;Total&quot;, fontsize=16)
+plt.xlabel(&quot;Year&quot;, fontsize=16)
+for feature in totals:
+    plt.plot(years, totals[feature], label=feature.replace(&quot;total &quot;,&quot;&quot;), linestyle=lines[feature], marker=markers[feature], color=colors_dict[feature])
+    plt.tick_params(labelsize=16)
+plt.plot(years,combined_predictors_unscaled[&#39;Fire Characteristics&#39;], label=&#39;Fire Characteristics&#39;, color=&#39;black&#39;, linestyle=&#39;--&#39;)
+plt.plot(years,combined_predictors_unscaled[&#39;Operations&#39;], label = &#39;Operations&#39;, color=&#39;black&#39;, linestyle = &#39;-&#39;)
+plt.plot(years,combined_predictors_unscaled[&#39;Intensity&#39;], label = &#39;Intensity&#39;, color = &#39;black&#39;, linestyle = &#39;:&#39;)
+plt.legend(bbox_to_anchor=(1.05, 1), loc=&#39;upper left&#39;, fontsize=16)
+plt.yscale(&#39;log&#39;)
+#plt.savefig(&#39;predictors.pdf&#39;, bbox_inches=&quot;tight&quot;)
+plt.show()
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_ics_heat_131_0.png" src="../_images/nblinks_ics_heat_131_0.png" />
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="Secondary-Analysis:">
+<h2>Secondary Analysis:<a class="headerlink" href="#Secondary-Analysis:" title="Permalink to this heading"></a></h2>
+<p>The secondary analysis includes inferential statistics methods, specifically: - Correlation matrix - Multiple Regression</p>
+<section id="Combined-Predictors">
+<h3>Combined Predictors<a class="headerlink" href="#Combined-Predictors" title="Permalink to this heading"></a></h3>
+<p>We use the combined predictors, rather than the raw predictors, for the secondary analysis.</p>
+</section>
+<section id="Correlation-Matrix">
+<h3>Correlation Matrix<a class="headerlink" href="#Correlation-Matrix" title="Permalink to this heading"></a></h3>
+<p>A correlation matrix is produced to examine the pairwise relationship between hazard frequency and each predictor.</p>
+<p>This is done using the create_correlation_matrix function in the trend analysis module. The scaled predictors and hazard frequencies are passed into the function arguments:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[72]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>corrMatrix_fires, correlation_mat_total_fires, p_values = create_correlation_matrix(combined_predictors_scaled, fire_freqs_scaled, graph=False, figsize=(9,8), fontsize=12)
+</pre></div>
+</div>
+</div>
+<p>For display purposes, the correlation matrix can be reshaped to show hazards on one axis and predictors on the other:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[73]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>predictors = [p for p in combined_predictors_scaled]
+hazards = [h for h in fire_freqs_scaled]
+reshape_correlation_matrix(corrMatrix_fires, p_values, predictors, hazards)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_ics_heat_137_0.png" src="../_images/nblinks_ics_heat_137_0.png" />
+</div>
+</div>
+<p>The full correlation matrix has correlations between all hazard and predictor pairs:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[74]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>corrMatrix_fires, correlation_mat_total_fires, p_values = create_correlation_matrix(combined_predictors_scaled, fire_freqs_scaled, graph=True, figsize=(8,6), fontsize=11, save=False, results_path=os.path.join(&#39;correlation_matrix&#39;))
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_ics_heat_139_0.png" src="../_images/nblinks_ics_heat_139_0.png" />
+</div>
+</div>
+</section>
+<section id="Multiple-regression">
+<h3>Multiple regression<a class="headerlink" href="#Multiple-regression" title="Permalink to this heading"></a></h3>
+<p>Typically multiple regression is used as a prediction algorithm where given a certain set of continuous inputs X=(x1,2,…xn), the regression predicts the value of continuous variable, y. Multiple regression uses a linear combination of X to produce y, and the error in y/goodness of fit indicates how good the model and predictors are at predicting the target.</p>
+<p>The importance of a predictor, xi, is evaluated by shuffling its input values, and seeing how the goodness of fit/error changes.</p>
+<p><strong>Our goal:</strong></p>
+<p>use regression to determine what the most important predictors are for the frequency of hazards. Since we have a limited number of data points (9) we will not be predicting on unseen data.</p>
+<p><strong>Inputs/Predictors</strong>:</p>
+<p>All operations trends, fire characteristics, and intensity</p>
+<p><strong>Output/y:</strong></p>
+<p>annual frequency of hazards time series</p>
+<p><strong>Method:</strong></p>
+<p>for each hazard, use its frequency time series: 1. fit linear regression model to the X,y 2. calculate correlation coefficient For each Xi: 3. record the regression coefficient (beta)</p>
+<p>Future goal: use ML to determine whether or not a hazard will occur based on past incident reports</p>
+<p>The output of the regression analysis is two graphs and a dataframe. The first graph shows the correlation coeffiecient (R2) for the full model with all three predictors for each hazard. The second graph show the importance of each predictor for each hazard. The results dataframes store the numeric information from the graphs.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[75]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>predictors = [p for p in combined_predictors_scaled]
+hazards = [h.replace(&quot;total &quot;,&quot;&quot;) for h in fire_freqs_scaled]
+results_df, delta_df, coefficient_df = multiple_reg_feature_importance(predictors, hazards, correlation_mat_total_fires,
+                                                       save=False, results_path=os.path.join(&#39;multiple_regression&#39;),
+                                                      r2_figsize=figsize, r2_fontsize=fontsize-4, predictor_import_figsize = (9, 2), predictor_import_fontsize=fontsize-4)
+display(results_df, delta_df, coefficient_df)
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_ics_heat_142_0.png" src="../_images/nblinks_ics_heat_142_0.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_ics_heat_142_1.png" src="../_images/nblinks_ics_heat_142_1.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>hazard</th>
+      <th>R2 for full model</th>
+      <th>MSE for full model</th>
+      <th>Fire Characteristics removed score</th>
+      <th>Operations removed score</th>
+      <th>Intensity removed score</th>
+      <th>Fire Characteristics removed MSE</th>
+      <th>Operations removed MSE</th>
+      <th>Intensity removed MSE</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Hazardous Terrain</td>
+      <td>0.398</td>
+      <td>0.048</td>
+      <td>0.409</td>
+      <td>0.406</td>
+      <td>-0.237</td>
+      <td>0.047</td>
+      <td>0.048</td>
+      <td>0.099</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Ecological Resources</td>
+      <td>0.377</td>
+      <td>0.089</td>
+      <td>0.039</td>
+      <td>0.123</td>
+      <td>-0.113</td>
+      <td>0.138</td>
+      <td>0.126</td>
+      <td>0.160</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Thunderstorms</td>
+      <td>0.511</td>
+      <td>0.047</td>
+      <td>0.450</td>
+      <td>0.471</td>
+      <td>-1.205</td>
+      <td>0.053</td>
+      <td>0.051</td>
+      <td>0.212</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Wind</td>
+      <td>0.552</td>
+      <td>0.042</td>
+      <td>0.351</td>
+      <td>-0.748</td>
+      <td>-1.659</td>
+      <td>0.061</td>
+      <td>0.165</td>
+      <td>0.251</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Dry Weather</td>
+      <td>0.426</td>
+      <td>0.062</td>
+      <td>0.367</td>
+      <td>0.361</td>
+      <td>-0.381</td>
+      <td>0.068</td>
+      <td>0.069</td>
+      <td>0.149</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Rain</td>
+      <td>0.639</td>
+      <td>0.036</td>
+      <td>0.145</td>
+      <td>-0.455</td>
+      <td>-1.419</td>
+      <td>0.086</td>
+      <td>0.146</td>
+      <td>0.242</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Smoke</td>
+      <td>0.154</td>
+      <td>0.084</td>
+      <td>0.129</td>
+      <td>0.161</td>
+      <td>-0.146</td>
+      <td>0.086</td>
+      <td>0.083</td>
+      <td>0.114</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Evacuations</td>
+      <td>0.301</td>
+      <td>0.087</td>
+      <td>0.311</td>
+      <td>0.287</td>
+      <td>-0.505</td>
+      <td>0.086</td>
+      <td>0.089</td>
+      <td>0.188</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Injury</td>
+      <td>0.323</td>
+      <td>0.067</td>
+      <td>0.320</td>
+      <td>-0.393</td>
+      <td>0.276</td>
+      <td>0.067</td>
+      <td>0.137</td>
+      <td>0.071</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>Resource Shortage</td>
+      <td>0.347</td>
+      <td>0.072</td>
+      <td>0.173</td>
+      <td>0.212</td>
+      <td>-0.158</td>
+      <td>0.091</td>
+      <td>0.087</td>
+      <td>0.127</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>Road Closures</td>
+      <td>0.358</td>
+      <td>0.064</td>
+      <td>0.369</td>
+      <td>0.240</td>
+      <td>0.051</td>
+      <td>0.062</td>
+      <td>0.075</td>
+      <td>0.094</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>Command Transition</td>
+      <td>0.437</td>
+      <td>0.066</td>
+      <td>0.437</td>
+      <td>0.450</td>
+      <td>-0.789</td>
+      <td>0.066</td>
+      <td>0.064</td>
+      <td>0.209</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>Inaccurate Mapping</td>
+      <td>0.412</td>
+      <td>0.059</td>
+      <td>0.392</td>
+      <td>0.417</td>
+      <td>-0.271</td>
+      <td>0.061</td>
+      <td>0.059</td>
+      <td>0.128</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>Aerial Grounding</td>
+      <td>0.793</td>
+      <td>0.027</td>
+      <td>-1.452</td>
+      <td>0.303</td>
+      <td>-0.084</td>
+      <td>0.321</td>
+      <td>0.091</td>
+      <td>0.142</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>Military Base</td>
+      <td>0.600</td>
+      <td>0.048</td>
+      <td>0.014</td>
+      <td>-0.170</td>
+      <td>0.230</td>
+      <td>0.118</td>
+      <td>0.140</td>
+      <td>0.092</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>Cultural Resources</td>
+      <td>0.328</td>
+      <td>0.055</td>
+      <td>0.246</td>
+      <td>-2.172</td>
+      <td>0.216</td>
+      <td>0.061</td>
+      <td>0.258</td>
+      <td>0.064</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>Law Violations</td>
+      <td>0.320</td>
+      <td>0.069</td>
+      <td>-0.475</td>
+      <td>-0.532</td>
+      <td>0.213</td>
+      <td>0.150</td>
+      <td>0.156</td>
+      <td>0.080</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>Infrastructure</td>
+      <td>0.192</td>
+      <td>0.092</td>
+      <td>0.173</td>
+      <td>0.198</td>
+      <td>-0.079</td>
+      <td>0.094</td>
+      <td>0.091</td>
+      <td>0.122</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>Livestock</td>
+      <td>0.336</td>
+      <td>0.059</td>
+      <td>0.354</td>
+      <td>0.322</td>
+      <td>-0.529</td>
+      <td>0.057</td>
+      <td>0.060</td>
+      <td>0.135</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>hazard</th>
+      <th>R2 for full model</th>
+      <th>MSE for full model</th>
+      <th>Fire Characteristics removed score</th>
+      <th>Operations removed score</th>
+      <th>Intensity removed score</th>
+      <th>Fire Characteristics removed MSE</th>
+      <th>Operations removed MSE</th>
+      <th>Intensity removed MSE</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Hazardous Terrain</td>
+      <td>0.398</td>
+      <td>0.048</td>
+      <td>0.010</td>
+      <td>0.008</td>
+      <td>0.636</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>-0.051</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Ecological Resources</td>
+      <td>0.377</td>
+      <td>0.089</td>
+      <td>0.338</td>
+      <td>0.254</td>
+      <td>0.490</td>
+      <td>-0.049</td>
+      <td>-0.037</td>
+      <td>-0.070</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Thunderstorms</td>
+      <td>0.511</td>
+      <td>0.047</td>
+      <td>0.061</td>
+      <td>0.040</td>
+      <td>1.716</td>
+      <td>-0.006</td>
+      <td>-0.004</td>
+      <td>-0.165</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Wind</td>
+      <td>0.552</td>
+      <td>0.042</td>
+      <td>0.201</td>
+      <td>1.301</td>
+      <td>2.211</td>
+      <td>-0.019</td>
+      <td>-0.123</td>
+      <td>-0.209</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Dry Weather</td>
+      <td>0.426</td>
+      <td>0.062</td>
+      <td>0.059</td>
+      <td>0.065</td>
+      <td>0.807</td>
+      <td>-0.006</td>
+      <td>-0.007</td>
+      <td>-0.087</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Rain</td>
+      <td>0.639</td>
+      <td>0.036</td>
+      <td>0.495</td>
+      <td>1.094</td>
+      <td>2.059</td>
+      <td>-0.050</td>
+      <td>-0.110</td>
+      <td>-0.206</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Smoke</td>
+      <td>0.154</td>
+      <td>0.084</td>
+      <td>0.025</td>
+      <td>0.007</td>
+      <td>0.300</td>
+      <td>-0.002</td>
+      <td>0.001</td>
+      <td>-0.030</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Evacuations</td>
+      <td>0.301</td>
+      <td>0.087</td>
+      <td>0.010</td>
+      <td>0.013</td>
+      <td>0.805</td>
+      <td>0.001</td>
+      <td>-0.002</td>
+      <td>-0.101</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Injury</td>
+      <td>0.323</td>
+      <td>0.067</td>
+      <td>0.003</td>
+      <td>0.716</td>
+      <td>0.048</td>
+      <td>-0.000</td>
+      <td>-0.070</td>
+      <td>-0.005</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>Resource Shortage</td>
+      <td>0.347</td>
+      <td>0.072</td>
+      <td>0.174</td>
+      <td>0.134</td>
+      <td>0.505</td>
+      <td>-0.019</td>
+      <td>-0.015</td>
+      <td>-0.055</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>Road Closures</td>
+      <td>0.358</td>
+      <td>0.064</td>
+      <td>0.011</td>
+      <td>0.118</td>
+      <td>0.307</td>
+      <td>0.001</td>
+      <td>-0.012</td>
+      <td>-0.030</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>Command Transition</td>
+      <td>0.437</td>
+      <td>0.066</td>
+      <td>0.000</td>
+      <td>0.013</td>
+      <td>1.226</td>
+      <td>-0.000</td>
+      <td>0.002</td>
+      <td>-0.143</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>Inaccurate Mapping</td>
+      <td>0.412</td>
+      <td>0.059</td>
+      <td>0.021</td>
+      <td>0.005</td>
+      <td>0.684</td>
+      <td>-0.002</td>
+      <td>0.001</td>
+      <td>-0.069</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>Aerial Grounding</td>
+      <td>0.793</td>
+      <td>0.027</td>
+      <td>2.245</td>
+      <td>0.489</td>
+      <td>0.877</td>
+      <td>-0.294</td>
+      <td>-0.064</td>
+      <td>-0.115</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>Military Base</td>
+      <td>0.600</td>
+      <td>0.048</td>
+      <td>0.587</td>
+      <td>0.771</td>
+      <td>0.370</td>
+      <td>-0.070</td>
+      <td>-0.092</td>
+      <td>-0.044</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>Cultural Resources</td>
+      <td>0.328</td>
+      <td>0.055</td>
+      <td>0.082</td>
+      <td>2.500</td>
+      <td>0.112</td>
+      <td>-0.007</td>
+      <td>-0.203</td>
+      <td>-0.009</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>Law Violations</td>
+      <td>0.320</td>
+      <td>0.069</td>
+      <td>0.795</td>
+      <td>0.852</td>
+      <td>0.106</td>
+      <td>-0.081</td>
+      <td>-0.087</td>
+      <td>-0.011</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>Infrastructure</td>
+      <td>0.192</td>
+      <td>0.092</td>
+      <td>0.019</td>
+      <td>0.006</td>
+      <td>0.272</td>
+      <td>-0.002</td>
+      <td>0.001</td>
+      <td>-0.031</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>Livestock</td>
+      <td>0.336</td>
+      <td>0.059</td>
+      <td>0.018</td>
+      <td>0.013</td>
+      <td>0.864</td>
+      <td>0.002</td>
+      <td>-0.001</td>
+      <td>-0.076</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Hazardous Terrain</th>
+      <th>Ecological Resources</th>
+      <th>Thunderstorms</th>
+      <th>Wind</th>
+      <th>Dry Weather</th>
+      <th>Rain</th>
+      <th>Smoke</th>
+      <th>Evacuations</th>
+      <th>Injury</th>
+      <th>Resource Shortage</th>
+      <th>Road Closures</th>
+      <th>Command Transition</th>
+      <th>Inaccurate Mapping</th>
+      <th>Aerial Grounding</th>
+      <th>Military Base</th>
+      <th>Cultural Resources</th>
+      <th>Law Violations</th>
+      <th>Infrastructure</th>
+      <th>Livestock</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Fire Characteristics</th>
+      <td>0.095744</td>
+      <td>-0.313514</td>
+      <td>-0.105875</td>
+      <td>0.318352</td>
+      <td>0.241583</td>
+      <td>0.410931</td>
+      <td>0.132562</td>
+      <td>0.030633</td>
+      <td>-0.008230</td>
+      <td>-0.175735</td>
+      <td>0.067870</td>
+      <td>-0.005561</td>
+      <td>0.114858</td>
+      <td>-0.931697</td>
+      <td>0.657452</td>
+      <td>-0.113661</td>
+      <td>0.645235</td>
+      <td>0.216450</td>
+      <td>0.075068</td>
+    </tr>
+    <tr>
+      <th>Operations</th>
+      <td>-0.022295</td>
+      <td>0.309108</td>
+      <td>-0.211922</td>
+      <td>-0.694471</td>
+      <td>-0.200577</td>
+      <td>-0.642130</td>
+      <td>-0.136309</td>
+      <td>-0.146819</td>
+      <td>0.436775</td>
+      <td>0.177629</td>
+      <td>0.154156</td>
+      <td>-0.102439</td>
+      <td>-0.013382</td>
+      <td>0.463498</td>
+      <td>0.578210</td>
+      <td>0.774194</td>
+      <td>-0.530265</td>
+      <td>-0.083715</td>
+      <td>-0.151685</td>
+    </tr>
+    <tr>
+      <th>Intensity</th>
+      <td>0.589151</td>
+      <td>0.659442</td>
+      <td>1.020362</td>
+      <td>1.178706</td>
+      <td>0.771584</td>
+      <td>1.156592</td>
+      <td>0.469682</td>
+      <td>0.801286</td>
+      <td>0.170047</td>
+      <td>0.603995</td>
+      <td>0.464643</td>
+      <td>0.895520</td>
+      <td>0.654770</td>
+      <td>0.843958</td>
+      <td>-0.560887</td>
+      <td>-0.258116</td>
+      <td>0.361587</td>
+      <td>0.431959</td>
+      <td>0.701494</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="Full-predictors">
+<h3>Full predictors<a class="headerlink" href="#Full-predictors" title="Permalink to this heading"></a></h3>
+<p>As an experiment, we also perform the secondary analysis with the full set of subpredictors. This is not recommended for robust analysis due to the small sample of years in the hazard dataset. Specifically, there are more predictors than years in the dataset so the regression model will always have a perfect fit.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[76]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>corrMatrix_fires, correlation_mat_total_fires, p_values = create_correlation_matrix(totals_scaled, fire_freqs_scaled, graph=False)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[77]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>predictors = [p for p in totals_scaled]
+hazards = [h for h in fire_freqs_scaled]
+reshape_correlation_matrix(corrMatrix_fires, p_values, predictors, hazards)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_ics_heat_145_0.png" src="../_images/nblinks_ics_heat_145_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[78]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>predictors = [p for p in totals_scaled]
+hazards = [h.replace(&quot;total &quot;,&quot;&quot;) for h in fire_freqs_scaled]
+results_df, delta_df, coefficient_df = multiple_reg_feature_importance(predictors, hazards, correlation_mat_total_fires)
+display(results_df, delta_df, coefficient_df)
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_ics_heat_146_0.png" src="../_images/nblinks_ics_heat_146_0.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_ics_heat_146_1.png" src="../_images/nblinks_ics_heat_146_1.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>hazard</th>
+      <th>R2 for full model</th>
+      <th>MSE for full model</th>
+      <th>Fire Frequency removed score</th>
+      <th>total Days Fires Burned removed score</th>
+      <th>total Acres Fires Burned removed score</th>
+      <th>total Aerial Assets removed score</th>
+      <th>total Personnel removed score</th>
+      <th>total Cost removed score</th>
+      <th>total Structures Damaged removed score</th>
+      <th>...</th>
+      <th>Fire Frequency removed MSE</th>
+      <th>total Days Fires Burned removed MSE</th>
+      <th>total Acres Fires Burned removed MSE</th>
+      <th>total Aerial Assets removed MSE</th>
+      <th>total Personnel removed MSE</th>
+      <th>total Cost removed MSE</th>
+      <th>total Structures Damaged removed MSE</th>
+      <th>total Structures Destroyed removed MSE</th>
+      <th>total Injuries removed MSE</th>
+      <th>total Fatalities removed MSE</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Hazardous Terrain</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.680</td>
+      <td>0.206</td>
+      <td>-0.237</td>
+      <td>0.553</td>
+      <td>0.450</td>
+      <td>0.787</td>
+      <td>0.523</td>
+      <td>...</td>
+      <td>0.026</td>
+      <td>0.064</td>
+      <td>0.099</td>
+      <td>0.036</td>
+      <td>0.044</td>
+      <td>0.017</td>
+      <td>0.038</td>
+      <td>0.018</td>
+      <td>0.015</td>
+      <td>0.022</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Ecological Resources</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>-0.082</td>
+      <td>0.696</td>
+      <td>-1.720</td>
+      <td>-1.004</td>
+      <td>0.230</td>
+      <td>-0.698</td>
+      <td>0.570</td>
+      <td>...</td>
+      <td>0.155</td>
+      <td>0.044</td>
+      <td>0.391</td>
+      <td>0.288</td>
+      <td>0.110</td>
+      <td>0.244</td>
+      <td>0.062</td>
+      <td>0.014</td>
+      <td>0.010</td>
+      <td>0.050</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Thunderstorms</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.450</td>
+      <td>0.353</td>
+      <td>0.784</td>
+      <td>1.000</td>
+      <td>0.881</td>
+      <td>0.977</td>
+      <td>0.810</td>
+      <td>...</td>
+      <td>0.053</td>
+      <td>0.062</td>
+      <td>0.021</td>
+      <td>0.000</td>
+      <td>0.011</td>
+      <td>0.002</td>
+      <td>0.018</td>
+      <td>0.055</td>
+      <td>0.012</td>
+      <td>0.005</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Wind</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.894</td>
+      <td>0.694</td>
+      <td>-1.538</td>
+      <td>-1.166</td>
+      <td>0.810</td>
+      <td>0.891</td>
+      <td>0.974</td>
+      <td>...</td>
+      <td>0.010</td>
+      <td>0.029</td>
+      <td>0.240</td>
+      <td>0.205</td>
+      <td>0.018</td>
+      <td>0.010</td>
+      <td>0.002</td>
+      <td>0.031</td>
+      <td>0.024</td>
+      <td>0.014</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Dry Weather</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.877</td>
+      <td>0.736</td>
+      <td>-2.479</td>
+      <td>-2.215</td>
+      <td>0.448</td>
+      <td>0.040</td>
+      <td>0.714</td>
+      <td>...</td>
+      <td>0.013</td>
+      <td>0.028</td>
+      <td>0.375</td>
+      <td>0.347</td>
+      <td>0.060</td>
+      <td>0.103</td>
+      <td>0.031</td>
+      <td>0.014</td>
+      <td>0.016</td>
+      <td>0.035</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Rain</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.893</td>
+      <td>0.942</td>
+      <td>-0.920</td>
+      <td>-2.795</td>
+      <td>1.000</td>
+      <td>0.466</td>
+      <td>1.000</td>
+      <td>...</td>
+      <td>0.011</td>
+      <td>0.006</td>
+      <td>0.192</td>
+      <td>0.380</td>
+      <td>0.000</td>
+      <td>0.053</td>
+      <td>0.000</td>
+      <td>0.027</td>
+      <td>0.005</td>
+      <td>0.002</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Smoke</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.991</td>
+      <td>0.516</td>
+      <td>0.105</td>
+      <td>-0.402</td>
+      <td>0.802</td>
+      <td>0.019</td>
+      <td>-0.092</td>
+      <td>...</td>
+      <td>0.001</td>
+      <td>0.048</td>
+      <td>0.089</td>
+      <td>0.139</td>
+      <td>0.020</td>
+      <td>0.097</td>
+      <td>0.108</td>
+      <td>0.033</td>
+      <td>0.001</td>
+      <td>0.035</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Evacuations</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.501</td>
+      <td>0.802</td>
+      <td>-2.623</td>
+      <td>-2.489</td>
+      <td>0.437</td>
+      <td>-0.450</td>
+      <td>0.583</td>
+      <td>...</td>
+      <td>0.062</td>
+      <td>0.025</td>
+      <td>0.453</td>
+      <td>0.436</td>
+      <td>0.070</td>
+      <td>0.181</td>
+      <td>0.052</td>
+      <td>0.022</td>
+      <td>0.009</td>
+      <td>0.048</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Injury</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.481</td>
+      <td>0.322</td>
+      <td>0.088</td>
+      <td>0.998</td>
+      <td>0.259</td>
+      <td>0.177</td>
+      <td>0.006</td>
+      <td>...</td>
+      <td>0.051</td>
+      <td>0.067</td>
+      <td>0.090</td>
+      <td>0.000</td>
+      <td>0.073</td>
+      <td>0.081</td>
+      <td>0.098</td>
+      <td>0.020</td>
+      <td>0.002</td>
+      <td>0.103</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>Resource Shortage</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.198</td>
+      <td>0.441</td>
+      <td>-1.338</td>
+      <td>-0.769</td>
+      <td>0.205</td>
+      <td>-0.071</td>
+      <td>0.493</td>
+      <td>...</td>
+      <td>0.088</td>
+      <td>0.061</td>
+      <td>0.257</td>
+      <td>0.194</td>
+      <td>0.087</td>
+      <td>0.118</td>
+      <td>0.056</td>
+      <td>0.011</td>
+      <td>0.015</td>
+      <td>0.031</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>Road Closures</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.885</td>
+      <td>0.444</td>
+      <td>-0.509</td>
+      <td>0.163</td>
+      <td>0.449</td>
+      <td>-0.038</td>
+      <td>0.294</td>
+      <td>...</td>
+      <td>0.011</td>
+      <td>0.055</td>
+      <td>0.149</td>
+      <td>0.083</td>
+      <td>0.055</td>
+      <td>0.103</td>
+      <td>0.070</td>
+      <td>0.018</td>
+      <td>0.006</td>
+      <td>0.052</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>Command Transition</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.352</td>
+      <td>0.980</td>
+      <td>0.491</td>
+      <td>0.970</td>
+      <td>0.950</td>
+      <td>0.630</td>
+      <td>0.745</td>
+      <td>...</td>
+      <td>0.076</td>
+      <td>0.002</td>
+      <td>0.059</td>
+      <td>0.003</td>
+      <td>0.006</td>
+      <td>0.043</td>
+      <td>0.030</td>
+      <td>0.077</td>
+      <td>0.000</td>
+      <td>0.016</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>Inaccurate Mapping</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.873</td>
+      <td>0.783</td>
+      <td>0.183</td>
+      <td>0.624</td>
+      <td>0.808</td>
+      <td>0.379</td>
+      <td>0.426</td>
+      <td>...</td>
+      <td>0.013</td>
+      <td>0.022</td>
+      <td>0.082</td>
+      <td>0.038</td>
+      <td>0.019</td>
+      <td>0.062</td>
+      <td>0.058</td>
+      <td>0.043</td>
+      <td>0.001</td>
+      <td>0.024</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>Aerial Grounding</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>-0.176</td>
+      <td>0.723</td>
+      <td>0.801</td>
+      <td>0.943</td>
+      <td>0.842</td>
+      <td>-0.085</td>
+      <td>0.996</td>
+      <td>...</td>
+      <td>0.154</td>
+      <td>0.036</td>
+      <td>0.026</td>
+      <td>0.007</td>
+      <td>0.021</td>
+      <td>0.142</td>
+      <td>0.001</td>
+      <td>0.013</td>
+      <td>0.004</td>
+      <td>0.003</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>Military Base</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>-0.645</td>
+      <td>0.989</td>
+      <td>-8.206</td>
+      <td>-3.829</td>
+      <td>-1.656</td>
+      <td>0.755</td>
+      <td>0.902</td>
+      <td>...</td>
+      <td>0.197</td>
+      <td>0.001</td>
+      <td>1.100</td>
+      <td>0.577</td>
+      <td>0.317</td>
+      <td>0.029</td>
+      <td>0.012</td>
+      <td>0.066</td>
+      <td>0.048</td>
+      <td>0.037</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>Cultural Resources</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.530</td>
+      <td>0.607</td>
+      <td>0.553</td>
+      <td>0.999</td>
+      <td>0.227</td>
+      <td>-0.268</td>
+      <td>-0.694</td>
+      <td>...</td>
+      <td>0.038</td>
+      <td>0.032</td>
+      <td>0.036</td>
+      <td>0.000</td>
+      <td>0.063</td>
+      <td>0.103</td>
+      <td>0.138</td>
+      <td>0.007</td>
+      <td>0.000</td>
+      <td>0.050</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>Law Violations</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.810</td>
+      <td>0.999</td>
+      <td>-9.595</td>
+      <td>-18.816</td>
+      <td>0.125</td>
+      <td>-0.861</td>
+      <td>0.908</td>
+      <td>...</td>
+      <td>0.019</td>
+      <td>0.000</td>
+      <td>1.078</td>
+      <td>2.017</td>
+      <td>0.089</td>
+      <td>0.189</td>
+      <td>0.009</td>
+      <td>0.017</td>
+      <td>0.032</td>
+      <td>0.009</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>Infrastructure</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.398</td>
+      <td>0.906</td>
+      <td>-4.407</td>
+      <td>-4.104</td>
+      <td>0.114</td>
+      <td>-0.643</td>
+      <td>0.306</td>
+      <td>...</td>
+      <td>0.068</td>
+      <td>0.011</td>
+      <td>0.613</td>
+      <td>0.579</td>
+      <td>0.101</td>
+      <td>0.186</td>
+      <td>0.079</td>
+      <td>0.008</td>
+      <td>0.006</td>
+      <td>0.068</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>Livestock</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.275</td>
+      <td>0.316</td>
+      <td>-0.843</td>
+      <td>0.304</td>
+      <td>0.416</td>
+      <td>0.781</td>
+      <td>0.599</td>
+      <td>...</td>
+      <td>0.064</td>
+      <td>0.060</td>
+      <td>0.163</td>
+      <td>0.062</td>
+      <td>0.052</td>
+      <td>0.019</td>
+      <td>0.035</td>
+      <td>0.023</td>
+      <td>0.016</td>
+      <td>0.034</td>
+    </tr>
+  </tbody>
+</table>
+<p>19 rows × 23 columns</p>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>hazard</th>
+      <th>R2 for full model</th>
+      <th>MSE for full model</th>
+      <th>Fire Frequency removed score</th>
+      <th>total Days Fires Burned removed score</th>
+      <th>total Acres Fires Burned removed score</th>
+      <th>total Aerial Assets removed score</th>
+      <th>total Personnel removed score</th>
+      <th>total Cost removed score</th>
+      <th>total Structures Damaged removed score</th>
+      <th>...</th>
+      <th>Fire Frequency removed MSE</th>
+      <th>total Days Fires Burned removed MSE</th>
+      <th>total Acres Fires Burned removed MSE</th>
+      <th>total Aerial Assets removed MSE</th>
+      <th>total Personnel removed MSE</th>
+      <th>total Cost removed MSE</th>
+      <th>total Structures Damaged removed MSE</th>
+      <th>total Structures Destroyed removed MSE</th>
+      <th>total Injuries removed MSE</th>
+      <th>total Fatalities removed MSE</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Hazardous Terrain</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.320</td>
+      <td>0.794</td>
+      <td>1.237</td>
+      <td>0.447</td>
+      <td>0.550</td>
+      <td>0.213</td>
+      <td>0.477</td>
+      <td>...</td>
+      <td>-0.026</td>
+      <td>-0.064</td>
+      <td>-0.099</td>
+      <td>-0.036</td>
+      <td>-0.044</td>
+      <td>-0.017</td>
+      <td>-0.038</td>
+      <td>-0.018</td>
+      <td>-0.015</td>
+      <td>-0.022</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Ecological Resources</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>1.082</td>
+      <td>0.304</td>
+      <td>2.720</td>
+      <td>2.004</td>
+      <td>0.770</td>
+      <td>1.698</td>
+      <td>0.430</td>
+      <td>...</td>
+      <td>-0.155</td>
+      <td>-0.044</td>
+      <td>-0.391</td>
+      <td>-0.288</td>
+      <td>-0.110</td>
+      <td>-0.244</td>
+      <td>-0.062</td>
+      <td>-0.014</td>
+      <td>-0.010</td>
+      <td>-0.050</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Thunderstorms</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.550</td>
+      <td>0.647</td>
+      <td>0.216</td>
+      <td>0.000</td>
+      <td>0.119</td>
+      <td>0.023</td>
+      <td>0.190</td>
+      <td>...</td>
+      <td>-0.053</td>
+      <td>-0.062</td>
+      <td>-0.021</td>
+      <td>-0.000</td>
+      <td>-0.011</td>
+      <td>-0.002</td>
+      <td>-0.018</td>
+      <td>-0.055</td>
+      <td>-0.012</td>
+      <td>-0.005</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Wind</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.106</td>
+      <td>0.306</td>
+      <td>2.538</td>
+      <td>2.166</td>
+      <td>0.190</td>
+      <td>0.109</td>
+      <td>0.026</td>
+      <td>...</td>
+      <td>-0.010</td>
+      <td>-0.029</td>
+      <td>-0.240</td>
+      <td>-0.205</td>
+      <td>-0.018</td>
+      <td>-0.010</td>
+      <td>-0.002</td>
+      <td>-0.031</td>
+      <td>-0.024</td>
+      <td>-0.014</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Dry Weather</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.123</td>
+      <td>0.264</td>
+      <td>3.479</td>
+      <td>3.215</td>
+      <td>0.552</td>
+      <td>0.960</td>
+      <td>0.286</td>
+      <td>...</td>
+      <td>-0.013</td>
+      <td>-0.028</td>
+      <td>-0.375</td>
+      <td>-0.347</td>
+      <td>-0.060</td>
+      <td>-0.103</td>
+      <td>-0.031</td>
+      <td>-0.014</td>
+      <td>-0.016</td>
+      <td>-0.035</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Rain</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.107</td>
+      <td>0.058</td>
+      <td>1.920</td>
+      <td>3.795</td>
+      <td>0.000</td>
+      <td>0.534</td>
+      <td>0.000</td>
+      <td>...</td>
+      <td>-0.011</td>
+      <td>-0.006</td>
+      <td>-0.192</td>
+      <td>-0.380</td>
+      <td>-0.000</td>
+      <td>-0.053</td>
+      <td>-0.000</td>
+      <td>-0.027</td>
+      <td>-0.005</td>
+      <td>-0.002</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Smoke</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.009</td>
+      <td>0.484</td>
+      <td>0.895</td>
+      <td>1.402</td>
+      <td>0.198</td>
+      <td>0.981</td>
+      <td>1.092</td>
+      <td>...</td>
+      <td>-0.001</td>
+      <td>-0.048</td>
+      <td>-0.089</td>
+      <td>-0.139</td>
+      <td>-0.020</td>
+      <td>-0.097</td>
+      <td>-0.108</td>
+      <td>-0.033</td>
+      <td>-0.001</td>
+      <td>-0.035</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Evacuations</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.499</td>
+      <td>0.198</td>
+      <td>3.623</td>
+      <td>3.489</td>
+      <td>0.563</td>
+      <td>1.450</td>
+      <td>0.417</td>
+      <td>...</td>
+      <td>-0.062</td>
+      <td>-0.025</td>
+      <td>-0.453</td>
+      <td>-0.436</td>
+      <td>-0.070</td>
+      <td>-0.181</td>
+      <td>-0.052</td>
+      <td>-0.022</td>
+      <td>-0.009</td>
+      <td>-0.048</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Injury</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.519</td>
+      <td>0.678</td>
+      <td>0.912</td>
+      <td>0.002</td>
+      <td>0.741</td>
+      <td>0.823</td>
+      <td>0.994</td>
+      <td>...</td>
+      <td>-0.051</td>
+      <td>-0.067</td>
+      <td>-0.090</td>
+      <td>-0.000</td>
+      <td>-0.073</td>
+      <td>-0.081</td>
+      <td>-0.098</td>
+      <td>-0.020</td>
+      <td>-0.002</td>
+      <td>-0.103</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>Resource Shortage</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.802</td>
+      <td>0.559</td>
+      <td>2.338</td>
+      <td>1.769</td>
+      <td>0.795</td>
+      <td>1.071</td>
+      <td>0.507</td>
+      <td>...</td>
+      <td>-0.088</td>
+      <td>-0.061</td>
+      <td>-0.257</td>
+      <td>-0.194</td>
+      <td>-0.087</td>
+      <td>-0.118</td>
+      <td>-0.056</td>
+      <td>-0.011</td>
+      <td>-0.015</td>
+      <td>-0.031</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>Road Closures</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.115</td>
+      <td>0.556</td>
+      <td>1.509</td>
+      <td>0.837</td>
+      <td>0.551</td>
+      <td>1.038</td>
+      <td>0.706</td>
+      <td>...</td>
+      <td>-0.011</td>
+      <td>-0.055</td>
+      <td>-0.149</td>
+      <td>-0.083</td>
+      <td>-0.055</td>
+      <td>-0.103</td>
+      <td>-0.070</td>
+      <td>-0.018</td>
+      <td>-0.006</td>
+      <td>-0.052</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>Command Transition</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.648</td>
+      <td>0.020</td>
+      <td>0.509</td>
+      <td>0.030</td>
+      <td>0.050</td>
+      <td>0.370</td>
+      <td>0.255</td>
+      <td>...</td>
+      <td>-0.076</td>
+      <td>-0.002</td>
+      <td>-0.059</td>
+      <td>-0.003</td>
+      <td>-0.006</td>
+      <td>-0.043</td>
+      <td>-0.030</td>
+      <td>-0.077</td>
+      <td>-0.000</td>
+      <td>-0.016</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>Inaccurate Mapping</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.127</td>
+      <td>0.217</td>
+      <td>0.817</td>
+      <td>0.376</td>
+      <td>0.192</td>
+      <td>0.621</td>
+      <td>0.574</td>
+      <td>...</td>
+      <td>-0.013</td>
+      <td>-0.022</td>
+      <td>-0.082</td>
+      <td>-0.038</td>
+      <td>-0.019</td>
+      <td>-0.062</td>
+      <td>-0.058</td>
+      <td>-0.043</td>
+      <td>-0.001</td>
+      <td>-0.024</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>Aerial Grounding</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>1.176</td>
+      <td>0.277</td>
+      <td>0.199</td>
+      <td>0.057</td>
+      <td>0.158</td>
+      <td>1.085</td>
+      <td>0.004</td>
+      <td>...</td>
+      <td>-0.154</td>
+      <td>-0.036</td>
+      <td>-0.026</td>
+      <td>-0.007</td>
+      <td>-0.021</td>
+      <td>-0.142</td>
+      <td>-0.001</td>
+      <td>-0.013</td>
+      <td>-0.004</td>
+      <td>-0.003</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>Military Base</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>1.645</td>
+      <td>0.011</td>
+      <td>9.206</td>
+      <td>4.829</td>
+      <td>2.656</td>
+      <td>0.245</td>
+      <td>0.098</td>
+      <td>...</td>
+      <td>-0.197</td>
+      <td>-0.001</td>
+      <td>-1.100</td>
+      <td>-0.577</td>
+      <td>-0.317</td>
+      <td>-0.029</td>
+      <td>-0.012</td>
+      <td>-0.066</td>
+      <td>-0.048</td>
+      <td>-0.037</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>Cultural Resources</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.470</td>
+      <td>0.393</td>
+      <td>0.447</td>
+      <td>0.001</td>
+      <td>0.773</td>
+      <td>1.268</td>
+      <td>1.694</td>
+      <td>...</td>
+      <td>-0.038</td>
+      <td>-0.032</td>
+      <td>-0.036</td>
+      <td>-0.000</td>
+      <td>-0.063</td>
+      <td>-0.103</td>
+      <td>-0.138</td>
+      <td>-0.007</td>
+      <td>-0.000</td>
+      <td>-0.050</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>Law Violations</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.190</td>
+      <td>0.001</td>
+      <td>10.595</td>
+      <td>19.816</td>
+      <td>0.875</td>
+      <td>1.861</td>
+      <td>0.092</td>
+      <td>...</td>
+      <td>-0.019</td>
+      <td>-0.000</td>
+      <td>-1.078</td>
+      <td>-2.017</td>
+      <td>-0.089</td>
+      <td>-0.189</td>
+      <td>-0.009</td>
+      <td>-0.017</td>
+      <td>-0.032</td>
+      <td>-0.009</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>Infrastructure</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.602</td>
+      <td>0.094</td>
+      <td>5.407</td>
+      <td>5.104</td>
+      <td>0.886</td>
+      <td>1.643</td>
+      <td>0.694</td>
+      <td>...</td>
+      <td>-0.068</td>
+      <td>-0.011</td>
+      <td>-0.613</td>
+      <td>-0.579</td>
+      <td>-0.101</td>
+      <td>-0.186</td>
+      <td>-0.079</td>
+      <td>-0.008</td>
+      <td>-0.006</td>
+      <td>-0.068</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>Livestock</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.725</td>
+      <td>0.684</td>
+      <td>1.843</td>
+      <td>0.696</td>
+      <td>0.584</td>
+      <td>0.219</td>
+      <td>0.401</td>
+      <td>...</td>
+      <td>-0.064</td>
+      <td>-0.060</td>
+      <td>-0.163</td>
+      <td>-0.062</td>
+      <td>-0.052</td>
+      <td>-0.019</td>
+      <td>-0.035</td>
+      <td>-0.023</td>
+      <td>-0.016</td>
+      <td>-0.034</td>
+    </tr>
+  </tbody>
+</table>
+<p>19 rows × 23 columns</p>
+</div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Hazardous Terrain</th>
+      <th>Ecological Resources</th>
+      <th>Thunderstorms</th>
+      <th>Wind</th>
+      <th>Dry Weather</th>
+      <th>Rain</th>
+      <th>Smoke</th>
+      <th>Evacuations</th>
+      <th>Injury</th>
+      <th>Resource Shortage</th>
+      <th>Road Closures</th>
+      <th>Command Transition</th>
+      <th>Inaccurate Mapping</th>
+      <th>Aerial Grounding</th>
+      <th>Military Base</th>
+      <th>Cultural Resources</th>
+      <th>Law Violations</th>
+      <th>Infrastructure</th>
+      <th>Livestock</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Fire Frequency</th>
+      <td>-0.313581</td>
+      <td>-0.771285</td>
+      <td>-0.449935</td>
+      <td>-0.196329</td>
+      <td>-0.225604</td>
+      <td>0.202982</td>
+      <td>0.059588</td>
+      <td>-0.488699</td>
+      <td>-0.442255</td>
+      <td>-0.581090</td>
+      <td>-0.208721</td>
+      <td>-0.538615</td>
+      <td>-0.220789</td>
+      <td>-0.768341</td>
+      <td>-0.867605</td>
+      <td>-0.382661</td>
+      <td>0.272065</td>
+      <td>-0.511384</td>
+      <td>-0.495606</td>
+    </tr>
+    <tr>
+      <th>Days Fires Burned</th>
+      <td>-0.385132</td>
+      <td>-0.318617</td>
+      <td>-0.380660</td>
+      <td>-0.259672</td>
+      <td>-0.257430</td>
+      <td>0.115959</td>
+      <td>-0.334563</td>
+      <td>-0.240227</td>
+      <td>-0.394124</td>
+      <td>-0.378236</td>
+      <td>-0.357760</td>
+      <td>-0.074543</td>
+      <td>-0.225562</td>
+      <td>-0.290985</td>
+      <td>0.054977</td>
+      <td>-0.272717</td>
+      <td>-0.013717</td>
+      <td>-0.157257</td>
+      <td>-0.375137</td>
+    </tr>
+    <tr>
+      <th>Acres Fires Burned</th>
+      <td>0.503948</td>
+      <td>0.999900</td>
+      <td>0.230524</td>
+      <td>0.783731</td>
+      <td>0.979924</td>
+      <td>0.701707</td>
+      <td>0.476732</td>
+      <td>1.077046</td>
+      <td>0.479210</td>
+      <td>0.810874</td>
+      <td>0.618201</td>
+      <td>0.390072</td>
+      <td>0.458425</td>
+      <td>0.258290</td>
+      <td>1.678019</td>
+      <td>0.304997</td>
+      <td>1.661379</td>
+      <td>1.252659</td>
+      <td>0.645825</td>
+    </tr>
+    <tr>
+      <th>Aerial Assets</th>
+      <td>-0.345966</td>
+      <td>-0.980415</td>
+      <td>-0.006346</td>
+      <td>-0.827021</td>
+      <td>-1.076034</td>
+      <td>-1.126873</td>
+      <td>-0.681862</td>
+      <td>-1.207323</td>
+      <td>-0.026165</td>
+      <td>-0.805801</td>
+      <td>-0.526007</td>
+      <td>-0.107781</td>
+      <td>-0.355459</td>
+      <td>-0.158250</td>
+      <td>-1.388392</td>
+      <td>-0.019445</td>
+      <td>-2.595552</td>
+      <td>-1.390232</td>
+      <td>-0.453423</td>
+    </tr>
+    <tr>
+      <th>Personnel</th>
+      <td>0.404772</td>
+      <td>0.640593</td>
+      <td>0.205707</td>
+      <td>0.258009</td>
+      <td>0.470289</td>
+      <td>-0.007586</td>
+      <td>0.270491</td>
+      <td>0.511258</td>
+      <td>0.520117</td>
+      <td>0.569720</td>
+      <td>0.449915</td>
+      <td>0.148036</td>
+      <td>0.267860</td>
+      <td>0.277383</td>
+      <td>1.085640</td>
+      <td>0.483215</td>
+      <td>0.575140</td>
+      <td>0.610948</td>
+      <td>0.437802</td>
+    </tr>
+    <tr>
+      <th>Cost</th>
+      <td>0.254719</td>
+      <td>0.962682</td>
+      <td>0.092205</td>
+      <td>0.198314</td>
+      <td>0.627064</td>
+      <td>0.450813</td>
+      <td>0.608486</td>
+      <td>0.830326</td>
+      <td>0.554710</td>
+      <td>0.668622</td>
+      <td>0.624789</td>
+      <td>0.405531</td>
+      <td>0.486784</td>
+      <td>0.735040</td>
+      <td>0.333345</td>
+      <td>0.625970</td>
+      <td>0.848553</td>
+      <td>0.841511</td>
+      <td>0.270968</td>
+    </tr>
+    <tr>
+      <th>Structures Damaged</th>
+      <td>-0.456810</td>
+      <td>-0.580431</td>
+      <td>-0.316060</td>
+      <td>-0.116516</td>
+      <td>-0.410260</td>
+      <td>0.000946</td>
+      <td>-0.768907</td>
+      <td>-0.533447</td>
+      <td>-0.730414</td>
+      <td>-0.551122</td>
+      <td>-0.617073</td>
+      <td>-0.402928</td>
+      <td>-0.560947</td>
+      <td>-0.055859</td>
+      <td>-0.252184</td>
+      <td>-0.867102</td>
+      <td>-0.225945</td>
+      <td>-0.655046</td>
+      <td>-0.439747</td>
+    </tr>
+    <tr>
+      <th>Structures Destroyed</th>
+      <td>0.428869</td>
+      <td>0.381243</td>
+      <td>0.757483</td>
+      <td>0.565964</td>
+      <td>0.377243</td>
+      <td>0.532924</td>
+      <td>0.583970</td>
+      <td>0.477964</td>
+      <td>0.457771</td>
+      <td>0.344615</td>
+      <td>0.436865</td>
+      <td>0.893835</td>
+      <td>0.668565</td>
+      <td>0.364034</td>
+      <td>-0.828011</td>
+      <td>0.272584</td>
+      <td>-0.425535</td>
+      <td>0.296102</td>
+      <td>0.492681</td>
+    </tr>
+    <tr>
+      <th>Injuries</th>
+      <td>0.278519</td>
+      <td>0.228356</td>
+      <td>0.249203</td>
+      <td>0.353876</td>
+      <td>0.288878</td>
+      <td>0.152031</td>
+      <td>0.058770</td>
+      <td>0.215857</td>
+      <td>0.090744</td>
+      <td>0.280603</td>
+      <td>0.171000</td>
+      <td>-0.001509</td>
+      <td>0.085335</td>
+      <td>0.148282</td>
+      <td>0.494017</td>
+      <td>-0.031798</td>
+      <td>0.406409</td>
+      <td>0.176420</td>
+      <td>0.286667</td>
+    </tr>
+    <tr>
+      <th>Fatalities</th>
+      <td>-0.288774</td>
+      <td>-0.437670</td>
+      <td>-0.135920</td>
+      <td>-0.230199</td>
+      <td>-0.368195</td>
+      <td>0.094284</td>
+      <td>-0.367375</td>
+      <td>-0.427765</td>
+      <td>-0.628802</td>
+      <td>-0.341738</td>
+      <td>-0.448117</td>
+      <td>-0.245164</td>
+      <td>-0.300802</td>
+      <td>-0.107585</td>
+      <td>-0.377401</td>
+      <td>-0.436124</td>
+      <td>-0.184218</td>
+      <td>-0.510116</td>
+      <td>-0.359751</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[79]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>cols = [col for col in delta_df.columns if &quot;MSE&quot; in col]
+delta_df.drop(cols, axis=1)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[79]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>hazard</th>
+      <th>R2 for full model</th>
+      <th>Fire Frequency removed score</th>
+      <th>total Days Fires Burned removed score</th>
+      <th>total Acres Fires Burned removed score</th>
+      <th>total Aerial Assets removed score</th>
+      <th>total Personnel removed score</th>
+      <th>total Cost removed score</th>
+      <th>total Structures Damaged removed score</th>
+      <th>total Structures Destroyed removed score</th>
+      <th>total Injuries removed score</th>
+      <th>total Fatalities removed score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Hazardous Terrain</td>
+      <td>1.0</td>
+      <td>0.320</td>
+      <td>0.794</td>
+      <td>1.237</td>
+      <td>0.447</td>
+      <td>0.550</td>
+      <td>0.213</td>
+      <td>0.477</td>
+      <td>0.220</td>
+      <td>0.189</td>
+      <td>0.272</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Ecological Resources</td>
+      <td>1.0</td>
+      <td>1.082</td>
+      <td>0.304</td>
+      <td>2.720</td>
+      <td>2.004</td>
+      <td>0.770</td>
+      <td>1.698</td>
+      <td>0.430</td>
+      <td>0.097</td>
+      <td>0.071</td>
+      <td>0.349</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Thunderstorms</td>
+      <td>1.0</td>
+      <td>0.550</td>
+      <td>0.647</td>
+      <td>0.216</td>
+      <td>0.000</td>
+      <td>0.119</td>
+      <td>0.023</td>
+      <td>0.190</td>
+      <td>0.574</td>
+      <td>0.126</td>
+      <td>0.050</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Wind</td>
+      <td>1.0</td>
+      <td>0.106</td>
+      <td>0.306</td>
+      <td>2.538</td>
+      <td>2.166</td>
+      <td>0.190</td>
+      <td>0.109</td>
+      <td>0.026</td>
+      <td>0.326</td>
+      <td>0.259</td>
+      <td>0.146</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Dry Weather</td>
+      <td>1.0</td>
+      <td>0.123</td>
+      <td>0.264</td>
+      <td>3.479</td>
+      <td>3.215</td>
+      <td>0.552</td>
+      <td>0.960</td>
+      <td>0.286</td>
+      <td>0.127</td>
+      <td>0.151</td>
+      <td>0.329</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Rain</td>
+      <td>1.0</td>
+      <td>0.107</td>
+      <td>0.058</td>
+      <td>1.920</td>
+      <td>3.795</td>
+      <td>0.000</td>
+      <td>0.534</td>
+      <td>0.000</td>
+      <td>0.272</td>
+      <td>0.045</td>
+      <td>0.023</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Smoke</td>
+      <td>1.0</td>
+      <td>0.009</td>
+      <td>0.484</td>
+      <td>0.895</td>
+      <td>1.402</td>
+      <td>0.198</td>
+      <td>0.981</td>
+      <td>1.092</td>
+      <td>0.330</td>
+      <td>0.007</td>
+      <td>0.355</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Evacuations</td>
+      <td>1.0</td>
+      <td>0.499</td>
+      <td>0.198</td>
+      <td>3.623</td>
+      <td>3.489</td>
+      <td>0.563</td>
+      <td>1.450</td>
+      <td>0.417</td>
+      <td>0.176</td>
+      <td>0.073</td>
+      <td>0.382</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Injury</td>
+      <td>1.0</td>
+      <td>0.519</td>
+      <td>0.678</td>
+      <td>0.912</td>
+      <td>0.002</td>
+      <td>0.741</td>
+      <td>0.823</td>
+      <td>0.994</td>
+      <td>0.205</td>
+      <td>0.016</td>
+      <td>1.051</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>Resource Shortage</td>
+      <td>1.0</td>
+      <td>0.802</td>
+      <td>0.559</td>
+      <td>2.338</td>
+      <td>1.769</td>
+      <td>0.795</td>
+      <td>1.071</td>
+      <td>0.507</td>
+      <td>0.104</td>
+      <td>0.140</td>
+      <td>0.278</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>Road Closures</td>
+      <td>1.0</td>
+      <td>0.115</td>
+      <td>0.556</td>
+      <td>1.509</td>
+      <td>0.837</td>
+      <td>0.551</td>
+      <td>1.038</td>
+      <td>0.706</td>
+      <td>0.185</td>
+      <td>0.058</td>
+      <td>0.531</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>Command Transition</td>
+      <td>1.0</td>
+      <td>0.648</td>
+      <td>0.020</td>
+      <td>0.509</td>
+      <td>0.030</td>
+      <td>0.050</td>
+      <td>0.370</td>
+      <td>0.255</td>
+      <td>0.657</td>
+      <td>0.000</td>
+      <td>0.134</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>Inaccurate Mapping</td>
+      <td>1.0</td>
+      <td>0.127</td>
+      <td>0.217</td>
+      <td>0.817</td>
+      <td>0.376</td>
+      <td>0.192</td>
+      <td>0.621</td>
+      <td>0.574</td>
+      <td>0.427</td>
+      <td>0.014</td>
+      <td>0.235</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>Aerial Grounding</td>
+      <td>1.0</td>
+      <td>1.176</td>
+      <td>0.277</td>
+      <td>0.199</td>
+      <td>0.057</td>
+      <td>0.158</td>
+      <td>1.085</td>
+      <td>0.004</td>
+      <td>0.097</td>
+      <td>0.033</td>
+      <td>0.023</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>Military Base</td>
+      <td>1.0</td>
+      <td>1.645</td>
+      <td>0.011</td>
+      <td>9.206</td>
+      <td>4.829</td>
+      <td>2.656</td>
+      <td>0.245</td>
+      <td>0.098</td>
+      <td>0.551</td>
+      <td>0.399</td>
+      <td>0.311</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>Cultural Resources</td>
+      <td>1.0</td>
+      <td>0.470</td>
+      <td>0.393</td>
+      <td>0.447</td>
+      <td>0.001</td>
+      <td>0.773</td>
+      <td>1.268</td>
+      <td>1.694</td>
+      <td>0.088</td>
+      <td>0.002</td>
+      <td>0.611</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>Law Violations</td>
+      <td>1.0</td>
+      <td>0.190</td>
+      <td>0.001</td>
+      <td>10.595</td>
+      <td>19.816</td>
+      <td>0.875</td>
+      <td>1.861</td>
+      <td>0.092</td>
+      <td>0.171</td>
+      <td>0.317</td>
+      <td>0.087</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>Infrastructure</td>
+      <td>1.0</td>
+      <td>0.602</td>
+      <td>0.094</td>
+      <td>5.407</td>
+      <td>5.104</td>
+      <td>0.886</td>
+      <td>1.643</td>
+      <td>0.694</td>
+      <td>0.074</td>
+      <td>0.054</td>
+      <td>0.600</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>Livestock</td>
+      <td>1.0</td>
+      <td>0.725</td>
+      <td>0.684</td>
+      <td>1.843</td>
+      <td>0.696</td>
+      <td>0.584</td>
+      <td>0.219</td>
+      <td>0.401</td>
+      <td>0.264</td>
+      <td>0.182</td>
+      <td>0.383</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+</section>
+<section id="Experimental">
+<h2>Experimental<a class="headerlink" href="#Experimental" title="Permalink to this heading"></a></h2>
+<p>The following cells are experimental supplementary analyses related to the secondary analysis. Here there are experiments regarding predictors and colinearity.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[80]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>totals = {key: list(totals[key]) for key in totals}
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[81]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>totals_new = {predictor: totals_scaled[predictor] for predictor in totals_scaled if predictor not in [&quot;total Structures Damaged&quot;, &quot;total Structures Destroyed&quot;]}
+totals_new[&quot;total structure&quot;] = minmax_scale([totals[&quot;total Structures Damaged&quot;][i]+totals[&quot;total Structures Destroyed&quot;][i] for i in range(len(totals[&quot;total Structures Destroyed&quot;]))])
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[82]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>corrMatrix_fires, correlation_mat_total_fires, p_values = create_correlation_matrix(totals_new, fire_freqs_scaled, graph=False)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[83]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>correlation_mat_total_fires
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[83]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Fire Frequency</th>
+      <th>total Days Fires Burned</th>
+      <th>total Acres Fires Burned</th>
+      <th>total Aerial Assets</th>
+      <th>total Personnel</th>
+      <th>total Cost</th>
+      <th>total Injuries</th>
+      <th>total Fatalities</th>
+      <th>total structure</th>
+      <th>Hazardous Terrain</th>
+      <th>...</th>
+      <th>Resource Shortage</th>
+      <th>Road Closures</th>
+      <th>Command Transition</th>
+      <th>Inaccurate Mapping</th>
+      <th>Aerial Grounding</th>
+      <th>Military Base</th>
+      <th>Cultural Resources</th>
+      <th>Law Violations</th>
+      <th>Infrastructure</th>
+      <th>Livestock</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.000000</td>
+      <td>0.968467</td>
+      <td>0.971840</td>
+      <td>0.903676</td>
+      <td>1.000000</td>
+      <td>0.351300</td>
+      <td>0.837050</td>
+      <td>0.88</td>
+      <td>0.233468</td>
+      <td>0.290398</td>
+      <td>...</td>
+      <td>0.130682</td>
+      <td>0.302326</td>
+      <td>0.000000</td>
+      <td>0.206667</td>
+      <td>0.000000</td>
+      <td>1.0</td>
+      <td>0.432692</td>
+      <td>0.582090</td>
+      <td>0.228571</td>
+      <td>0.142857</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.514501</td>
+      <td>0.417518</td>
+      <td>0.855911</td>
+      <td>0.641318</td>
+      <td>0.806630</td>
+      <td>0.484181</td>
+      <td>1.000000</td>
+      <td>0.84</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>...</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>0.904762</td>
+      <td>0.8</td>
+      <td>0.875000</td>
+      <td>0.656716</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.543502</td>
+      <td>0.000000</td>
+      <td>0.269501</td>
+      <td>0.395437</td>
+      <td>0.604627</td>
+      <td>1.000000</td>
+      <td>0.778731</td>
+      <td>0.76</td>
+      <td>0.542703</td>
+      <td>0.711944</td>
+      <td>...</td>
+      <td>0.857955</td>
+      <td>0.888372</td>
+      <td>0.534161</td>
+      <td>0.740000</td>
+      <td>1.000000</td>
+      <td>0.4</td>
+      <td>0.894231</td>
+      <td>0.791045</td>
+      <td>0.790476</td>
+      <td>0.619048</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.015038</td>
+      <td>0.251387</td>
+      <td>0.316664</td>
+      <td>0.065272</td>
+      <td>0.253145</td>
+      <td>0.123329</td>
+      <td>0.195540</td>
+      <td>0.12</td>
+      <td>0.192790</td>
+      <td>0.494145</td>
+      <td>...</td>
+      <td>0.602273</td>
+      <td>0.530233</td>
+      <td>0.360248</td>
+      <td>0.413333</td>
+      <td>0.523810</td>
+      <td>1.0</td>
+      <td>0.653846</td>
+      <td>0.686567</td>
+      <td>0.800000</td>
+      <td>0.533333</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.258861</td>
+      <td>0.124672</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.055537</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.00</td>
+      <td>0.000000</td>
+      <td>0.210773</td>
+      <td>...</td>
+      <td>0.136364</td>
+      <td>0.255814</td>
+      <td>0.006211</td>
+      <td>0.166667</td>
+      <td>0.095238</td>
+      <td>0.2</td>
+      <td>0.490385</td>
+      <td>0.223881</td>
+      <td>0.257143</td>
+      <td>0.152381</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>0.854995</td>
+      <td>1.000000</td>
+      <td>0.930638</td>
+      <td>0.426489</td>
+      <td>0.443150</td>
+      <td>0.278302</td>
+      <td>0.346484</td>
+      <td>0.36</td>
+      <td>0.723218</td>
+      <td>0.484778</td>
+      <td>...</td>
+      <td>0.431818</td>
+      <td>0.655814</td>
+      <td>0.627329</td>
+      <td>0.693333</td>
+      <td>0.142857</td>
+      <td>0.6</td>
+      <td>0.576923</td>
+      <td>1.000000</td>
+      <td>0.866667</td>
+      <td>0.457143</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>0.461869</td>
+      <td>0.924088</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>0.896474</td>
+      <td>0.817606</td>
+      <td>0.696398</td>
+      <td>0.64</td>
+      <td>0.729902</td>
+      <td>0.697892</td>
+      <td>...</td>
+      <td>0.778409</td>
+      <td>0.837209</td>
+      <td>0.894410</td>
+      <td>0.806667</td>
+      <td>0.904762</td>
+      <td>1.0</td>
+      <td>1.000000</td>
+      <td>0.313433</td>
+      <td>0.876190</td>
+      <td>0.695238</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>0.000000</td>
+      <td>0.569343</td>
+      <td>0.264532</td>
+      <td>0.419518</td>
+      <td>0.524836</td>
+      <td>0.559381</td>
+      <td>0.423671</td>
+      <td>1.00</td>
+      <td>0.264700</td>
+      <td>0.372365</td>
+      <td>...</td>
+      <td>0.488636</td>
+      <td>0.376744</td>
+      <td>0.453416</td>
+      <td>0.393333</td>
+      <td>0.761905</td>
+      <td>0.6</td>
+      <td>0.711538</td>
+      <td>0.104478</td>
+      <td>0.447619</td>
+      <td>0.333333</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>0.111708</td>
+      <td>0.266861</td>
+      <td>0.176067</td>
+      <td>0.245300</td>
+      <td>0.000000</td>
+      <td>0.547244</td>
+      <td>0.240137</td>
+      <td>0.16</td>
+      <td>0.576248</td>
+      <td>0.000000</td>
+      <td>...</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.124224</td>
+      <td>0.000000</td>
+      <td>0.619048</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+    </tr>
+  </tbody>
+</table>
+<p>9 rows × 28 columns</p>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[84]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>predictors = [p for p in totals_new]
+hazards = [h for h in fire_freqs_scaled]
+reshape_correlation_matrix(corrMatrix_fires, p_values, predictors, hazards)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_ics_heat_153_0.png" src="../_images/nblinks_ics_heat_153_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[85]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>predictors = [p for p in totals_new]
+hazards = [h.replace(&quot;total &quot;,&quot;&quot;) for h in fire_freqs_scaled]
+results_df, delta_df, coefficient_df = multiple_reg_feature_importance(predictors, hazards, correlation_mat_total_fires)
+display(results_df, delta_df, coefficient_df)
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_ics_heat_154_0.png" src="../_images/nblinks_ics_heat_154_0.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_ics_heat_154_1.png" src="../_images/nblinks_ics_heat_154_1.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>hazard</th>
+      <th>R2 for full model</th>
+      <th>MSE for full model</th>
+      <th>Fire Frequency removed score</th>
+      <th>total Days Fires Burned removed score</th>
+      <th>total Acres Fires Burned removed score</th>
+      <th>total Aerial Assets removed score</th>
+      <th>total Personnel removed score</th>
+      <th>total Cost removed score</th>
+      <th>total Injuries removed score</th>
+      <th>...</th>
+      <th>total structure removed score</th>
+      <th>Fire Frequency removed MSE</th>
+      <th>total Days Fires Burned removed MSE</th>
+      <th>total Acres Fires Burned removed MSE</th>
+      <th>total Aerial Assets removed MSE</th>
+      <th>total Personnel removed MSE</th>
+      <th>total Cost removed MSE</th>
+      <th>total Injuries removed MSE</th>
+      <th>total Fatalities removed MSE</th>
+      <th>total structure removed MSE</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Hazardous Terrain</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.998</td>
+      <td>-3.219</td>
+      <td>0.768</td>
+      <td>-0.623</td>
+      <td>-18.478</td>
+      <td>0.942</td>
+      <td>-5.249</td>
+      <td>...</td>
+      <td>-0.482</td>
+      <td>0.000</td>
+      <td>0.338</td>
+      <td>0.019</td>
+      <td>0.130</td>
+      <td>1.562</td>
+      <td>0.005</td>
+      <td>0.501</td>
+      <td>0.003</td>
+      <td>0.119</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Ecological Resources</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.656</td>
+      <td>-1.463</td>
+      <td>-0.201</td>
+      <td>-2.790</td>
+      <td>-15.777</td>
+      <td>0.526</td>
+      <td>-4.314</td>
+      <td>...</td>
+      <td>0.093</td>
+      <td>0.049</td>
+      <td>0.354</td>
+      <td>0.172</td>
+      <td>0.544</td>
+      <td>2.409</td>
+      <td>0.068</td>
+      <td>0.763</td>
+      <td>0.000</td>
+      <td>0.130</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Thunderstorms</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.919</td>
+      <td>-2.368</td>
+      <td>0.992</td>
+      <td>0.703</td>
+      <td>-11.873</td>
+      <td>0.782</td>
+      <td>-4.017</td>
+      <td>...</td>
+      <td>-1.165</td>
+      <td>0.008</td>
+      <td>0.324</td>
+      <td>0.001</td>
+      <td>0.029</td>
+      <td>1.238</td>
+      <td>0.021</td>
+      <td>0.482</td>
+      <td>0.017</td>
+      <td>0.208</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Wind</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.994</td>
+      <td>-0.259</td>
+      <td>-0.664</td>
+      <td>-2.116</td>
+      <td>-3.930</td>
+      <td>1.000</td>
+      <td>0.152</td>
+      <td>...</td>
+      <td>0.025</td>
+      <td>0.001</td>
+      <td>0.119</td>
+      <td>0.157</td>
+      <td>0.295</td>
+      <td>0.466</td>
+      <td>0.000</td>
+      <td>0.080</td>
+      <td>0.000</td>
+      <td>0.092</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Dry Weather</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.998</td>
+      <td>-0.988</td>
+      <td>-0.903</td>
+      <td>-4.106</td>
+      <td>-11.762</td>
+      <td>0.807</td>
+      <td>-2.505</td>
+      <td>...</td>
+      <td>0.132</td>
+      <td>0.000</td>
+      <td>0.214</td>
+      <td>0.205</td>
+      <td>0.551</td>
+      <td>1.376</td>
+      <td>0.021</td>
+      <td>0.378</td>
+      <td>0.000</td>
+      <td>0.094</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Rain</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.775</td>
+      <td>0.991</td>
+      <td>-0.465</td>
+      <td>-3.489</td>
+      <td>-0.057</td>
+      <td>0.718</td>
+      <td>0.612</td>
+      <td>...</td>
+      <td>0.369</td>
+      <td>0.023</td>
+      <td>0.001</td>
+      <td>0.147</td>
+      <td>0.450</td>
+      <td>0.106</td>
+      <td>0.028</td>
+      <td>0.039</td>
+      <td>0.013</td>
+      <td>0.063</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Smoke</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.292</td>
+      <td>-4.610</td>
+      <td>0.999</td>
+      <td>-3.227</td>
+      <td>-31.827</td>
+      <td>1.000</td>
+      <td>-16.137</td>
+      <td>...</td>
+      <td>-1.675</td>
+      <td>0.070</td>
+      <td>0.557</td>
+      <td>0.000</td>
+      <td>0.420</td>
+      <td>3.259</td>
+      <td>0.000</td>
+      <td>1.701</td>
+      <td>0.019</td>
+      <td>0.265</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Evacuations</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.948</td>
+      <td>-1.310</td>
+      <td>-0.745</td>
+      <td>-4.893</td>
+      <td>-16.169</td>
+      <td>0.691</td>
+      <td>-4.964</td>
+      <td>...</td>
+      <td>-0.228</td>
+      <td>0.006</td>
+      <td>0.289</td>
+      <td>0.218</td>
+      <td>0.737</td>
+      <td>2.148</td>
+      <td>0.039</td>
+      <td>0.746</td>
+      <td>0.000</td>
+      <td>0.154</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Injury</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.999</td>
+      <td>-4.561</td>
+      <td>0.985</td>
+      <td>0.284</td>
+      <td>-31.617</td>
+      <td>1.000</td>
+      <td>-13.042</td>
+      <td>...</td>
+      <td>-1.001</td>
+      <td>0.000</td>
+      <td>0.547</td>
+      <td>0.001</td>
+      <td>0.070</td>
+      <td>3.208</td>
+      <td>0.000</td>
+      <td>1.381</td>
+      <td>0.001</td>
+      <td>0.197</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>Resource Shortage</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.834</td>
+      <td>-2.396</td>
+      <td>0.128</td>
+      <td>-2.615</td>
+      <td>-17.949</td>
+      <td>0.861</td>
+      <td>-4.717</td>
+      <td>...</td>
+      <td>-0.018</td>
+      <td>0.018</td>
+      <td>0.373</td>
+      <td>0.096</td>
+      <td>0.397</td>
+      <td>2.082</td>
+      <td>0.015</td>
+      <td>0.628</td>
+      <td>0.003</td>
+      <td>0.112</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>Road Closures</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.937</td>
+      <td>-3.285</td>
+      <td>0.741</td>
+      <td>-1.578</td>
+      <td>-23.280</td>
+      <td>0.952</td>
+      <td>-8.632</td>
+      <td>...</td>
+      <td>-0.605</td>
+      <td>0.006</td>
+      <td>0.424</td>
+      <td>0.026</td>
+      <td>0.255</td>
+      <td>2.402</td>
+      <td>0.005</td>
+      <td>0.953</td>
+      <td>0.001</td>
+      <td>0.159</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>Command Transition</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.913</td>
+      <td>-0.671</td>
+      <td>0.991</td>
+      <td>0.409</td>
+      <td>-13.779</td>
+      <td>0.993</td>
+      <td>-7.398</td>
+      <td>...</td>
+      <td>-1.566</td>
+      <td>0.010</td>
+      <td>0.195</td>
+      <td>0.001</td>
+      <td>0.069</td>
+      <td>1.727</td>
+      <td>0.001</td>
+      <td>0.982</td>
+      <td>0.014</td>
+      <td>0.300</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>Inaccurate Mapping</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.937</td>
+      <td>-2.354</td>
+      <td>0.973</td>
+      <td>-0.752</td>
+      <td>-21.516</td>
+      <td>0.999</td>
+      <td>-10.048</td>
+      <td>...</td>
+      <td>-1.394</td>
+      <td>0.006</td>
+      <td>0.337</td>
+      <td>0.003</td>
+      <td>0.176</td>
+      <td>2.262</td>
+      <td>0.000</td>
+      <td>1.110</td>
+      <td>0.013</td>
+      <td>0.241</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>Aerial Grounding</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.080</td>
+      <td>0.345</td>
+      <td>0.913</td>
+      <td>0.852</td>
+      <td>-0.647</td>
+      <td>0.239</td>
+      <td>0.721</td>
+      <td>...</td>
+      <td>0.726</td>
+      <td>0.121</td>
+      <td>0.086</td>
+      <td>0.011</td>
+      <td>0.019</td>
+      <td>0.216</td>
+      <td>0.100</td>
+      <td>0.037</td>
+      <td>0.000</td>
+      <td>0.036</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>Military Base</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>-0.739</td>
+      <td>0.964</td>
+      <td>-8.432</td>
+      <td>-3.656</td>
+      <td>-0.897</td>
+      <td>0.705</td>
+      <td>0.295</td>
+      <td>...</td>
+      <td>0.182</td>
+      <td>0.208</td>
+      <td>0.004</td>
+      <td>1.127</td>
+      <td>0.556</td>
+      <td>0.227</td>
+      <td>0.035</td>
+      <td>0.084</td>
+      <td>0.045</td>
+      <td>0.098</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>Cultural Resources</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.985</td>
+      <td>-4.960</td>
+      <td>0.897</td>
+      <td>0.029</td>
+      <td>-42.847</td>
+      <td>0.999</td>
+      <td>-20.483</td>
+      <td>...</td>
+      <td>-0.955</td>
+      <td>0.001</td>
+      <td>0.485</td>
+      <td>0.008</td>
+      <td>0.079</td>
+      <td>3.566</td>
+      <td>0.000</td>
+      <td>1.747</td>
+      <td>0.010</td>
+      <td>0.159</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>Law Violations</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.762</td>
+      <td>0.980</td>
+      <td>-9.159</td>
+      <td>-19.375</td>
+      <td>-0.706</td>
+      <td>-0.674</td>
+      <td>0.927</td>
+      <td>...</td>
+      <td>0.832</td>
+      <td>0.024</td>
+      <td>0.002</td>
+      <td>1.034</td>
+      <td>2.074</td>
+      <td>0.174</td>
+      <td>0.170</td>
+      <td>0.007</td>
+      <td>0.005</td>
+      <td>0.017</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>Infrastructure</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.945</td>
+      <td>-1.311</td>
+      <td>-1.770</td>
+      <td>-7.370</td>
+      <td>-21.867</td>
+      <td>0.699</td>
+      <td>-7.042</td>
+      <td>...</td>
+      <td>-0.043</td>
+      <td>0.006</td>
+      <td>0.262</td>
+      <td>0.314</td>
+      <td>0.949</td>
+      <td>2.593</td>
+      <td>0.034</td>
+      <td>0.912</td>
+      <td>0.000</td>
+      <td>0.118</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>Livestock</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.875</td>
+      <td>-2.789</td>
+      <td>0.435</td>
+      <td>-1.008</td>
+      <td>-17.469</td>
+      <td>0.957</td>
+      <td>-4.752</td>
+      <td>...</td>
+      <td>-0.545</td>
+      <td>0.011</td>
+      <td>0.335</td>
+      <td>0.050</td>
+      <td>0.178</td>
+      <td>1.633</td>
+      <td>0.004</td>
+      <td>0.509</td>
+      <td>0.001</td>
+      <td>0.137</td>
+    </tr>
+  </tbody>
+</table>
+<p>19 rows × 21 columns</p>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>hazard</th>
+      <th>R2 for full model</th>
+      <th>MSE for full model</th>
+      <th>Fire Frequency removed score</th>
+      <th>total Days Fires Burned removed score</th>
+      <th>total Acres Fires Burned removed score</th>
+      <th>total Aerial Assets removed score</th>
+      <th>total Personnel removed score</th>
+      <th>total Cost removed score</th>
+      <th>total Injuries removed score</th>
+      <th>...</th>
+      <th>total structure removed score</th>
+      <th>Fire Frequency removed MSE</th>
+      <th>total Days Fires Burned removed MSE</th>
+      <th>total Acres Fires Burned removed MSE</th>
+      <th>total Aerial Assets removed MSE</th>
+      <th>total Personnel removed MSE</th>
+      <th>total Cost removed MSE</th>
+      <th>total Injuries removed MSE</th>
+      <th>total Fatalities removed MSE</th>
+      <th>total structure removed MSE</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Hazardous Terrain</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.002</td>
+      <td>4.219</td>
+      <td>0.232</td>
+      <td>1.623</td>
+      <td>19.478</td>
+      <td>0.058</td>
+      <td>6.249</td>
+      <td>...</td>
+      <td>1.482</td>
+      <td>-0.000</td>
+      <td>-0.338</td>
+      <td>-0.019</td>
+      <td>-0.130</td>
+      <td>-1.562</td>
+      <td>-0.005</td>
+      <td>-0.501</td>
+      <td>-0.003</td>
+      <td>-0.119</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Ecological Resources</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.344</td>
+      <td>2.463</td>
+      <td>1.201</td>
+      <td>3.790</td>
+      <td>16.777</td>
+      <td>0.474</td>
+      <td>5.314</td>
+      <td>...</td>
+      <td>0.907</td>
+      <td>-0.049</td>
+      <td>-0.354</td>
+      <td>-0.172</td>
+      <td>-0.544</td>
+      <td>-2.409</td>
+      <td>-0.068</td>
+      <td>-0.763</td>
+      <td>-0.000</td>
+      <td>-0.130</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Thunderstorms</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.081</td>
+      <td>3.368</td>
+      <td>0.008</td>
+      <td>0.297</td>
+      <td>12.873</td>
+      <td>0.218</td>
+      <td>5.017</td>
+      <td>...</td>
+      <td>2.165</td>
+      <td>-0.008</td>
+      <td>-0.324</td>
+      <td>-0.001</td>
+      <td>-0.029</td>
+      <td>-1.238</td>
+      <td>-0.021</td>
+      <td>-0.482</td>
+      <td>-0.017</td>
+      <td>-0.208</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Wind</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.006</td>
+      <td>1.259</td>
+      <td>1.664</td>
+      <td>3.116</td>
+      <td>4.930</td>
+      <td>0.000</td>
+      <td>0.848</td>
+      <td>...</td>
+      <td>0.975</td>
+      <td>-0.001</td>
+      <td>-0.119</td>
+      <td>-0.157</td>
+      <td>-0.295</td>
+      <td>-0.466</td>
+      <td>-0.000</td>
+      <td>-0.080</td>
+      <td>-0.000</td>
+      <td>-0.092</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Dry Weather</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.002</td>
+      <td>1.988</td>
+      <td>1.903</td>
+      <td>5.106</td>
+      <td>12.762</td>
+      <td>0.193</td>
+      <td>3.505</td>
+      <td>...</td>
+      <td>0.868</td>
+      <td>-0.000</td>
+      <td>-0.214</td>
+      <td>-0.205</td>
+      <td>-0.551</td>
+      <td>-1.376</td>
+      <td>-0.021</td>
+      <td>-0.378</td>
+      <td>-0.000</td>
+      <td>-0.094</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Rain</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.225</td>
+      <td>0.009</td>
+      <td>1.465</td>
+      <td>4.489</td>
+      <td>1.057</td>
+      <td>0.282</td>
+      <td>0.388</td>
+      <td>...</td>
+      <td>0.631</td>
+      <td>-0.023</td>
+      <td>-0.001</td>
+      <td>-0.147</td>
+      <td>-0.450</td>
+      <td>-0.106</td>
+      <td>-0.028</td>
+      <td>-0.039</td>
+      <td>-0.013</td>
+      <td>-0.063</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Smoke</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.708</td>
+      <td>5.610</td>
+      <td>0.001</td>
+      <td>4.227</td>
+      <td>32.827</td>
+      <td>0.000</td>
+      <td>17.137</td>
+      <td>...</td>
+      <td>2.675</td>
+      <td>-0.070</td>
+      <td>-0.557</td>
+      <td>-0.000</td>
+      <td>-0.420</td>
+      <td>-3.259</td>
+      <td>-0.000</td>
+      <td>-1.701</td>
+      <td>-0.019</td>
+      <td>-0.265</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Evacuations</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.052</td>
+      <td>2.310</td>
+      <td>1.745</td>
+      <td>5.893</td>
+      <td>17.169</td>
+      <td>0.309</td>
+      <td>5.964</td>
+      <td>...</td>
+      <td>1.228</td>
+      <td>-0.006</td>
+      <td>-0.289</td>
+      <td>-0.218</td>
+      <td>-0.737</td>
+      <td>-2.148</td>
+      <td>-0.039</td>
+      <td>-0.746</td>
+      <td>-0.000</td>
+      <td>-0.154</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Injury</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.001</td>
+      <td>5.561</td>
+      <td>0.015</td>
+      <td>0.716</td>
+      <td>32.617</td>
+      <td>0.000</td>
+      <td>14.042</td>
+      <td>...</td>
+      <td>2.001</td>
+      <td>-0.000</td>
+      <td>-0.547</td>
+      <td>-0.001</td>
+      <td>-0.070</td>
+      <td>-3.208</td>
+      <td>-0.000</td>
+      <td>-1.381</td>
+      <td>-0.001</td>
+      <td>-0.197</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>Resource Shortage</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.166</td>
+      <td>3.396</td>
+      <td>0.872</td>
+      <td>3.615</td>
+      <td>18.949</td>
+      <td>0.139</td>
+      <td>5.717</td>
+      <td>...</td>
+      <td>1.018</td>
+      <td>-0.018</td>
+      <td>-0.373</td>
+      <td>-0.096</td>
+      <td>-0.397</td>
+      <td>-2.082</td>
+      <td>-0.015</td>
+      <td>-0.628</td>
+      <td>-0.003</td>
+      <td>-0.112</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>Road Closures</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.063</td>
+      <td>4.285</td>
+      <td>0.259</td>
+      <td>2.578</td>
+      <td>24.280</td>
+      <td>0.048</td>
+      <td>9.632</td>
+      <td>...</td>
+      <td>1.605</td>
+      <td>-0.006</td>
+      <td>-0.424</td>
+      <td>-0.026</td>
+      <td>-0.255</td>
+      <td>-2.402</td>
+      <td>-0.005</td>
+      <td>-0.953</td>
+      <td>-0.001</td>
+      <td>-0.159</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>Command Transition</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.087</td>
+      <td>1.671</td>
+      <td>0.009</td>
+      <td>0.591</td>
+      <td>14.779</td>
+      <td>0.007</td>
+      <td>8.398</td>
+      <td>...</td>
+      <td>2.566</td>
+      <td>-0.010</td>
+      <td>-0.195</td>
+      <td>-0.001</td>
+      <td>-0.069</td>
+      <td>-1.727</td>
+      <td>-0.001</td>
+      <td>-0.982</td>
+      <td>-0.014</td>
+      <td>-0.300</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>Inaccurate Mapping</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.063</td>
+      <td>3.354</td>
+      <td>0.027</td>
+      <td>1.752</td>
+      <td>22.516</td>
+      <td>0.001</td>
+      <td>11.048</td>
+      <td>...</td>
+      <td>2.394</td>
+      <td>-0.006</td>
+      <td>-0.337</td>
+      <td>-0.003</td>
+      <td>-0.176</td>
+      <td>-2.262</td>
+      <td>-0.000</td>
+      <td>-1.110</td>
+      <td>-0.013</td>
+      <td>-0.241</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>Aerial Grounding</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.920</td>
+      <td>0.655</td>
+      <td>0.087</td>
+      <td>0.148</td>
+      <td>1.647</td>
+      <td>0.761</td>
+      <td>0.279</td>
+      <td>...</td>
+      <td>0.274</td>
+      <td>-0.121</td>
+      <td>-0.086</td>
+      <td>-0.011</td>
+      <td>-0.019</td>
+      <td>-0.216</td>
+      <td>-0.100</td>
+      <td>-0.037</td>
+      <td>-0.000</td>
+      <td>-0.036</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>Military Base</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>1.739</td>
+      <td>0.036</td>
+      <td>9.432</td>
+      <td>4.656</td>
+      <td>1.897</td>
+      <td>0.295</td>
+      <td>0.705</td>
+      <td>...</td>
+      <td>0.818</td>
+      <td>-0.208</td>
+      <td>-0.004</td>
+      <td>-1.127</td>
+      <td>-0.556</td>
+      <td>-0.227</td>
+      <td>-0.035</td>
+      <td>-0.084</td>
+      <td>-0.045</td>
+      <td>-0.098</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>Cultural Resources</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.015</td>
+      <td>5.960</td>
+      <td>0.103</td>
+      <td>0.971</td>
+      <td>43.847</td>
+      <td>0.001</td>
+      <td>21.483</td>
+      <td>...</td>
+      <td>1.955</td>
+      <td>-0.001</td>
+      <td>-0.485</td>
+      <td>-0.008</td>
+      <td>-0.079</td>
+      <td>-3.566</td>
+      <td>-0.000</td>
+      <td>-1.747</td>
+      <td>-0.010</td>
+      <td>-0.159</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>Law Violations</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.238</td>
+      <td>0.020</td>
+      <td>10.159</td>
+      <td>20.375</td>
+      <td>1.706</td>
+      <td>1.674</td>
+      <td>0.073</td>
+      <td>...</td>
+      <td>0.168</td>
+      <td>-0.024</td>
+      <td>-0.002</td>
+      <td>-1.034</td>
+      <td>-2.074</td>
+      <td>-0.174</td>
+      <td>-0.170</td>
+      <td>-0.007</td>
+      <td>-0.005</td>
+      <td>-0.017</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>Infrastructure</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.055</td>
+      <td>2.311</td>
+      <td>2.770</td>
+      <td>8.370</td>
+      <td>22.867</td>
+      <td>0.301</td>
+      <td>8.042</td>
+      <td>...</td>
+      <td>1.043</td>
+      <td>-0.006</td>
+      <td>-0.262</td>
+      <td>-0.314</td>
+      <td>-0.949</td>
+      <td>-2.593</td>
+      <td>-0.034</td>
+      <td>-0.912</td>
+      <td>-0.000</td>
+      <td>-0.118</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>Livestock</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.125</td>
+      <td>3.789</td>
+      <td>0.565</td>
+      <td>2.008</td>
+      <td>18.469</td>
+      <td>0.043</td>
+      <td>5.752</td>
+      <td>...</td>
+      <td>1.545</td>
+      <td>-0.011</td>
+      <td>-0.335</td>
+      <td>-0.050</td>
+      <td>-0.178</td>
+      <td>-1.633</td>
+      <td>-0.004</td>
+      <td>-0.509</td>
+      <td>-0.001</td>
+      <td>-0.137</td>
+    </tr>
+  </tbody>
+</table>
+<p>19 rows × 21 columns</p>
+</div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Hazardous Terrain</th>
+      <th>Ecological Resources</th>
+      <th>Thunderstorms</th>
+      <th>Wind</th>
+      <th>Dry Weather</th>
+      <th>Rain</th>
+      <th>Smoke</th>
+      <th>Evacuations</th>
+      <th>Injury</th>
+      <th>Resource Shortage</th>
+      <th>Road Closures</th>
+      <th>Command Transition</th>
+      <th>Inaccurate Mapping</th>
+      <th>Aerial Grounding</th>
+      <th>Military Base</th>
+      <th>Cultural Resources</th>
+      <th>Law Violations</th>
+      <th>Infrastructure</th>
+      <th>Livestock</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Fire Frequency</th>
+      <td>-0.026710</td>
+      <td>-0.434907</td>
+      <td>-0.172281</td>
+      <td>-0.044706</td>
+      <td>0.030674</td>
+      <td>0.294113</td>
+      <td>0.518757</td>
+      <td>-0.157628</td>
+      <td>-0.022735</td>
+      <td>-0.264684</td>
+      <td>0.154315</td>
+      <td>-0.196994</td>
+      <td>0.155867</td>
+      <td>-0.679722</td>
+      <td>-0.892195</td>
+      <td>0.068827</td>
+      <td>0.304387</td>
+      <td>-0.154814</td>
+      <td>-0.205733</td>
+    </tr>
+    <tr>
+      <th>Days Fires Burned</th>
+      <td>-0.887679</td>
+      <td>-0.907474</td>
+      <td>-0.868228</td>
+      <td>-0.526449</td>
+      <td>-0.706361</td>
+      <td>-0.045041</td>
+      <td>-1.138592</td>
+      <td>-0.820146</td>
+      <td>-1.128467</td>
+      <td>-0.932083</td>
+      <td>-0.993370</td>
+      <td>-0.674310</td>
+      <td>-0.885755</td>
+      <td>-0.447021</td>
+      <td>0.100759</td>
+      <td>-1.062265</td>
+      <td>-0.068719</td>
+      <td>-0.781091</td>
+      <td>-0.883145</td>
+    </tr>
+    <tr>
+      <th>Acres Fires Burned</th>
+      <td>0.218366</td>
+      <td>0.664421</td>
+      <td>-0.044154</td>
+      <td>0.634500</td>
+      <td>0.724769</td>
+      <td>0.612986</td>
+      <td>0.019111</td>
+      <td>0.747378</td>
+      <td>0.060722</td>
+      <td>0.495242</td>
+      <td>0.256264</td>
+      <td>0.051919</td>
+      <td>0.083995</td>
+      <td>0.171237</td>
+      <td>1.698509</td>
+      <td>-0.146490</td>
+      <td>1.626812</td>
+      <td>0.896498</td>
+      <td>0.357554</td>
+    </tr>
+    <tr>
+      <th>Aerial Assets</th>
+      <td>-0.659419</td>
+      <td>-1.348238</td>
+      <td>-0.308950</td>
+      <td>-0.991925</td>
+      <td>-1.356072</td>
+      <td>-1.225549</td>
+      <td>-1.183809</td>
+      <td>-1.569110</td>
+      <td>-0.484941</td>
+      <td>-1.151817</td>
+      <td>-0.922921</td>
+      <td>-0.480188</td>
+      <td>-0.766777</td>
+      <td>-0.254556</td>
+      <td>-1.363317</td>
+      <td>-0.513679</td>
+      <td>-2.631943</td>
+      <td>-1.780378</td>
+      <td>-0.770022</td>
+    </tr>
+    <tr>
+      <th>Personnel</th>
+      <td>2.408827</td>
+      <td>2.991060</td>
+      <td>2.143770</td>
+      <td>1.315660</td>
+      <td>2.260642</td>
+      <td>0.627199</td>
+      <td>3.478669</td>
+      <td>2.824167</td>
+      <td>3.451628</td>
+      <td>2.780700</td>
+      <td>2.986533</td>
+      <td>2.532783</td>
+      <td>2.898649</td>
+      <td>0.895393</td>
+      <td>0.917536</td>
+      <td>3.639132</td>
+      <td>0.803142</td>
+      <td>3.103003</td>
+      <td>2.462551</td>
+    </tr>
+    <tr>
+      <th>Cost</th>
+      <td>-0.132613</td>
+      <td>0.508451</td>
+      <td>-0.282524</td>
+      <td>-0.006252</td>
+      <td>0.281038</td>
+      <td>0.327950</td>
+      <td>-0.011527</td>
+      <td>0.383307</td>
+      <td>-0.011801</td>
+      <td>0.241353</td>
+      <td>0.134572</td>
+      <td>-0.055549</td>
+      <td>-0.021726</td>
+      <td>0.615493</td>
+      <td>0.366185</td>
+      <td>0.016190</td>
+      <td>0.804696</td>
+      <td>0.359965</td>
+      <td>-0.120391</td>
+    </tr>
+    <tr>
+      <th>Injuries</th>
+      <td>-1.601518</td>
+      <td>-1.975918</td>
+      <td>-1.571002</td>
+      <td>-0.640381</td>
+      <td>-1.390647</td>
+      <td>-0.445877</td>
+      <td>-2.950252</td>
+      <td>-1.953818</td>
+      <td>-2.658327</td>
+      <td>-1.792774</td>
+      <td>-2.208000</td>
+      <td>-2.241003</td>
+      <td>-2.383291</td>
+      <td>-0.432888</td>
+      <td>0.656517</td>
+      <td>-2.989975</td>
+      <td>0.195391</td>
+      <td>-2.159981</td>
+      <td>-1.613143</td>
+    </tr>
+    <tr>
+      <th>Fatalities</th>
+      <td>0.111248</td>
+      <td>0.031103</td>
+      <td>0.252046</td>
+      <td>-0.017979</td>
+      <td>-0.010848</td>
+      <td>0.222284</td>
+      <td>0.272664</td>
+      <td>0.033852</td>
+      <td>-0.044206</td>
+      <td>0.099170</td>
+      <td>0.057863</td>
+      <td>0.232096</td>
+      <td>0.224665</td>
+      <td>0.016528</td>
+      <td>-0.413534</td>
+      <td>0.192506</td>
+      <td>-0.140251</td>
+      <td>-0.013458</td>
+      <td>0.044595</td>
+    </tr>
+    <tr>
+      <th>structure</th>
+      <td>1.055031</td>
+      <td>1.103966</td>
+      <td>1.395890</td>
+      <td>0.928990</td>
+      <td>0.936069</td>
+      <td>0.769336</td>
+      <td>1.576520</td>
+      <td>1.198997</td>
+      <td>1.357454</td>
+      <td>1.023104</td>
+      <td>1.219264</td>
+      <td>1.675715</td>
+      <td>1.500671</td>
+      <td>0.579354</td>
+      <td>-0.956481</td>
+      <td>1.220021</td>
+      <td>-0.399779</td>
+      <td>1.051994</td>
+      <td>1.131003</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="Colinearity">
+<h2>Colinearity<a class="headerlink" href="#Colinearity" title="Permalink to this heading"></a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[86]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from statsmodels.stats.outliers_influence import variance_inflation_factor
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[87]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>vif_data = pd.DataFrame()
+input_df = pd.DataFrame({predictor:totals_new[predictor] for predictor in totals_new})
+vif_data[&quot;feature&quot;] = input_df.columns
+vif_data[&quot;VIF&quot;] = [variance_inflation_factor(input_df.values, i)
+                          for i in range(len(input_df.columns))]
+vif_data
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[87]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>feature</th>
+      <th>VIF</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Fire Frequency</td>
+      <td>10.545422</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>total Days Fires Burned</td>
+      <td>98.508631</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>total Acres Fires Burned</td>
+      <td>318.148035</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>total Aerial Assets</td>
+      <td>47.954849</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>total Personnel</td>
+      <td>215.555330</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>total Cost</td>
+      <td>21.487662</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>total Injuries</td>
+      <td>187.177715</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>total Fatalities</td>
+      <td>80.066638</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>total structure</td>
+      <td>54.806470</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[88]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>vif_data = pd.DataFrame()
+input_df = pd.DataFrame({predictor:combined_predictors_scaled[predictor] for predictor in combined_predictors_scaled})
+vif_data[&quot;feature&quot;] = input_df.columns
+vif_data[&quot;VIF&quot;] = [variance_inflation_factor(input_df.values, i)
+                          for i in range(len(input_df.columns))]
+vif_data
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[88]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>feature</th>
+      <th>VIF</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Fire Characteristics</td>
+      <td>3.984066</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Operations</td>
+      <td>17.004590</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Intensity</td>
+      <td>13.810379</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[89]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>sums = []
+for col in input_df:
+    temp_input = input_df.drop(col, axis=1)
+    vif_data = pd.DataFrame()
+    vif_data[&quot;feature&quot;] = temp_input.columns
+    vif_data[&quot;VIF&quot;] = [variance_inflation_factor(temp_input.values, i)
+                          for i in range(len(temp_input.columns))]
+    sum_vif = sum(vif_data[&quot;VIF&quot;].tolist())
+    sums.append(sum_vif)
+    display(col,sum_vif, vif_data)
+print(min(sums), sums.index(min(sums)), predictors[sums.index(min(sums))])
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&#39;Fire Characteristics&#39;
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+27.612735626886067
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>feature</th>
+      <th>VIF</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Operations</td>
+      <td>13.806368</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Intensity</td>
+      <td>13.806368</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&#39;Operations&#39;
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+6.469486432284111
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>feature</th>
+      <th>VIF</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Fire Characteristics</td>
+      <td>3.234743</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Intensity</td>
+      <td>3.234743</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&#39;Intensity&#39;
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+7.96581799128896
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>feature</th>
+      <th>VIF</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Fire Characteristics</td>
+      <td>3.982909</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Operations</td>
+      <td>3.982909</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+6.469486432284111 1 total Days Fires Burned
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[90]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># to_drop = [&quot;total Acres Fires Burned&quot;, &quot;total Personnel&quot;, &quot;total Injuries&quot;, &quot;total Aerial Assets&quot;, &quot;total Cost&quot;]#,&quot;total Days Fires Burned&quot;]
+# temp_input = input_df.drop(to_drop, axis=1)
+# vif_data = pd.DataFrame()
+# vif_data[&quot;feature&quot;] = temp_input.columns
+# vif_data[&quot;VIF&quot;] = [variance_inflation_factor(temp_input.values, i)
+#                       for i in range(len(temp_input.columns))]
+# sum_vif = sum(vif_data[&quot;VIF&quot;].tolist())
+# display(sum_vif, vif_data)
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../results/fmea_results.html" class="btn btn-neutral float-left" title="FMEA Results" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="safecom_heat.html" class="btn btn-neutral float-right" title="Hazard Extraction and Analysis of Trends (HEAT): SAFECOM" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright © 2023 United States Government as represented by the Administrator of the National Aeronautics and Space Administration. All Rights Reserved.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

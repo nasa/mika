@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MIKA &mdash; MIKA 1.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=af2ce170"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="utils package" href="utils.html" />
+    <link rel="prev" title="Overview" href="readme.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            MIKA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="readme.html">Overview</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">MIKA</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">utils package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kd.html">kd package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ir.html">ir package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="data.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MIKA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">MIKA</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/components.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mika">
+<h1>MIKA<a class="headerlink" href="#mika" title="Permalink to this heading"></a></h1>
+<p>The MIKA package contains three core components for analyzing large sets of narrative text: <code class="docutils literal notranslate"><span class="pre">mika.kd</span></code> for
+knowldege discovery, <code class="docutils literal notranslate"><span class="pre">mika.ir</span></code> for information retrieval, and <code class="docutils literal notranslate"><span class="pre">mika.utils</span></code> for utilities. Typically,
+a user will load and configure their data using <code class="docutils literal notranslate"><span class="pre">mika.utils</span></code> and then use a combination of functions
+from <code class="docutils literal notranslate"><span class="pre">mika.kd</span></code> and <code class="docutils literal notranslate"><span class="pre">mika.ir</span></code> to perform an analysis.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">utils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#mika-utils-data">mika.utils.Data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#mika.utils.Data"><code class="docutils literal notranslate"><span class="pre">Data</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#mika.utils.Data.load"><code class="docutils literal notranslate"><span class="pre">Data.load()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#mika.utils.Data.prepare_data"><code class="docutils literal notranslate"><span class="pre">Data.prepare_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#mika.utils.Data.preprocess_data"><code class="docutils literal notranslate"><span class="pre">Data.preprocess_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#mika.utils.Data.save"><code class="docutils literal notranslate"><span class="pre">Data.save()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#mika.utils.Data.sentence_tokenization"><code class="docutils literal notranslate"><span class="pre">Data.sentence_tokenization()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="kd.html">kd package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="kd.html#mika-kd-fmea">mika.kd.FMEA</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.FMEA"><code class="docutils literal notranslate"><span class="pre">FMEA</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.FMEA.build_fmea"><code class="docutils literal notranslate"><span class="pre">FMEA.build_fmea()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.FMEA.calc_frequency"><code class="docutils literal notranslate"><span class="pre">FMEA.calc_frequency()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.FMEA.calc_risk"><code class="docutils literal notranslate"><span class="pre">FMEA.calc_risk()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.FMEA.calc_severity"><code class="docutils literal notranslate"><span class="pre">FMEA.calc_severity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.FMEA.display_doc"><code class="docutils literal notranslate"><span class="pre">FMEA.display_doc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.FMEA.evaluate_preds"><code class="docutils literal notranslate"><span class="pre">FMEA.evaluate_preds()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.FMEA.get_entities_per_doc"><code class="docutils literal notranslate"><span class="pre">FMEA.get_entities_per_doc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.FMEA.get_year_per_doc"><code class="docutils literal notranslate"><span class="pre">FMEA.get_year_per_doc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.FMEA.group_docs_manual"><code class="docutils literal notranslate"><span class="pre">FMEA.group_docs_manual()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.FMEA.group_docs_with_meta"><code class="docutils literal notranslate"><span class="pre">FMEA.group_docs_with_meta()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.FMEA.load_data"><code class="docutils literal notranslate"><span class="pre">FMEA.load_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.FMEA.load_model"><code class="docutils literal notranslate"><span class="pre">FMEA.load_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.FMEA.post_process_fmea"><code class="docutils literal notranslate"><span class="pre">FMEA.post_process_fmea()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.FMEA.predict"><code class="docutils literal notranslate"><span class="pre">FMEA.predict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="kd.html#mika-kd-topic-model-plus">mika.kd.Topic_Model_plus</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.bert_topic"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.bert_topic()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.calc_bert_coherence"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.calc_bert_coherence()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.coherence_scores"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.coherence_scores()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.get_bert_coherence"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.get_bert_coherence()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.get_bert_topic_diversity"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.get_bert_topic_diversity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.get_bert_topics_from_probs"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.get_bert_topics_from_probs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.hdp"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.hdp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.hlda"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.hlda()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.hlda_display"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.hlda_display()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.hlda_extract_models"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.hlda_extract_models()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.hlda_visual"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.hlda_visual()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.label_hlda_topics"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.label_hlda_topics()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.label_lda_topics"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.label_lda_topics()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.lda"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.lda()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.lda_extract_models"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.lda_extract_models()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.lda_visual"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.lda_visual()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.load_bert_model"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.load_bert_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.reduce_bert_topics"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.reduce_bert_topics()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.save_bert_coherence"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.save_bert_coherence()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.save_bert_document_topic_distribution"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.save_bert_document_topic_distribution()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.save_bert_model"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.save_bert_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.save_bert_results"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.save_bert_results()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.save_bert_taxonomy"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.save_bert_taxonomy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.save_bert_topic_diversity"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.save_bert_topic_diversity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.save_bert_topics"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.save_bert_topics()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.save_bert_topics_from_probs"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.save_bert_topics_from_probs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.save_bert_vis"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.save_bert_vis()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.save_hlda_coherence"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.save_hlda_coherence()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.save_hlda_document_topic_distribution"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.save_hlda_document_topic_distribution()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.save_hlda_level_n_taxonomy"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.save_hlda_level_n_taxonomy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.save_hlda_models"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.save_hlda_models()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.save_hlda_results"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.save_hlda_results()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.save_hlda_taxonomy"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.save_hlda_taxonomy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.save_hlda_topics"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.save_hlda_topics()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.save_lda_coherence"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.save_lda_coherence()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.save_lda_document_topic_distribution"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.save_lda_document_topic_distribution()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.save_lda_models"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.save_lda_models()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.save_lda_results"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.save_lda_results()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.save_lda_taxonomy"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.save_lda_taxonomy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.save_lda_topics"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.save_lda_topics()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kd.html#mika.kd.Topic_Model_plus.save_mixed_taxonomy"><code class="docutils literal notranslate"><span class="pre">Topic_Model_plus.save_mixed_taxonomy()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="kd.html#module-mika.kd.NER">mika.kd.NER</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.NER.align_labels_with_tokens"><code class="docutils literal notranslate"><span class="pre">align_labels_with_tokens()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.NER.build_confusion_matrix"><code class="docutils literal notranslate"><span class="pre">build_confusion_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.NER.check_doc_to_sentence_split"><code class="docutils literal notranslate"><span class="pre">check_doc_to_sentence_split()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.NER.clean_annots_from_str"><code class="docutils literal notranslate"><span class="pre">clean_annots_from_str()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.NER.clean_doccano_annots"><code class="docutils literal notranslate"><span class="pre">clean_doccano_annots()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.NER.clean_text_tags"><code class="docutils literal notranslate"><span class="pre">clean_text_tags()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.NER.compute_classification_report"><code class="docutils literal notranslate"><span class="pre">compute_classification_report()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.NER.compute_metrics"><code class="docutils literal notranslate"><span class="pre">compute_metrics()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.NER.get_cleaned_label"><code class="docutils literal notranslate"><span class="pre">get_cleaned_label()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.NER.identify_bad_annotations"><code class="docutils literal notranslate"><span class="pre">identify_bad_annotations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.NER.plot_eval_metrics"><code class="docutils literal notranslate"><span class="pre">plot_eval_metrics()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.NER.plot_eval_results"><code class="docutils literal notranslate"><span class="pre">plot_eval_results()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.NER.plot_loss"><code class="docutils literal notranslate"><span class="pre">plot_loss()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.NER.read_doccano_annots"><code class="docutils literal notranslate"><span class="pre">read_doccano_annots()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.NER.read_trainer_logs"><code class="docutils literal notranslate"><span class="pre">read_trainer_logs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.NER.split_docs_to_sentences"><code class="docutils literal notranslate"><span class="pre">split_docs_to_sentences()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.NER.tokenize"><code class="docutils literal notranslate"><span class="pre">tokenize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.NER.tokenize_and_align_labels"><code class="docutils literal notranslate"><span class="pre">tokenize_and_align_labels()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="kd.html#module-mika.kd.trend_analysis">mika.kd.trend_analysis</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.add_hazards_to_docs"><code class="docutils literal notranslate"><span class="pre">add_hazards_to_docs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.bootstrap_metric"><code class="docutils literal notranslate"><span class="pre">bootstrap_metric()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.build_word_clouds"><code class="docutils literal notranslate"><span class="pre">build_word_clouds()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.calc_CI"><code class="docutils literal notranslate"><span class="pre">calc_CI()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.calc_classification_metrics"><code class="docutils literal notranslate"><span class="pre">calc_classification_metrics()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.calc_rate"><code class="docutils literal notranslate"><span class="pre">calc_rate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.calc_severity_per_hazard"><code class="docutils literal notranslate"><span class="pre">calc_severity_per_hazard()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.check_for_hazard_words"><code class="docutils literal notranslate"><span class="pre">check_for_hazard_words()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.check_for_negation_words"><code class="docutils literal notranslate"><span class="pre">check_for_negation_words()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.chi_squared_tests"><code class="docutils literal notranslate"><span class="pre">chi_squared_tests()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.corr_sig"><code class="docutils literal notranslate"><span class="pre">corr_sig()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.create_correlation_matrix"><code class="docutils literal notranslate"><span class="pre">create_correlation_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.examine_hazard_extraction_mismatches"><code class="docutils literal notranslate"><span class="pre">examine_hazard_extraction_mismatches()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.get_doc_text"><code class="docutils literal notranslate"><span class="pre">get_doc_text()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.get_doc_time"><code class="docutils literal notranslate"><span class="pre">get_doc_time()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.get_hazard_df"><code class="docutils literal notranslate"><span class="pre">get_hazard_df()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.get_hazard_doc_ids"><code class="docutils literal notranslate"><span class="pre">get_hazard_doc_ids()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.get_hazard_info"><code class="docutils literal notranslate"><span class="pre">get_hazard_info()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.get_hazard_topics"><code class="docutils literal notranslate"><span class="pre">get_hazard_topics()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.get_hazard_topics_per_doc"><code class="docutils literal notranslate"><span class="pre">get_hazard_topics_per_doc()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.get_hazard_words"><code class="docutils literal notranslate"><span class="pre">get_hazard_words()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.get_likelihood_FAA"><code class="docutils literal notranslate"><span class="pre">get_likelihood_FAA()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.get_likelihood_USFS"><code class="docutils literal notranslate"><span class="pre">get_likelihood_USFS()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.get_negation_words"><code class="docutils literal notranslate"><span class="pre">get_negation_words()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.get_results_info"><code class="docutils literal notranslate"><span class="pre">get_results_info()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.get_topics_per_doc"><code class="docutils literal notranslate"><span class="pre">get_topics_per_doc()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.get_word_frequencies"><code class="docutils literal notranslate"><span class="pre">get_word_frequencies()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.hazard_accuracy"><code class="docutils literal notranslate"><span class="pre">hazard_accuracy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.identify_docs_per_fmea_row"><code class="docutils literal notranslate"><span class="pre">identify_docs_per_fmea_row()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.identify_docs_per_hazard"><code class="docutils literal notranslate"><span class="pre">identify_docs_per_hazard()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.make_pie_chart"><code class="docutils literal notranslate"><span class="pre">make_pie_chart()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.minmax_scale"><code class="docutils literal notranslate"><span class="pre">minmax_scale()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.multiple_reg_feature_importance"><code class="docutils literal notranslate"><span class="pre">multiple_reg_feature_importance()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.plot_USFS_risk_matrix"><code class="docutils literal notranslate"><span class="pre">plot_USFS_risk_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.plot_frequency_time_series"><code class="docutils literal notranslate"><span class="pre">plot_frequency_time_series()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.plot_metric_averages"><code class="docutils literal notranslate"><span class="pre">plot_metric_averages()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.plot_metric_time_series"><code class="docutils literal notranslate"><span class="pre">plot_metric_time_series()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.plot_predictors"><code class="docutils literal notranslate"><span class="pre">plot_predictors()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.plot_risk_matrix"><code class="docutils literal notranslate"><span class="pre">plot_risk_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.proposed_topics"><code class="docutils literal notranslate"><span class="pre">proposed_topics()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.record_hazard_doc_info"><code class="docutils literal notranslate"><span class="pre">record_hazard_doc_info()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.regression_feature_importance"><code class="docutils literal notranslate"><span class="pre">regression_feature_importance()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.remove_outliers"><code class="docutils literal notranslate"><span class="pre">remove_outliers()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.reshape_correlation_matrix"><code class="docutils literal notranslate"><span class="pre">reshape_correlation_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.sample_for_accuracy"><code class="docutils literal notranslate"><span class="pre">sample_for_accuracy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kd.html#mika.kd.trend_analysis.set_up_docs_per_hazard_vars"><code class="docutils literal notranslate"><span class="pre">set_up_docs_per_hazard_vars()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ir.html">ir package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#mika-ir-search">mika.ir.search</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ir.html#mika.ir.search"><code class="docutils literal notranslate"><span class="pre">search</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ir.html#mika.ir.search.get_sentence_embeddings"><code class="docutils literal notranslate"><span class="pre">search.get_sentence_embeddings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ir.html#mika.ir.search.load_sentence_embeddings"><code class="docutils literal notranslate"><span class="pre">search.load_sentence_embeddings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ir.html#mika.ir.search.run_search"><code class="docutils literal notranslate"><span class="pre">search.run_search()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="readme.html" class="btn btn-neutral float-left" title="Overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="utils.html" class="btn btn-neutral float-right" title="utils package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright © 2023 United States Government as represented by the Administrator of the National Aeronautics and Space Administration. All Rights Reserved.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,3 @@
+{
+"path": "../../../examples/KD/HEAT/JSS_2023/ICS quantitative analysis - Journal.ipynb"
+}

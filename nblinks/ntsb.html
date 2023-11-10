@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Case Study: NTSB Reports &mdash; MIKA 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/nbsphinx-code-cells.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=af2ce170"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Hazard Extraction and Analysis of Trends (HEAT): SAFECOM" href="safecom_heat.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            MIKA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../components.html">MIKA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">Models</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../examples.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#utils">Utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#ir">IR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#kd">KD</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../examples.html#ntsb-case-study">NTSB Case Study</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Case Study: NTSB Reports</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Case-Study-set-up:">Case Study set up:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#Information-Retrieval">Information Retrieval</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Topic-Modeling">Topic Modeling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#FMEA-using-Named-Entity-Recognition">FMEA using Named-Entity Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Trend-Analysis">Trend Analysis</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MIKA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../examples.html">Examples</a></li>
+      <li class="breadcrumb-item active">Case Study: NTSB Reports</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/nblinks/ntsb.nblink.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Case-Study:-NTSB-Reports">
+<h1>Case Study: NTSB Reports<a class="headerlink" href="#Case-Study:-NTSB-Reports" title="Permalink to this heading"></a></h1>
+<p>This notebook provides an example of MIKA capabilties via a case study on NTSB reports. The capabilities shown in this example include: - Information Retrieval - Topic Modeling - FMEA extraction through custom NER - Trend Analysis</p>
+<section id="Case-Study-set-up:">
+<h2>Case Study set up:<a class="headerlink" href="#Case-Study-set-up:" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Package imports</p></li>
+<li><p>Data import</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span>import sys, os
+#sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)),&quot;..&quot;,&quot;..&quot;)) #not working in notebook
+sys.path.append(os.path.join(&quot;..&quot;,&quot;..&quot;))
+import numpy as np
+import pandas as pd
+from mika.utils import Data
+from mika.ir import search
+from datetime import datetime as dt
+from mika.kd.topic_model_plus import Topic_Model_plus
+from mika.kd.trend_analysis import plot_frequency_time_series, plot_metric_time_series, plot_metric_averages, make_pie_chart, chi_squared_tests, plot_risk_matrix, get_likelihood_FAA, identify_docs_per_fmea_row, calc_severity_per_hazard, add_hazards_to_docs, chi_squared_tests
+from mika.kd import FMEA
+from sklearn.feature_extraction.text import CountVectorizer
+from sentence_transformers import SentenceTransformer
+from torch import cuda
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>os.chdir(&#39;../&#39;)
+os.chdir(&#39;../&#39;)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>ntsb_filepath = os.path.join(&quot;data/NTSB/ntsb_full.csv&quot;)
+ntsb_text_columns = [&#39;narr_cause&#39;, &#39;narr_accf&#39;] # narrative accident cause and narrative accident final
+ntsb_document_id_col = &#39;ev_id&#39;
+ntsb_database_name = &#39;NTSB&#39;
+ntsb_data = Data()
+ntsb_data.load(ntsb_filepath, preprocessed=False, id_col=ntsb_document_id_col, text_columns=ntsb_text_columns.copy(), name=ntsb_database_name, load_kwargs={&#39;dtype&#39;:str})
+ntsb_data.prepare_data(create_ids=False, combine_columns=ntsb_text_columns.copy(), remove_incomplete_rows=False)
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Combining Columns…: 100%|██████████| 196535/196535 [00:04&lt;00:00, 41292.74it/s]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+data preparation:  0.08 minutes
+
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>years_of_interest = [&#39;2011&#39;, &#39;2012&#39;, &#39;2013&#39;, &#39;2014&#39;, &#39;2015&#39;, &#39;2016&#39;, &#39;2017&#39;, &#39;2018&#39;, &#39;2019&#39;, &#39;2020&#39;, &#39;2021&#39;]
+ntsb_data.data_df = ntsb_data.data_df.loc[ntsb_data.data_df[&#39;ev_year&#39;].isin(years_of_interest)].drop_duplicates(subset=&#39;ev_id&#39;, keep=&quot;last&quot;).reset_index(drop=True) # keep the last record, this one has the phase of flight and mishap right before the accident
+ntsb_data._Data__update_ids()
+ntsb_data.data_df
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>ev_id</th>
+      <th>damage</th>
+      <th>ev_highest_injury</th>
+      <th>inj_tot_f</th>
+      <th>ev_date</th>
+      <th>ev_year</th>
+      <th>ev_state</th>
+      <th>wind_dir_ind</th>
+      <th>wind_vel_ind</th>
+      <th>light_cond</th>
+      <th>...</th>
+      <th>narr_accf</th>
+      <th>narr_cause</th>
+      <th>acft_make</th>
+      <th>acft_model</th>
+      <th>flt_plan_filed</th>
+      <th>flight_plan_activated</th>
+      <th>total_seats</th>
+      <th>Phase</th>
+      <th>Mishap Category</th>
+      <th>Combined Text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>20110103X01024</td>
+      <td>SUBS</td>
+      <td>FATL</td>
+      <td>1.0</td>
+      <td>2011-01-01 00:00:00</td>
+      <td>2011</td>
+      <td>MA</td>
+      <td>U</td>
+      <td>F</td>
+      <td>NITE</td>
+      <td>...</td>
+      <td>The pilot and passenger were on a pleasure fli...</td>
+      <td>The pilot did not maintain separation from tre...</td>
+      <td>CESSNA</td>
+      <td>310F</td>
+      <td>NONE</td>
+      <td></td>
+      <td>4.0</td>
+      <td>Approach-VFR Pattern Final</td>
+      <td>Control flight into terr/obj</td>
+      <td>The pilot did not maintain separation from tre...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>20110103X35259</td>
+      <td>SUBS</td>
+      <td>FATL</td>
+      <td>1.0</td>
+      <td>2011-01-04 00:00:00</td>
+      <td>2011</td>
+      <td>MO</td>
+      <td>U</td>
+      <td>F</td>
+      <td>NITE</td>
+      <td>...</td>
+      <td>The accident occurred during the fourth leg of...</td>
+      <td>The pilot's loss of control for undetermined r...</td>
+      <td>CESSNA</td>
+      <td>172H</td>
+      <td>NONE</td>
+      <td></td>
+      <td>4.0</td>
+      <td>Enroute-Cruise</td>
+      <td>Loss of control in flight</td>
+      <td>The pilot's loss of control for undetermined r...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>20110103X42941</td>
+      <td>SUBS</td>
+      <td>SERS</td>
+      <td>0.0</td>
+      <td>2011-01-03 00:00:00</td>
+      <td>2011</td>
+      <td>PA</td>
+      <td>U</td>
+      <td>F</td>
+      <td>NITE</td>
+      <td>...</td>
+      <td>The instrument-rated pilot was on the return l...</td>
+      <td>The pilot's failure to maintain clearance from...</td>
+      <td>PIPER</td>
+      <td>PA-28-161</td>
+      <td>NONE</td>
+      <td>N</td>
+      <td>4.0</td>
+      <td>Enroute-Cruise</td>
+      <td>Control flight into terr/obj</td>
+      <td>The pilot's failure to maintain clearance from...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>20110103X63632</td>
+      <td>SUBS</td>
+      <td>NONE</td>
+      <td>0.0</td>
+      <td>2011-01-02 00:00:00</td>
+      <td>2011</td>
+      <td>NM</td>
+      <td>U</td>
+      <td>F</td>
+      <td>DAYL</td>
+      <td>...</td>
+      <td>The pilot stated that during landing he lost d...</td>
+      <td>The pilot's failure to maintain directional co...</td>
+      <td>BELLANCA</td>
+      <td>1419</td>
+      <td>NONE</td>
+      <td>N</td>
+      <td>4.0</td>
+      <td>Landing-Landing Roll</td>
+      <td>Landing gear collapse</td>
+      <td>The pilot's failure to maintain directional co...</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>20110104X52154</td>
+      <td>SUBS</td>
+      <td>NONE</td>
+      <td>0.0</td>
+      <td>2011-01-04 00:00:00</td>
+      <td>2011</td>
+      <td>AZ</td>
+      <td>U</td>
+      <td>F</td>
+      <td>DAYL</td>
+      <td>...</td>
+      <td>While parking the airplane, the student pilot ...</td>
+      <td>The student pilot's failure to maintain cleara...</td>
+      <td>PIPER</td>
+      <td>PA-28-181</td>
+      <td>NONE</td>
+      <td></td>
+      <td>4.0</td>
+      <td>Taxi-from Runway</td>
+      <td>Collision with terr/obj (non-CFIT)</td>
+      <td>The student pilot's failure to maintain cleara...</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>16909</th>
+      <td>20200908X33742</td>
+      <td>SUBS</td>
+      <td>FATL</td>
+      <td>3.0</td>
+      <td>2020-09-08 00:00:00</td>
+      <td>2020</td>
+      <td>TN</td>
+      <td>U</td>
+      <td>F</td>
+      <td>DAYL</td>
+      <td>...</td>
+      <td></td>
+      <td></td>
+      <td>Piper</td>
+      <td>PA28</td>
+      <td>NONE</td>
+      <td>N</td>
+      <td>4.0</td>
+      <td>Uncontrolled Descent</td>
+      <td>Collision with terr/obj (non-CFIT)</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>16910</th>
+      <td>20210929103995</td>
+      <td>SUBS</td>
+      <td>MINR</td>
+      <td>0.0</td>
+      <td>2021-09-28 00:00:00</td>
+      <td>2021</td>
+      <td>FL</td>
+      <td>U</td>
+      <td>F</td>
+      <td>DAYL</td>
+      <td>...</td>
+      <td></td>
+      <td></td>
+      <td>ROBINSON HELICOPTER COMPANY</td>
+      <td>R44 II</td>
+      <td></td>
+      <td></td>
+      <td>4.0</td>
+      <td>Standing-Engine(s) Operating</td>
+      <td>Loss of control on ground</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>16911</th>
+      <td>20190826X12752</td>
+      <td>SUBS</td>
+      <td>NONE</td>
+      <td>0.0</td>
+      <td>2019-08-26 00:00:00</td>
+      <td>2019</td>
+      <td>CA</td>
+      <td>U</td>
+      <td>F</td>
+      <td>NDRK</td>
+      <td>...</td>
+      <td></td>
+      <td></td>
+      <td>Lockheed</td>
+      <td>C130</td>
+      <td>VFIF</td>
+      <td>Y</td>
+      <td>7.0</td>
+      <td>Initial Climb</td>
+      <td>Part(s) separation from AC</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>16912</th>
+      <td>20200823X00819</td>
+      <td>SUBS</td>
+      <td>NONE</td>
+      <td>0.0</td>
+      <td>2020-08-22 00:00:00</td>
+      <td>2020</td>
+      <td>NC</td>
+      <td>U</td>
+      <td>F</td>
+      <td>DAYL</td>
+      <td>...</td>
+      <td></td>
+      <td></td>
+      <td>Aeronca</td>
+      <td>11AC</td>
+      <td>NONE</td>
+      <td></td>
+      <td>2.0</td>
+      <td>Landing-Landing Roll</td>
+      <td>Collision with terr/obj (non-CFIT)</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>16913</th>
+      <td>20200921X53937</td>
+      <td>DEST</td>
+      <td>FATL</td>
+      <td>1.0</td>
+      <td>2020-09-21 00:00:00</td>
+      <td>2020</td>
+      <td>FL</td>
+      <td>U</td>
+      <td>F</td>
+      <td>DAYL</td>
+      <td>...</td>
+      <td></td>
+      <td></td>
+      <td>Vans</td>
+      <td>RV 8</td>
+      <td>NONE</td>
+      <td></td>
+      <td>2.0</td>
+      <td>Enroute-Cruise</td>
+      <td>Fire/smoke (non-impact)</td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+<p>16914 rows × 22 columns</p>
+</div></div>
+</div>
+</section>
+</section>
+<section id="Information-Retrieval">
+<h1>Information Retrieval<a class="headerlink" href="#Information-Retrieval" title="Permalink to this heading"></a></h1>
+<p>Two model options are available for IR: 1. fine-tuned model 2. pre-trained distilroberta model</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># fine tuned model
+model = SentenceTransformer(os.path.join(&#39;models&#39;, &#39;fine_tuned_llis_model&#39;))
+#model = SentenceTransformer(&#39;all-distilroberta-v1&#39;) #uncomment to use pretrained model
+query = &#39;fatigue crack&#39;
+ir_ntsb = search(&#39;narr_cause&#39;, ntsb_data, model)
+embeddings_path = os.path.join(&#39;data&#39;, &#39;NTSB&#39;, &#39;ntsb_sentence_embeddings_finetune.npy&#39;)
+ir_ntsb.get_sentence_embeddings(embeddings_path) # uncomment this if the embeddings do not yet exist
+#ir_ntsb.load_sentence_embeddings(embeddings_path) # uncomment this if you wish to load sentence embeddings that already exist
+queries = [&#39;what components are vulnerable to fatigue crack&#39;, &#39;what are the consequences of a fuel leak&#39;, &#39;what are the risks of low visibility&#39;]
+for query in queries:
+    print(query)
+    print(ir_ntsb.run_search(query, return_k=10, rank_k=10))
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+what components are vulnerable to fatigue crack
+   top_hit_idx     top_hit_doc  top_hit_scores  \
+0        37185  20121204X63622        0.746134
+1        23081  20141027X62323        0.728395
+2        39995  20141027X62323        0.728395
+3        41744  20160114X73526        0.715234
+4        24830  20160114X73526        0.715234
+5        17989  20110809X03303        0.702911
+6        34903  20110809X03303        0.702911
+7        20253  20121130X01711        0.699882
+8        37167  20121130X01711        0.699882
+9        37185  20121204X63622        0.699882
+
+                                        top_hit_text
+0  The total loss of engine power as a result of ...
+1  The private pilot and a sport pilot-rated pass...
+2  The loss of engine power during cruise flight ...
+3  Failure of the left wing in flight due to comp...
+4  The sport pilot was conducting a personal cros...
+5  The pilot had just leveled off to cruise fligh...
+6  A sudden loss of engine thrust due to the sepa...
+7  The airplane was operating as a night, schedul...
+8  The total loss of engine power as a result of ...
+9  The total loss of engine power as a result of ...
+what are the consequences of a fuel leak
+   top_hit_idx     top_hit_doc  top_hit_scores  \
+0        18698  20120129X84717        0.756848
+1        35612  20120129X84717        0.756848
+2        22747  20140812X10218        0.723396
+3        39661  20140812X10218        0.723396
+4        33896  20110128X23759        0.705061
+5        16982  20110128X23759        0.705061
+6        27222  20170710X71845        0.704668
+7        44136  20170710X71845        0.704668
+8        47247  20190716X10219        0.679851
+9        30333  20190716X10219        0.679851
+
+                                        top_hit_text
+0  The pilot stated that, during the preflight in...
+1  The total loss of engine power due to fuel sta...
+2  The pilot reported that the airplane&#39;s engine ...
+3  The pilot’s failure to properly manage the air...
+4  The pilot’s inadequate preflight inspection to...
+5  The pilot requested that the airplane be “topp...
+6  The pilot reported that, shortly after takeoff...
+7  A total loss of engine power due to fuel starv...
+8  The pilot&#39;s improper fuel planning, which resu...
+9  The pilot reported that, after takeoff and whi...
+what are the risks of low visibility
+   top_hit_idx     top_hit_doc  top_hit_scores  \
+0        16921  20110105X11652        0.562436
+1        33835  20110105X11652        0.562436
+2        16989  20110131X11636        0.526502
+3        33903  20110131X11636        0.526502
+4        42919  20160921X20513        0.518302
+5        26005  20160921X20513        0.518302
+6        22413  20140613X91656        0.513717
+7        39327  20140613X91656        0.513717
+8        22413  20140613X91656        0.484448
+9        39327  20140613X91656        0.484448
+
+                                        top_hit_text
+0  During the approximately 5 hour and 25 minute ...
+1  The pilot&#39;s failure to maintain control of the...
+2  The pilot reported that he was practicing nigh...
+3  The pilot&#39;s failure to maintain control of the...
+4  The pilot&#39;s decision to land in an area of low...
+5  While maneuvering at low altitude for a water ...
+6  The pilot arrived at the fixed-base operator o...
+7  The pilot&#39;s failure to maintain a positive cli...
+8  The pilot arrived at the fixed-base operator o...
+9  The pilot&#39;s failure to maintain a positive cli...
+</pre></div></div>
+</div>
+</section>
+<section id="Topic-Modeling">
+<h1>Topic Modeling<a class="headerlink" href="#Topic-Modeling" title="Permalink to this heading"></a></h1>
+<p>Here we implement BERtopic via topic model plus to create a taxonomy of failure information.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>tm = Topic_Model_plus(text_columns=ntsb_text_columns, data=ntsb_data, results_path=os.path.join(os.getcwd(),&quot;examples/Case_Study_NTSB&quot;))
+vectorizer_model = CountVectorizer(ngram_range=(1, 3), stop_words=&quot;english&quot;) #removes stopwords
+BERTkwargs={&quot;top_n_words&quot;: 10, &#39;min_topic_size&#39;:25}
+tm.bert_topic(count_vectorizor=vectorizer_model, BERTkwargs=BERTkwargs, from_probs=False)
+tm.save_bert_model()
+tm.save_bert_results(from_probs=False)
+tm.save_bert_taxonomy() #saves taxonomy #takes 15 min to run
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>taxonomy = pd.read_csv(os.path.join(tm.folder_path,&#39;BERT_taxonomy.csv&#39;), index_col=0) #print taxonomy
+taxonomy = taxonomy.dropna(how=&#39;any&#39;).reset_index(drop=True)
+taxonomy
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>narr_cause</th>
+      <th>narr_accf</th>
+      <th>document IDs for row</th>
+      <th>number of documents for row</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>abort, abort takeoff, decision abort, decision...</td>
+      <td>airplane, pilot reported, pilot, reported, run...</td>
+      <td>['20120515X10453', '20120531X13740', '20120907...</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>abort, abort takeoff, decision abort, decision...</td>
+      <td>airplane, pilot, runway, landing, engine, left...</td>
+      <td>['20110609X25931', '20110706X70339', '20110805...</td>
+      <td>41</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>abort, abort takeoff, decision abort, decision...</td>
+      <td>carburetor, power, engine, carburetor heat, he...</td>
+      <td>['20120430X00440', '20120514X11605']</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>abort, abort takeoff, decision abort, decision...</td>
+      <td>fuel, tank, engine, fuel tank, power, tanks, p...</td>
+      <td>['20111221X54903', '20200920X32151']</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>abort, abort takeoff, decision abort, decision...</td>
+      <td>snow, airplane, snowcovered, pilot, reported, ...</td>
+      <td>['20120316X94235']</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1149</th>
+      <td>wing, left wing, right wing, spar, right, fail...</td>
+      <td>airplane, pilot reported, pilot, reported, run...</td>
+      <td>['20120831X90624', '20130829X54643']</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>1150</th>
+      <td>wing, left wing, right wing, spar, right, fail...</td>
+      <td>airplane, pilot, runway, landing, engine, left...</td>
+      <td>['20110228X83526', '20110919X61206', '20120320...</td>
+      <td>19</td>
+    </tr>
+    <tr>
+      <th>1151</th>
+      <td>wing, left wing, right wing, spar, right, fail...</td>
+      <td>airplane, tailwheelequipped, reported, right, ...</td>
+      <td>['20200519X04334']</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1152</th>
+      <td>wing, left wing, right wing, spar, right, fail...</td>
+      <td>flight, pilot, conditions, weather, accident, ...</td>
+      <td>['20150505X85410', '20180404X13226']</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>1153</th>
+      <td>wing, left wing, right wing, spar, right, fail...</td>
+      <td>taxiway, taxi, airplane, taxiing, wing, pilot,...</td>
+      <td>['20210727103561']</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+<p>1154 rows × 4 columns</p>
+</div></div>
+</div>
+</section>
+<section id="FMEA-using-Named-Entity-Recognition">
+<h1>FMEA using Named-Entity Recognition<a class="headerlink" href="#FMEA-using-Named-Entity-Recognition" title="Permalink to this heading"></a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>#definted according to FAA order 8040.4B: https://www.faa.gov/documentLibrary/media/Order/FAA_Order_8040.4B.pdf
+def NTSB_severity(damage, inj_level, inj_tot_f, persons_onboard): #damage, ev_highest_injury, inj_tot_f
+    if float(persons_onboard) == 0:
+        persons_onboard = inj_tot_f
+    if inj_tot_f != 0 :
+        pct_fatal = inj_tot_f/persons_onboard
+    else:
+        pct_fatal = 0
+    #minimal: no injuries, no damage.
+    if inj_level == &#39;NONE&#39; and damage == &#39;UKN&#39;:
+        severity = &#39;Minimal&#39;
+    #minor: slight (MINR) damage, physical discomfort
+    elif inj_level == &#39;MINR&#39; or inj_level == &#39;NONE&#39;:
+        #major: substaintail (SUBS) damage, injuries
+        if damage == &#39;SUBS&#39;:
+            severity = &#39;Major&#39;
+        elif damage == &#39;DEST&#39;:
+            severity = &#39;Hazardous&#39;
+        else:
+            severity = &#39;Minor&#39;
+    #hazardous: multiple serious injuries, fatalities&lt;2, hull loss (DEST)
+    elif inj_level == &#39;SERS&#39; or (inj_level == &#39;FATL&#39; and (inj_tot_f &lt;= 2 or pct_fatal &lt; 0.75)) or damage == &#39;DEST&#39;:
+        severity = &#39;Hazardous&#39;
+    #catatrophic: fatalities &gt; 2, or num person on board= num fatalities,  hull loss (DEST)
+    elif inj_level == &#39;FATL&#39; and (inj_tot_f &gt; 2 or pct_fatal &gt; 0.75):
+        severity = &#39;Catastrophic&#39;
+    else:
+        severity = &#39;Minimal&#39; #case with no reported fatalities, injury level, or damage level
+    return severity
+
+def severity_func(df, numeric=True):
+    severity_dict = {&#39;Catastrophic&#39;:5, &#39;Hazardous&#39;: 4, &#39;Major&#39;:3, &#39;Minor&#39;:2, &#39;Minimal&#39;:1}
+    severities = []
+    for i in range(len(df)):
+        severities.append(NTSB_severity(df.at[i, &#39;damage&#39;], df.at[i, &#39;ev_highest_injury&#39;], float(df.at[i, &#39;inj_tot_f&#39;].replace(&#39;&#39;,&#39;0&#39;)), float(df.at[i, &#39;total_seats&#39;].replace(&#39;&#39;,&#39;0&#39;))))
+    if numeric == True:
+        df[&#39;severity&#39;] = [severity_dict[severity] for severity in severities]
+    else:
+        df[&#39;severity&#39;] = severities
+    return df
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>#prepare the df for FMEA - drop repeat rows
+fmea_input_df = ntsb_data.data_df.copy()
+fmea_input_df = fmea_input_df.loc[~(fmea_input_df[&#39;Combined Text&#39;]==&#39;&#39;)].reset_index(drop=True) # remove docs with no text
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>model_checkpoint = os.path.join(&quot;models&quot;, &quot;FMEA-ner-model&quot;, &quot;checkpoint-1424&quot;)
+print(model_checkpoint)
+
+device = &#39;cuda&#39; if cuda.is_available() else &#39;cpu&#39;
+cuda.empty_cache()
+print(device)
+
+fmea = FMEA()
+fmea.load_model(model_checkpoint)
+print(&quot;loaded model&quot;)
+input_data = fmea.load_data(&#39;Combined Text&#39;,&#39;ev_id&#39;, df=fmea_input_df, formatted=False)
+print(&quot;loaded data&quot;)
+preds = fmea.predict()
+df = fmea.get_entities_per_doc()
+fmea.group_docs_with_meta(grouping_col=&#39;Mishap Category&#39;, additional_cols=[&#39;Phase&#39;])
+fmea.grouped_df.to_csv(os.path.join(os.getcwd(),&quot;examples/Case_Study_NTSB/ntsb_fmea_raw.csv&quot;))
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+models\FMEA-ner-model\checkpoint-1424
+cuda
+loaded model
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Token indices sequence length is longer than the specified maximum sequence length for this model (3132 &gt; 512). Running this sequence through the model will result in indexing errors
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+loaded data
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fmea.calc_severity(severity_func, from_file=False)
+fmea.calc_frequency(year_col=&quot;ev_year&quot;) #add year column
+fmea.calc_risk()
+fmea.post_process_fmea(phase_name=&#39;Phase&#39;, id_name=&#39;NTSB&#39;, max_words=10)
+
+fmea.fmea_df.astype(str).to_csv(os.path.join(os.getcwd(),&quot;examples/Case_Study_NTSB/NTSB_FMEA.csv&quot;))
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>mishaps_of_interest = [&#39;Birdstrike&#39;,&#39;Midair collision&#39;, &#39;Loss of control in flight&#39;,&#39;Loss of control on ground&#39;,&#39;Turbulence encounter&#39;, &#39;Ground collision&#39;]
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fmea.fmea_df.loc[fmea.fmea_df.index.isin(mishaps_of_interest)].astype(str).to_csv(os.path.join(os.getcwd(),&quot;examples/Case_Study_NTSB/NTSB_FMEA_truncated.csv&quot;))
+fmea.fmea_df.loc[fmea.fmea_df.index.isin(mishaps_of_interest)]
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Phase</th>
+      <th>Cause</th>
+      <th>Failure Mode</th>
+      <th>Effect</th>
+      <th>Control Process</th>
+      <th>Recommendations</th>
+      <th>Frequency</th>
+      <th>Severity</th>
+      <th>Risk</th>
+      <th>NTSB</th>
+    </tr>
+    <tr>
+      <th>cluster</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Birdstrike</th>
+      <td>Approach-VFR Pattern Downwind; Enroute; Enrout...</td>
+      <td>at low, bird, surface, a, red - tailed, hawk, ...</td>
+      <td>in - flight, collision, with a, bird, large, p...</td>
+      <td>bird, substantial, damage, large, broke the fr...</td>
+      <td>was, towed to the gate, a, bird ingestion and ...</td>
+      <td>see the public, , enter, keep an, eye, on, land,</td>
+      <td>4</td>
+      <td>3.0114942528735638</td>
+      <td>12.045977011494251</td>
+      <td>20170626X02552</td>
+    </tr>
+    <tr>
+      <th>Ground collision</th>
+      <td>Approach-VFR Pattern Downwind; Standing-Engine...</td>
+      <td>', inadequate visual, lookout, failure, zodiac...</td>
+      <td>to see and avoid the, zodiac was, from the, pr...</td>
+      <td>hit, rear, vertical stabilize, were, destroyed...</td>
+      <td>radio, calls, position, reports, checked the t...</td>
+      <td>inform, , use caution, hold, pilot, clearance,...</td>
+      <td>4</td>
+      <td>2.878504672897196</td>
+      <td>11.514018691588785</td>
+      <td>20140603X83103</td>
+    </tr>
+    <tr>
+      <th>Loss of control in flight</th>
+      <td>Approach-VFR Pattern Downwind; Approach-IFR Fi...</td>
+      <td>pilot's, fatigue, pilot, departed, night, test...</td>
+      <td>pilot's loss of, entered a, descending left, f...</td>
+      <td>und, airplane, spiraled, down, impacting an op...</td>
+      <td>intermediate, stops, radar track, toxicology, ...</td>
+      <td>, conform to its type, certificate, documentat...</td>
+      <td>5</td>
+      <td>3.659551760939168</td>
+      <td>18.29775880469584</td>
+      <td>20190713X34059</td>
+    </tr>
+    <tr>
+      <th>Loss of control on ground</th>
+      <td>Approach-VFR Pattern Downwind; Approach-IFR Fi...</td>
+      <td>pre - existing crack in the weld, joint, const...</td>
+      <td>failure of the left main landing gear, st, lef...</td>
+      <td>the, structural, damage, to the, fuselage, rig...</td>
+      <td>right ailer, point, applied right rudder to, c...</td>
+      <td>, remain, reduce, land to the, north, take off...</td>
+      <td>5</td>
+      <td>3.0433925049309667</td>
+      <td>15.216962524654834</td>
+      <td>20111104X64432</td>
+    </tr>
+    <tr>
+      <th>Midair collision</th>
+      <td>Enroute; Enroute-Descent; Landing; Maneuvering...</td>
+      <td>failure of both pilots to see and avoid the ot...</td>
+      <td>midair, collision, airplanes, collided, collid...</td>
+      <td>impacted the, terrain, a utility, pole, to, re...</td>
+      <td>wingtip -, - mounted strobe anticollision, lig...</td>
+      <td>alter, course, pass well, not have passed over...</td>
+      <td>3</td>
+      <td>3.3968253968253967</td>
+      <td>10.19047619047619</td>
+      <td>20191205X95005</td>
+    </tr>
+    <tr>
+      <th>Turbulence encounter</th>
+      <td>Approach-VFR Pattern Downwind; Enroute; Enrout...</td>
+      <td>with, of, cumulonimbus, clouds, slowly, activi...</td>
+      <td>and, turbulence, tailwind, knots, tailwind sud...</td>
+      <td>indicated speed of the airplane quickly, incre...</td>
+      <td>captain activated the speed, brakes, disengage...</td>
+      <td>, expect light - to - moderate, before -, cabin</td>
+      <td>4</td>
+      <td>3.792307692307692</td>
+      <td>15.169230769230769</td>
+      <td>20181001X33722</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="Trend-Analysis">
+<h1>Trend Analysis<a class="headerlink" href="#Trend-Analysis" title="Permalink to this heading"></a></h1>
+<p>Now that we have rows of mishaps and failure information, we can look at trends in the mishap. In this case, we look at trends in: 1. mishap frequency over time 2. mishap severity over time 3. average mishap severity 3. distribution of mishaps over activated flight plans 4. distribution of mishaps over visibility conditions</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>frequency, docs_per_row = identify_docs_per_fmea_row(ntsb_data.data_df, &#39;Mishap Category&#39;, &#39;ev_year&#39;, &#39;ev_id&#39;)
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>mishaps_of_interest = [&#39;Birdstrike&#39;,&#39;Midair collision&#39;, &#39;Loss of control in flight&#39;,&#39;Loss of control on ground&#39;,&#39;Turbulence encounter&#39;, &#39;Ground collision&#39;,]
+years_of_interest = [&#39;2011&#39;, &#39;2012&#39;, &#39;2013&#39;, &#39;2014&#39;, &#39;2015&#39;, &#39;2016&#39;, &#39;2017&#39;, &#39;2018&#39;, &#39;2019&#39;, &#39;2020&#39;, &#39;2021&#39;]
+frequency_set = {mishap:{year: frequency[mishap][year] for year in years_of_interest} for mishap in mishaps_of_interest}
+doc_set = {mishap:{year: docs_per_row[mishap][year] for year in years_of_interest} for mishap in mishaps_of_interest}
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plot_frequency_time_series(frequency_set, metric_name=&#39;Frequency&#39;, line_styles=[],
+                               markers=[], title=&quot;Frequency from 2011-2021&quot;, time_name=&quot;Year&quot;, xtick_freq=2,
+                               scale=False, save=False, yscale=&#39;log&#39;, legend=True,
+                               figsize=(6,4), fontsize=24)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_ntsb_21_0.png" src="../_images/nblinks_ntsb_21_0.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>df_with_severities = severity_func(ntsb_data.data_df, numeric=True)
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>severities, total_severities_hazard = calc_severity_per_hazard(doc_set, df_with_severities, &#39;ev_id&#39;, metric=&#39;max&#39;)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plot_metric_time_series(metric_data=severities, metric_name=&quot;Severity&quot;, title=&quot;Average Severity from 2011-2021&quot;, time_name=&#39;Year&#39;, xtick_freq=2, show_std=False, save=False, figsize=(6,4), fontsize=24)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_ntsb_24_0.png" src="../_images/nblinks_ntsb_24_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plot_metric_averages(metric_data=severities, metric_name=&quot;Severity&quot;, show_std=True, title=&quot;Average Severity&quot;, save=False, legend=False, figsize=(8,4),fontsize=24)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_ntsb_25_0.png" src="../_images/nblinks_ntsb_25_0.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>df_with_severities[&#39;sky_cond_nonceil&#39;].unique()
+sky_conditions_dict = {&#39;CLER&#39;: &#39;clear&#39;,
+&#39;&#39;:&#39;unknown&#39;,
+&#39;SCAT&#39;: &#39;scattered&#39;,
+&#39;FEW&#39;: &#39;few&#39;,
+&#39;UNK&#39;: &#39;unknown&#39;,
+&#39;OVCT&#39;: &#39;thin overcast&#39;,
+&#39;OVC&#39;: &#39;overcast&#39;,
+&#39;OBSC&#39;: &#39;obscured&#39;,
+&#39;BKNT&#39;: &#39;thin broken&#39;,
+&#39;BKN&#39;: &#39;broken&#39;,
+&#39;POBS&#39;: &#39;partially obscured&#39;,
+&#39;VV&#39;: &#39;indefinite&#39;,
+&#39;NONE&#39;: &#39;none&#39;}
+df_with_severities[&#39;sky_cond_nonceil_cleaned&#39;] = [sky_conditions_dict[cond] for cond in df_with_severities[&#39;sky_cond_nonceil&#39;].tolist()]
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>df_with_severities[&#39;flight_plan_activated_cleaned&#39;] = [val if val!=&#39;&#39; else &#39;U&#39; for val in df_with_severities[&#39;flight_plan_activated&#39;].tolist()]
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>make_pie_chart(doc_set, df_with_severities, &#39;flight_plan_activated_cleaned&#39;, mishaps_of_interest, &#39;ev_id&#39;, &#39;Activated Flight Plan&#39;, save=False, fontsize=12, pie_kwargs={&#39;pctdistance&#39;:1.27}, figsize=(6,4), padding=10)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_ntsb_28_0.png" src="../_images/nblinks_ntsb_28_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>make_pie_chart(doc_set, df_with_severities, &#39;sky_cond_nonceil_cleaned&#39;, mishaps_of_interest, &#39;ev_id&#39;, &#39;Sky Condition&#39;, save=False, fontsize=12, pie_kwargs={&#39;pctdistance&#39;:1.27}, figsize=(6,4), padding=10)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_ntsb_29_0.png" src="../_images/nblinks_ntsb_29_0.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>df_with_hazards = add_hazards_to_docs(df_with_severities, id_field=&#39;ev_id&#39;, docs=doc_set)
+stats_df, counts_dfs = chi_squared_tests(df_with_hazards, mishaps_of_interest, predictors=[&#39;flight_plan_activated_cleaned&#39;,&#39;sky_cond_nonceil_cleaned&#39;], pred_dict={&#39;flight_plan_activated_cleaned&#39;:&#39;flight plan&#39;,&#39;sky_cond_nonceil_cleaned&#39;: &#39;sky condition&#39;})
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>stats_df
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th>Predictor</th>
+      <th colspan="2" halign="left">flight plan</th>
+      <th colspan="2" halign="left">sky condition</th>
+    </tr>
+    <tr>
+      <th>Measure</th>
+      <th>p-val</th>
+      <th>chi-squared</th>
+      <th>p-val</th>
+      <th>chi-squared</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Birdstrike</th>
+      <td>0.000</td>
+      <td>44.813</td>
+      <td>0.027</td>
+      <td>10.929</td>
+    </tr>
+    <tr>
+      <th>Midair collision</th>
+      <td>0.007</td>
+      <td>10.024</td>
+      <td>0.789</td>
+      <td>1.710</td>
+    </tr>
+    <tr>
+      <th>Loss of control in flight</th>
+      <td>0.000</td>
+      <td>30.626</td>
+      <td>0.000</td>
+      <td>34.186</td>
+    </tr>
+    <tr>
+      <th>Loss of control on ground</th>
+      <td>0.000</td>
+      <td>74.891</td>
+      <td>0.000</td>
+      <td>65.104</td>
+    </tr>
+    <tr>
+      <th>Turbulence encounter</th>
+      <td>0.000</td>
+      <td>319.912</td>
+      <td>0.000</td>
+      <td>98.286</td>
+    </tr>
+    <tr>
+      <th>Ground collision</th>
+      <td>0.005</td>
+      <td>10.670</td>
+      <td>0.040</td>
+      <td>10.004</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>for df in counts_dfs:
+    display(counts_dfs[df])
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>N</th>
+      <th>U</th>
+      <th>Y</th>
+    </tr>
+    <tr>
+      <th>Hazard</th>
+      <th>Present</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="2" valign="top">Birdstrike</th>
+      <th>0</th>
+      <td>18.343739</td>
+      <td>4.985338</td>
+      <td>-23.329077</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-18.343739</td>
+      <td>-4.985338</td>
+      <td>23.329077</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Midair collision</th>
+      <th>0</th>
+      <td>14.496985</td>
+      <td>-14.321509</td>
+      <td>-0.175476</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-14.496985</td>
+      <td>14.321509</td>
+      <td>0.175476</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Loss of control in flight</th>
+      <th>0</th>
+      <td>42.169032</td>
+      <td>-86.260908</td>
+      <td>44.091877</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-42.169032</td>
+      <td>86.260908</td>
+      <td>-44.091877</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Loss of control on ground</th>
+      <th>0</th>
+      <td>-118.701135</td>
+      <td>43.465236</td>
+      <td>75.235899</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>118.701135</td>
+      <td>-43.465236</td>
+      <td>-75.235899</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Turbulence encounter</th>
+      <th>0</th>
+      <td>71.030330</td>
+      <td>8.283020</td>
+      <td>-79.313350</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-71.030330</td>
+      <td>-8.283020</td>
+      <td>79.313350</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Ground collision</th>
+      <th>0</th>
+      <td>2.819085</td>
+      <td>14.042805</td>
+      <td>-16.861890</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-2.819085</td>
+      <td>-14.042805</td>
+      <td>16.861890</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>clear</th>
+      <th>unknown</th>
+      <th>few</th>
+      <th>scattered</th>
+      <th>thin overcast</th>
+    </tr>
+    <tr>
+      <th>Hazard</th>
+      <th>Present</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="2" valign="top">Birdstrike</th>
+      <th>0</th>
+      <td>12.706515</td>
+      <td>-3.719641</td>
+      <td>-7.401206</td>
+      <td>-0.237436</td>
+      <td>-1.348232</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-12.706515</td>
+      <td>3.719641</td>
+      <td>7.401206</td>
+      <td>0.237436</td>
+      <td>1.348232</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Midair collision</th>
+      <th>0</th>
+      <td>-3.161168</td>
+      <td>-1.408892</td>
+      <td>2.871940</td>
+      <td>1.083954</td>
+      <td>0.614166</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>3.161168</td>
+      <td>1.408892</td>
+      <td>-2.871940</td>
+      <td>-1.083954</td>
+      <td>-0.614166</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Loss of control in flight</th>
+      <th>0</th>
+      <td>19.721178</td>
+      <td>-80.587797</td>
+      <td>36.090635</td>
+      <td>20.597552</td>
+      <td>4.178432</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-19.721178</td>
+      <td>80.587797</td>
+      <td>-36.090635</td>
+      <td>-20.597552</td>
+      <td>-4.178432</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Loss of control on ground</th>
+      <th>0</th>
+      <td>-83.986165</td>
+      <td>111.842143</td>
+      <td>-24.983505</td>
+      <td>-4.546825</td>
+      <td>1.674353</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>83.986165</td>
+      <td>-111.842143</td>
+      <td>24.983505</td>
+      <td>4.546825</td>
+      <td>-1.674353</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Turbulence encounter</th>
+      <th>0</th>
+      <td>54.640771</td>
+      <td>-54.730164</td>
+      <td>0.199894</td>
+      <td>0.792775</td>
+      <td>-0.903275</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-54.640771</td>
+      <td>54.730164</td>
+      <td>-0.199894</td>
+      <td>-0.792775</td>
+      <td>0.903275</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Ground collision</th>
+      <th>0</th>
+      <td>7.663238</td>
+      <td>2.133144</td>
+      <td>-14.683576</td>
+      <td>3.370581</td>
+      <td>1.516613</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-7.663238</td>
+      <td>-2.133144</td>
+      <td>14.683576</td>
+      <td>-3.370581</td>
+      <td>-1.516613</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>severity_dict = {5:&#39;Catastrophic Impact&#39;, 4:&#39;Hazardous Impact&#39;, 3:&#39;Major Impact&#39;, 2:&#39;Minor Impact&#39;, 1:&#39;Minimal Impact&#39;}
+rm_severities = {hazard: severity_dict[round(total_severities_hazard[hazard])] for hazard in total_severities_hazard}
+rates = {hazard: sum([frequency_set[hazard][year] for year in frequency_set[hazard]])/len(years_of_interest) for hazard in frequency_set}
+rm_likelihoods = get_likelihood_FAA(rates)
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>mpl.rcParams.update(mpl.rcParamsDefault)
+plt.rcParams[&quot;font.family&quot;] = &quot;Times New Roman&quot;
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plot_risk_matrix(rm_likelihoods, rm_severities, figsize=(8,4), fontsize=12, max_chars=20, annot_font=10)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/nblinks_ntsb_35_0.png" src="../_images/nblinks_ntsb_35_0.png" />
+</div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="safecom_heat.html" class="btn btn-neutral float-left" title="Hazard Extraction and Analysis of Trends (HEAT): SAFECOM" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright © 2023 United States Government as represented by the Administrator of the National Aeronautics and Space Administration. All Rights Reserved.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

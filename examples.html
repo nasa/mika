@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Examples &mdash; MIKA 1.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=af2ce170"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Data Example" href="nblinks/data_example.html" />
+    <link rel="prev" title="Custom Named-Entity Recognition" href="models/FMEA.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            MIKA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="components.html">MIKA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#utils">Utils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/data_example.html">Data Example</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#ir">IR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/ir_example.html">Search</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#kd">KD</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/topic_model_plus.html">Topic Model Plus Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="results/topic_modeling_results.html">Topic Modeling Results</a></li>
+<li class="toctree-l3"><a class="reference internal" href="results/taxonomy_results.html">Taxonomy Results</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/fmea_example.html">FMEA Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="results/fmea_results.html">FMEA Results</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/ics_heat.html">Hazard Extraction and Analysis of Trends (HEAT): ICS-209-PLUS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/safecom_heat.html">Hazard Extraction and Analysis of Trends (HEAT): SAFECOM</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#ntsb-case-study">NTSB Case Study</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/ntsb.html">Case Study: NTSB Reports</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/ntsb.html#Information-Retrieval">Information Retrieval</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/ntsb.html#Topic-Modeling">Topic Modeling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/ntsb.html#FMEA-using-Named-Entity-Recognition">FMEA using Named-Entity Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/ntsb.html#Trend-Analysis">Trend Analysis</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MIKA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Examples</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/examples.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="examples">
+<h1>Examples<a class="headerlink" href="#examples" title="Permalink to this heading"></a></h1>
+<p>Example notebooks and scripts can be found in in the base repository under <cite>/examples</cite>. The examples directory is separated into <cite>/examples/kd</cite> and <cite>/examples/ir</cite>, with a complete case stufy of all the capabilities of MIKA under <cite>/examples/Case_Study_NTSB</cite></p>
+<section id="utils">
+<h2>Utils<a class="headerlink" href="#utils" title="Permalink to this heading"></a></h2>
+<p>The main components of utils are the Data class and dataset-specific functions, which are used throughout other examples. A dedicated Data example can be found under  <cite>/examples/utils</cite></p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="nblinks/data_example.html">Data Example</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/data_example.html#Initiate-object">Initiate object</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/data_example.html#Load-file">Load file</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/data_example.html#Initiate-loading-information">Initiate loading information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/data_example.html#Load-the-data">Load the data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/data_example.html#Prepare-data">Prepare data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/data_example.html#Preprocessing">Preprocessing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/data_example.html#Sentence-Tokenization">Sentence Tokenization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/data_example.html#Save-results">Save results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/data_example.html#Loading-preprocessed-data">Loading preprocessed data</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="ir">
+<h2>IR<a class="headerlink" href="#ir" title="Permalink to this heading"></a></h2>
+<p>Information Retrieval examples can be found in <cite>/examples/IR</cite>, with two sub directories for corresponding publications.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="nblinks/ir_example.html">Search</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/ir_example.html#Prepare-Data:-NTSB">Prepare Data: NTSB</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/ir_example.html#Perform-Search">Perform Search</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="kd">
+<h2>KD<a class="headerlink" href="#kd" title="Permalink to this heading"></a></h2>
+<p>Knowledge Discovery examples can be found in <cite>/examples/KD</cite>, with sub directories for Hazard Extraction and Analysis of Trends (HEAT), Failure Modes and Effects Analysis (FMEA), and failure taxonomies. Within these subdirectories, there are separate directories that correspond to specific publications.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="nblinks/topic_model_plus.html">Topic Model Plus Example</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/topic_model_plus.html#Data-Preparation-for-BERTopic">Data Preparation for BERTopic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/topic_model_plus.html#Data-Preparation-for-LDA-and-hLDA">Data Preparation for LDA and hLDA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/topic_model_plus.html#Initiate-topic-model-plus-object">Initiate topic model plus object</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/topic_model_plus.html#BERTopic">BERTopic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/topic_model_plus.html#LDA-Topic-Modeling">LDA Topic Modeling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/topic_model_plus.html#hLDA-Topic-Modeling">hLDA Topic Modeling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/topic_model_plus.html#Loading-existing-models">Loading existing models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/topic_model_plus.html#id1">BERTopic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/topic_model_plus.html#hLDA/LDA">hLDA/LDA</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="results/topic_modeling_results.html">Topic Modeling Results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="results/taxonomy_results.html">Taxonomy Results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nblinks/fmea_example.html">FMEA Example</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/fmea_example.html#Define-Severity-Calculation">Define Severity Calculation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/fmea_example.html#Initiate-FMEA">Initiate FMEA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/fmea_example.html#Predict-Entities">Predict Entities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/fmea_example.html#Post-Process">Post Process</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="results/fmea_results.html">FMEA Results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nblinks/ics_heat.html">Hazard Extraction and Analysis of Trends (HEAT): ICS-209-PLUS</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/ics_heat.html#Imports">Imports</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/ics_heat.html#Data-Import">Data Import</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/ics_heat.html#Hazard-Extraction">Hazard Extraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/ics_heat.html#Primary-Analysis:">Primary Analysis:</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/ics_heat.html#Hazard-Metrics">Hazard Metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/ics_heat.html#Risk-Matrix-of-Hazards-(rate-by-severity)">Risk Matrix of Hazards (rate by severity)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/ics_heat.html#Graphic-Analysis:">Graphic Analysis:</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/ics_heat.html#Hazard-Metrics-Time-Series">Hazard Metrics Time Series</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/ics_heat.html#Predictor-Time-Series">Predictor Time Series</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="nblinks/ics_heat.html#Fire-Characteristics">Fire Characteristics</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="nblinks/ics_heat.html#Graphs">Graphs</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="nblinks/ics_heat.html#Operations">Operations</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="nblinks/ics_heat.html#id1">Graphs</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="nblinks/ics_heat.html#Intensity">Intensity</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="nblinks/ics_heat.html#id2">Graphs</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="nblinks/ics_heat.html#Combined-predictors-time-series">Combined predictors time series</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/ics_heat.html#Secondary-Analysis:">Secondary Analysis:</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/ics_heat.html#Combined-Predictors">Combined Predictors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/ics_heat.html#Correlation-Matrix">Correlation Matrix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/ics_heat.html#Multiple-regression">Multiple regression</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/ics_heat.html#Full-predictors">Full predictors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/ics_heat.html#Experimental">Experimental</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/ics_heat.html#Colinearity">Colinearity</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="nblinks/safecom_heat.html">Hazard Extraction and Analysis of Trends (HEAT): SAFECOM</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/safecom_heat.html#Imports">Imports</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/safecom_heat.html#SAFECOM-Data">SAFECOM Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/safecom_heat.html#Hazard-Extraction-and-Primary-Analysis">Hazard Extraction and Primary Analysis</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/safecom_heat.html#Annotator-agreement">Annotator agreement</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/safecom_heat.html#Graphic-Analysis">Graphic Analysis</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/safecom_heat.html#Severity-Graphs">Severity Graphs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/safecom_heat.html#Frequency-Graphs">Frequency Graphs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/safecom_heat.html#Pie-Charts">Pie Charts</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/safecom_heat.html#Secondary-Analysis">Secondary Analysis</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/safecom_heat.html#Chi-Squared-Analysis">Chi-Squared Analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/safecom_heat.html#ANOVA">ANOVA</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/safecom_heat.html#Risk-Matrix">Risk Matrix</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/safecom_heat.html#Situation-Specific-Risk-Matrices">Situation Specific Risk Matrices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/safecom_heat.html#Example-1:-Aerial-commander-flying-an-Aero-Commander-airplane-in-California">Example 1: Aerial commander flying an Aero Commander airplane in California</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/safecom_heat.html#Example-2:-Air-Tanker-flying-a-redardant-drop-mission-with-a-Lockheed-multi-engine-in-Oregon">Example 2: Air Tanker flying a redardant drop mission with a Lockheed multi-engine in Oregon</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nblinks/safecom_heat.html#Example-3:-Pilot-flying-a-Bell-Helicopter-for-reconnaisance-in-Texas">Example 3: Pilot flying a Bell Helicopter for reconnaisance in Texas</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="ntsb-case-study">
+<h2>NTSB Case Study<a class="headerlink" href="#ntsb-case-study" title="Permalink to this heading"></a></h2>
+<p>The NTSB Case Study is documented in the publication:</p>
+<p>Andrade, S. and Walsh, H. (2023), MIKA: Manager for Intelligent Knowledge Access Toolkit for Engineering Knowledge Discovery and Information Retrieval. INCOSE International Symposium, 33: 1659-1673. <a class="reference external" href="https://doi.org/10.1002/iis2.13105">https://doi.org/10.1002/iis2.13105</a></p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="nblinks/ntsb.html">Case Study: NTSB Reports</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="nblinks/ntsb.html#Case-Study-set-up:">Case Study set up:</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="nblinks/ntsb.html#Information-Retrieval">Information Retrieval</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nblinks/ntsb.html#Topic-Modeling">Topic Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nblinks/ntsb.html#FMEA-using-Named-Entity-Recognition">FMEA using Named-Entity Recognition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nblinks/ntsb.html#Trend-Analysis">Trend Analysis</a></li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="models/FMEA.html" class="btn btn-neutral float-left" title="Custom Named-Entity Recognition" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="nblinks/data_example.html" class="btn btn-neutral float-right" title="Data Example" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright © 2023 United States Government as represented by the Administrator of the National Aeronautics and Space Administration. All Rights Reserved.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
