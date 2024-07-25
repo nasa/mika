@@ -1446,7 +1446,6 @@ def make_pie_chart(docs, data, predictor, hazards, id_field, predictor_label=Non
     #set up lables, colors dict
     total_docs_with_hazards = [doc for hazard in hazards for year in docs[hazard] for doc in docs[hazard][year] ]
     labels = data.loc[data[id_field].isin(total_docs_with_hazards)][predictor].value_counts().index.sort_values().tolist()
-    labels.remove('')
     colors = cm.coolwarm(np.linspace(0, 1, len(labels)))
     for ax, hazard in zip(axes.flatten(), hazards):
         total_docs = [doc for year in docs[hazard] for doc in docs[hazard][year]]
