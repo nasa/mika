@@ -37,7 +37,7 @@ class test_FMEA(unittest.TestCase):
         self.test_dates = 'date'
         self.test_additional_cols = ["additional"]
         self.test_df.to_csv(self.test_filename)
-        self.test_model_checkpoint = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),"models", "FMEA-ner-model", "checkpoint-1424")
+        self.test_model_checkpoint = "NASA-AIML/MIKA_BERT_FMEA_NER"
     
     def tearDown(self):
         os.remove(self.test_filename)

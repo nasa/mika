@@ -24,7 +24,7 @@ class test_topic_modeling_methods(unittest.TestCase):
         self.test_data = Data()
         text_columns = ['Lesson(s) Learned','Driving Event','Recommendation(s)']
         document_id_col = 'Lesson ID'
-        csv_file_name = os.path.join(os.pardir, "data","LLIS","preprocessed_data_LLIS.csv")
+        csv_file_name = os.path.join("data","LLIS","preprocessed_data_LLIS.csv")
         self.test_data.load(csv_file_name, preprocessed=True, id_col=document_id_col, text_columns=text_columns)
         raw_text_columns = ['Raw '+col for col in text_columns]
         self.raw_test_data = Data()
