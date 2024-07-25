@@ -50,6 +50,13 @@ MIKA is available on PyPI and can be installed with:
 
     pip install nasa-mika
 
+Note that some users have had issues with certain MIKA dependencies, such as HDBSCAN. If you encounter an issue installing a dependency via pip, we recommend first installing the dependency using conda prior to installing MIKA, for example:
+
+.. code-block:: python
+
+    conda install -c conda-forge hdbscan
+    pip install nasa-mika
+
 After installing mika, initialize nltk by running the following in python:
 
 .. code-block:: python
@@ -57,6 +64,12 @@ After installing mika, initialize nltk by running the following in python:
     import nltk
     nltk.download('words')
 
+Also, download the spacy transformer model by running the following command:
+
+.. code-block:: python
+
+    python -m spacy download en_core_web_trf
+    
 Now you can import anything in MIKA:
 
 .. code-block:: python
@@ -78,6 +91,10 @@ The latest version of MIKA is also available via the NASA github page using:
 .. code-block:: python
     
     git clone https://github.com/nasa/mika.git
+
+MIKA includes three custom large language models, which can be found on the NASA huggingface at: https://huggingface.co/NASA-AIML 
+
+Examples in MIKA use specific datasets which are NOT included in the software distribution, however, they can be easily created by following the instuctions in the documentation at: https://nasa.github.io/mika/data.html 
 
 Prerequisites
 -------------
